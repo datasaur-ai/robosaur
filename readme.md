@@ -1,6 +1,6 @@
 # Robosaur
 
-This is a project template to start automatic your labeling workflow with Datasaur.
+This is a project template to start automating your labeling workflow with Datasaur.
 
 ## Requirements:
 - NodeJS 12.16.0 or newer
