@@ -1,0 +1,44 @@
+{
+  "datasaur": {
+    "host": "https://datasaur.ai",
+    "clientId": "<DATASAUR_CLIENT_ID> See the guide here https://datasaurai.gitbook.io/datasaur/advanced/datasaur-apis/oauth-2.0#generate-oauth-credentials-menu",
+    "clientSecret": "<DATASAUR_CLIENT_SECRET> See the guide here https://datasaurai.gitbook.io/datasaur/advanced/datasaur-apis/oauth-2.0#generate-oauth-credentials-menu"
+  },
+  "documents": {
+    "source": "remote",
+    "path": "./documents.json"
+  },
+  "assignment": {
+    "labelers": [
+      "labeler-email-1@datasaur.ai",
+      "labeler-email-2@datasaur.ai"
+    ],
+    "reviewers": [
+      "reviewer-email-1@datasaur.ai",
+      "reviewer-email-2@datasaur.ai"
+    ]
+  },
+  "project": {
+    "teamId": "<TEAM_ID>",
+    "projectSettings": {
+      "consensus": 1,
+      "enableEditLabelSet": false,
+      "enableEditSentence": false,
+      "hideLabelerNamesDuringReview": false,
+      "hideRejectedLabelsDuringReview": true,
+      "hideLabelsFromInactiveLabelSetDuringReview": false
+    },
+    "documentSettings" : {
+      "kind": "TOKEN_BASED",
+      "customScriptId": null,
+
+      "allowCharacterBasedLabeling": false,
+      "allowArcDrawing": true,
+      "allowMultiLabels": true,
+      "allTokensMustBeLabeled": false,
+      "textLabelMaxTokenLength": 999999,
+      "sentenceSeparator": "\n",
+      "tokenizer": "WINK"
+    }
+  }
+}
