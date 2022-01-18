@@ -9,7 +9,7 @@ import { createProject } from '../datasaur/create-project';
 import { getJobs, Job, JobStatus } from '../datasaur/get-jobs';
 import { getLabelSetsFromDirectory } from '../utils/labelset';
 import { getStorageClient } from '../utils/object-storage';
-import { normalizeFolderName } from '../utils/object-storage/helper';
+import { getBucketName, getObjectName, normalizeFolderName } from '../utils/object-storage/helper';
 import { ObjectStorageClient } from '../utils/object-storage/interface';
 import { sleep } from '../utils/sleep';
 import { handleCreateProject } from './create-project.handler';
@@ -55,7 +55,9 @@ export async function handleCreateProjects(configFile: string, options) {
   let states: null | ScriptState[] = null;
   if (stateFilePath) {
     try {
-      states = JSON.parse(await storageClient.getFileContent(bucketName, stateFilePath));
+      states = JSON.parse(
+        await storageClient.getFileContent(getBucketName(stateFilePath), getObjectName(stateFilePath)),
+      );
     } catch (error) {
       states = [];
     }

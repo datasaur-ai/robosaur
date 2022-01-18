@@ -3,6 +3,7 @@ import { resolve } from 'path';
 import { StorageSources } from '../config/interfaces';
 import { getStorageClient } from '../utils/object-storage';
 import { getConfig } from '../config/config';
+import { getBucketName, getObjectName } from '../utils/object-storage/helper';
 
 export async function parseAssignment(): Promise<{ labelers: string[]; reviewers: string[] }> {
   const { source, path } = getConfig().assignment;
@@ -19,16 +20,4 @@ export async function parseAssignment(): Promise<{ labelers: string[]; reviewers
     default:
       throw new Error('Unimplemented');
   }
-}
-
-function getBucketName(fullObjectPath: string) {
-  const parts = fullObjectPath.split('//');
-  const [bucket, ...rest] = parts[1].split('/');
-  return bucket;
-}
-
-function getObjectName(fullObjectPath: string) {
-  const parts = fullObjectPath.split('//');
-  const [bucket, ...rest] = parts[1].split('/');
-  return rest.join('/');
 }

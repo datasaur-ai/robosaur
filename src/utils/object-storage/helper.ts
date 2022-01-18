@@ -23,3 +23,15 @@ export function normalizeFolderName(folder: string) {
   if (folder[folder.length - 1] !== '/') folder = folder + '/';
   return folder;
 }
+
+export function getBucketName(fullObjectPath: string) {
+  const parts = fullObjectPath.split('//');
+  const [bucket, ...rest] = parts[1].split('/');
+  return bucket;
+}
+
+export function getObjectName(fullObjectPath: string) {
+  const parts = fullObjectPath.split('//');
+  const [bucket, ...rest] = parts[1].split('/');
+  return rest.join('/');
+}
