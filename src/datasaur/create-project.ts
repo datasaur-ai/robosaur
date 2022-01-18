@@ -4,7 +4,7 @@ import { Document } from '../documents/interfaces';
 import { query } from './query';
 import { EXTENSIONS } from './constants';
 import { createLabelSet } from './create-label-set';
-import { Config } from 'src/config/interfaces';
+import { Config } from '../config/interfaces';
 
 const CREATE_PROJECT_MUTATION = gql`
   mutation LaunchTextProjectAsyncMutation($input: LaunchTextProjectInput!) {
@@ -44,7 +44,7 @@ export async function createProject(
           return result.id;
         }
         return null;
-      })
+      }),
     );
   }
 
