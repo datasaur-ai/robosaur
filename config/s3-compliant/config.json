@@ -1,0 +1,45 @@
+{
+  "datasaur": {
+    "host": "https://datasaur.ai",
+    "clientId": "<DATASAUR_CLIENT_ID> See the guide here https://datasaurai.gitbook.io/datasaur/advanced/datasaur-apis/oauth-2.0#generate-oauth-credentials-menu",
+    "clientSecret": "<DATASAUR_CLIENT_SECRET> See the guide here https://datasaurai.gitbook.io/datasaur/advanced/datasaur-apis/oauth-2.0#generate-oauth-credentials-menu"
+  },
+  "documents": {
+    "source": "s3",
+    "bucketName": "my-bucket",
+    "prefix": "projects",
+    "stateFilePath": "imported.json",
+    "s3Endpoint": "localhost",
+    "s3Port": 9000,
+    "s3AccessKey": "accesskey",
+    "s3SecretKey": "secretkey",
+    "s3UseSSL": true
+  },
+  "assignment": {
+    "source": "s3",
+    "path": "s3://my-bucket/assignment.json"
+  },
+  "project": {
+    "teamId": "<TEAM_ID>",
+    "projectSettings": {
+      "consensus": 1,
+      "enableEditLabelSet": false,
+      "enableEditSentence": false,
+      "hideLabelerNamesDuringReview": false,
+      "hideRejectedLabelsDuringReview": true,
+      "hideLabelsFromInactiveLabelSetDuringReview": false
+    },
+    "documentSettings": {
+      "kind": "TOKEN_BASED",
+      "customScriptId": "<CUSTOM SCRIPT ID>",
+
+      "allowCharacterBasedLabeling": false,
+      "allowArcDrawing": true,
+      "allowMultiLabels": true,
+      "allTokensMustBeLabeled": false,
+      "textLabelMaxTokenLength": 999999,
+      "sentenceSeparator": "\n",
+      "tokenizer": "WINK"
+    }
+  }
+}
