@@ -1,3 +1,12 @@
+import { LabelItem } from '../datasaur/interfaces';
+
+export enum StorageSources {
+  LOCAL = 'local',
+  REMOTE = 'remote',
+  GOOGLE = 'gcs',
+  AMAZONS3 = 's3',
+}
+
 export interface Config {
   datasaur: {
     /**
@@ -18,23 +27,76 @@ export interface Config {
     /**
      * @description determine whether the source of the documents should be in local folder or remote url.
      */
-    source: 'local' | 'remote';
+    source: StorageSources;
     /**
-     * @description if the source is 'local', the path should point to a folder.
+     * @description Required for 'local' and 'remote' sources.
+     * if the source is 'local', the path should point to a folder.
      * if the source is `remote`, the path should point to a JSON file. See the sample at config/documents.json
      */
     path: string;
+
+    /**
+     * @description Required for 'gcs' and 's3' sources.
+     * the GCS or S3 bucket name, without gs:// or s3:// prefix
+     */
+    bucketName: string;
+
+    /**
+     * @description Required for 'gcs' and 's3' sources.
+     * Path to the folder containing sub-folders, without leading slash (/). Each subfolders will be created to a new Datasaur project.
+     * If the subfolders are located in root, set prefix to empty string ''
+     */
+    prefix: string;
+
+    /**
+     * @description Required for 'gcs' sources.
+     * Relative or absolute local file path to the credential file.
+     */
+    gcsCredentialJson: string;
+
+    /**
+     * @description Required for 's3' sources.
+     */
+    s3Endpoint: string;
+
+    /**
+     * @description Required for 's3' sources.
+     */
+    s3Port: number;
+
+    /**
+     * @description Required for 's3' sources.
+     */
+    s3AccessKey: string;
+
+    /**
+     * @description Required for 's3' sources.
+     */
+    s3SecretKey: string;
+
+    /**
+     * @description Required for 's3' sources.
+     */
+    s3UseSSl: boolean;
+
+    /**
+     * @description For 'gcs' and 's3' sources
+     * Path to a state file to keep-track which folders and projects have been created.
+     * If not supplied, script will always create a new project for each and every folder
+     */
+    stateFilePath: string;
   };
   assignment: {
     /**
-     * @description describe labelers who will be assigned to the project
+     * @description determine whether the source of the assignment file should be in local folder or remote url.
      */
-    labelers: string[];
+    source: StorageSources;
     /**
-     * @description describe reviewers who will be assigned to the project
+     * @description path to file, or URL to remote file
      */
-    reviewers: string[];
+    path: string;
   };
+
   project: {
     /**
      * @description id of the team.
@@ -65,14 +127,14 @@ export interface Config {
        * The ID can be obtained from the custom script page in this format: https://datasaur.ai/teams/{teamId}/custom-scripts/{custom-script-id}
        */
       customScriptId?: string;
-  
+
       // TOKEN_BASED
       allTokensMustBeLabeled?: boolean;
       allowArcDrawing?: boolean;
       allowMultiLabels?: boolean;
       textLabelMaxTokenLength?: number;
       allowCharacterBasedLabeling?: boolean;
-  
+
       // ROW_BASED
       displayedRows?: number;
       mediaDisplayStrategy?: string;
@@ -92,13 +154,13 @@ export interface Config {
     labelSets?: Array<null | {
       label: string;
       config: {
-        options: Array<{
-          id: string;
-          parentId?: string | null;
-          label: string;
-          color?: string | null;
-        }>;
-      }
-    }>;  
+        options: Array<LabelItem>;
+      };
+    }>;
+
+    /**
+     * @description Optional. Local path to a folder containing CSV files for TOKEN_BASED
+     */
+    labelSetDirectory?: string;
   };
 }
