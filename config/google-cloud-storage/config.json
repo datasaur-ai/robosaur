@@ -1,41 +1,41 @@
 {
-    "datasaur": {
-      "host": "https://datasaur.ai",
-      "clientId": "<DATASAUR_CLIENT_ID> See the guide here https://datasaurai.gitbook.io/datasaur/advanced/datasaur-apis/oauth-2.0#generate-oauth-credentials-menu",
-      "clientSecret": "<DATASAUR_CLIENT_SECRET> See the guide here https://datasaurai.gitbook.io/datasaur/advanced/datasaur-apis/oauth-2.0#generate-oauth-credentials-menu"
+  "datasaur": {
+    "host": "https://datasaur.ai",
+    "clientId": "<DATASAUR_CLIENT_ID> See the guide here https://datasaurai.gitbook.io/datasaur/advanced/datasaur-apis/oauth-2.0#generate-oauth-credentials-menu",
+    "clientSecret": "<DATASAUR_CLIENT_SECRET> See the guide here https://datasaurai.gitbook.io/datasaur/advanced/datasaur-apis/oauth-2.0#generate-oauth-credentials-menu"
+  },
+  "documents": {
+    "source": "gcs",
+    "bucketName": "my-bucket",
+    "prefix": "projects",
+    "gcsCredentialJson": "config/google-cloud-storage/credential.json",
+    "stateFilePath": "gs://bucket/path/to/stateFile.json"
+  },
+  "assignment": {
+    "source": "gcs",
+    "path": "gs://my-bucket/projects/assignment.json"
+  },
+  "project": {
+    "teamId": "<TEAM_ID>",
+    "projectSettings": {
+      "consensus": 1,
+      "enableEditLabelSet": false,
+      "enableEditSentence": false,
+      "hideLabelerNamesDuringReview": false,
+      "hideRejectedLabelsDuringReview": true,
+      "hideLabelsFromInactiveLabelSetDuringReview": false
     },
-    "documents": {
-      "source": "gcs",
-      "bucketName": "my-bucket",
-      "prefix": "projects",
-      "gcsCredentialJson": "config/google-cloud-storage/credential.json",
-      "stateFilePath": "gs://bucket/path/to/stateFile.json"
-    },
-    "assignment": {
-      "source": "gcs",
-      "path": "gs://my-bucket/projects/assignment.json"
-    },
-    "project": {
-      "teamId": "<TEAM_ID>",
-      "projectSettings": {
-        "consensus": 1,
-        "enableEditLabelSet": false,
-        "enableEditSentence": false,
-        "hideLabelerNamesDuringReview": false,
-        "hideRejectedLabelsDuringReview": true,
-        "hideLabelsFromInactiveLabelSetDuringReview": false
-      },
-      "documentSettings" : {
-        "kind": "TOKEN_BASED",
-        "customScriptId": "<CUSTOM SCRIPT ID>",
-  
-        "allowCharacterBasedLabeling": false,
-        "allowArcDrawing": true,
-        "allowMultiLabels": true,
-        "allTokensMustBeLabeled": false,
-        "textLabelMaxTokenLength": 999999,
-        "sentenceSeparator": "\n",
-        "tokenizer": "WINK"
-      }
+    "documentSettings": {
+      "kind": "TOKEN_BASED",
+      "customScriptId": "<CUSTOM SCRIPT ID>",
+
+      "allowCharacterBasedLabeling": false,
+      "allowArcDrawing": true,
+      "allowMultiLabels": true,
+      "allTokensMustBeLabeled": false,
+      "textLabelMaxTokenLength": 999999,
+      "sentenceSeparator": "\n",
+      "tokenizer": "WINK"
     }
   }
+}
