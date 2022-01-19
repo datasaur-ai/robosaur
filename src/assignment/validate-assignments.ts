@@ -17,7 +17,9 @@ export async function validateAssignments(assignees) {
   );
 
   if (assignees.labelers.length === 0) {
-    console.warn(`No labeler is registered. Please create assignment file at inputs/assignment.csv`);
+    console.warn(
+      'No labeler is registered. To setup project assignment please configure your config.assignment settings.',
+    );
   }
 
   const labelerEmailDiferrences = difference(assignees.labelers, memberEmails);

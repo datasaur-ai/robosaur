@@ -43,7 +43,7 @@ export interface Config {
 
     /**
      * @description Required for 'gcs' and 's3' sources.
-     * Path to the folder containing sub-folders, without leading slash (/). Each subfolders will be created to a new Datasaur project.
+     * Path to the folder containing sub-folders, without leading slash (/). Each subfolders will be created as a new Datasaur project.
      * If the subfolders are located in root, set prefix to empty string ''
      */
     prefix: string;

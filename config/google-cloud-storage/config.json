@@ -13,7 +13,7 @@
     },
     "assignment": {
       "source": "gcs",
-      "path": "gs://my-bucket/projects/assignment.csv"
+      "path": "gs://my-bucket/projects/assignment.json"
     },
     "project": {
       "teamId": "<TEAM_ID>",
