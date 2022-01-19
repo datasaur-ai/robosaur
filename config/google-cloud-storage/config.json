@@ -9,7 +9,7 @@
       "bucketName": "my-bucket",
       "prefix": "projects",
       "gcsCredentialJson": "config/google-cloud-storage/credential.json",
-      "stateFilePath": "projects/state.json"
+      "stateFilePath": "gs://bucket/path/to/stateFile.json"
     },
     "assignment": {
       "source": "gcs",
