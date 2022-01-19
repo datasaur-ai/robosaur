@@ -17,7 +17,7 @@ export function getLabelSetsFromDirectory(directory: string): LabelSet[] {
   const filesInDir = readdirSync(directory, { withFileTypes: true })
     .filter((dirEntries) => dirEntries.isFile() && dirEntries.name.endsWith('.csv'))
     .sort((entry1, entry2) => {
-      return entry1.name.toLowerCase() < entry2.name.toLowerCase() ? -1 : 1;
+      return entry1.name.localeCompare(entry2.name);
     });
 
   if (filesInDir.length > LABELSET_COUNT_LIMIT) {
