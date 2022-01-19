@@ -4,21 +4,14 @@ import { documentsSchemaValidator } from './documents-schema-validator';
 
 export function validateConfigDocuments(config: Config) {
   if (!documentsSchemaValidator(config.documents)) {
-    return Promise.reject(
-      new Error(`config.documents has some errors: ${JSON.stringify(documentsSchemaValidator.errors)}`),
-    );
+    throw new Error(`config.documents has some errors: ${JSON.stringify(documentsSchemaValidator.errors)}`);
   }
-  return Promise.resolve();
 }
 
 export function validateConfigAssignment(config: Config) {
   if (config.assignment) {
     if (!assignmentSchemaValidator(config.assignment)) {
-      return Promise.reject(
-        Error(`config.assignment has some errors: ${JSON.stringify(assignmentSchemaValidator.errors)}`),
-      );
+      throw new Error(`config.assignment has some errors: ${JSON.stringify(assignmentSchemaValidator.errors)}`);
     }
-    return Promise.resolve();
   }
-  return Promise.resolve();
 }

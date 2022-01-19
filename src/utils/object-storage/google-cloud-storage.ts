@@ -33,7 +33,7 @@ export class GoogleCloudStorageClient implements ObjectStorageClient {
     const bucket = GoogleCloudStorageClient.getClient().bucket(bucketName);
     prefix = normalizeFolderName(prefix);
     const response = await bucket.getFiles({ prefix });
-    return response[0].filter((file) => file.name !== prefix).map((file) => ({ name: file.name, ...file }));
+    return response[0].filter((file) => file.name !== prefix).map((file) => ({ name: file.name }));
   }
 
   async getObjectUrl(bucketName: string, objectName: string): Promise<string> {

@@ -3,7 +3,7 @@ import { Document } from './interfaces';
 import { getLocalDocuments } from './get-local-documents';
 import { getRemoteDocuments } from './get-remote-documents';
 import { getConfig, getConfigPath } from '../config/config';
-import { StorageSources } from 'src/config/interfaces';
+import { StorageSources } from '../config/interfaces';
 
 const IMPLEMENTED_SOURCES = [StorageSources.LOCAL, StorageSources.REMOTE];
 

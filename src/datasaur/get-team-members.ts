@@ -21,7 +21,15 @@ const TEAM_MEMBER_QUERY = gql`
   }
 `;
 
-export async function getTeamMembers(teamId) {
+export interface TeamMember {
+  user: {
+    email: string;
+  };
+  invitationStatus: string;
+  invitationEmail: string;
+}
+
+export async function getTeamMembers(teamId): Promise<TeamMember[]> {
   return await requestAllPages(TEAM_MEMBER_QUERY, {
     teamId: `${teamId}`,
     roleId: [],

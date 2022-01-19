@@ -1,3 +1,4 @@
+import { validateConfigAssignment, validateConfigDocuments } from './schema/validator';
 import { readJSONFile } from '../utils/readJSONFile';
 import { Config } from './interfaces';
 
@@ -21,5 +22,7 @@ export function getConfig(): Config {
 export function setConfigByJSONFile(filePath: string) {
   console.log(`Config from: ${filePath}`);
   config = readJSONFile(filePath);
+  validateConfigAssignment(config as Config);
+  validateConfigDocuments(config as Config);
   configPath = filePath;
 }

@@ -2,7 +2,7 @@ import { Readable as ReadableStream } from 'stream';
 
 export function streamToArray(stream: ReadableStream): Promise<any[]> {
   return new Promise((resolve, reject) => {
-    const array = [];
+    const array: any[] = [];
     stream.on('data', onData);
     stream.on('end', onEnd);
     stream.on('error', onEnd);
