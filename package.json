@@ -19,7 +19,8 @@
     "lodash": "^4.17.21",
     "minio": "^7.0.26",
     "papaparse": "^5.3.1",
-    "qs": "^6.9.4"
+    "qs": "^6.9.4",
+    "winston": "^3.4.0"
   },
   "devDependencies": {
     "@types/commander": "^2.12.2",

@@ -1,6 +1,7 @@
 import { validateConfigAssignment, validateConfigDocuments } from './schema/validator';
 import { readJSONFile } from '../utils/readJSONFile';
 import { Config } from './interfaces';
+import { getLogger } from '../logger';
 
 let config: Config | null = null;
 let configPath: string | null = null;
@@ -20,7 +21,7 @@ export function getConfig(): Config {
 }
 
 export function setConfigByJSONFile(filePath: string) {
-  console.log(`Config from: ${filePath}`);
+  getLogger().info(`Config from: ${filePath}`);
   config = readJSONFile(filePath);
   validateConfigAssignment(config as Config);
   validateConfigDocuments(config as Config);

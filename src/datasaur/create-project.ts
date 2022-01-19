@@ -5,6 +5,7 @@ import { query } from './query';
 import { EXTENSIONS } from './constants';
 import { createLabelSet } from './create-label-set';
 import { Config } from '../config/interfaces';
+import { getLogger } from '../logger';
 
 const CREATE_PROJECT_MUTATION = gql`
   mutation LaunchTextProjectAsyncMutation($input: LaunchTextProjectInput!) {
@@ -39,7 +40,7 @@ export async function createProject(
     labelSetIDs = await Promise.all(
       settings.labelSets.map(async (labelSet, index) => {
         if (labelSet) {
-          console.log(`Uploading label set "${labelSet.label}" for index: ${index}...`);
+          getLogger().info(`Uploading label set "${labelSet.label}" for index: ${index}...`);
           const result = await createLabelSet(labelSet.label, index, labelSet.config.options);
           return result.id;
         }

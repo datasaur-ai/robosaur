@@ -1,5 +1,6 @@
 import { readdirSync } from 'fs';
 import { basename, resolve, parse } from 'path';
+import { getLogger } from '../logger';
 import { LabelItem } from '../datasaur/interfaces';
 import { defaultCSVConfig, readCSVFile } from './readCSVFile';
 
@@ -13,7 +14,7 @@ export interface LabelSet {
 }
 
 export function getLabelSetsFromDirectory(directory: string): LabelSet[] {
-  console.log('Retrieving list of labelset files in directory');
+  getLogger().info('Retrieving list of labelset files in directory');
   const filesInDir = readdirSync(directory, { withFileTypes: true })
     .filter((dirEntries) => dirEntries.isFile() && dirEntries.name.endsWith('.csv'))
     .sort((entry1, entry2) => {
@@ -21,12 +22,16 @@ export function getLabelSetsFromDirectory(directory: string): LabelSet[] {
     });
 
   if (filesInDir.length > LABELSET_COUNT_LIMIT) {
-    console.error(`Currently Datasaur supports up to ${LABELSET_COUNT_LIMIT} labelsets`);
+    getLogger().error(
+      `Currently Datasaur supports up to ${LABELSET_COUNT_LIMIT} labelsets, you have ${filesInDir.length} csv files in the directory`,
+    );
     throw new Error(`More than ${LABELSET_COUNT_LIMIT} labelsets defined`);
   }
 
-  console.log(`Found ${filesInDir.length} labelset file in ${directory}`);
-  console.log(JSON.stringify(filesInDir.map((file) => file.name)));
+  getLogger().info(
+    `Found ${filesInDir.length} labelset file in ${directory}`,
+    JSON.stringify(filesInDir.map((file) => file.name)),
+  );
   return filesInDir.map((file) => parseCSVToLabelSet(resolve(directory, file.name)));
 }
 

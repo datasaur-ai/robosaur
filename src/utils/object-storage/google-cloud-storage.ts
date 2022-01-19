@@ -1,5 +1,4 @@
 import { Storage } from '@google-cloud/storage';
-import { getConfig } from 'src/config/config';
 import { streamToString } from '../streamToString';
 import { getGCSConfig, normalizeFolderName } from './helper';
 import { BucketItem, ObjectStorageClient } from './interface';

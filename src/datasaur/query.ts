@@ -1,7 +1,7 @@
 import { GraphQLClient } from 'graphql-request';
 import { RequestDocument } from 'graphql-request/dist/types';
-
 import { getConfig } from '../config/config';
+import { getLogger } from '../logger';
 import { getAccessToken } from './get-access-token';
 
 let client: GraphQLClient;
@@ -16,10 +16,10 @@ export async function query<T = any, V = any>(
 
 async function getClient() {
   if (!client) {
-    console.log('Generating access token...');
+    getLogger().info('Generating access token...');
     const config = getConfig().datasaur;
     const accessToken = await getAccessToken(config.host, config.clientId, config.clientSecret);
-    console.log('Finished generating access token...');
+    getLogger().info('Finished generating access token...');
 
     client = new GraphQLClient(`${config.host}/graphql`, {
       headers: {

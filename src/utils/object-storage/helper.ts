@@ -1,6 +1,6 @@
 import { StorageOptions } from '@google-cloud/storage';
 import { ClientOptions } from 'minio';
-import { getConfig } from './../../config/config';
+import { getConfig } from '../../config/config';
 
 export function getGCSConfig(): StorageOptions {
   return {

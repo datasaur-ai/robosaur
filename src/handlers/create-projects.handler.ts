@@ -1,5 +1,6 @@
 import { writeFileSync } from 'fs';
 import { basename, resolve } from 'path';
+import { getLogger } from '../logger';
 import { assignAllDocuments } from '../assignment/assign-all-documents';
 import { parseAssignment } from '../assignment/parse-assignment';
 import { validateAssignments } from '../assignment/validate-assignments';
@@ -37,13 +38,13 @@ export async function handleCreateProjects(configFile: string, options) {
 
   const { bucketName, prefix: storagePrefix, source, stateFilePath } = getConfig().documents;
 
-  console.log(`Retrieving folders in bucket ${bucketName} with prefix: '${storagePrefix}'`);
+  getLogger().info(`Retrieving folders in bucket ${bucketName} with prefix: '${storagePrefix}'`);
   const storageClient: ObjectStorageClient = getStorageClient(source);
   const foldersInBucket = await storageClient.listSubfoldersOfPrefix(bucketName, storagePrefix);
   let projectsToCreate = foldersInBucket.map((foldername) =>
     foldername.replace(getConfig().documents.prefix, '').replace(/\//g, ''),
   );
-  console.log(`Found folders: ${JSON.stringify(foldersInBucket)}`);
+  getLogger().info(`Found folders: ${JSON.stringify(foldersInBucket)}`);
   let states: ScriptState[] = [];
 
   if (stateFilePath) {
@@ -62,11 +63,11 @@ export async function handleCreateProjects(configFile: string, options) {
   });
 
   if (projectsToCreate.length === 0) {
-    console.log('No projects left to create, exiting...');
+    getLogger().info('No projects left to create, exiting...');
     return;
   }
 
-  console.log(`Found ${projectsToCreate.length} projects to create: ${JSON.stringify(projectsToCreate)}`);
+  getLogger().info(`Found ${projectsToCreate.length} projects to create: ${JSON.stringify(projectsToCreate)}`);
 
   const assignees = await parseAssignment();
 
@@ -76,16 +77,16 @@ export async function handleCreateProjects(configFile: string, options) {
     labelsets = getLabelSetsFromDirectory(labelSetDirectory);
 
     if (labelsets.length === 0) {
-      console.log(`No labelsets was provided in ${labelSetDirectory}`);
-      console.log(`To create future projects with labelsets, put csv files in ${labelSetDirectory}`);
-      console.log(
+      getLogger().info(`No labelsets was provided in ${labelSetDirectory}`);
+      getLogger().info(`To create future projects with labelsets, put csv files in ${labelSetDirectory}`);
+      getLogger().info(
         'Reference: https://datasaurai.gitbook.io/datasaur/basics/creating-a-project/label-sets#token-based-labeling',
       );
     }
-    console.log('Labelset parsing completed');
+    getLogger().info('Labelset parsing completed');
   }
 
-  console.log('validating project assignments...');
+  getLogger().info('validating project assignments...');
   await validateAssignments(assignees);
 
   let results: any[] = [];
@@ -108,10 +109,10 @@ export async function handleCreateProjects(configFile: string, options) {
         documentAssignments: assignAllDocuments(assignees, documents),
         projectConfig: getConfig().project,
       };
-      console.log(`new project to be created: ${projectName} with ${documents.length} documents`);
+      getLogger().info(`new project to be created: ${projectName} with ${documents.length} documents`);
       results.push(newProjectConfiguration);
     } else {
-      console.log(`creating project ${projectName}...`);
+      getLogger().info(`creating project ${projectName}...`);
       const jobId = await createProject(
         projectName,
         documents,
@@ -119,7 +120,7 @@ export async function handleCreateProjects(configFile: string, options) {
         getConfig().project,
       );
       results.push(jobId);
-      console.log('kembalian await create project', jobId);
+      getLogger().info('kembalian await create project', jobId);
       states.push({
         projectName: projectName,
         documents: documents.map((doc) => ({ bucketName, prefix: fullPrefix, name: doc.fileName })),
@@ -133,7 +134,7 @@ export async function handleCreateProjects(configFile: string, options) {
   if (dryRun) {
     let filepath = resolve(cwd, `dry-run-output-${Date.now()}.json`);
     writeFileSync(filepath, JSON.stringify(results, null, 2));
-    console.log(`dry-run results created in ${filepath}`);
+    getLogger().info(`dry-run results created in ${filepath}`);
   } else {
     while (true) {
       await sleep(5000);
@@ -141,7 +142,7 @@ export async function handleCreateProjects(configFile: string, options) {
       const notFinishedStatuses = [JobStatus.IN_PROGRESS, JobStatus.NONE, JobStatus.QUEUED];
       const notFinishedJobs = jobs.filter((job) => notFinishedStatuses.includes(job.status));
       if (notFinishedJobs.length === 0) {
-        console.log(JSON.stringify(jobs, null, 2));
+        getLogger().info(JSON.stringify(jobs, null, 2));
 
         // update states
         jobs.forEach((job: Job) => {
@@ -152,6 +153,7 @@ export async function handleCreateProjects(configFile: string, options) {
 
         // set state back
         await getStorageClient(source).setFileContent(bucketName, stateFilePath, JSON.stringify(states));
+        getLogger().info('exiting script...');
         break;
       }
     }
