@@ -1,6 +1,5 @@
-import { resolve } from 'path';
 import { readdirSync } from 'fs';
-import { basename } from 'path';
+import { basename, resolve, parse } from 'path';
 import { LabelItem } from '../datasaur/interfaces';
 import { defaultCSVConfig, readCSVFile } from './readCSVFile';
 
@@ -15,9 +14,11 @@ export interface LabelSet {
 
 export function getLabelSetsFromDirectory(directory: string): LabelSet[] {
   console.log('Retrieving list of labelset files in directory');
-  const filesInDir = readdirSync(directory, { withFileTypes: true }).filter(
-    (dirEntries) => dirEntries.isFile() && dirEntries.name.endsWith('.csv'),
-  );
+  const filesInDir = readdirSync(directory, { withFileTypes: true })
+    .filter((dirEntries) => dirEntries.isFile() && dirEntries.name.endsWith('.csv'))
+    .sort((entry1, entry2) => {
+      return entry1.name.toLowerCase() < entry2.name.toLowerCase() ? -1 : 1;
+    });
 
   if (filesInDir.length > LABELSET_COUNT_LIMIT) {
     console.error(`Currently Datasaur supports up to ${LABELSET_COUNT_LIMIT} labelsets`);
@@ -41,12 +42,12 @@ function parseCSVToLabelSet(filepath: string) {
       id,
       label,
       color,
-      parentId: id.includes('.') ? getParentId(id) : null,
+      parentId: id && id.includes('.') ? getParentId(id) : null,
     };
   });
 
   return {
-    label: basename(filepath).split('.')[0],
+    label: parse(basename(filepath)).name,
     config: {
       options: items,
     },
