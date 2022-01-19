@@ -6,7 +6,14 @@ import { defaultCSVConfig, readCSVFile } from './readCSVFile';
 
 const LABELSET_COUNT_LIMIT = 5;
 
-export function getLabelSetsFromDirectory(directory: string) {
+export interface LabelSet {
+  label: string;
+  config: {
+    options: LabelItem[];
+  };
+}
+
+export function getLabelSetsFromDirectory(directory: string): LabelSet[] {
   console.log('Retrieving list of labelset files in directory');
   const filesInDir = readdirSync(directory, { withFileTypes: true }).filter(
     (dirEntries) => dirEntries.isFile() && dirEntries.name.endsWith('.csv'),

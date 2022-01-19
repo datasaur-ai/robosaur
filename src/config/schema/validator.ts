@@ -1,7 +1,8 @@
+import { Config } from '../interfaces';
 import { assignmentSchemaValidator } from './assignment-schema-validator';
 import { documentsSchemaValidator } from './documents-schema-validator';
 
-export function validateConfigDocuments(config) {
+export function validateConfigDocuments(config: Config) {
   if (!documentsSchemaValidator(config.documents)) {
     return Promise.reject(
       new Error(`config.documents has some errors: ${JSON.stringify(documentsSchemaValidator.errors)}`),
@@ -10,7 +11,7 @@ export function validateConfigDocuments(config) {
   return Promise.resolve();
 }
 
-export function validateConfigAssignment(config) {
+export function validateConfigAssignment(config: Config) {
   if (config.assignment) {
     if (!assignmentSchemaValidator(config.assignment)) {
       return Promise.reject(

@@ -10,7 +10,7 @@ import { sleep } from '../utils/sleep';
 export async function handleCreateProject(projectName: string, configFile: string) {
   const cwd = process.cwd();
   setConfigByJSONFile(resolve(cwd, configFile));
-  
+
   const projectSetting = getConfig().project;
   const documents = getDocuments();
   const assignmentPool = await getAssignmentConfig();

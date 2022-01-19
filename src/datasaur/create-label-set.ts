@@ -19,7 +19,11 @@ interface LabelItem {
 
 export async function createLabelSet(name: string, index: number, labelItems: LabelItem[]) {
   const variables = {
-    input: { index, name, tagItems: labelItems.map(({ id, parentId, label, color }) => ({ id, parentId, tagName: label, color })) }
+    input: {
+      index,
+      name,
+      tagItems: labelItems.map(({ id, parentId, label, color }) => ({ id, parentId, tagName: label, color })),
+    },
   };
   const data = await query(CREATE_LABEL_SET_MUTATION, variables);
   return data.result;

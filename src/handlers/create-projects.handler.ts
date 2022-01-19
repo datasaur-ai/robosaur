@@ -1,31 +1,24 @@
 import { writeFileSync } from 'fs';
 import { basename, resolve } from 'path';
-import { parseAssignment } from '../assignment/parse-assignment';
-import { StorageSources } from '../config/interfaces';
 import { assignAllDocuments } from '../assignment/assign-all-documents';
+import { parseAssignment } from '../assignment/parse-assignment';
 import { validateAssignments } from '../assignment/validate-assignments';
 import { getConfig, setConfigByJSONFile } from '../config/config';
+import { StorageSources } from '../config/interfaces';
 import { createProject } from '../datasaur/create-project';
 import { getJobs, Job, JobStatus } from '../datasaur/get-jobs';
-import { getLabelSetsFromDirectory } from '../utils/labelset';
+import { getLabelSetsFromDirectory, LabelSet } from '../utils/labelset';
 import { getStorageClient } from '../utils/object-storage';
 import { getBucketName, getObjectName, normalizeFolderName } from '../utils/object-storage/helper';
 import { ObjectStorageClient } from '../utils/object-storage/interface';
 import { sleep } from '../utils/sleep';
 import { handleCreateProject } from './create-project.handler';
 
-interface ExistingProjects {
-  id: string;
-  name: string;
-  tags: any[];
-  __typename: 'Project';
-}
-
 interface ScriptState {
-  jobId: string | undefined;
+  jobId: string | null | undefined;
   projectName: string;
   documents: Array<{ bucketName: string; prefix: string; name: string }>;
-  projectId: string | undefined;
+  projectId: string | null | undefined;
   status: JobStatus;
 }
 
@@ -42,7 +35,6 @@ export async function handleCreateProjects(configFile: string, options) {
       return await handleCreateProject('New Robosaur Project', configFile);
   }
 
-  const teamId = getConfig().project.teamId;
   const { bucketName, prefix: storagePrefix, source, stateFilePath } = getConfig().documents;
 
   console.log(`Retrieving folders in bucket ${bucketName} with prefix: '${storagePrefix}'`);
@@ -52,7 +44,8 @@ export async function handleCreateProjects(configFile: string, options) {
     foldername.replace(getConfig().documents.prefix, '').replace(/\//g, ''),
   );
   console.log(`Found folders: ${JSON.stringify(foldersInBucket)}`);
-  let states: null | ScriptState[] = null;
+  let states: ScriptState[] = [];
+
   if (stateFilePath) {
     try {
       states = JSON.parse(
@@ -77,29 +70,28 @@ export async function handleCreateProjects(configFile: string, options) {
 
   const assignees = await parseAssignment();
 
-  let labelsets = [];
-  if (getConfig().project.labelSetDirectory) {
-    labelsets = getLabelSetsFromDirectory(getConfig().project.labelSetDirectory);
+  const { labelSetDirectory } = getConfig().project;
+  let labelsets: LabelSet[] = [];
+  if (labelSetDirectory) {
+    labelsets = getLabelSetsFromDirectory(labelSetDirectory);
 
     if (labelsets.length === 0) {
-      console.log(`No labelsets was provided in ${getConfig().project.labelSetDirectory}`);
-      console.log(
-        `To create future projects with labelsets, put csv files in ${getConfig().project.labelSetDirectory}`,
-      );
+      console.log(`No labelsets was provided in ${labelSetDirectory}`);
+      console.log(`To create future projects with labelsets, put csv files in ${labelSetDirectory}`);
       console.log(
         'Reference: https://datasaurai.gitbook.io/datasaur/basics/creating-a-project/label-sets#token-based-labeling',
       );
     }
-
     console.log('Labelset parsing completed');
   }
 
   console.log('validating project assignments...');
   await validateAssignments(assignees);
 
-  let results = [];
+  let results: any[] = [];
   for (const projectName of projectsToCreate) {
-    const fullPrefix = foldersInBucket.find((folderName) => folderName.endsWith(normalizeFolderName(projectName)));
+    const fullPrefix =
+      foldersInBucket.find((folderName) => folderName.endsWith(normalizeFolderName(projectName))) ?? '';
     const bucketItems = await storageClient.listItemsInBucket(bucketName, fullPrefix);
 
     const documents = await Promise.all(

@@ -13,7 +13,6 @@ export interface Config {
      * @description Target environment of Datasaur. To target our cloud environment, set to https://datasaur.ai
      */
     host: string;
-
     /**
      * @description Obtain the client ID and Secret in this [guide](https://datasaurai.gitbook.io/datasaur/advanced/apis-docs/oauth-2.0)
      */
@@ -34,51 +33,42 @@ export interface Config {
      * if the source is `remote`, the path should point to a JSON file. See the sample at config/documents.json
      */
     path: string;
-
     /**
      * @description Required for 'gcs' and 's3' sources.
      * the GCS or S3 bucket name, without gs:// or s3:// prefix
      */
     bucketName: string;
-
     /**
      * @description Required for 'gcs' and 's3' sources.
      * Path to the folder containing sub-folders, without leading slash (/). Each subfolders will be created as a new Datasaur project.
      * If the subfolders are located in root, set prefix to empty string ''
      */
     prefix: string;
-
     /**
      * @description Required for 'gcs' sources.
      * Relative or absolute local file path to the credential file.
      */
     gcsCredentialJson: string;
-
     /**
      * @description Required for 's3' sources.
      */
     s3Endpoint: string;
-
     /**
      * @description Required for 's3' sources.
      */
     s3Port: number;
-
     /**
      * @description Required for 's3' sources.
      */
     s3AccessKey: string;
-
     /**
      * @description Required for 's3' sources.
      */
     s3SecretKey: string;
-
     /**
      * @description Required for 's3' sources.
      */
     s3UseSSl: boolean;
-
     /**
      * @description For 'gcs' and 's3' sources
      * Path to a state file to keep-track which folders and projects have been created.
@@ -96,7 +86,6 @@ export interface Config {
      */
     path: string;
   };
-
   project: {
     /**
      * @description id of the team.
@@ -157,7 +146,6 @@ export interface Config {
         options: Array<LabelItem>;
       };
     }>;
-
     /**
      * @description Optional. Local path to a folder containing CSV files for TOKEN_BASED
      */
