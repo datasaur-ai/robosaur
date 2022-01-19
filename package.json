@@ -4,11 +4,12 @@
   "description": "Datasaur template for creating and exporting projects.",
   "main": "src/index.ts",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest",
     "start": "ts-node src/index.ts"
   },
   "dependencies": {
     "@google-cloud/storage": "^5.17.0",
+    "ajv": "^8.9.0",
     "axios": "^0.21.1",
     "commander": "^7.2.0",
     "dotenv": "^10.0.0",
@@ -22,6 +23,7 @@
   },
   "devDependencies": {
     "@types/commander": "^2.12.2",
+    "@types/jest": "^27.4.0",
     "@types/minio": "^7.0.11",
     "@types/node": "^12.8.1",
     "@types/papaparse": "^5.3.1",
@@ -39,5 +41,22 @@
     "typescript": "^3.9.9"
   },
   "author": "Datasaur.ai (https://github.com/datasaur-ai)",
-  "license": "MIT"
+  "license": "MIT",
+  "jest": {
+    "moduleFileExtensions": [
+      "js",
+      "json",
+      "ts"
+    ],
+    "rootDir": "src",
+    "testRegex": [
+      ".spec.ts$"
+    ],
+    "transform": {
+      "^.+\\.(t|j)s$": "ts-jest",
+      "^.+\\.(ts|js)x?$": "ts-jest"
+    },
+    "coverageDirectory": "../coverage",
+    "testEnvironment": "node"
+  }
 }

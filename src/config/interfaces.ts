@@ -90,9 +90,9 @@ export interface Config {
     /**
      * @description determine whether the source of the assignment file should be in local folder or remote url.
      */
-    source: StorageSources;
+    source: StorageSources.LOCAL | StorageSources.AMAZONS3 | StorageSources.GOOGLE;
     /**
-     * @description path to file, or URL to remote file
+     * @description path to file, or path to file in storage bucket
      */
     path: string;
   };
