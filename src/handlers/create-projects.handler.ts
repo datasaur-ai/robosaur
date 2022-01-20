@@ -117,8 +117,8 @@ export async function handleCreateProjects(configFile: string, options) {
         assignAllDocuments(assignees, documents),
         getConfig().project,
       );
+      getLogger().info(`ProjectLaunchJob for ${projectName} submitted: Job ID: ${jobId.job.id}`);
       results.push(jobId);
-      getLogger().info('kembalian await create project', jobId);
       states.push({
         projectName: projectName,
         documents: documents.map((doc) => ({ bucketName, prefix: fullPrefix, name: doc.fileName })),
