@@ -33,11 +33,11 @@ interface LabelCSVContent {
   label: string;
   color: string;
 }
-function parseCSVToLabelSet(filepath: string) {
+function parseCSVToLabelSet(filepath: string): LabelSet {
   const content = readCSVFile(filepath, 'utf-8', { ...defaultCSVConfig, header: true });
-  const items: LabelItem[] = content.data.map(({ id, label, color }: LabelCSVContent) => {
+  const items: LabelItem[] = content.data.map(({ id, label, color }: LabelCSVContent, index) => {
     return {
-      id,
+      id: id ?? index.toString(),
       label,
       color,
       parentId: id && id.includes('.') ? getParentId(id) : null,

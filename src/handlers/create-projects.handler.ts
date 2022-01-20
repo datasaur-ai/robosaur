@@ -100,13 +100,17 @@ export async function handleCreateProjects(configFile: string, options) {
     const fullPrefix =
       foldersInBucket.find((folderName) => folderName.endsWith(normalizeFolderName(projectName))) ?? '';
     const documents = await getObjectStorageDocuments(bucketName, fullPrefix);
+    const projectConfig = getConfig().project;
+
+    // override config from JSON with parsed content
+    projectConfig.labelSets = labelsets;
 
     if (dryRun) {
       const newProjectConfiguration = {
         projectName,
         documents,
         documentAssignments: assignAllDocuments(assignees, documents),
-        projectConfig: getConfig().project,
+        projectConfig: projectConfig,
       };
       getLogger().info(`new project to be created: ${projectName} with ${documents.length} documents`, { dryRun });
       results.push(newProjectConfiguration);
@@ -116,7 +120,7 @@ export async function handleCreateProjects(configFile: string, options) {
         projectName,
         documents,
         assignAllDocuments(assignees, documents),
-        getConfig().project,
+        projectConfig,
       );
       getLogger().info(`ProjectLaunchJob for ${projectName} submitted: Job ID: ${jobId.job.id}`);
       results.push(jobId);
