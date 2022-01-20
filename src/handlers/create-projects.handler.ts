@@ -6,7 +6,6 @@ import { getConfig, setConfigByJSONFile } from '../config/config';
 import { StorageSources } from '../config/interfaces';
 import { createProject } from '../datasaur/create-project';
 import { getJobs, Job, JobStatus } from '../datasaur/get-jobs';
-import { LabelSet } from '../datasaur/interfaces';
 import { getObjectStorageDocuments } from '../documents/get-object-storage-documents';
 import { getLogger } from '../logger';
 import { getLabelSetsFromDirectory } from '../utils/labelset';
@@ -71,22 +70,8 @@ export async function handleCreateProjects(configFile: string, options) {
 
   getLogger().info(`Found ${projectsToCreate.length} projects to create: ${JSON.stringify(projectsToCreate)}`);
 
-  const { labelSetDirectory, labelSets } = getConfig().project;
-  let labelsets: LabelSet[] = [];
-  if (labelSetDirectory) {
-    labelsets = getLabelSetsFromDirectory(labelSetDirectory);
-
-    if (labelsets.length === 0) {
-      getLogger().info(`No labelsets was provided in ${labelSetDirectory}`);
-      getLogger().info(`To create future projects with labelsets, put csv files in ${labelSetDirectory}`);
-      getLogger().info(
-        'Reference: https://datasaurai.gitbook.io/datasaur/basics/creating-a-project/label-sets#token-based-labeling',
-      );
-    }
-    getLogger().info('Labelset parsing completed');
-  } else {
-    if (labelSets) labelsets = getConfig().project.labelSets as LabelSet[];
-  }
+  const updatedProjectConfig = getConfig().project;
+  updatedProjectConfig.labelSets = getLabelSetsFromDirectory(getConfig());
 
   getLogger().info('validating project assignments...');
   const assignees = await getAssignmentConfig();
@@ -100,17 +85,13 @@ export async function handleCreateProjects(configFile: string, options) {
     const fullPrefix =
       foldersInBucket.find((folderName) => folderName.endsWith(normalizeFolderName(projectName))) ?? '';
     const documents = await getObjectStorageDocuments(bucketName, fullPrefix);
-    const projectConfig = getConfig().project;
-
-    // override config from JSON with parsed content
-    projectConfig.labelSets = labelsets;
 
     if (dryRun) {
       const newProjectConfiguration = {
         projectName,
         documents,
         documentAssignments: assignAllDocuments(assignees, documents),
-        projectConfig: projectConfig,
+        projectConfig: updatedProjectConfig,
       };
       getLogger().info(`new project to be created: ${projectName} with ${documents.length} documents`, { dryRun });
       results.push(newProjectConfiguration);
@@ -120,7 +101,7 @@ export async function handleCreateProjects(configFile: string, options) {
         projectName,
         documents,
         assignAllDocuments(assignees, documents),
-        projectConfig,
+        updatedProjectConfig,
       );
       getLogger().info(`ProjectLaunchJob for ${projectName} submitted: Job ID: ${jobId.job.id}`);
       results.push(jobId);

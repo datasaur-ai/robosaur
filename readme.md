@@ -57,7 +57,7 @@ Here are a couple important details about the storage configuration:
 
 2. `stateFilePath` => full URI to a JSON file.  
    For GCS bucket, an example URI would be: `gs://{bucketName}/path/to/file.json`  
-   This file will be continuosly overwritten every time the script is run.
+   This file will be continuously overwritten every time the script is run.
 3. `config.assignment.path` => if source is `gcs` or `s3`, `path` should be the full URI same as `staticFilePath`.  
    if source is `config.assignment.local`, `path` should be relative or full path to json file
 4. `config.project.labelSetDirectory` => Optional. Relative or full path to a local folder containing labelsets csv  

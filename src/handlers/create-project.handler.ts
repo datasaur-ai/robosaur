@@ -1,12 +1,13 @@
 import { resolve } from 'path';
-import { getConfig, setConfigByJSONFile } from '../config/config';
 import { assignAllDocuments } from '../assignment/assign-all-documents';
 import { getAssignmentConfig } from '../assignment/get-assignment-config';
+import { getConfig, setConfigByJSONFile } from '../config/config';
 import { createProject } from '../datasaur/create-project';
 import { getJobs, JobStatus } from '../datasaur/get-jobs';
 import { getDocuments } from '../documents/get-documents';
-import { sleep } from '../utils/sleep';
 import { getLogger } from '../logger';
+import { getLabelSetsFromDirectory } from '../utils/labelset';
+import { sleep } from '../utils/sleep';
 
 export async function handleCreateProject(projectName: string, configFile: string) {
   const cwd = process.cwd();
@@ -17,6 +18,8 @@ export async function handleCreateProject(projectName: string, configFile: strin
   const assignmentPool = await getAssignmentConfig();
 
   const assignments = assignAllDocuments(assignmentPool, documents);
+
+  projectSetting.labelSets = getLabelSetsFromDirectory(getConfig());
 
   const result = await createProject(projectName, documents, assignments, projectSetting);
   while (true) {

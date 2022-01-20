@@ -3,29 +3,37 @@ import { basename, resolve, parse } from 'path';
 import { getLogger } from '../logger';
 import { LabelItem, LabelSet } from '../datasaur/interfaces';
 import { defaultCSVConfig, readCSVFile } from './readCSVFile';
+import { Config } from '../config/interfaces';
 
 const LABELSET_COUNT_LIMIT = 5;
 
-export function getLabelSetsFromDirectory(directory: string): LabelSet[] {
-  getLogger().info('Retrieving list of labelset files in directory');
-  const filesInDir = readdirSync(directory, { withFileTypes: true })
-    .filter((dirEntries) => dirEntries.isFile() && dirEntries.name.endsWith('.csv'))
-    .sort((entry1, entry2) => {
-      return entry1.name.localeCompare(entry2.name);
-    });
+export function getLabelSetsFromDirectory({ project }: Config): LabelSet[] {
+  const directory = project.labelSetDirectory;
 
-  if (filesInDir.length > LABELSET_COUNT_LIMIT) {
-    getLogger().error(
-      `Currently Datasaur supports up to ${LABELSET_COUNT_LIMIT} labelsets, you have ${filesInDir.length} csv files in the directory`,
+  if (directory) {
+    getLogger().info('Retrieving list of labelset files in directory');
+    const filesInDir = readdirSync(directory, { withFileTypes: true })
+      .filter((dirEntries) => dirEntries.isFile() && dirEntries.name.endsWith('.csv'))
+      .sort((entry1, entry2) => {
+        return entry1.name.localeCompare(entry2.name);
+      });
+
+    if (filesInDir.length > LABELSET_COUNT_LIMIT) {
+      getLogger().error(
+        `Currently Datasaur supports up to ${LABELSET_COUNT_LIMIT} labelsets, you have ${filesInDir.length} csv files in the directory`,
+      );
+      throw new Error(`More than ${LABELSET_COUNT_LIMIT} labelsets defined`);
+    }
+
+    getLogger().info(
+      `Found ${filesInDir.length} labelset file in ${directory}`,
+      JSON.stringify(filesInDir.map((file) => file.name)),
     );
-    throw new Error(`More than ${LABELSET_COUNT_LIMIT} labelsets defined`);
+    return filesInDir.map((file) => parseCSVToLabelSet(resolve(directory, file.name)));
+  } else {
+    getLogger().info('No labelSetDirectory in config file');
+    return project.labelSets as LabelSet[];
   }
-
-  getLogger().info(
-    `Found ${filesInDir.length} labelset file in ${directory}`,
-    JSON.stringify(filesInDir.map((file) => file.name)),
-  );
-  return filesInDir.map((file) => parseCSVToLabelSet(resolve(directory, file.name)));
 }
 
 interface LabelCSVContent {
