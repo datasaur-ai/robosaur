@@ -41,5 +41,6 @@
       "sentenceSeparator": "\n",
       "tokenizer": "WINK"
     }
-  }
+  },
+  "labelSetDirectory": "config/labelset"
 }
