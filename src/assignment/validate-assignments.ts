@@ -25,19 +25,17 @@ export async function validateAssignment(assignees) {
 
   const labelerEmailDiferrences = difference(assignees.labelers, memberEmails);
   if (labelerEmailDiferrences.length > 0) {
-    getLogger().error(
-      'There are some labelers that have not been registered to the team.',
-      JSON.stringify([...labelerEmailDiferrences]),
-    );
+    getLogger().error('There are some labelers that have not been registered to the team.', {
+      labeler: [...labelerEmailDiferrences],
+    });
     throw new Error(`There are some labelers that haven't been registered to the team.`);
   }
 
   const reviewerEmailDiferrences = difference(assignees.reviewers, memberEmails);
   if (reviewerEmailDiferrences.length > 0) {
-    getLogger().error(
-      'There are some reviewers that have not been registered to the team.',
-      JSON.stringify([...reviewerEmailDiferrences]),
-    );
+    getLogger().error('There are some reviewers that have not been registered to the team.', {
+      reviewer: [...reviewerEmailDiferrences],
+    });
     throw new Error(`There are some reviewers that haven't been registered to the team.`);
   }
 }
