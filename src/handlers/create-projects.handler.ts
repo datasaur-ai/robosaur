@@ -95,9 +95,10 @@ export async function handleCreateProjects(configFile: string, options) {
   let results: any[] = [];
   for (const projectName of projectsToCreate) {
     getLogger().info(`creating project ${projectName}...`);
+
+    getLogger().info(`retrieving documents from ${source}...`);
     const fullPrefix =
       foldersInBucket.find((folderName) => folderName.endsWith(normalizeFolderName(projectName))) ?? '';
-
     const documents = await getObjectStorageDocuments(bucketName, fullPrefix);
 
     if (dryRun) {
@@ -107,10 +108,10 @@ export async function handleCreateProjects(configFile: string, options) {
         documentAssignments: assignAllDocuments(assignees, documents),
         projectConfig: getConfig().project,
       };
-      getLogger().info(`new project to be created: ${projectName} with ${documents.length} documents`);
+      getLogger().info(`new project to be created: ${projectName} with ${documents.length} documents`, { dryRun });
       results.push(newProjectConfiguration);
     } else {
-      getLogger().info(`creating project ${projectName}...`);
+      getLogger().info(`Submitting ProjectLaunchJob...`);
       const jobId = await createProject(
         projectName,
         documents,
@@ -132,15 +133,17 @@ export async function handleCreateProjects(configFile: string, options) {
   if (dryRun) {
     let filepath = resolve(cwd, `dry-run-output-${Date.now()}.json`);
     writeFileSync(filepath, JSON.stringify(results, null, 2));
-    getLogger().info(`dry-run results created in ${filepath}`);
+    getLogger().info(`dry-run results created in ${filepath}`, { dryRun });
   } else {
+    getLogger().info(`Sending query for ProjectLaunchJob status...`);
     while (true) {
       await sleep(5000);
       const jobs = await getJobs(results.map((result) => result.job.id));
       const notFinishedStatuses = [JobStatus.IN_PROGRESS, JobStatus.NONE, JobStatus.QUEUED];
       const notFinishedJobs = jobs.filter((job) => notFinishedStatuses.includes(job.status));
       if (notFinishedJobs.length === 0) {
-        getLogger().info(JSON.stringify(jobs, null, 2));
+        getLogger().info(`All ProjectLaunchJob finished.`);
+        getLogger().info(JSON.stringify(jobs));
 
         // update states
         jobs.forEach((job: Job) => {
@@ -150,16 +153,19 @@ export async function handleCreateProjects(configFile: string, options) {
         });
 
         // set state back
-        getLogger().info(`uploading stateFile to bucket...`);
-        try {
-          await getStorageClient(source).setFileContent(
-            getBucketName(stateFilePath),
-            getObjectName(stateFilePath),
-            JSON.stringify(states),
-          );
-        } catch (error) {
-          getLogger().error(`error during uploading stateFile`, error);
+        if (stateFilePath) {
+          getLogger().info(`uploading stateFile to bucket...`);
+          try {
+            await getStorageClient(source).setFileContent(
+              getBucketName(stateFilePath),
+              getObjectName(stateFilePath),
+              JSON.stringify(states),
+            );
+          } catch (error) {
+            getLogger().error(`error during uploading stateFile`, error);
+          }
         }
+
         getLogger().info('exiting script...');
         break;
       }

@@ -25,7 +25,7 @@ export async function handleCreateProject(projectName: string, configFile: strin
     const notFinishedStatuses = [JobStatus.IN_PROGRESS, JobStatus.NONE, JobStatus.QUEUED];
     const notFinishedJobs = jobs.filter((job) => notFinishedStatuses.includes(job.status));
     if (notFinishedJobs.length === 0) {
-      getLogger().info(JSON.stringify(jobs[0], null, 2));
+      getLogger().info(JSON.stringify(jobs[0]));
       break;
     }
   }
