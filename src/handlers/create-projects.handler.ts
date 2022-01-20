@@ -1,14 +1,15 @@
 import { writeFileSync } from 'fs';
-import { basename, resolve } from 'path';
-import { getLogger } from '../logger';
+import { resolve } from 'path';
 import { assignAllDocuments } from '../assignment/assign-all-documents';
-import { parseAssignment } from '../assignment/parse-assignment';
-import { validateAssignments } from '../assignment/validate-assignments';
+import { getAssignmentConfig } from '../assignment/get-assignment-config';
 import { getConfig, setConfigByJSONFile } from '../config/config';
 import { StorageSources } from '../config/interfaces';
 import { createProject } from '../datasaur/create-project';
 import { getJobs, Job, JobStatus } from '../datasaur/get-jobs';
-import { getLabelSetsFromDirectory, LabelSet } from '../utils/labelset';
+import { LabelSet } from '../datasaur/interfaces';
+import { getObjectStorageDocuments } from '../documents/get-object-storage-documents';
+import { getLogger } from '../logger';
+import { getLabelSetsFromDirectory } from '../utils/labelset';
 import { getStorageClient } from '../utils/object-storage';
 import { getBucketName, getObjectName, normalizeFolderName } from '../utils/object-storage/helper';
 import { ObjectStorageClient } from '../utils/object-storage/interface';
@@ -53,6 +54,7 @@ export async function handleCreateProjects(configFile: string, options) {
         await storageClient.getFileContent(getBucketName(stateFilePath), getObjectName(stateFilePath)),
       );
     } catch (error) {
+      getLogger().info(`No stateFile found in ${stateFilePath}. Robosaur will create a new one`);
       states = [];
     }
   }
@@ -69,9 +71,7 @@ export async function handleCreateProjects(configFile: string, options) {
 
   getLogger().info(`Found ${projectsToCreate.length} projects to create: ${JSON.stringify(projectsToCreate)}`);
 
-  const assignees = await parseAssignment();
-
-  const { labelSetDirectory } = getConfig().project;
+  const { labelSetDirectory, labelSets } = getConfig().project;
   let labelsets: LabelSet[] = [];
   if (labelSetDirectory) {
     labelsets = getLabelSetsFromDirectory(labelSetDirectory);
@@ -84,23 +84,21 @@ export async function handleCreateProjects(configFile: string, options) {
       );
     }
     getLogger().info('Labelset parsing completed');
+  } else {
+    if (labelSets) labelsets = getConfig().project.labelSets as LabelSet[];
   }
 
   getLogger().info('validating project assignments...');
-  await validateAssignments(assignees);
+  const assignees = await getAssignmentConfig();
+  getLogger().info('projects assignment');
 
   let results: any[] = [];
   for (const projectName of projectsToCreate) {
+    getLogger().info(`creating project ${projectName}...`);
     const fullPrefix =
       foldersInBucket.find((folderName) => folderName.endsWith(normalizeFolderName(projectName))) ?? '';
-    const bucketItems = await storageClient.listItemsInBucket(bucketName, fullPrefix);
 
-    const documents = await Promise.all(
-      bucketItems.map(async (item) => ({
-        fileName: basename(item.name),
-        externalImportableUrl: await storageClient.getObjectUrl(bucketName, item.name),
-      })),
-    );
+    const documents = await getObjectStorageDocuments(bucketName, fullPrefix);
 
     if (dryRun) {
       const newProjectConfiguration = {
@@ -152,7 +150,16 @@ export async function handleCreateProjects(configFile: string, options) {
         });
 
         // set state back
-        await getStorageClient(source).setFileContent(bucketName, stateFilePath, JSON.stringify(states));
+        getLogger().info(`uploading stateFile to bucket...`);
+        try {
+          await getStorageClient(source).setFileContent(
+            getBucketName(stateFilePath),
+            getObjectName(stateFilePath),
+            JSON.stringify(states),
+          );
+        } catch (error) {
+          getLogger().error(`error during uploading stateFile`, error);
+        }
         getLogger().info('exiting script...');
         break;
       }

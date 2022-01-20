@@ -15,3 +15,10 @@ export interface LabelItem {
   label: string;
   color?: string | null;
 }
+
+export interface LabelSet {
+  label: string;
+  config: {
+    options: LabelItem[];
+  };
+}

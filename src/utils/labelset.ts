@@ -1,17 +1,10 @@
 import { readdirSync } from 'fs';
 import { basename, resolve, parse } from 'path';
 import { getLogger } from '../logger';
-import { LabelItem } from '../datasaur/interfaces';
+import { LabelItem, LabelSet } from '../datasaur/interfaces';
 import { defaultCSVConfig, readCSVFile } from './readCSVFile';
 
 const LABELSET_COUNT_LIMIT = 5;
-
-export interface LabelSet {
-  label: string;
-  config: {
-    options: LabelItem[];
-  };
-}
 
 export function getLabelSetsFromDirectory(directory: string): LabelSet[] {
   getLogger().info('Retrieving list of labelset files in directory');

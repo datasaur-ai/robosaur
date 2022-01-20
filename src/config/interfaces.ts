@@ -1,4 +1,4 @@
-import { LabelItem } from '../datasaur/interfaces';
+import { LabelSet } from '../datasaur/interfaces';
 
 export enum StorageSources {
   LOCAL = 'local',
@@ -140,14 +140,9 @@ export interface Config {
     /**
      * @description Label sets configurations. Only applicable when documentSettings.kind is TOKEN_BASED
      */
-    labelSets?: Array<null | {
-      label: string;
-      config: {
-        options: Array<LabelItem>;
-      };
-    }>;
+    labelSets?: Array<null | LabelSet>;
     /**
-     * @description Optional. Local path to a folder containing CSV files for TOKEN_BASED
+     * @description Optional. Local path to a folder containing CSV files for TOKEN_BASED. If both labelSetDirectory and labelSets is provided, robosaur will pick labelSets
      */
     labelSetDirectory?: string;
   };
