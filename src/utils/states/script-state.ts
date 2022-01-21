@@ -29,6 +29,10 @@ export class ScriptState {
       (this.teams = oldState.teams.map((tps) => new TeamProjectsState(tps))), (this.createdAt = oldState.createdAt);
       this.updatedAt = oldState.updatedAt;
       this.version = oldState.version;
+
+      if (this.version !== packageJson.version) {
+        getLogger().warn(`different Robosaur version detected from statefile`);
+      }
     } else {
       this.teams = [];
       this.createdAt = Date.now();
