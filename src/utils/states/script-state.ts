@@ -8,7 +8,7 @@ import { Project } from '../../datasaur/interfaces';
 import { getLogger } from '../../logger';
 import { getStorageClient } from '../object-storage';
 import { getBucketName, getObjectName } from '../object-storage/helper';
-import { ProjectState, TeamProjectsState } from './team-projects-states';
+import { ProjectState, TeamProjectsState } from './team-projects-state';
 
 const IMPLEMENTED_STATE_SOURCE = [StorageSources.LOCAL, StorageSources.AMAZONS3, StorageSources.GOOGLE];
 
