@@ -16,10 +16,10 @@ export async function query<T = any, V = any>(
 
 async function getClient() {
   if (!client) {
-    getLogger().info('Generating access token...');
+    getLogger().info('generating access token...');
     const config = getConfig().datasaur;
     const accessToken = await getAccessToken(config.host, config.clientId, config.clientSecret);
-    getLogger().info('Finished generating access token...');
+    getLogger().info('finished generating access token...');
 
     client = new GraphQLClient(`${config.host}/graphql`, {
       headers: {

@@ -11,7 +11,7 @@ export function getLabelSetsFromDirectory({ project }: Config): LabelSet[] {
   const directory = project.labelSetDirectory;
 
   if (directory) {
-    getLogger().info('Retrieving list of labelset files in directory');
+    getLogger().info('retrieving list of labelset files in directory');
     const filesInDir = readdirSync(directory, { withFileTypes: true })
       .filter((dirEntries) => dirEntries.isFile() && dirEntries.name.endsWith('.csv'))
       .sort((entry1, entry2) => {
@@ -20,18 +20,18 @@ export function getLabelSetsFromDirectory({ project }: Config): LabelSet[] {
 
     if (filesInDir.length > LABELSET_COUNT_LIMIT) {
       getLogger().error(
-        `Currently Datasaur supports up to ${LABELSET_COUNT_LIMIT} labelsets, you have ${filesInDir.length} csv files in the directory`,
+        `currently Datasaur supports up to ${LABELSET_COUNT_LIMIT} labelsets, you have ${filesInDir.length} csv files in the directory`,
       );
-      throw new Error(`More than ${LABELSET_COUNT_LIMIT} labelsets defined`);
+      throw new Error(`more than ${LABELSET_COUNT_LIMIT} labelsets defined`);
     }
 
     getLogger().info(
-      `Found ${filesInDir.length} labelset file in ${directory}`,
+      `found ${filesInDir.length} labelset file in ${directory}`,
       JSON.stringify(filesInDir.map((file) => file.name)),
     );
     return filesInDir.map((file) => parseCSVToLabelSet(resolve(directory, file.name)));
   } else {
-    getLogger().info('No labelSetDirectory in config file');
+    getLogger().info('no labelSetDirectory in config file');
     return project.labelSets as LabelSet[];
   }
 }

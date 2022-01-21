@@ -19,23 +19,23 @@ export async function validateAssignment(assignees) {
 
   if (assignees.labelers.length === 0) {
     getLogger().warn(
-      'No labeler is registered. To setup project assignment please configure your config.assignment settings.',
+      'no labeler is registered. To setup project assignment please configure your config.assignment settings.',
     );
   }
 
   const labelerEmailDiferrences = difference(assignees.labelers, memberEmails);
   if (labelerEmailDiferrences.length > 0) {
-    getLogger().error('There are some labelers that have not been registered to the team.', {
+    getLogger().error('there are some labelers that have not been registered to the team.', {
       labeler: [...labelerEmailDiferrences],
     });
-    throw new Error(`There are some labelers that haven't been registered to the team.`);
+    throw new Error(`there are some labelers that haven't been registered to the team.`);
   }
 
   const reviewerEmailDiferrences = difference(assignees.reviewers, memberEmails);
   if (reviewerEmailDiferrences.length > 0) {
-    getLogger().error('There are some reviewers that have not been registered to the team.', {
+    getLogger().error('there are some reviewers that have not been registered to the team.', {
       reviewer: [...reviewerEmailDiferrences],
     });
-    throw new Error(`There are some reviewers that haven't been registered to the team.`);
+    throw new Error(`there are some reviewers that haven't been registered to the team.`);
   }
 }

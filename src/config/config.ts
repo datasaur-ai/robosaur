@@ -21,7 +21,7 @@ export function getConfig(): Config {
 }
 
 export function setConfigByJSONFile(filePath: string) {
-  getLogger().info(`Config from: ${filePath}`);
+  getLogger().info(`reading config from: ${filePath}`);
   config = readJSONFile(filePath);
   validateConfigAssignment(config as Config);
   validateConfigDocuments(config as Config);

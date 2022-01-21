@@ -40,7 +40,7 @@ export async function createProject(
     labelSetIDs = await Promise.all(
       settings.labelSets.map(async (labelSet, index) => {
         if (labelSet) {
-          getLogger().info(`Uploading label set "${labelSet.label}" for index: ${index}...`);
+          getLogger().info(`uploading label set "${labelSet.label}" for index: ${index}...`);
           const result = await createLabelSet(labelSet.label, index, labelSet.config.options);
           return result.id;
         }
