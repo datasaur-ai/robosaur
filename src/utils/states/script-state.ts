@@ -26,7 +26,8 @@ export class ScriptState {
 
   constructor(oldState?: ScriptState) {
     if (oldState) {
-      (this.teams = oldState.teams.map((tps) => new TeamProjectsState(tps))), (this.createdAt = oldState.createdAt);
+      this.teams = oldState.teams.map((tps) => new TeamProjectsState(tps));
+      this.createdAt = oldState.createdAt;
       this.updatedAt = oldState.updatedAt;
       this.version = oldState.version;
 
