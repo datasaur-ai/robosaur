@@ -1,5 +1,3 @@
-import { LabelSet } from '../datasaur/interfaces';
-
 export enum StorageSources {
   LOCAL = 'local',
   REMOTE = 'remote',
@@ -25,6 +23,7 @@ export interface Config {
   documents: {
     /**
      * @description determine whether the source of the documents should be in local folder or remote url.
+     * One of 'local', 'remote', 'gcs', 's3'
      */
     source: StorageSources;
     /**
@@ -79,6 +78,7 @@ export interface Config {
   assignment: {
     /**
      * @description determine whether the source of the assignment file should be in local folder or remote url.
+     * One of 'local', 's3', 'gcs'
      */
     source: StorageSources.LOCAL | StorageSources.AMAZONS3 | StorageSources.GOOGLE;
     /**
@@ -140,7 +140,17 @@ export interface Config {
     /**
      * @description Label sets configurations. Only applicable when documentSettings.kind is TOKEN_BASED
      */
-    labelSets?: Array<null | LabelSet>;
+    labelSets?: Array<null | {
+      label: string;
+      config: {
+        options: Array<{
+          id: string;
+          parentId?: string | null;
+          label: string;
+          color?: string | null;
+        }>;
+      };
+    }>;
     /**
      * @description Optional. Local path to a folder containing CSV files for TOKEN_BASED. If both labelSetDirectory and labelSets is provided, robosaur will pick labelSets
      */
