@@ -78,46 +78,48 @@ export async function handleCreateProjects(configFile: string, options) {
   let results: any[] = [];
   let projectCounter = 0;
   for (const projectDetails of projectsToCreate) {
-    getLogger().info(`creating project ${projectDetails.name}...`);
+    let counterRetry = 0;
+    while (counterRetry < LIMIT_RETRY) {
+      getLogger().info(`creating project ${projectDetails.name}...`);
 
-    getLogger().info(`retrieving documents from ${source}...`);
-    const documents =
-      source === StorageSources.LOCAL
-        ? getLocalDocuments(projectDetails.fullPath)
-        : await getObjectStorageDocuments(bucketName, projectDetails.fullPath);
+      getLogger().info(`retrieving documents from ${source}...`);
+      const documents =
+        source === StorageSources.LOCAL
+          ? getLocalDocuments(projectDetails.fullPath)
+          : await getObjectStorageDocuments(bucketName, projectDetails.fullPath);
 
-    const newProjectConfiguration: ProjectConfiguration = {
-      projectName: projectDetails.name,
-      documents,
-      documentAssignments: assignAllDocuments(assignees, documents),
-      projectConfig: updatedProjectConfig,
-    };
+      const newProjectConfiguration: ProjectConfiguration = {
+        projectName: projectDetails.name,
+        documents,
+        documentAssignments: assignAllDocuments(assignees, documents),
+        projectConfig: updatedProjectConfig,
+      };
 
-    if (dryRun) {
-      getLogger().info(`new project to be created: ${projectDetails.name} with ${documents.length} documents`, {
-        dryRun,
-      });
-      results.push(newProjectConfiguration);
-    } else {
-      getLogger().info(`submitting ProjectLaunchJob...`);
-
-      let counterRetry = 0;
-      while (counterRetry < LIMIT_RETRY) {
+      if (dryRun) {
+        getLogger().info(`new project to be created: ${projectDetails.name} with ${documents.length} documents`, {
+          dryRun,
+        });
+        results.push(newProjectConfiguration);
+        counterRetry = LIMIT_RETRY;
+      } else {
+        getLogger().info(`submitting ProjectLaunchJob...`);
         counterRetry += 1;
         try {
           const result = await doCreateProjectAndUpdateState(newProjectConfiguration, scriptState);
           results.push(result);
+          counterRetry = LIMIT_RETRY + 1;
         } catch (error) {
-          if (counterRetry > LIMIT_RETRY) {
+          if (counterRetry >= LIMIT_RETRY) {
             getLogger().error(`reached retry limit for ${projectDetails.name}, skipping...`, { error });
           } else {
             getLogger().warn(`error creating ${projectDetails.name}, retrying...`, { error });
           }
         }
       }
-      projectCounter += 1;
-      if (projectCounter % PROJECT_BEFORE_SAVE === 0) await scriptState.save();
     }
+
+    projectCounter += 1;
+    if (projectCounter % PROJECT_BEFORE_SAVE === 0) await scriptState.save();
   }
 
   if (dryRun) {
