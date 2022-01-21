@@ -1,5 +1,5 @@
-import { writeFileSync } from 'fs';
-import { join, resolve } from 'path';
+import { readdirSync, writeFileSync } from 'fs';
+import { resolve } from 'path';
 import { assignAllDocuments } from '../assignment/assign-all-documents';
 import { getAssignmentConfig } from '../assignment/get-assignment-config';
 import { DocumentAssignment } from '../assignment/interfaces';
@@ -7,12 +7,12 @@ import { getConfig, setConfigByJSONFile } from '../config/config';
 import { StorageSources } from '../config/interfaces';
 import { createProject } from '../datasaur/create-project';
 import { getJobs, JobStatus } from '../datasaur/get-jobs';
+import { getLocalDocuments } from '../documents/get-local-documents';
 import { getObjectStorageDocuments } from '../documents/get-object-storage-documents';
-import { RemoteDocument } from '../documents/interfaces';
+import { LocalDocument, RemoteDocument } from '../documents/interfaces';
 import { getLogger } from '../logger';
 import { getLabelSetsFromDirectory } from '../utils/labelset';
 import { getStorageClient } from '../utils/object-storage';
-import { normalizeFolderName } from '../utils/object-storage/helper';
 import { ObjectStorageClient } from '../utils/object-storage/interface';
 import { sleep } from '../utils/sleep';
 import { ScriptState } from '../utils/states/script-state';
@@ -20,7 +20,7 @@ import { handleCreateProject } from './create-project.handler';
 
 interface ProjectConfiguration {
   projectName: string;
-  documents: Array<RemoteDocument>;
+  documents: Array<RemoteDocument | LocalDocument>;
   documentAssignments: Array<DocumentAssignment>;
 
   /**
@@ -30,103 +30,89 @@ interface ProjectConfiguration {
 }
 
 const LIMIT_RETRY = 3;
-const PROJECT_BEFORE_SAVE = 1;
+const PROJECT_BEFORE_SAVE = 5;
 
 export async function handleCreateProjects(configFile: string, options) {
   const { dryRun } = options;
-
   const cwd = process.cwd();
   setConfigByJSONFile(resolve(cwd, configFile));
 
   const documentSource = getConfig().documents.source;
   switch (documentSource) {
-    case StorageSources.LOCAL:
     case StorageSources.REMOTE:
-      return await handleCreateProject('New Robosaur Project', configFile);
+      getLogger().warn(
+        `${documentSource} is unsupported for multiple projects creation. Falling back to singular project creation...`,
+      );
+      return handleCreateProject('New Robosaur Project', configFile);
   }
-
-  const { bucketName, prefix: storagePrefix, source, stateFilePath } = getConfig().documents;
-
-  getLogger().info(`Retrieving folders in bucket ${bucketName} with prefix: '${storagePrefix}'`);
-  const storageClient: ObjectStorageClient = getStorageClient(source);
-  const foldersInBucket = await storageClient.listSubfoldersOfPrefix(bucketName, storagePrefix);
-  let projectsToCreate = foldersInBucket.map((foldername) =>
-    foldername.replace(getConfig().documents.prefix, '').replace(/\//g, ''),
-  );
-  getLogger().info(`Found folders: ${JSON.stringify(foldersInBucket)}`);
+  const { bucketName, prefix: storagePrefix, source, stateFilePath, path } = getConfig().documents;
 
   let scriptState: ScriptState;
-
   try {
     scriptState = await ScriptState.fromConfig();
     await scriptState.updateInProgressStates();
   } catch (error) {
-    console.error(error);
-    getLogger().info(`No stateFile found in ${stateFilePath}. Robosaur will create a new one`);
+    getLogger().info(`no stateFile found in ${stateFilePath}. Robosaur will create a new one`, { error });
     scriptState = new ScriptState();
   }
 
+  let projectsToCreate: { name: string; fullPath: string }[];
+  projectsToCreate = await getProjectNamesFromFolderNames(source, { bucketName, prefix: storagePrefix, path });
+
   // potential improvement: checks documents / file inside each bucket folder
-  projectsToCreate = projectsToCreate.filter((project) => {
-    return !scriptState
-      .getTeamProjectsState()
-      .getProjects()
-      .some((state) => state.projectName === project && state.status === JobStatus.DELIVERED);
-  });
+  projectsToCreate = projectsToCreate.filter((project) => !scriptState.projectNameHasBeenUsed(project.name));
 
   if (projectsToCreate.length === 0) {
-    getLogger().info('No projects left to create, exiting...');
+    getLogger().info('no projects left to create, exiting...');
     if (!dryRun) await scriptState.save();
     return;
   }
-
-  getLogger().info(`Found ${projectsToCreate.length} projects to create: ${JSON.stringify(projectsToCreate)}`);
+  getLogger().info(`found ${projectsToCreate.length} projects to create: ${JSON.stringify(projectsToCreate)}`);
 
   const updatedProjectConfig = getConfig().project;
   updatedProjectConfig.labelSets = getLabelSetsFromDirectory(getConfig());
 
-  getLogger().info('validating project assignments...');
+  getLogger().info('validating project assignment...');
   const assignees = await getAssignmentConfig();
-  getLogger().info('projects assignment');
 
   let results: any[] = [];
   let projectCounter = 0;
-  for (const projectName of projectsToCreate) {
-    getLogger().info(`creating project ${projectName}...`);
+  for (const projectDetails of projectsToCreate) {
+    getLogger().info(`creating project ${projectDetails.name}...`);
 
     getLogger().info(`retrieving documents from ${source}...`);
-    const fullPrefix =
-      foldersInBucket.find((folderName) => folderName.endsWith(normalizeFolderName(projectName))) ?? '';
-    const documents = await getObjectStorageDocuments(bucketName, fullPrefix);
+    const documents =
+      source === StorageSources.LOCAL
+        ? getLocalDocuments(projectDetails.fullPath)
+        : await getObjectStorageDocuments(bucketName, projectDetails.fullPath);
 
     const newProjectConfiguration: ProjectConfiguration = {
-      projectName,
+      projectName: projectDetails.name,
       documents,
       documentAssignments: assignAllDocuments(assignees, documents),
       projectConfig: updatedProjectConfig,
     };
 
     if (dryRun) {
-      getLogger().info(`new project to be created: ${projectName} with ${documents.length} documents`, { dryRun });
+      getLogger().info(`new project to be created: ${projectDetails.name} with ${documents.length} documents`, {
+        dryRun,
+      });
       results.push(newProjectConfiguration);
     } else {
-      getLogger().info(`Submitting ProjectLaunchJob...`);
-      // add retry logic
+      getLogger().info(`submitting ProjectLaunchJob...`);
+
       let counterRetry = 0;
-      let fail = true;
-      while (fail) {
+      while (counterRetry < LIMIT_RETRY) {
+        counterRetry += 1;
         try {
           const result = await doCreateProjectAndUpdateState(newProjectConfiguration, scriptState);
           results.push(result);
-          fail = false;
         } catch (error) {
-          fail = true;
           if (counterRetry > LIMIT_RETRY) {
-            getLogger().error(`reached retry limit for ${projectName}, skipping...`);
-            fail = false;
+            getLogger().error(`reached retry limit for ${projectDetails.name}, skipping...`, { error });
+          } else {
+            getLogger().warn(`error creating ${projectDetails.name}, retrying...`, { error });
           }
-          getLogger().warn(`error creating ${projectName}, retrying...`);
-          counterRetry += 1;
         }
       }
       projectCounter += 1;
@@ -134,25 +120,25 @@ export async function handleCreateProjects(configFile: string, options) {
     }
   }
 
-  if (!dryRun) await scriptState.save();
-
   if (dryRun) {
     let filepath = resolve(cwd, `dry-run-output-${Date.now()}.json`);
     writeFileSync(filepath, JSON.stringify(results, null, 2));
     getLogger().info(`dry-run results created in ${filepath}`, { dryRun });
   } else {
-    getLogger().info(`Sending query for ProjectLaunchJob status...`);
+    await scriptState.save();
+    getLogger().info(`sending query for ProjectLaunchJob status...`);
     while (true) {
       await sleep(5000);
       const jobs = await getJobs(results.map((result) => result.job.id));
-      // get state where status === IN_PROGRESS
+
       const notFinishedStatuses = [JobStatus.IN_PROGRESS, JobStatus.NONE, JobStatus.QUEUED];
       const notFinishedJobs = jobs.filter((job) => notFinishedStatuses.includes(job.status));
       if (notFinishedJobs.length === 0) {
-        getLogger().info(`All ProjectLaunchJob finished.`);
-        getLogger().info(JSON.stringify(jobs));
+        getLogger().info(`sll ProjectLaunchJob finished.`, { jobs });
+
         scriptState.updateStatesFromJobs(jobs);
         await scriptState.save();
+
         getLogger().info('exiting script...');
         break;
       }
@@ -167,8 +153,6 @@ async function doCreateProjectAndUpdateState(projectConfiguration: ProjectConfig
   state.addProject({
     projectName: projectName,
     documents: documents.map((doc) => ({
-      bucketName: getConfig().documents.bucketName,
-      prefix: join(getConfig().documents.prefix, projectName),
       name: doc.fileName,
     })),
     jobId: result.job.id,
@@ -176,4 +160,26 @@ async function doCreateProjectAndUpdateState(projectConfiguration: ProjectConfig
     status: JobStatus.IN_PROGRESS,
   });
   return result;
+}
+
+async function getProjectNamesFromFolderNames(
+  source: StorageSources,
+  { bucketName, prefix, path }: { bucketName: string; prefix: string; path: string },
+) {
+  if (source === StorageSources.LOCAL) {
+    getLogger().info(`retrieving folders in local directory ${path} `);
+    const dirpath = resolve(process.cwd(), getConfig().documents.path);
+    const directories = readdirSync(dirpath, { withFileTypes: true }).filter((p) => p.isDirectory());
+    return directories.map((dir) => ({ name: dir.name, fullPath: resolve(dirpath, dir.name) }));
+  } else {
+    getLogger().info(`retrieving folders in bucket ${bucketName} with prefix: '${prefix}'`);
+    const storageClient: ObjectStorageClient = getStorageClient(source);
+    const foldersInBucket = await storageClient.listSubfoldersOfPrefix(bucketName, prefix);
+    getLogger().info(`found folders: ${JSON.stringify(foldersInBucket)}`);
+
+    return foldersInBucket.map((foldername) => ({
+      name: foldername.replace(getConfig().documents.prefix, '').replace(/\//g, ''),
+      fullPath: foldername,
+    }));
+  }
 }

@@ -1,5 +1,7 @@
+import { existsSync, readFileSync, writeFileSync } from 'fs';
 import packageJson from '../../../package.json';
 import { getConfig } from '../../config/config';
+import { StorageSources } from '../../config/interfaces';
 import { getJobs, Job, JobStatus } from '../../datasaur/get-jobs';
 import { getProjects } from '../../datasaur/get-projects';
 import { Project } from '../../datasaur/interfaces';
@@ -8,13 +10,16 @@ import { getStorageClient } from '../object-storage';
 import { getBucketName, getObjectName } from '../object-storage/helper';
 import { ProjectState, TeamProjectsState } from './team-projects-states';
 
+const IMPLEMENTED_STATE_SOURCE = [StorageSources.LOCAL, StorageSources.AMAZONS3, StorageSources.GOOGLE];
+
 export class ScriptState {
   private teams: TeamProjectsState[];
-  private createdAt: Date;
-  public updatedAt: Date;
+  private createdAt: number;
+  private updatedAt: number;
   private version: string;
   private static stateFilePath: string;
   private static activeTeamId: string;
+  private static source: StorageSources;
 
   constructor(oldState: ScriptState);
   constructor();
@@ -26,29 +31,25 @@ export class ScriptState {
       this.version = oldState.version;
     } else {
       this.teams = [];
-      this.createdAt = new Date();
-      this.updatedAt = new Date();
+      this.createdAt = Date.now();
+      this.updatedAt = Date.now();
       this.version = packageJson.version;
     }
   }
 
   public static async fromConfig() {
     ScriptState.stateFilePath = getConfig().documents.stateFilePath;
+    ScriptState.source = getConfig().documents.source;
     ScriptState.activeTeamId = getConfig().project.teamId;
     if (ScriptState.stateFilePath) {
       try {
         getLogger().info('reading state...');
-        const scriptState = JSON.parse(
-          await getStorageClient().getFileContent(
-            getBucketName(ScriptState.stateFilePath),
-            getObjectName(ScriptState.stateFilePath),
-          ),
-        );
+        const scriptState = JSON.parse(await ScriptState.readStateFile());
         getLogger().info('parsing state finished');
         return new ScriptState(scriptState);
       } catch (error) {
-        getLogger().error('error in parsing state', error);
-        throw new Error(`Error parsing state file from ${ScriptState.stateFilePath}`);
+        getLogger().error('error in parsing state', { error });
+        throw new Error(`error parsing state file from ${ScriptState.stateFilePath}`);
       }
     } else {
       getLogger().warn('no stateFilePath is configured, creating new in-memory state');
@@ -103,19 +104,21 @@ export class ScriptState {
     return this.teams[index];
   }
 
+  projectNameHasBeenUsed(name: string) {
+    return this.getTeamProjectsState()
+      .getProjects()
+      .some(({ projectName, status }) => projectName === name && status === JobStatus.DELIVERED);
+  }
+
   async save() {
     const stateFilePath = ScriptState.stateFilePath;
     if (stateFilePath) {
       try {
         getLogger().info('saving state...');
-        await getStorageClient().setFileContent(
-          getBucketName(stateFilePath),
-          getObjectName(stateFilePath),
-          JSON.stringify(this, null, 2),
-        );
+        await ScriptState.writeStateFile(this);
         getLogger().info('saving finished');
       } catch (error) {
-        getLogger().error('error in saving state', error);
+        getLogger().error('error in saving state:', { error });
       }
     } else {
       getLogger().warn('no stateFilePath is configured, skipping...');
@@ -129,6 +132,45 @@ export class ScriptState {
   }
 
   private updateTimeStamp() {
-    this.updatedAt = new Date();
+    this.updatedAt = Date.now();
+  }
+
+  private static async readStateFile() {
+    switch (ScriptState.source) {
+      case StorageSources.AMAZONS3:
+      case StorageSources.GOOGLE:
+        return getStorageClient().getFileContent(
+          getBucketName(ScriptState.stateFilePath),
+          getObjectName(ScriptState.stateFilePath),
+        );
+      case StorageSources.LOCAL:
+        if (!existsSync(ScriptState.stateFilePath)) throw new Error('state file not found');
+        return readFileSync(ScriptState.stateFilePath, { encoding: 'utf-8' });
+      default:
+        getLogger().error(
+          `${ScriptState.source} is unsupported. Please use one of ${JSON.stringify(IMPLEMENTED_STATE_SOURCE)}`,
+        );
+        throw new Error(`unsupported source: ${ScriptState.source}`);
+    }
+  }
+
+  private static async writeStateFile(content: ScriptState) {
+    switch (ScriptState.source) {
+      case StorageSources.AMAZONS3:
+      case StorageSources.GOOGLE:
+        await getStorageClient().setFileContent(
+          getBucketName(ScriptState.stateFilePath),
+          getObjectName(ScriptState.stateFilePath),
+          JSON.stringify(content, null, 2),
+        );
+        return;
+      case StorageSources.LOCAL:
+        return writeFileSync(ScriptState.stateFilePath, JSON.stringify(content), { encoding: 'utf-8' });
+      default:
+        getLogger().error(
+          `${ScriptState.source} is unsupported. Please use one of ${JSON.stringify(IMPLEMENTED_STATE_SOURCE)}`,
+        );
+        throw new Error(`unsupported source: ${ScriptState.source}`);
+    }
   }
 }

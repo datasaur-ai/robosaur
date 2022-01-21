@@ -3,11 +3,11 @@ import { JobStatus } from '../../datasaur/get-jobs';
 export interface ProjectState {
   jobId: string | null | undefined;
   projectName: string;
-  documents: Array<{ bucketName: string; prefix: string; name: string }>;
+  documents: Array<{ name: string }>;
   projectId: string | null | undefined;
   status: JobStatus;
-  createdAt?: Date;
-  updatedAt?: Date;
+  createdAt?: number;
+  updatedAt?: number;
 }
 
 export class TeamProjectsState {
@@ -28,7 +28,7 @@ export class TeamProjectsState {
   }
 
   push(newProject: ProjectState) {
-    this.projects.push({ ...newProject, createdAt: new Date(), updatedAt: new Date() });
+    this.projects.push({ ...newProject, createdAt: Date.now(), updatedAt: Date.now() });
   }
 
   updateByJobId(jobid: string, newProjectData: Partial<ProjectState>) {
@@ -63,6 +63,6 @@ export class TeamProjectsState {
     for (const [key, value] of Object.entries(newProjectData)) {
       this.projects[identifier][key] = value;
     }
-    this.projects[identifier].updatedAt = new Date();
+    this.projects[identifier].updatedAt = Date.now();
   }
 }
