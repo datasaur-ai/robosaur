@@ -69,9 +69,12 @@ export class ScriptState {
   }
 
   updateStatesFromJobs(jobs: Job[]) {
-    jobs.forEach((job: Job) => {
-      this.getTeamProjectsState().updateByJobId(job.id, { status: job.status, projectId: job.resultId });
-    });
+    for (const job of jobs) {
+      this.getTeamProjectsState().updateByJobId(job.id, {
+        status: job.status,
+        projectId: job.resultId,
+      });
+    }
     this.updateTimeStamp();
   }
 
@@ -83,11 +86,18 @@ export class ScriptState {
     const latestResult = await getJobs(inProgressStates.map((s) => s.jobId));
     this.updateStatesFromJobs(latestResult);
 
-    const existingProjects = (await getProjects({ teamId: this.getActiveTeamId() })).filter((project) => {
-      return inProgressStates.some((state) => state.projectName === project.name);
-    });
+    inProgressStates = this.getTeamProjectsState()
+      .getProjects()
+      .filter((state) => state.status === JobStatus.IN_PROGRESS);
 
-    this.updateStatesFromProjects(existingProjects);
+    if (inProgressStates.length > 0) {
+      const allProjects = await getProjects({ teamId: this.getActiveTeamId() });
+      const relevantProjects = allProjects.filter((project) => {
+        return inProgressStates.some((state) => state.projectName === project.name);
+      });
+      this.updateStatesFromProjects(relevantProjects);
+    }
+
     this.updateTimeStamp();
   }
 

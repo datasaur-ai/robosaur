@@ -136,7 +136,7 @@ export async function handleCreateProjects(configFile: string, options) {
       const notFinishedStatuses = [JobStatus.IN_PROGRESS, JobStatus.NONE, JobStatus.QUEUED];
       const notFinishedJobs = jobs.filter((job) => notFinishedStatuses.includes(job.status));
       if (notFinishedJobs.length === 0) {
-        getLogger().info(`sll ProjectLaunchJob finished.`, { jobs });
+        getLogger().info(`all ProjectLaunchJob finished.`, { jobs });
 
         scriptState.updateStatesFromJobs(jobs);
         await scriptState.save();

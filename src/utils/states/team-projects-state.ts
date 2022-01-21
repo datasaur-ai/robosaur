@@ -32,7 +32,7 @@ export class TeamProjectsState {
   }
 
   updateByJobId(jobid: string, newProjectData: Partial<ProjectState>) {
-    const toUpdate = this.projects.findIndex((s) => s.projectId === jobid);
+    const toUpdate = this.projects.findIndex((s) => s.jobId === jobid);
     if (toUpdate === -1) return;
 
     this.update(toUpdate, newProjectData);
