@@ -2,6 +2,7 @@ import { Command } from 'commander';
 import packageJson from '../package.json';
 import { handleCreateProject } from './handlers/create-project.handler';
 import { handleCreateProjects } from './handlers/create-projects.handler';
+import { getLogger } from './logger';
 
 const program = new Command();
 
@@ -19,3 +20,10 @@ program
   .action(handleCreateProjects);
 
 program.parseAsync(process.argv);
+
+const handleUncaughtExceptionAndRejections = (arg) => {
+  getLogger().on('finish', () => process.exit);
+};
+
+process.on('unhandledRejection', handleUncaughtExceptionAndRejections);
+process.on('uncaughtException', handleUncaughtExceptionAndRejections);

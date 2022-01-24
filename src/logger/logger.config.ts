@@ -31,5 +31,8 @@ const loggerDefaultConfig: LoggerOptions = {
   ),
   silent: false,
   exitOnError: true,
-  transports: [new transports.Console()],
+  transports: [
+    new transports.File({ dirname: resolve(process.cwd(), 'logs'), tailable: true }),
+    new transports.Console(),
+  ],
 };

@@ -86,7 +86,8 @@ Here are a couple important details about the storage configuration:
    For GCS bucket, an example URI would be: `gs://{bucketName}/path/to/file.json`  
    This file will be continuously overwritten every time the script is run.
 3. `config.assignment.path` => if source is `gcs` or `s3`, `path` should be the full URI same as `staticFilePath`.  
-   if source is `config.assignment.local`, `path` should be relative or full path to json file
+   if source is `config.assignment.local`, `path` should be relative or full path to json file  
+   if we want to create a project without any labelers or reviewers, we can remove the `assignment` key from the JSON altogether.
 4. `config.project.labelSetDirectory` => Optional. Relative or full path to a local folder containing labelsets csv  
    The files in this directory will be listed and then sorted by its name in ascending order. The files will be converted to labelset in that order. To force a particular order, we could prefix the filenames with number, for example `filename.csv` -> `1.filename.csv`
 
