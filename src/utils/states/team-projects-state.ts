@@ -11,7 +11,7 @@ export interface ProjectState {
 }
 
 export class TeamProjectsState {
-  private projects: ProjectState[];
+  private projects: Map<string, ProjectState>;
   private id: string;
 
   constructor(id: string);
@@ -20,39 +20,38 @@ export class TeamProjectsState {
   constructor(args: string | TeamProjectsState) {
     if (typeof args === 'string') {
       this.id = args;
-      this.projects = [];
+      this.projects = new Map<string, ProjectState>();
     } else {
       this.id = args.id;
-      this.projects = args.projects.map((p: Required<ProjectState>) => ({
-        ...p,
-        createdAt: new Date(p.createdAt).getTime(),
-        updatedAt: new Date(p.updatedAt).getTime(),
-      }));
+      this.projects = new Map<string, ProjectState>();
+      args.projects.forEach((p: Required<ProjectState>, key) => {
+        this.projects.set(key, {
+          ...p,
+          createdAt: new Date(p.createdAt).getTime(),
+          updatedAt: new Date(p.updatedAt).getTime(),
+        });
+      });
     }
   }
 
   push(newProject: ProjectState) {
-    this.projects.push({ ...newProject, createdAt: Date.now(), updatedAt: Date.now() });
+    this.projects.set(newProject.projectName, { ...newProject, createdAt: Date.now(), updatedAt: Date.now() });
   }
 
   updateByJobId(jobid: string, newProjectData: Partial<ProjectState>) {
-    const toUpdate = this.projects.findIndex((s) => s.jobId === jobid);
-    if (toUpdate === -1) return -1;
+    let identifier = '';
+    for (const [key, project] of this.projects) {
+      if (project.jobId === jobid) {
+        identifier = key;
+        break;
+      }
+    }
 
-    return this.update(toUpdate, newProjectData);
+    return this.update(identifier, newProjectData);
   }
 
   updateByProjectName(projectName: string, newProjectData: Partial<ProjectState>) {
-    const toUpdate = this.projects.findIndex((s) => s.projectName === projectName);
-    if (toUpdate === -1) return -1;
-
-    return this.update(toUpdate, newProjectData);
-  }
-
-  updateByIndex(index: number, newProjectData: Partial<ProjectState>) {
-    if (index < this.projects.length) return this.update(index, newProjectData);
-
-    return -1;
+    return this.update(projectName, newProjectData);
   }
 
   getProjects() {
@@ -63,25 +62,29 @@ export class TeamProjectsState {
     return this.id;
   }
 
-  private update(identifier: number, newProjectData: Partial<ProjectState>) {
-    if (identifier === -1) return -1;
+  private update(identifier: string, newProjectData: Partial<ProjectState>) {
+    if (!identifier) return -1;
 
-    for (const [key, value] of Object.entries(newProjectData)) {
-      this.projects[identifier][key] = value;
-    }
-    this.projects[identifier].updatedAt = Date.now();
+    const existingData = this.projects.get(identifier);
+    if (!existingData) return -1;
 
+    this.projects.set(identifier, { ...existingData, ...newProjectData });
     return identifier;
   }
 
   toJSON() {
+    const arrayProjects: any[] = [];
+    for (const [key, project] of this.projects) {
+      arrayProjects.push({
+        ...project,
+        createdAt: new Date(project.createdAt as number).toISOString(),
+        updatedAt: new Date(project.updatedAt as number).toISOString(),
+      });
+    }
+
     const retvalObject = {
       id: this.id,
-      projects: this.getProjects().map((p) => ({
-        ...p,
-        createdAt: new Date(p.createdAt as number).toISOString(),
-        updatedAt: new Date(p.updatedAt as number).toISOString(),
-      })),
+      projects: arrayProjects,
     };
     return retvalObject;
   }

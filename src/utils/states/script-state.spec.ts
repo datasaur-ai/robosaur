@@ -8,16 +8,17 @@ describe(ScriptState.name, () => {
     let state: ScriptState;
     beforeEach(() => {
       state = new ScriptState();
-      jest.spyOn(TeamProjectsState.prototype, 'getProjects').mockReturnValue([
-        {
-          projectName: 'delivered-project',
-          status: JobStatus.DELIVERED,
-        } as ProjectState,
-        {
-          projectName: 'inprogress-project',
-          status: JobStatus.IN_PROGRESS,
-        } as ProjectState,
-      ]);
+      const dummyMap = new Map();
+      dummyMap.set('delivered-project', {
+        projectName: 'delivered-project',
+        status: JobStatus.DELIVERED,
+      } as ProjectState);
+      dummyMap.set('inprogress-project', {
+        projectName: 'inprogress-project',
+        status: JobStatus.IN_PROGRESS,
+      } as ProjectState);
+
+      jest.spyOn(TeamProjectsState.prototype, 'getProjects').mockReturnValue(dummyMap);
       jest.spyOn(state, 'getTeamProjectsState').mockReturnValue(new TeamProjectsState('dummy-team'));
     });
 
@@ -51,23 +52,13 @@ describe(ScriptState.name, () => {
       const dummyNewProject = { projectName: 'newly-added-project' };
       state.addProject(dummyNewProject as ProjectState);
 
-      expect(state.getTeamProjectsState().getProjects().length).toBeGreaterThan(
-        state.getTeamProjectsState(OTHER_TEAM).getProjects().length,
+      expect(state.getTeamProjectsState().getProjects().size).toBeGreaterThan(
+        state.getTeamProjectsState(OTHER_TEAM).getProjects().size,
       );
 
-      expect(
-        state
-          .getTeamProjectsState()
-          .getProjects()
-          .find((p) => p.projectName === dummyNewProject.projectName),
-      ).toBeTruthy();
+      expect(state.getTeamProjectsState(ACTIVE_TEAM).getProjects().get(dummyNewProject.projectName)).toBeTruthy();
 
-      expect(
-        state
-          .getTeamProjectsState(OTHER_TEAM)
-          .getProjects()
-          .find((p) => p.projectName === dummyNewProject.projectName),
-      ).toBeFalsy();
+      expect(state.getTeamProjectsState(OTHER_TEAM).getProjects().get(dummyNewProject.projectName)).toBeFalsy();
     });
   });
 

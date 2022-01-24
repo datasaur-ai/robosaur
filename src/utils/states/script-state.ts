@@ -79,16 +79,16 @@ export class ScriptState {
   }
 
   async updateInProgressStates() {
-    let inProgressStates = this.getTeamProjectsState()
-      .getProjects()
-      .filter((state) => state.status === JobStatus.IN_PROGRESS);
+    let inProgressStates = Array.from(this.getTeamProjectsState().getProjects())
+      .filter(([_key, state]) => state.status === JobStatus.IN_PROGRESS)
+      .map(([_key, state]) => state);
 
     const latestResult = await getJobs(inProgressStates.map((s) => s.jobId));
     this.updateStatesFromJobs(latestResult);
 
-    inProgressStates = this.getTeamProjectsState()
-      .getProjects()
-      .filter((state) => state.status === JobStatus.IN_PROGRESS);
+    inProgressStates = Array.from(this.getTeamProjectsState().getProjects())
+      .filter(([_key, state]) => state.status === JobStatus.IN_PROGRESS)
+      .map(([_key, state]) => state);
 
     if (inProgressStates.length > 0) {
       const allProjects = await getProjects({ teamId: this.getActiveTeamId() });
@@ -120,9 +120,9 @@ export class ScriptState {
   }
 
   projectNameHasBeenUsed(name: string) {
-    return this.getTeamProjectsState()
-      .getProjects()
-      .some(({ projectName, status }) => projectName === name && status === JobStatus.DELIVERED);
+    return Array.from(this.getTeamProjectsState().getProjects()).some(
+      ([_key, { projectName, status }]) => projectName === name && status === JobStatus.DELIVERED,
+    );
   }
 
   async save() {
