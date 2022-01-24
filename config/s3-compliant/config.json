@@ -40,7 +40,7 @@
       "textLabelMaxTokenLength": 999999,
       "sentenceSeparator": "\n",
       "tokenizer": "WINK"
-    }
-  },
-  "labelSetDirectory": "config/labelset"
+    },
+    "labelSetDirectory": "config/labelset"
+  }
 }
