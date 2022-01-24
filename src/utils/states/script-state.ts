@@ -133,7 +133,10 @@ export class ScriptState {
         await ScriptState.writeStateFile(this);
         getLogger().info('saving finished');
       } catch (error) {
-        getLogger().error('error in saving state:', { error });
+        getLogger().error('error when saving state', {
+          error: { code: error.code, message: error.message, stack: error?.stack },
+        });
+        throw new Error('error in saving state');
       }
     } else {
       getLogger().warn('no stateFilePath is configured, skipping...');

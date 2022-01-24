@@ -53,7 +53,7 @@ export async function handleCreateProjects(configFile: string, options) {
     await scriptState.updateInProgressStates();
   } catch (error) {
     getLogger().info(`no stateFile found in ${stateFilePath}. Robosaur will create a new one`, { error });
-    scriptState = new ScriptState();
+    scriptState = await createAndSaveNewState();
   }
 
   let projectsToCreate: { name: string; fullPath: string }[];
@@ -183,5 +183,16 @@ async function getProjectNamesFromFolderNames(
       name: foldername.replace(getConfig().documents.prefix, '').replace(/\//g, ''),
       fullPath: foldername,
     }));
+  }
+}
+
+async function createAndSaveNewState() {
+  try {
+    const state = new ScriptState();
+    await state.save();
+    return state;
+  } catch (error) {
+    getLogger().error(`fail in creating & saving new state file`);
+    throw error;
   }
 }
