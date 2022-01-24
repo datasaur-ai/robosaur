@@ -33,20 +33,22 @@ export class TeamProjectsState {
 
   updateByJobId(jobid: string, newProjectData: Partial<ProjectState>) {
     const toUpdate = this.projects.findIndex((s) => s.jobId === jobid);
-    if (toUpdate === -1) return;
+    if (toUpdate === -1) return -1;
 
-    this.update(toUpdate, newProjectData);
+    return this.update(toUpdate, newProjectData);
   }
 
   updateByProjectName(projectName: string, newProjectData: Partial<ProjectState>) {
     const toUpdate = this.projects.findIndex((s) => s.projectName === projectName);
-    if (toUpdate === -1) return;
+    if (toUpdate === -1) return -1;
 
-    this.update(toUpdate, newProjectData);
+    return this.update(toUpdate, newProjectData);
   }
 
   updateByIndex(index: number, newProjectData: Partial<ProjectState>) {
-    this.update(index, newProjectData);
+    if (index < this.projects.length) return this.update(index, newProjectData);
+
+    return -1;
   }
 
   getProjects() {
@@ -58,11 +60,13 @@ export class TeamProjectsState {
   }
 
   private update(identifier: number, newProjectData: Partial<ProjectState>) {
-    if (identifier === -1) return;
+    if (identifier === -1) return -1;
 
     for (const [key, value] of Object.entries(newProjectData)) {
       this.projects[identifier][key] = value;
     }
     this.projects[identifier].updatedAt = Date.now();
+
+    return identifier;
   }
 }

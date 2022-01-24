@@ -1,6 +1,7 @@
 import { JobStatus } from '../../datasaur/get-jobs';
 import { ScriptState } from './script-state';
 import { ProjectState, TeamProjectsState } from './team-projects-state';
+import { dummyPopulateProjects } from './test-helper';
 
 describe(ScriptState.name, () => {
   describe(ScriptState.prototype.projectNameHasBeenUsed, () => {
@@ -74,15 +75,3 @@ describe(ScriptState.name, () => {
     jest.restoreAllMocks();
   });
 });
-
-function dummyPopulateProjects(teamId: string, projectCount: number, state: ScriptState) {
-  for (let index = 0; index < projectCount; index++) {
-    const identifier = `${teamId}-${index}`;
-
-    // manually get team's state, and push a project to it
-    state.getTeamProjectsState(teamId).push({
-      projectId: identifier,
-      projectName: identifier,
-    } as ProjectState);
-  }
-}
