@@ -8,7 +8,7 @@ import { getBucketName, getObjectName } from '../utils/object-storage/helper';
 const IMPLEMENTED_SOURCES = [StorageSources.LOCAL, StorageSources.AMAZONS3, StorageSources.GOOGLE];
 
 export async function parseAssignment(): Promise<{ labelers: string[]; reviewers: string[] }> {
-  const { source, path } = getConfig().assignment;
+  const { source, path } = getConfig()?.assignment ?? { source: false, path: false };
 
   if (!source) return { labelers: [], reviewers: [] };
 
