@@ -144,6 +144,7 @@ export async function handleCreateProjects(configFile: string, options) {
         getLogger().info('exiting script...');
         break;
       }
+      getLogger().info(`found ${notFinishedJobs.length} unfinished job, re-sending query...`);
     }
   }
 }
