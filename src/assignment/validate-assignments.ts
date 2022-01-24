@@ -3,7 +3,7 @@ import { getLogger } from '../logger';
 import { getConfig } from '../config/config';
 import { getTeamMembers } from '../datasaur/get-team-members';
 
-export async function validateAssignment(assignees) {
+export async function validateAssignment(assignees: { labelers: string[]; reviewers: string[] }) {
   const teamMembers = await getTeamMembers(getConfig().project.teamId);
   const memberEmails = Array.from(
     new Set(
