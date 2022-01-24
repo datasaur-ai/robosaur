@@ -23,7 +23,11 @@ export class TeamProjectsState {
       this.projects = [];
     } else {
       this.id = args.id;
-      this.projects = args.projects;
+      this.projects = args.projects.map((p: Required<ProjectState>) => ({
+        ...p,
+        createdAt: new Date(p.createdAt).getTime(),
+        updatedAt: new Date(p.updatedAt).getTime(),
+      }));
     }
   }
 
@@ -68,5 +72,17 @@ export class TeamProjectsState {
     this.projects[identifier].updatedAt = Date.now();
 
     return identifier;
+  }
+
+  toJSON() {
+    const retvalObject = {
+      id: this.id,
+      projects: this.getProjects().map((p) => ({
+        ...p,
+        createdAt: new Date(p.createdAt as number).toISOString(),
+        updatedAt: new Date(p.updatedAt as number).toISOString(),
+      })),
+    };
+    return retvalObject;
   }
 }

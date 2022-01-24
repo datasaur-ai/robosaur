@@ -27,8 +27,8 @@ export class ScriptState {
   constructor(oldState?: ScriptState) {
     if (oldState) {
       this.teams = oldState.teams.map((tps) => new TeamProjectsState(tps));
-      this.createdAt = oldState.createdAt;
-      this.updatedAt = oldState.updatedAt;
+      this.createdAt = new Date(oldState.createdAt).getTime();
+      this.updatedAt = new Date(oldState.updatedAt).getTime();
       this.version = oldState.version;
 
       if (this.version !== packageJson.version) {
@@ -190,5 +190,15 @@ export class ScriptState {
         );
         throw new Error(`unsupported source: ${ScriptState.source}`);
     }
+  }
+
+  toJSON() {
+    const retvalObject = {
+      version: this.version,
+      createdAt: new Date(this.createdAt).toISOString(),
+      updatedAt: new Date(this.updatedAt).toISOString(),
+      teams: this.teams,
+    };
+    return retvalObject;
   }
 }
