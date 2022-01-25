@@ -50,11 +50,12 @@ export async function handleCreateProjects(configFile: string, options) {
   let scriptState: ScriptState;
   try {
     scriptState = await ScriptState.fromConfig();
-    await scriptState.updateInProgressStates();
   } catch (error) {
     getLogger().info(`no stateFile found in ${stateFilePath}. Robosaur will create a new one`, { error });
     scriptState = await createAndSaveNewState();
   }
+
+  await scriptState.updateInProgressStates();
 
   let projectsToCreate: { name: string; fullPath: string }[];
   projectsToCreate = await getProjectNamesFromFolderNames(source, { bucketName, prefix: storagePrefix, path });

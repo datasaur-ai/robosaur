@@ -21,9 +21,10 @@ program
 
 program.parseAsync(process.argv);
 
-const handleUncaughtExceptionAndRejections = (arg) => {
-  getLogger().on('finish', () => process.exit);
-};
+process.on('unhandledRejection', (error) => exitHandler('unhandledRejection', error));
+process.on('uncaughtException', (error) => exitHandler('uncaughtException', error));
 
-process.on('unhandledRejection', handleUncaughtExceptionAndRejections);
-process.on('uncaughtException', handleUncaughtExceptionAndRejections);
+function exitHandler(event: string, error: any) {
+  getLogger().error(`encountered ${event}`, { error: error.message });
+  getLogger().on('finish', () => process.exit(-1));
+}

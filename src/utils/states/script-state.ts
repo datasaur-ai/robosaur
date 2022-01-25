@@ -83,6 +83,9 @@ export class ScriptState {
       .filter(([_key, state]) => state.status === JobStatus.IN_PROGRESS)
       .map(([_key, state]) => state);
 
+    if (inProgressStates.length === 0) return;
+
+    getLogger().info(`found several IN_PROGRESS jobs in state, fetching latest information from Datasaur...`);
     const latestResult = await getJobs(inProgressStates.map((s) => s.jobId));
     this.updateStatesFromJobs(latestResult);
 
