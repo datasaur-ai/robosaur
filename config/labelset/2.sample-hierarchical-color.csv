@@ -1,0 +1,7 @@
+id,label,color
+1,Novel,#ff0000
+1.1,Author,#00ff00
+1.2,Title,#0000ff
+2,Characters,#ffff00
+2.1,Antagonist,#00ffff
+2.2,Protagonist,#ff00ff

@@ -9,14 +9,8 @@
     "path": "./documents.json"
   },
   "assignment": {
-    "labelers": [
-      "labeler-email-1@datasaur.ai",
-      "labeler-email-2@datasaur.ai"
-    ],
-    "reviewers": [
-      "reviewer-email-1@datasaur.ai",
-      "reviewer-email-2@datasaur.ai"
-    ]
+    "source": "local",
+    "path": "config/assignment/assignment.json"
   },
   "project": {
     "teamId": "<TEAM_ID>",
@@ -28,7 +22,7 @@
       "hideRejectedLabelsDuringReview": true,
       "hideLabelsFromInactiveLabelSetDuringReview": false
     },
-    "documentSettings" : {
+    "documentSettings": {
       "kind": "TOKEN_BASED",
       "customScriptId": null,
 

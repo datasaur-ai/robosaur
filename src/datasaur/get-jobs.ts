@@ -38,7 +38,7 @@ const GET_JOBS = gql`
     }
   }
 `;
-export async function getJobs(jobIds) {
+export async function getJobs(jobIds): Promise<Job[]> {
   const variables = { jobIds };
   const data = await query(GET_JOBS, variables);
   return data.result;

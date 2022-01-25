@@ -1,0 +1,40 @@
+{
+  "datasaur": {
+    "host": "https://datasaur.ai",
+    "clientId": "<DATASAUR_CLIENT_ID> See the guide here https://datasaurai.gitbook.io/datasaur/advanced/datasaur-apis/oauth-2.0#generate-oauth-credentials-menu",
+    "clientSecret": "<DATASAUR_CLIENT_SECRET> See the guide here https://datasaurai.gitbook.io/datasaur/advanced/datasaur-apis/oauth-2.0#generate-oauth-credentials-menu"
+  },
+  "documents": {
+    "source": "local",
+    "path": "path-to-local-folder",
+    "stateFilePath": "path-to-local-state.json"
+  },
+  "assignment": {
+    "source": "local",
+    "path": "config/assignment/assignment.json"
+  },
+  "project": {
+    "teamId": "<TEAM_ID>",
+    "projectSettings": {
+      "consensus": 1,
+      "enableEditLabelSet": false,
+      "enableEditSentence": false,
+      "hideLabelerNamesDuringReview": false,
+      "hideRejectedLabelsDuringReview": true,
+      "hideLabelsFromInactiveLabelSetDuringReview": false
+    },
+    "documentSettings": {
+      "kind": "TOKEN_BASED",
+      "customScriptId": null,
+
+      "allowCharacterBasedLabeling": false,
+      "allowArcDrawing": true,
+      "allowMultiLabels": true,
+      "allTokensMustBeLabeled": false,
+      "textLabelMaxTokenLength": 999999,
+      "sentenceSeparator": "\n",
+      "tokenizer": "WINK"
+    },
+    "labelSetDirectory": "config/labelset"
+  }
+}
