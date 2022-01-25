@@ -1,0 +1,4 @@
+{
+  "labelers": ["labeler-email@domain.tld"],
+  "reviewers": ["reviewer-email@domain.tld"]
+}

@@ -17,7 +17,8 @@
     "outDir": "./dist/",
     "sourceMap": true,
     "target": "es2017",
-    "baseUrl": "."
+    "baseUrl": ".",
+    "strictNullChecks": true
   },
   "exclude": ["node_modules", "**/*.spec.ts"]
 }
