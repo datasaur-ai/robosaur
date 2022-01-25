@@ -88,7 +88,9 @@ Here are a couple important details about the storage configuration:
 3. `config.assignment.path` => if source is `gcs` or `s3`, `path` should be the full URI same as `staticFilePath`.  
    if source is `config.assignment.local`, `path` should be relative or full path to json file  
    if we want to create a project without any labelers or reviewers, we can remove the `assignment` key from the JSON altogether.
-4. `config.project.labelSetDirectory` => Optional. Relative or full path to a local folder containing labelsets csv  
+4. `config.project.labelSetDirectory` => Optional. Relative or full path to a local folder containing labelsets  
+   Currently, only labelsets in CSV format for token-based project are supported.  
+   See [our gitbook](https://datasaurai.gitbook.io/datasaur/basics/creating-a-project/label-sets#token-based-labeling) for detailed information on the format. Sample files are also provided in the config/labelset directory
    The files in this directory will be listed and then sorted by its name in ascending order. The files will be converted to labelset in that order. To force a particular order, we could prefix the filenames with number, for example `filename.csv` -> `1.filename.csv`
 
 To run the command, run:
@@ -99,7 +101,7 @@ npm run start -- create-projects <pathToConfigJson>
 
 Calling `create-projects` with a `remote` documents source is currently unsupported, and the command will fallback to creating just one project using `create-project`
 
-#### Stateful Execution
+### Stateful Execution
 
 For the `create-projects` command, Robosaur can behave smarter with the help of a state file. This state file must be stored in the same `source` as the documents, meaning if we are using GCS bucket to store the documents, the state file needs to be somewhere in the same bucket as well.
 
