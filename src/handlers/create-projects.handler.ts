@@ -137,7 +137,13 @@ export async function handleCreateProjects(configFile: string, options) {
       const notFinishedStatuses = [JobStatus.IN_PROGRESS, JobStatus.NONE, JobStatus.QUEUED];
       const notFinishedJobs = jobs.filter((job) => notFinishedStatuses.includes(job.status));
       if (notFinishedJobs.length === 0) {
-        getLogger().info(`all ProjectLaunchJob finished.`, { jobs });
+        const failedJobs = jobs.filter((j) => j.status === JobStatus.FAILED).map((j) => j.id);
+        const deliveredJobs = jobs.filter((j) => j.status === JobStatus.DELIVERED).map((j) => j.id);
+        getLogger().info(`all ProjectLaunchJob finished.`, { failedJobs, deliveredJobs });
+        const okCount = deliveredJobs.length;
+        const failCount = failedJobs.length;
+        const totalCount = okCount + failCount;
+        getLogger().info(`completed ${totalCount} jobs; ${okCount} successful and ${failCount} failed`);
 
         scriptState.updateStatesFromJobs(jobs);
         await scriptState.save();
