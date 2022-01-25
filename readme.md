@@ -4,8 +4,8 @@ This is a project template to start automating your labeling workflow with Datas
 
 ## Requirements
 
-- NodeJS 12.16.0 or newer
-- NPM 6 or newer
+- NodeJS v16.13.2 or newer
+- NPM 8 or newer
 
 ## Installation
 

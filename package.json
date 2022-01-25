@@ -4,6 +4,7 @@
   "description": "Datasaur template for creating and exporting projects.",
   "main": "src/index.ts",
   "scripts": {
+    "test:ci": "jest --runInBand --ci",
     "test": "jest",
     "start": "ts-node src/index.ts"
   },
