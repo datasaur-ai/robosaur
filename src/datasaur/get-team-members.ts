@@ -24,9 +24,9 @@ const TEAM_MEMBER_QUERY = gql`
 export interface TeamMember {
   user: {
     email: string;
-  };
+  } | null;
   invitationStatus: string;
-  invitationEmail: string;
+  invitationEmail: string | null;
 }
 
 export async function getTeamMembers(teamId): Promise<TeamMember[]> {
