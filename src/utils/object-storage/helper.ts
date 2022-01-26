@@ -15,7 +15,7 @@ export function getMinioConfig(): ClientOptions {
     port: getConfig().credentials[StorageSources.AMAZONS3].s3Port,
     accessKey: getConfig().credentials[StorageSources.AMAZONS3].s3AccessKey,
     secretKey: getConfig().credentials[StorageSources.AMAZONS3].s3SecretKey,
-    useSSL: getConfig().credentials[StorageSources.AMAZONS3].s3UseSSl,
+    useSSL: getConfig().credentials[StorageSources.AMAZONS3].s3UseSSL,
   };
 }
 

@@ -7,7 +7,7 @@ import { getProjects } from '../../datasaur/get-projects';
 import { Project } from '../../datasaur/interfaces';
 import { getLogger } from '../../logger';
 import { getStorageClient } from '../object-storage';
-import { ProjectState, TeamProjectsState } from './team-projects-state';
+import { JobState, ProjectState, TeamProjectsState } from './team-projects-state';
 
 const IMPLEMENTED_STATE_SOURCE = [StorageSources.LOCAL, StorageSources.AMAZONS3, StorageSources.GOOGLE];
 
@@ -65,10 +65,10 @@ export class ScriptState {
     this.updateTimeStamp();
   }
 
-  updateStatesFromJobs(jobs: Job[]) {
+  updateStatesFromProjectCreationJobs(jobs: Job[]) {
     for (const job of jobs) {
-      this.getTeamProjectsState().updateByJobId(job.id, {
-        status: job.status,
+      this.getTeamProjectsState().updateByCreateJobId(job.id, {
+        create: { jobStatus: job.status, jobId: job.id },
         projectId: job.resultId,
       });
     }
@@ -77,17 +77,17 @@ export class ScriptState {
 
   async updateInProgressStates() {
     let inProgressStates = Array.from(this.getTeamProjectsState().getProjects())
-      .filter(([_key, state]) => state.status === JobStatus.IN_PROGRESS)
+      .filter(([_key, state]) => state.create?.jobStatus === JobStatus.IN_PROGRESS)
       .map(([_key, state]) => state);
 
     if (inProgressStates.length === 0) return;
 
     getLogger().info(`found several IN_PROGRESS jobs in state, fetching latest information from Datasaur...`);
-    const latestResult = await getJobs(inProgressStates.map((s) => s.jobId));
-    this.updateStatesFromJobs(latestResult);
+    const latestResult = await getJobs(inProgressStates.map((s) => s.create?.jobId));
+    this.updateStatesFromProjectCreationJobs(latestResult);
 
     inProgressStates = Array.from(this.getTeamProjectsState().getProjects())
-      .filter(([_key, state]) => state.status === JobStatus.IN_PROGRESS)
+      .filter(([_key, state]) => state.create?.jobStatus === JobStatus.IN_PROGRESS)
       .map(([_key, state]) => state);
 
     if (inProgressStates.length > 0) {
@@ -121,7 +121,7 @@ export class ScriptState {
 
   projectNameHasBeenUsed(name: string) {
     return Array.from(this.getTeamProjectsState().getProjects()).some(
-      ([_key, { projectName, status }]) => projectName === name && status === JobStatus.DELIVERED,
+      ([_key, { projectName, create }]) => projectName === name && create?.jobStatus === JobStatus.DELIVERED,
     );
   }
 
@@ -144,7 +144,10 @@ export class ScriptState {
 
   private updateStatesFromProjects(projects: Project[]) {
     projects.forEach((p) =>
-      this.getTeamProjectsState().updateByProjectName(p.name, { status: JobStatus.DELIVERED, projectId: p.id }),
+      this.getTeamProjectsState().updateByProjectName(p.name, {
+        create: { jobStatus: JobStatus.DELIVERED } as JobState,
+        projectId: p.id,
+      }),
     );
   }
 

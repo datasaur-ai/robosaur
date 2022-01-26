@@ -11,11 +11,11 @@ describe(ScriptState.name, () => {
       const dummyMap = new Map();
       dummyMap.set('delivered-project', {
         projectName: 'delivered-project',
-        status: JobStatus.DELIVERED,
+        create: { jobStatus: JobStatus.DELIVERED },
       } as ProjectState);
       dummyMap.set('inprogress-project', {
         projectName: 'inprogress-project',
-        status: JobStatus.IN_PROGRESS,
+        create: { jobStatus: JobStatus.IN_PROGRESS },
       } as ProjectState);
 
       jest.spyOn(TeamProjectsState.prototype, 'getProjects').mockReturnValue(dummyMap);

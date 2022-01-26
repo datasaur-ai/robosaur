@@ -147,7 +147,7 @@ export async function handleCreateProjects(configFile: string, options) {
         const totalCount = okCount + failCount;
         getLogger().info(`completed ${totalCount} jobs; ${okCount} successful and ${failCount} failed`);
 
-        scriptState.updateStatesFromJobs(jobs);
+        scriptState.updateStatesFromProjectCreationJobs(jobs);
         await scriptState.save();
 
         getLogger().info('exiting script...');
@@ -167,9 +167,11 @@ async function doCreateProjectAndUpdateState(projectConfiguration: ProjectConfig
     documents: documents.map((doc) => ({
       name: doc.fileName,
     })),
-    jobId: result.job.id,
+    create: {
+      jobId: result.job.id,
+      jobStatus: JobStatus.IN_PROGRESS,
+    },
     projectId: undefined,
-    status: JobStatus.IN_PROGRESS,
   });
   return result;
 }
