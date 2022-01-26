@@ -28,7 +28,7 @@ export interface Config {
       s3Port: number;
       s3AccessKey: string;
       s3SecretKey: string;
-      s3UseSSl: boolean;
+      s3UseSSL: boolean;
     };
     [StorageSources.GOOGLE]: {
       /**
