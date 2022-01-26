@@ -5,6 +5,14 @@ export enum StorageSources {
   AMAZONS3 = 's3',
 }
 
+export enum ProjectStatus {
+  CREATED = 'CREATED',
+  IN_PROGRESS = 'IN_PROGRESS',
+  REVIEW_READY = 'REVIEW_READY',
+  IN_REVIEW = 'IN_REVIEW',
+  COMPLETED = 'COMPLETED',
+}
+
 export interface Config {
   datasaur: {
     /**
@@ -115,7 +123,7 @@ export interface Config {
   };
 }
 
-interface IStateConfig extends WithStorage {
+export interface IStateConfig extends WithStorage {
   /**
    * @description For 'gcs' and 's3' sources
    * Path to a state file to keep-track which folders and projects have been created and exported.
@@ -123,7 +131,7 @@ interface IStateConfig extends WithStorage {
   path: string;
 }
 
-interface IDocumentsConfig extends WithStorage {
+export interface IDocumentsConfig extends WithStorage {
   /**
    * @description Required for 'gcs' and 's3' sources.
    * Path to the folder containing sub-folders, without leading slash (/)
@@ -139,14 +147,15 @@ interface IDocumentsConfig extends WithStorage {
   path: string;
 }
 
-interface IAssignmentConfig {
+export interface IAssignmentConfig extends WithStorage {
+  source: StorageSources.AMAZONS3 | StorageSources.GOOGLE | StorageSources.LOCAL;
   /**
    * @description local or remote path to assignment file
    */
   path: string;
 }
 
-interface IExportConfig {
+interface IExportConfig extends WithStorage {
   statusFilter: Array<ProjectStatus>;
 
   /**
@@ -165,12 +174,4 @@ interface WithStorage {
    * the GCS or S3 bucket name, without gs:// or s3:// prefix
    */
   bucketName: string;
-}
-
-enum ProjectStatus {
-  CREATED = 'CREATED',
-  IN_PROGRESS = 'IN_PROGRESS',
-  REVIEW_READY = 'REVIEW_READY',
-  IN_REVIEW = 'IN_REVIEW',
-  COMPLETED = 'COMPLETED',
 }
