@@ -1,11 +1,11 @@
 import Ajv, { JSONSchemaType } from 'ajv';
-import { IAssignmentConfig } from '../interfaces';
+import { AssignmentConfig } from '../interfaces';
 
 const schemaValidator = new Ajv({
   allErrors: true,
 });
 
-const AssignmentSchema: JSONSchemaType<IAssignmentConfig> = {
+const AssignmentSchema: JSONSchemaType<AssignmentConfig> = {
   type: 'object',
   properties: {
     source: { type: 'string' },
