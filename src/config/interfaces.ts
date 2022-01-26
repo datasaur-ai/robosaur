@@ -43,14 +43,14 @@ export interface Config {
       gcsCredentialJson: string;
     };
   };
-  state: IStateConfig;
+  state: StatefileConfig;
 
   // project export
-  export: IExportConfig;
+  export: ExportConfig;
 
   // project creation
-  documents: IDocumentsConfig;
-  assignment: IAssignmentConfig;
+  documents: DocumentsConfig;
+  assignment: AssignmentConfig;
   project: {
     /**
      * @description id of the team.
@@ -123,7 +123,7 @@ export interface Config {
   };
 }
 
-export interface IStateConfig extends WithStorage {
+export interface StatefileConfig extends WithStorage {
   /**
    * @description For 'gcs' and 's3' sources
    * Path to a state file to keep-track which folders and projects have been created and exported.
@@ -131,7 +131,7 @@ export interface IStateConfig extends WithStorage {
   path: string;
 }
 
-export interface IDocumentsConfig extends WithStorage {
+export interface DocumentsConfig extends WithStorage {
   /**
    * @description Required for 'gcs' and 's3' sources.
    * Path to the folder containing sub-folders, without leading slash (/)
@@ -147,7 +147,7 @@ export interface IDocumentsConfig extends WithStorage {
   path: string;
 }
 
-export interface IAssignmentConfig extends WithStorage {
+export interface AssignmentConfig extends WithStorage {
   source: StorageSources.AMAZONS3 | StorageSources.GOOGLE | StorageSources.LOCAL;
   /**
    * @description local or remote path to assignment file
@@ -155,7 +155,7 @@ export interface IAssignmentConfig extends WithStorage {
   path: string;
 }
 
-interface IExportConfig extends WithStorage {
+interface ExportConfig extends WithStorage {
   statusFilter: Array<ProjectStatus>;
 
   /**

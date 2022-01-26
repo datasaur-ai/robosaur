@@ -1,7 +1,7 @@
 import { existsSync, readFileSync, writeFileSync } from 'fs';
 import packageJson from '../../../package.json';
 import { getConfig } from '../../config/config';
-import { IStateConfig, StorageSources } from '../../config/interfaces';
+import { StatefileConfig, StorageSources } from '../../config/interfaces';
 import { getJobs, Job, JobStatus } from '../../datasaur/get-jobs';
 import { getProjects } from '../../datasaur/get-projects';
 import { Project } from '../../datasaur/interfaces';
@@ -17,7 +17,7 @@ export class ScriptState {
   private updatedAt: number;
   private version: string;
   private static activeTeamId: string;
-  private static stateConfig: IStateConfig;
+  private static stateConfig: StatefileConfig;
 
   constructor(oldState: ScriptState);
   constructor();
