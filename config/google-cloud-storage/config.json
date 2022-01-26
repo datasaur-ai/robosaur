@@ -4,16 +4,23 @@
     "clientId": "<DATASAUR_CLIENT_ID> See the guide here https://datasaurai.gitbook.io/datasaur/advanced/datasaur-apis/oauth-2.0#generate-oauth-credentials-menu",
     "clientSecret": "<DATASAUR_CLIENT_SECRET> See the guide here https://datasaurai.gitbook.io/datasaur/advanced/datasaur-apis/oauth-2.0#generate-oauth-credentials-menu"
   },
+  "credentials": {
+    "gcsCredentialJson": "config/google-cloud-storage/credential.json"
+  },
+  "state": {
+    "source": "gcs",
+    "bucketName": "my-bucket",
+    "path": "path/to/stateFile.json"
+  },
   "documents": {
     "source": "gcs",
     "bucketName": "my-bucket",
-    "prefix": "projects",
-    "gcsCredentialJson": "config/google-cloud-storage/credential.json",
-    "stateFilePath": "gs://bucket/path/to/stateFile.json"
+    "prefix": "projects"
   },
   "assignment": {
     "source": "gcs",
-    "path": "gs://my-bucket/projects/assignment.json"
+    "bucketName": "my-bucket",
+    "path": "path/to/assignment.json"
   },
   "project": {
     "teamId": "<TEAM_ID>",

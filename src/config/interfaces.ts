@@ -20,72 +20,29 @@ export interface Config {
      */
     clientSecret: string;
   };
-  documents: {
-    /**
-     * @description determine whether the source of the documents should be in local folder or remote url.
-     * One of 'local', 'remote', 'gcs', 's3'
-     */
-    source: StorageSources;
-    /**
-     * @description Required for 'local' and 'remote' sources.
-     * if the source is 'local', the path should point to a folder.
-     * if the source is `remote`, the path should point to a JSON file. See the sample at config/documents.json
-     */
-    path: string;
-    /**
-     * @description Required for 'gcs' and 's3' sources.
-     * the GCS or S3 bucket name, without gs:// or s3:// prefix
-     */
-    bucketName: string;
-    /**
-     * @description Required for 'gcs' and 's3' sources.
-     * Path to the folder containing sub-folders, without leading slash (/). Each subfolders will be created as a new Datasaur project.
-     * If the subfolders are located in root, set prefix to empty string ''
-     */
-    prefix: string;
-    /**
-     * @description Required for 'gcs' sources.
-     * Relative or absolute local file path to the credential file.
-     */
-    gcsCredentialJson: string;
-    /**
-     * @description Required for 's3' sources.
-     */
-    s3Endpoint: string;
-    /**
-     * @description Required for 's3' sources.
-     */
-    s3Port: number;
-    /**
-     * @description Required for 's3' sources.
-     */
-    s3AccessKey: string;
-    /**
-     * @description Required for 's3' sources.
-     */
-    s3SecretKey: string;
-    /**
-     * @description Required for 's3' sources.
-     */
-    s3UseSSl: boolean;
-    /**
-     * @description For 'gcs' and 's3' sources
-     * Path to a state file to keep-track which folders and projects have been created.
-     * If not supplied, script will always create a new project for each and every folder
-     */
-    stateFilePath: string;
+  credentials: {
+    [StorageSources.AMAZONS3]: {
+      s3Endpoint: string;
+      s3Port: number;
+      s3AccessKey: string;
+      s3SecretKey: string;
+      s3UseSSl: boolean;
+    };
+    [StorageSources.GOOGLE]: {
+      /**
+       * @description Relative or absolute local file path to the credential file.
+       */
+      gcsCredentialJson: string;
+    };
   };
-  assignment: {
-    /**
-     * @description determine whether the source of the assignment file should be in local folder or remote url.
-     * One of 'local', 's3', 'gcs'
-     */
-    source: StorageSources.LOCAL | StorageSources.AMAZONS3 | StorageSources.GOOGLE;
-    /**
-     * @description path to file, or path to file in storage bucket
-     */
-    path: string;
-  };
+  state: IStateConfig;
+
+  // project export
+  export: IExportConfig;
+
+  // project creation
+  documents: IDocumentsConfig;
+  assignment: IAssignmentConfig;
   project: {
     /**
      * @description id of the team.
@@ -156,4 +113,64 @@ export interface Config {
      */
     labelSetDirectory?: string;
   };
+}
+
+interface IStateConfig extends WithStorage {
+  /**
+   * @description For 'gcs' and 's3' sources
+   * Path to a state file to keep-track which folders and projects have been created and exported.
+   */
+  path: string;
+}
+
+interface IDocumentsConfig extends WithStorage {
+  /**
+   * @description Required for 'gcs' and 's3' sources.
+   * Path to the folder containing sub-folders, without leading slash (/)
+   * Each subfolders will be created as a new Datasaur project
+   * If the subfolders are located in root, set prefix to empty string ''
+   */
+  prefix: string;
+  /**
+   * @description Required for 'local' and 'remote' sources.
+   * if the source is 'local', the path should point to a folder
+   * if the source is `remote`, the path should point to a JSON file. See the sample at config/remote-files/documents.json
+   */
+  path: string;
+}
+
+interface IAssignmentConfig {
+  /**
+   * @description local or remote path to assignment file
+   */
+  path: string;
+}
+
+interface IExportConfig {
+  statusFilter: Array<ProjectStatus>;
+
+  /**
+   * @description Required for 'gcs' and 's3' sources.
+   * Path to the folder containing sub-folders, without leading slash (/)
+   * Each exported project will be uploaded into a separate subfolder, with its' projectName as the folder name
+   * If the subfolders are located in root, set prefix to empty string ''
+   */
+  prefix: string;
+}
+
+interface WithStorage {
+  source: StorageSources;
+  /**
+   * @description Required for 'gcs' and 's3' sources.
+   * the GCS or S3 bucket name, without gs:// or s3:// prefix
+   */
+  bucketName: string;
+}
+
+enum ProjectStatus {
+  CREATED = 'CREATED',
+  IN_PROGRESS = 'IN_PROGRESS',
+  REVIEW_READY = 'REVIEW_READY',
+  IN_REVIEW = 'IN_REVIEW',
+  COMPLETED = 'COMPLETED',
 }
