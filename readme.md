@@ -82,7 +82,7 @@ Here are a couple important details about the storage configuration:
       3. storage.objects.create
       4. storage.objects.delete - used with storage.objects.create to update the statefile
 
-2. `state.path` => path to a JSON file.  
+2. `config.state.path` => path to a JSON file.  
    For GCS and S3, this means path without protocol (`gs://` or `s3://`) and bucketName.  
    For example, a file `my-file.json` at S3 bucket `my-bucket` in folder `my-folder` accessed as `s3://my-bucket/my-folder/my-file.json` should be written as follows:
 
