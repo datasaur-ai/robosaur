@@ -1,4 +1,4 @@
-import { setConfigByJSONFile, getConfig } from '../config';
+import { getConfig, setConfigByJSONFile } from '../config';
 import { validateConfigAssignment, validateConfigDocuments } from './validator';
 
 describe(validateConfigAssignment.name, () => {
@@ -7,7 +7,7 @@ describe(validateConfigAssignment.name, () => {
     ['config/remote-files/config.json'],
     ['config/google-cloud-storage/config.json'],
   ])('sample file %s should pass assignment validation', (configFilePath: string) => {
-    setConfigByJSONFile(configFilePath);
+    setConfigByJSONFile(configFilePath, []);
     expect(() => validateConfigAssignment(getConfig())).not.toThrow();
   });
 });
@@ -18,7 +18,7 @@ describe(validateConfigDocuments.name, () => {
     ['config/remote-files/config.json'],
     ['config/google-cloud-storage/config.json'],
   ])('sample file %s should pass documents validation', (configFilePath: string) => {
-    setConfigByJSONFile(configFilePath);
+    setConfigByJSONFile(configFilePath, []);
     expect(() => validateConfigDocuments(getConfig())).not.toThrow();
   });
 });
