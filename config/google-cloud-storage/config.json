@@ -5,7 +5,7 @@
     "clientSecret": "<DATASAUR_CLIENT_SECRET> See the guide here https://datasaurai.gitbook.io/datasaur/advanced/datasaur-apis/oauth-2.0#generate-oauth-credentials-menu"
   },
   "credentials": {
-    "gcsCredentialJson": "config/google-cloud-storage/credential.json"
+    "gcs": { "gcsCredentialJson": "config/google-cloud-storage/credential.json" }
   },
   "state": {
     "source": "gcs",
