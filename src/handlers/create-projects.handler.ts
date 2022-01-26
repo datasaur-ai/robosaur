@@ -5,6 +5,7 @@ import { getAssignmentConfig } from '../assignment/get-assignment-config';
 import { DocumentAssignment } from '../assignment/interfaces';
 import { getConfig, setConfigByJSONFile } from '../config/config';
 import { StorageSources } from '../config/interfaces';
+import { getProjectCreationValidators } from '../config/schema/validator';
 import { createProject } from '../datasaur/create-project';
 import { getJobs, JobStatus } from '../datasaur/get-jobs';
 import { getLocalDocuments } from '../documents/get-local-documents';
@@ -35,7 +36,7 @@ const PROJECT_BEFORE_SAVE = 5;
 export async function handleCreateProjects(configFile: string, options) {
   const { dryRun } = options;
   const cwd = process.cwd();
-  setConfigByJSONFile(resolve(cwd, configFile));
+  setConfigByJSONFile(resolve(cwd, configFile), getProjectCreationValidators());
 
   const documentSource = getConfig().documents.source;
   switch (documentSource) {
@@ -45,7 +46,8 @@ export async function handleCreateProjects(configFile: string, options) {
       );
       return handleCreateProject('New Robosaur Project', configFile);
   }
-  const { bucketName, prefix: storagePrefix, source, stateFilePath, path } = getConfig().documents;
+  const { bucketName, prefix: storagePrefix, source, path } = getConfig().documents;
+  const { path: stateFilePath } = getConfig().state;
 
   let scriptState: ScriptState;
   try {
