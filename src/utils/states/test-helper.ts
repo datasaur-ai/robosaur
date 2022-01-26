@@ -1,4 +1,5 @@
 import { JobStatus } from '../../datasaur/get-jobs';
+import { DeepPartial } from '../interface';
 import { ScriptState } from './script-state';
 import { ProjectState, TeamProjectsState } from './team-projects-state';
 
@@ -9,7 +10,7 @@ export function dummyPopulateProjects(teamId: string, projectCount: number, stat
 export function dummyPopulateTeamProjectState(
   projectCount: number,
   state: TeamProjectsState,
-  template: Partial<ProjectState> = { status: JobStatus.NONE },
+  template: DeepPartial<ProjectState> = { create: { jobStatus: JobStatus.NONE } },
 ) {
   for (let index = 0; index < projectCount; index++) {
     const identifier = `${state.getTeamId()}-${index}`;
@@ -18,8 +19,16 @@ export function dummyPopulateTeamProjectState(
     state.push({
       projectId: identifier,
       projectName: identifier,
-      jobId: `job-${identifier}`,
       ...template,
+
+      create: {
+        jobId: `job-${identifier}`,
+        ...template?.create,
+      },
+
+      export: {
+        ...template?.export,
+      },
     } as ProjectState);
   }
 }

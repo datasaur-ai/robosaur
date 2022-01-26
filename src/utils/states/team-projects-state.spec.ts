@@ -7,7 +7,7 @@ describe(TeamProjectsState.name, () => {
   let teamState: TeamProjectsState;
   beforeEach(() => {
     teamState = new TeamProjectsState('dummy-team');
-    dummyPopulateTeamProjectState(4, teamState, { status: JobStatus.IN_PROGRESS });
+    dummyPopulateTeamProjectState(4, teamState, { create: { jobStatus: JobStatus.IN_PROGRESS } });
   });
 
   describe(TeamProjectsState.prototype.updateByProjectName, () => {
@@ -15,7 +15,7 @@ describe(TeamProjectsState.name, () => {
       const projectName = 'non-exist-project';
       const prev = JSON.stringify(teamState);
 
-      const retval = teamState.updateByProjectName(projectName, { status: JobStatus.DELIVERED });
+      const retval = teamState.updateByProjectName(projectName, { create: { jobStatus: JobStatus.DELIVERED } });
       expect(retval).toEqual(-1);
       expect(JSON.stringify(teamState)).toEqual(prev);
     });
@@ -26,18 +26,18 @@ describe(TeamProjectsState.name, () => {
         'projectName',
       );
 
-      const retval = teamState.updateByProjectName(projectName, { status: JobStatus.DELIVERED });
+      const retval = teamState.updateByProjectName(projectName, { create: { jobStatus: JobStatus.DELIVERED } });
       expect(retval).toEqual(projectName);
-      expect(teamState.getProjects().get(retval as string)?.status).toEqual(JobStatus.DELIVERED);
+      expect(teamState.getProjects().get(retval as string)?.create?.jobStatus).toEqual(JobStatus.DELIVERED);
     });
   });
 
-  describe(TeamProjectsState.prototype.updateByJobId, () => {
+  describe(TeamProjectsState.prototype.updateByCreateJobId, () => {
     it('should return -1 and not change anything when specified jobId is not found', () => {
       const jobId = 'non-exist-jobid';
       const prev = JSON.stringify(teamState);
 
-      const retval = teamState.updateByJobId(jobId, { status: JobStatus.FAILED });
+      const retval = teamState.updateByCreateJobId(jobId, { create: { jobStatus: JobStatus.FAILED } });
       expect(retval).toEqual(-1);
       expect(JSON.stringify(teamState)).toEqual(prev);
     });
@@ -48,11 +48,13 @@ describe(TeamProjectsState.name, () => {
         'projectName',
       );
 
-      const jobId = teamState.getProjects().get(expectedProjectName)?.jobId as string;
+      const jobId = teamState.getProjects().get(expectedProjectName)?.create?.jobId as string;
+      console.log(jobId);
+      console.log(teamState.getProjects());
 
-      const retval = teamState.updateByJobId(jobId, { status: JobStatus.DELIVERED });
+      const retval = teamState.updateByCreateJobId(jobId, { create: { jobStatus: JobStatus.DELIVERED } });
       expect(retval).toEqual(expectedProjectName);
-      expect(teamState.getProjects().get(retval as string)?.status).toEqual(JobStatus.DELIVERED);
+      expect(teamState.getProjects().get(retval as string)?.create?.jobStatus).toEqual(JobStatus.DELIVERED);
     });
   });
 

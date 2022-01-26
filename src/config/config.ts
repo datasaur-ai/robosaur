@@ -1,7 +1,6 @@
-import { validateConfigAssignment, validateConfigDocuments } from './schema/validator';
+import { getLogger } from '../logger';
 import { readJSONFile } from '../utils/readJSONFile';
 import { Config } from './interfaces';
-import { getLogger } from '../logger';
 
 let config: Config | null = null;
 let configPath: string | null = null;
@@ -20,10 +19,14 @@ export function getConfig(): Config {
   return config;
 }
 
-export function setConfigByJSONFile(filePath: string) {
+export function setConfigByJSONFile(filePath: string, validators: Array<Function> = []) {
   getLogger().info(`reading config from: ${filePath}`);
   config = readJSONFile(filePath);
-  validateConfigAssignment(config as Config);
-  validateConfigDocuments(config as Config);
+  if (validators.length === 0) getLogger().warn('config was set without validators');
+
+  for (const validator of validators) {
+    validator(config as Config);
+  }
+
   configPath = filePath;
 }

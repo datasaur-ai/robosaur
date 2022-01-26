@@ -66,7 +66,23 @@ Sample config files for GCS and S3 are available in `config/google-cloud-storage
 Additional configs like project assignment and labelset for all projects can also be configured here.  
 Here are a couple important details about the storage configuration:
 
-1. `config.documents.source` => `local`, `s3` or `gcs`  
+1. `config.credentials` => a JSON object with two possible keys: `s3` or `gcs`  
+   For `s3`, we need to provide five values: `s3Endpoint`, `s3Port`, `s3AccessKey`, `s3SecretKey`, and `s3UseSSL`.  
+   Typical AWS S3 config would be as follows:
+
+   ```json
+   {
+     "s3Endpoint": "s3.amazonaws.com",
+     "s3Port": 443,
+     "s3AccessKey": "<accessKey>",
+     "s3SecretKey": "<secretKey>",
+     "s3UseSSL": true
+   }
+   ```
+
+   For GCS, there is only one value, `gcsCredentialJSON` which should be a local file path pointing to a JSON file similar to the one available in `config/google-cloud-storage/credential.json`.
+
+2. `config.documents.source` => `local`, `s3` or `gcs`  
    To enable [stateful](#stateful-execution) script execution, the script also need write access to a specific file inside the bucket.  
    Assuming we are using the same bucket for both storing the project documents as well as keeping the state file, here are the permission required
 
@@ -82,13 +98,23 @@ Here are a couple important details about the storage configuration:
       3. storage.objects.create
       4. storage.objects.delete - used with storage.objects.create to update the statefile
 
-2. `stateFilePath` => full URI / path to a JSON file.  
-   For GCS bucket, an example URI would be: `gs://{bucketName}/path/to/file.json`  
-   This file will be continuously overwritten every time the script is run.
-3. `config.assignment.path` => if source is `gcs` or `s3`, `path` should be the full URI same as `staticFilePath`.  
-   if source is `config.assignment.local`, `path` should be relative or full path to json file  
+3. `config.state.path` => path to a JSON file.  
+   For GCS and S3, this means path without protocol (`gs://` or `s3://`) and bucketName.  
+   For example, a file `my-file.json` at S3 bucket `my-bucket` in folder `my-folder` accessed as `s3://my-bucket/my-folder/my-file.json` should be written as follows:
+
+   ```json
+   {
+     "state": {
+       "source": "s3",
+       "bucketName": "my-bucket",
+       "path": "my-folder/my-file.json"
+     }
+   }
+   ```
+
+4. `config.assignment.path` => same as `state.path` above  
    if we want to create a project without any labelers or reviewers, we can remove the `assignment` key from the JSON altogether.
-4. `config.project.labelSetDirectory` => Optional. Relative or full path to a local folder containing labelsets  
+5. `config.project.labelSetDirectory` => Optional. Relative or full path to a local folder containing labelsets  
    Currently, only labelsets in CSV format for token-based project are supported.  
    See [our gitbook](https://datasaurai.gitbook.io/datasaur/basics/creating-a-project/label-sets#token-based-labeling) for detailed information on the format. Sample files are also provided in the config/labelset directory
    The files in this directory will be listed and then sorted by its name in ascending order. The files will be converted to labelset in that order. To force a particular order, we could prefix the filenames with number, for example `filename.csv` -> `1.filename.csv`

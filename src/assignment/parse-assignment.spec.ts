@@ -34,7 +34,8 @@ describe(parseAssignment.name, () => {
         return {
           assignment: {
             source: source,
-            path: 'protocol://bucket-name/path/to/file.json',
+            path: 'path/to/file.json',
+            bucketName: 'bucket-name',
           },
         } as Config;
       });

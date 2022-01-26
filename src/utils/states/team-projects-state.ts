@@ -1,11 +1,20 @@
 import { JobStatus } from '../../datasaur/get-jobs';
+import { DeepPartial } from '../interface';
 
-export interface ProjectState {
+export interface JobState {
   jobId: string | null | undefined;
+  jobStatus: JobStatus;
+  createdAt?: number;
+  updatedAt?: number;
+}
+export interface ProjectState {
+  create?: JobState;
+  // TODO: to be detailed in 10243
+  export?: JobState;
+
   projectName: string;
   documents: Array<{ name: string }>;
   projectId: string | null | undefined;
-  status: JobStatus;
   createdAt?: number;
   updatedAt?: number;
 }
@@ -38,19 +47,19 @@ export class TeamProjectsState {
     this.projects.set(newProject.projectName, { ...newProject, createdAt: Date.now(), updatedAt: Date.now() });
   }
 
-  updateByJobId(jobid: string, newProjectData: Partial<ProjectState>) {
+  updateByCreateJobId(jobid: string, newProjectData: DeepPartial<ProjectState>) {
     let identifier = '';
     for (const [key, project] of this.projects) {
-      if (project.jobId === jobid) {
+      if (project.create?.jobId === jobid) {
         identifier = key;
         break;
       }
     }
 
-    return this.update(identifier, newProjectData);
+    return this.update(identifier, { ...newProjectData });
   }
 
-  updateByProjectName(projectName: string, newProjectData: Partial<ProjectState>) {
+  updateByProjectName(projectName: string, newProjectData: DeepPartial<ProjectState>) {
     return this.update(projectName, newProjectData);
   }
 
@@ -62,13 +71,26 @@ export class TeamProjectsState {
     return this.id;
   }
 
-  private update(identifier: string, newProjectData: Partial<ProjectState>) {
+  private update(identifier: string, newProjectData: DeepPartial<ProjectState>) {
     if (!identifier) return -1;
 
     const existingData = this.projects.get(identifier);
     if (!existingData) return -1;
 
-    this.projects.set(identifier, { ...existingData, ...newProjectData });
+    this.projects.set(identifier, {
+      ...existingData,
+      ...newProjectData,
+      create: {
+        ...existingData.create,
+        ...newProjectData.create,
+      },
+      export: {
+        ...existingData.export,
+        ...newProjectData.export,
+      },
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+    } as ProjectState);
     return identifier;
   }
 
