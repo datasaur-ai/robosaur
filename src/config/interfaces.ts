@@ -1,16 +1,10 @@
+import { ExportFormat, ProjectStatus } from '../datasaur/interfaces';
+
 export enum StorageSources {
   LOCAL = 'local',
   REMOTE = 'remote',
   GOOGLE = 'gcs',
   AMAZONS3 = 's3',
-}
-
-export enum ProjectStatus {
-  CREATED = 'CREATED',
-  IN_PROGRESS = 'IN_PROGRESS',
-  REVIEW_READY = 'REVIEW_READY',
-  IN_REVIEW = 'IN_REVIEW',
-  COMPLETED = 'COMPLETED',
 }
 
 export interface Config {
@@ -165,6 +159,25 @@ interface ExportConfig extends WithStorage {
    * If the subfolders are located in root, set prefix to empty string ''
    */
   prefix: string;
+
+  /**
+   * @description id of the team.
+   * The ID can be obtained from your team workspace page in this format: https://datasaur.ai/teams/{teamId}
+   */
+  teamId: string;
+
+  /**
+   * @description format of the experted project
+   * see [Datasaur GitBook](https://datasaurai.gitbook.io/datasaur/advanced/apis-docs/export-project#export-all-files) for more information
+   */
+  format: ExportFormat;
+
+  /**
+   * @description custom export script to use
+   * only used when format is CUSTOM
+   * The ID can be obtained from the custom script page in this format: https://datasaur.ai/teams/{teamId}/custom-scripts/{custom-script-id}
+   */
+  customScriptId: string;
 }
 
 interface WithStorage {
