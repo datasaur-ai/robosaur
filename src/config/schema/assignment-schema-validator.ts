@@ -1,20 +1,16 @@
 import Ajv, { JSONSchemaType } from 'ajv';
-import { StorageSources } from '../interfaces';
+import { AssignmentConfig } from '../interfaces';
 
 const schemaValidator = new Ajv({
   allErrors: true,
 });
-
-interface AssignmentConfig {
-  source: StorageSources;
-  path: string;
-}
 
 const AssignmentSchema: JSONSchemaType<AssignmentConfig> = {
   type: 'object',
   properties: {
     source: { type: 'string' },
     path: { type: 'string' },
+    bucketName: { type: 'string', nullable: true }, // nullable when local
   },
   required: ['path', 'source'],
 };

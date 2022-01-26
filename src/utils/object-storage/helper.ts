@@ -1,20 +1,21 @@
 import { StorageOptions } from '@google-cloud/storage';
 import { ClientOptions } from 'minio';
 import { getConfig } from '../../config/config';
+import { StorageSources } from '../../config/interfaces';
 
 export function getGCSConfig(): StorageOptions {
   return {
-    keyFilename: getConfig().documents.gcsCredentialJson,
+    keyFilename: getConfig().credentials[StorageSources.GOOGLE].gcsCredentialJson,
   };
 }
 
 export function getMinioConfig(): ClientOptions {
   return {
-    endPoint: getConfig().documents.s3Endpoint,
-    port: getConfig().documents.s3Port,
-    accessKey: getConfig().documents.s3AccessKey,
-    secretKey: getConfig().documents.s3SecretKey,
-    useSSL: getConfig().documents.s3UseSSl,
+    endPoint: getConfig().credentials[StorageSources.AMAZONS3].s3Endpoint,
+    port: getConfig().credentials[StorageSources.AMAZONS3].s3Port,
+    accessKey: getConfig().credentials[StorageSources.AMAZONS3].s3AccessKey,
+    secretKey: getConfig().credentials[StorageSources.AMAZONS3].s3SecretKey,
+    useSSL: getConfig().credentials[StorageSources.AMAZONS3].s3UseSSL,
   };
 }
 

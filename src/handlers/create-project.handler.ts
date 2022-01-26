@@ -2,6 +2,7 @@ import { resolve } from 'path';
 import { assignAllDocuments } from '../assignment/assign-all-documents';
 import { getAssignmentConfig } from '../assignment/get-assignment-config';
 import { getConfig, setConfigByJSONFile } from '../config/config';
+import { getProjectCreationValidators } from '../config/schema/validator';
 import { createProject } from '../datasaur/create-project';
 import { getJobs, JobStatus } from '../datasaur/get-jobs';
 import { getDocuments } from '../documents/get-documents';
@@ -11,7 +12,7 @@ import { sleep } from '../utils/sleep';
 
 export async function handleCreateProject(projectName: string, configFile: string) {
   const cwd = process.cwd();
-  setConfigByJSONFile(resolve(cwd, configFile));
+  setConfigByJSONFile(resolve(cwd, configFile), getProjectCreationValidators());
 
   const projectSetting = getConfig().project;
   const documents = getDocuments();
