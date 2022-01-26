@@ -82,11 +82,21 @@ Here are a couple important details about the storage configuration:
       3. storage.objects.create
       4. storage.objects.delete - used with storage.objects.create to update the statefile
 
-2. `stateFilePath` => full URI / path to a JSON file.  
-   For GCS bucket, an example URI would be: `gs://{bucketName}/path/to/file.json`  
-   This file will be continuously overwritten every time the script is run.
-3. `config.assignment.path` => if source is `gcs` or `s3`, `path` should be the full URI same as `staticFilePath`.  
-   if source is `config.assignment.local`, `path` should be relative or full path to json file  
+2. `state.path` => path to a JSON file.  
+   For GCS and S3, this means path without protocol (`gs://` or `s3://`) and bucketName.  
+   For example, a file `my-file.json` at S3 bucket `my-bucket` in folder `my-folder` accessed as `s3://my-bucket/my-folder/my-file.json` should be written as follows:
+
+   ```json
+   {
+     "state": {
+       "source": "s3",
+       "bucketName": "my-bucket",
+       "path": "my-folder/my-file.json"
+     }
+   }
+   ```
+
+3. `config.assignment.path` => same as `state.path` above  
    if we want to create a project without any labelers or reviewers, we can remove the `assignment` key from the JSON altogether.
 4. `config.project.labelSetDirectory` => Optional. Relative or full path to a local folder containing labelsets  
    Currently, only labelsets in CSV format for token-based project are supported.  
