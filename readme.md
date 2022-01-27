@@ -32,7 +32,7 @@ Obtain Oauth Credentials from this guide: <https://datasaurai.gitbook.io/datasau
 
 ---
 
-### Create Multiple Projetcs
+### Create Multiple Projects
 
 This command will create multiple project with the same configuration but different documents.  
 Currently, the documents have to be stored in an S3-compliant bucket, a GCS bucket or in a local folder.  
