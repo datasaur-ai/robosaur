@@ -47,11 +47,7 @@ describe(TeamProjectsState.name, () => {
         [...teamState.getProjects()].map(([_key, project]) => project),
         'projectName',
       );
-
       const jobId = teamState.getProjects().get(expectedProjectName)?.create?.jobId as string;
-      console.log(jobId);
-      console.log(teamState.getProjects());
-
       const retval = teamState.updateByCreateJobId(jobId, { create: { jobStatus: JobStatus.DELIVERED } });
       expect(retval).toEqual(expectedProjectName);
       expect(teamState.getProjects().get(retval as string)?.create?.jobStatus).toEqual(JobStatus.DELIVERED);

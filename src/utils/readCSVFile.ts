@@ -20,6 +20,7 @@ export const defaultCSVConfig: Papa.ParseConfig = {
   delimitersToGuess: [',', '\t', '|', ';', Papa.RECORD_SEP, Papa.UNIT_SEP],
 };
 
-export function readCSVFile(filepath, encoding = 'utf-8', config = defaultCSVConfig) {
-  return Papa.parse(readFileSync(filepath, { encoding }), config);
+export function readCSVFile(filepath: string, encoding: BufferEncoding = 'utf-8', config = defaultCSVConfig) {
+  const content = readFileSync(filepath, { encoding });
+  return Papa.parse(content, config);
 }
