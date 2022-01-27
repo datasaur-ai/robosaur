@@ -8,6 +8,14 @@
     "source": "local",
     "path": "path-to-local-state.json"
   },
+  "export": {
+    "source": "local",
+    "prefix": "path/to/export/root",
+    "teamId": "<TEAM_ID>",
+    "statusFilter": ["COMPLETED"],
+    "format": "CUSTOM",
+    "customScriptId": "<CUSTOM SCRIPT ID>"
+  },
   "documents": {
     "source": "local",
     "path": "path-to-local-folder"

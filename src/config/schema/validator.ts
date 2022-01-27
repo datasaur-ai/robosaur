@@ -2,6 +2,7 @@ import { getLogger } from '../../logger';
 import { Config } from '../interfaces';
 import { assignmentSchemaValidator } from './assignment-schema-validator';
 import { documentsSchemaValidator } from './documents-schema-validator';
+import { exportSchemaValidator } from './export-schema-validator';
 
 export function getProjectCreationValidators() {
   return [validateConfigAssignment, validateConfigDocuments];
@@ -28,8 +29,11 @@ export function validateConfigAssignment(config: Config) {
 }
 
 // TODO #10243
-function validateConfigExport(config: Config) {
-  throw new Error('not implemented');
+export function validateConfigExport(config: Config) {
+  if (!exportSchemaValidator(config.export)) {
+    getLogger().error(`config.export has some errors`, { errors: exportSchemaValidator.errors });
+    throw new Error(`config.export has some errors ${JSON.stringify({ errors: exportSchemaValidator.errors })}`);
+  }
 }
 
 // TODO #10243

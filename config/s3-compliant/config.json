@@ -18,6 +18,14 @@
     "bucketName": "my-bucket",
     "path": "path/to/stateFile.json"
   },
+  "export": {
+    "teamId": "<TEAM_ID>",
+    "format": "TSV",
+    "source": "s3",
+    "bucketName": "my-export-bucket",
+    "prefix": "",
+    "statusFilter": ["IN_REVIEW", "REVIEW_READY", "COMPLETED"]
+  },
 
   "documents": {
     "source": "s3",
@@ -52,12 +60,5 @@
       "tokenizer": "WINK"
     },
     "labelSetDirectory": "config/labelset"
-  },
-
-  "export": {
-    "source": "s3",
-    "bucketName": "my-export-bucket",
-    "prefix": "",
-    "statusFilter": ["IN_REVIEW", "REVIEW_READY", "COMPLETED"]
   }
 }

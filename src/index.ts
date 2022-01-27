@@ -2,6 +2,7 @@ import { Command } from 'commander';
 import packageJson from '../package.json';
 import { handleCreateProject } from './handlers/create-project.handler';
 import { handleCreateProjects } from './handlers/create-projects.handler';
+import { handleExportProjects } from './handlers/export-projects.handler';
 import { getLogger } from './logger';
 
 const program = new Command();
@@ -18,6 +19,11 @@ program
   .option('--dry-run', 'Simulates what the script is doing without creating the projects')
   .description('Create Datasaur projects based on the given config file')
   .action(handleCreateProjects);
+
+program
+  .command(`export-projects <configFile>`)
+  .description('Export all projects based on the given config file')
+  .action(handleExportProjects);
 
 program.parseAsync(process.argv);
 

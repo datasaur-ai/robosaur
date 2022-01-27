@@ -149,7 +149,7 @@ export interface AssignmentConfig extends WithStorage {
   path: string;
 }
 
-interface ExportConfig extends WithStorage {
+export interface ExportConfig extends WithStorage {
   statusFilter: Array<ProjectStatus>;
 
   /**
