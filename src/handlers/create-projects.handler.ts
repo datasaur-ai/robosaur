@@ -14,7 +14,7 @@ import { LocalDocument, RemoteDocument } from '../documents/interfaces';
 import { getLogger } from '../logger';
 import { getLabelSetsFromDirectory } from '../utils/labelset';
 import { getStorageClient } from '../utils/object-storage';
-import { ObjectStorageClient } from '../utils/object-storage/interface';
+import { ObjectStorageClient } from '../utils/object-storage/interfaces';
 import { sleep } from '../utils/sleep';
 import { ScriptState } from '../utils/states/script-state';
 import { handleCreateProject } from './create-project.handler';

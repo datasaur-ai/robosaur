@@ -2,7 +2,7 @@ import { Client, BucketItem as MinioBucketItem } from 'minio';
 import { streamToArray } from '../streamToArray';
 import { streamToString } from '../streamToString';
 import { getMinioConfig, normalizeFolderName } from './helper';
-import { BucketItem, ObjectStorageClient } from './interface';
+import { BucketItem, ObjectStorageClient } from './interfaces';
 
 export class S3CompatibleClient implements ObjectStorageClient {
   static client: Client;

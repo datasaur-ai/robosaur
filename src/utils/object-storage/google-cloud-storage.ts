@@ -1,7 +1,7 @@
 import { Storage } from '@google-cloud/storage';
 import { streamToString } from '../streamToString';
 import { getGCSConfig, normalizeFolderName } from './helper';
-import { BucketItem, ObjectStorageClient } from './interface';
+import { BucketItem, ObjectStorageClient } from './interfaces';
 
 const URL_EXPIRATION_DAYS = 1 * 24 * 60 * 60; // GCS v4 max is 7 days
 

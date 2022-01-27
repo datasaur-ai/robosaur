@@ -1,6 +1,7 @@
 import { JobStatus } from '../../datasaur/get-jobs';
+import { ProjectState } from './interfaces';
 import { ScriptState } from './script-state';
-import { ProjectState, TeamProjectsState } from './team-projects-state';
+import { TeamProjectsState } from './team-projects-state';
 import { dummyPopulateProjects } from './test-helper';
 
 describe(ScriptState.name, () => {

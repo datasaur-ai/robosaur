@@ -1,9 +1,9 @@
 import { readdirSync } from 'fs';
-import { basename, resolve, parse } from 'path';
-import { getLogger } from '../logger';
-import { LabelItem, LabelSet } from '../datasaur/interfaces';
-import { defaultCSVConfig, readCSVFile } from './readCSVFile';
+import { basename, parse, resolve } from 'path';
 import { Config } from '../config/interfaces';
+import { LabelItem, LabelSet } from '../datasaur/interfaces';
+import { getLogger } from '../logger';
+import { defaultCSVConfig, readCSVFile } from './readCSVFile';
 
 const LABELSET_COUNT_LIMIT = 5;
 

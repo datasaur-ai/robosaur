@@ -1,7 +1,8 @@
 import { JobStatus } from '../../datasaur/get-jobs';
-import { DeepPartial } from '../interface';
+import { DeepPartial } from '../interfaces';
+import { ProjectState } from './interfaces';
 import { ScriptState } from './script-state';
-import { ProjectState, TeamProjectsState } from './team-projects-state';
+import { TeamProjectsState } from './team-projects-state';
 
 export function dummyPopulateProjects(teamId: string, projectCount: number, state: ScriptState) {
   dummyPopulateTeamProjectState(projectCount, state.getTeamProjectsState(teamId));

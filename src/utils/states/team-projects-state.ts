@@ -1,23 +1,5 @@
-import { JobStatus } from '../../datasaur/get-jobs';
-import { DeepPartial } from '../interface';
-
-export interface JobState {
-  jobId: string | null | undefined;
-  jobStatus: JobStatus;
-  createdAt?: number;
-  updatedAt?: number;
-}
-export interface ProjectState {
-  create?: JobState;
-  // TODO: to be detailed in 10243
-  export?: JobState;
-
-  projectName: string;
-  documents: Array<{ name: string }>;
-  projectId: string | null | undefined;
-  createdAt?: number;
-  updatedAt?: number;
-}
+import { DeepPartial } from '../interfaces';
+import { ProjectState } from './interfaces';
 
 export class TeamProjectsState {
   private projects: Map<string, ProjectState>;

@@ -2,6 +2,7 @@ export interface Project {
   id: string;
   name: string;
   tags: Tag[];
+  status: ProjectStatus;
 }
 
 export interface Tag {
