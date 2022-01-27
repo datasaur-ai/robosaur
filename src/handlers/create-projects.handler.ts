@@ -16,7 +16,9 @@ import { getLabelSetsFromDirectory } from '../utils/labelset';
 import { getStorageClient } from '../utils/object-storage';
 import { ObjectStorageClient } from '../utils/object-storage/interfaces';
 import { sleep } from '../utils/sleep';
+import { getState } from '../utils/states/getStates';
 import { ScriptState } from '../utils/states/script-state';
+import { ScriptAction } from './constants';
 import { handleCreateProject } from './create-project.handler';
 
 interface ProjectConfiguration {
@@ -36,7 +38,7 @@ const PROJECT_BEFORE_SAVE = 5;
 export async function handleCreateProjects(configFile: string, options) {
   const { dryRun } = options;
   const cwd = process.cwd();
-  setConfigByJSONFile(resolve(cwd, configFile), getProjectCreationValidators());
+  setConfigByJSONFile(resolve(cwd, configFile), getProjectCreationValidators(), ScriptAction.PROJECT_CREATION);
 
   const documentSource = getConfig().documents.source;
   switch (documentSource) {
@@ -47,17 +49,9 @@ export async function handleCreateProjects(configFile: string, options) {
       return handleCreateProject('New Robosaur Project', configFile);
   }
   const { bucketName, prefix: storagePrefix, source, path } = getConfig().documents;
-  const { path: stateFilePath } = getConfig().state;
 
-  let scriptState: ScriptState;
-  try {
-    scriptState = await ScriptState.fromConfig();
-  } catch (error) {
-    getLogger().info(`no stateFile found in ${stateFilePath}. Robosaur will create a new one`, { error });
-    scriptState = await createAndSaveNewState();
-  }
-
-  await scriptState.updateInProgressStates();
+  const scriptState = await getState();
+  await scriptState.updateInProgressProjectCreationStates();
 
   let projectsToCreate: { name: string; fullPath: string }[];
   projectsToCreate = await getProjectNamesFromFolderNames(source, { bucketName, prefix: storagePrefix, path });
@@ -195,16 +189,5 @@ async function getProjectNamesFromFolderNames(
       name: foldername.replace(getConfig().documents.prefix, '').replace(/\//g, ''),
       fullPath: foldername,
     }));
-  }
-}
-
-async function createAndSaveNewState() {
-  try {
-    const state = new ScriptState();
-    await state.save();
-    return state;
-  } catch (error) {
-    getLogger().error(`fail in creating & saving new state file`);
-    throw error;
   }
 }
