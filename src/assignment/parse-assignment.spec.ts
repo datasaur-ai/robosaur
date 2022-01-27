@@ -14,11 +14,12 @@ describe(parseAssignment.name, () => {
       .mockName('mockGetStorageClient')
       .mockImplementation(() => {
         return {
-          getFileContent: jest.fn(async () => JSON.stringify({ functionCalled: 'getFileContent' })),
+          getStringFileContent: jest.fn(async () => JSON.stringify({ functionCalled: 'getFileContent' })),
           getObjectUrl: jest.fn(async () => 'getObjectUrl'),
           listItemsInBucket: jest.fn(async () => []),
           listSubfoldersOfPrefix: jest.fn(async () => ['listSubfolders']),
           setFileContent: jest.fn(),
+          setStringFileContent: jest.fn(),
         };
       });
   });

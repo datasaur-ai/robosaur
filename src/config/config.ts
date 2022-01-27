@@ -51,6 +51,7 @@ function setActiveTeamId(context: ScriptAction) {
       break;
     case ScriptAction.PROJECT_EXPORT:
       activeTeamId = getConfig().export.teamId;
+      break;
     case ScriptAction.NONE:
       getLogger().warn('unspecified script context, attempt to set teamId automatically');
       const projectCreationTeam = getConfig().project?.teamId;

@@ -6,6 +6,7 @@ import { getJobs, Job, JobStatus } from '../../datasaur/get-jobs';
 import { getProjects } from '../../datasaur/get-projects';
 import { Project } from '../../datasaur/interfaces';
 import { getLogger } from '../../logger';
+import { DeepPartial } from '../interfaces';
 import { getStorageClient } from '../object-storage';
 import { CreateJobState, ProjectState } from './interfaces';
 import { TeamProjectsState } from './team-projects-state';
@@ -51,7 +52,7 @@ export class ScriptState {
         getLogger().info('parsing state finished');
         return new ScriptState(scriptState);
       } catch (error) {
-        getLogger().error('error in parsing state', { error: { message: error.message } });
+        getLogger().error('error in parsing state', { error: { ...error, message: error.message } });
         throw new Error(`error parsing state file from ${ScriptState.stateConfig.path}`);
       }
     } else {
@@ -68,10 +69,11 @@ export class ScriptState {
 
   addProjectsToExport(projects: Project[]) {
     for (const project of projects) {
-      this.getTeamProjectsState().updateByProjectName(project.name, {
+      this.getTeamProjectsState().addOrUpdateByProjectName(project.name, {
         projectId: project.id,
         projectName: project.name,
         updatedAt: Date.now(),
+        projectStatus: project.status,
       });
     }
   }
@@ -84,6 +86,22 @@ export class ScriptState {
       });
     }
     this.updateTimeStamp();
+  }
+
+  updateStatesFromProjectExportJobs(jobs: Job[]) {
+    for (const job of jobs) {
+      this.getTeamProjectsState().updateByExportJobId(job.id, {
+        export: {
+          jobId: job.id,
+          jobStatus: job.status,
+        },
+      });
+    }
+    this.updateTimeStamp();
+  }
+
+  updateStateByProjectName(projectName: string, newProjectState: DeepPartial<ProjectState>) {
+    return this.getTeamProjectsState().updateByProjectName(projectName, newProjectState);
   }
 
   async updateInProgressProjectCreationStates() {
@@ -144,7 +162,7 @@ export class ScriptState {
         getLogger().info('saving finished');
       } catch (error) {
         getLogger().error('error when saving state', {
-          error: { code: error.code, message: error.message, stack: error?.stack },
+          error: { ...error, code: error.code, message: error.message, stack: error?.stack },
         });
         throw new Error('error in saving state');
       }
@@ -170,7 +188,10 @@ export class ScriptState {
     switch (ScriptState.stateConfig.source) {
       case StorageSources.AMAZONS3:
       case StorageSources.GOOGLE:
-        return getStorageClient().getFileContent(ScriptState.stateConfig.bucketName, ScriptState.stateConfig.path);
+        return getStorageClient(ScriptState.stateConfig.source).getStringFileContent(
+          ScriptState.stateConfig.bucketName,
+          ScriptState.stateConfig.path,
+        );
       case StorageSources.LOCAL:
         if (!existsSync(ScriptState.stateConfig.path)) throw new Error('state file not found');
         return readFileSync(ScriptState.stateConfig.path, { encoding: 'utf-8' });
@@ -188,7 +209,7 @@ export class ScriptState {
     switch (ScriptState.stateConfig.source) {
       case StorageSources.AMAZONS3:
       case StorageSources.GOOGLE:
-        await getStorageClient().setFileContent(
+        await getStorageClient(ScriptState.stateConfig.source).setStringFileContent(
           ScriptState.stateConfig.bucketName,
           ScriptState.stateConfig.path,
           JSON.stringify(content, null, 2),

@@ -46,3 +46,11 @@ export enum ProjectStatus {
   IN_REVIEW = 'IN_REVIEW',
   COMPLETED = 'COMPLETED',
 }
+
+export interface ExportResult {
+  redirect: string | null;
+  queued: boolean | null;
+  fileUrl: string;
+  fileUrlExpiredAt: string;
+  exportId: string;
+}

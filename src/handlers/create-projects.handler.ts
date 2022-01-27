@@ -7,7 +7,8 @@ import { getConfig, setConfigByJSONFile } from '../config/config';
 import { StorageSources } from '../config/interfaces';
 import { getProjectCreationValidators } from '../config/schema/validator';
 import { createProject } from '../datasaur/create-project';
-import { getJobs, JobStatus } from '../datasaur/get-jobs';
+import { JobStatus } from '../datasaur/get-jobs';
+import { ProjectStatus } from '../datasaur/interfaces';
 import { getLocalDocuments } from '../documents/get-local-documents';
 import { getObjectStorageDocuments } from '../documents/get-object-storage-documents';
 import { LocalDocument, RemoteDocument } from '../documents/interfaces';
@@ -15,7 +16,7 @@ import { getLogger } from '../logger';
 import { getLabelSetsFromDirectory } from '../utils/labelset';
 import { getStorageClient } from '../utils/object-storage';
 import { ObjectStorageClient } from '../utils/object-storage/interfaces';
-import { sleep } from '../utils/sleep';
+import { pollJobsUntilCompleted } from '../utils/polling.helper';
 import { getState } from '../utils/states/getStates';
 import { ScriptState } from '../utils/states/script-state';
 import { ScriptAction } from './constants';
@@ -107,9 +108,13 @@ export async function handleCreateProjects(configFile: string, options) {
           counterRetry = LIMIT_RETRY + 1;
         } catch (error) {
           if (counterRetry >= LIMIT_RETRY) {
-            getLogger().error(`reached retry limit for ${projectDetails.name}, skipping...`, { error });
+            getLogger().error(`reached retry limit for ${projectDetails.name}, skipping...`, {
+              error: { ...error, message: error.message },
+            });
           } else {
-            getLogger().warn(`error creating ${projectDetails.name}, retrying...`, { error });
+            getLogger().warn(`error creating ${projectDetails.name}, retrying...`, {
+              error: { ...error, message: error.message },
+            });
           }
         }
       }
@@ -126,29 +131,15 @@ export async function handleCreateProjects(configFile: string, options) {
   } else {
     await scriptState.save();
     getLogger().info(`sending query for ProjectLaunchJob status...`);
-    while (true) {
-      await sleep(5000);
-      const jobs = await getJobs(results.map((result) => result.job.id));
+    const jobs = await pollJobsUntilCompleted(results.map((r) => r.job.id));
 
-      const notFinishedStatuses = [JobStatus.IN_PROGRESS, JobStatus.NONE, JobStatus.QUEUED];
-      const notFinishedJobs = jobs.filter((job) => notFinishedStatuses.includes(job.status));
-      if (notFinishedJobs.length === 0) {
-        const failedJobs = jobs.filter((j) => j.status === JobStatus.FAILED).map((j) => j.id);
-        const deliveredJobs = jobs.filter((j) => j.status === JobStatus.DELIVERED).map((j) => j.id);
-        getLogger().info(`all ProjectLaunchJob finished.`, { failedJobs, deliveredJobs });
-        const okCount = deliveredJobs.length;
-        const failCount = failedJobs.length;
-        const totalCount = okCount + failCount;
-        getLogger().info(`completed ${totalCount} jobs; ${okCount} successful and ${failCount} failed`);
+    const createFail = jobs.filter((j) => j.status === JobStatus.FAILED).map((j) => j.id);
+    const createOK = jobs.filter((j) => j.status === JobStatus.DELIVERED).map((j) => j.id);
+    getLogger().info(`all ProjectLaunchJob finished.`, { success: createOK, fail: createFail });
+    getLogger().info(`completed ${jobs.length} jobs; ${createOK.length} successful and ${createFail.length} failed`);
 
-        scriptState.updateStatesFromProjectCreationJobs(jobs);
-        await scriptState.save();
-
-        getLogger().info('exiting script...');
-        break;
-      }
-      getLogger().info(`found ${notFinishedJobs.length} unfinished job, re-sending query...`);
-    }
+    scriptState.updateStatesFromProjectCreationJobs(jobs);
+    await scriptState.save();
   }
 }
 
@@ -166,6 +157,7 @@ async function doCreateProjectAndUpdateState(projectConfiguration: ProjectConfig
       jobStatus: JobStatus.IN_PROGRESS,
     },
     projectId: undefined,
+    projectStatus: ProjectStatus.CREATED,
   });
   return result;
 }

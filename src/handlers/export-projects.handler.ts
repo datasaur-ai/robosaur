@@ -1,46 +1,109 @@
 import { getConfig, setConfigByJSONFile } from '../config/config';
 import { getProjectExportValidators } from '../config/schema/validator';
 import { exportProject } from '../datasaur/export-project';
+import { JobStatus } from '../datasaur/get-jobs';
 import { getProjects } from '../datasaur/get-projects';
-import { isExportedStatusLower } from '../utils/states/isExportedStatusLower';
+import { getLogger } from '../logger';
+import { pollJobsUntilCompleted } from '../utils/polling.helper';
+import { publishZipFile } from '../utils/publishZipFile';
 import { getState } from '../utils/states/getStates';
 import { ProjectState } from '../utils/states/interfaces';
+import { isExportedStatusLower } from '../utils/states/isExportedStatusLower';
 import { ScriptAction } from './constants';
 
 export async function handleExportProjects(configFile: string) {
-  // set config
   setConfigByJSONFile(configFile, getProjectExportValidators(), ScriptAction.PROJECT_EXPORT);
 
   const scriptState = await getState();
   await scriptState.updateInProgressProjectCreationStates();
 
-  // get export filter
-  const { statusFilter, teamId, format: exportFormat, customScriptId: exportCustomScriptId } = getConfig().export;
-  const validProjectsFromDatasaur = await getProjects({ statuses: 'CREATED', teamId });
+  const {
+    statusFilter,
+    teamId,
+    format: exportFormat,
+    customScriptId: exportCustomScriptId,
+    source,
+  } = getConfig().export;
 
+  // retrieves projects from Datasaur matching the status filters
+  // add or update the projects in script state
+  getLogger().info('retrieving projects with filters', { filter: statusFilter });
+  const validProjectsFromDatasaur = await getProjects({ statuses: statusFilter, teamId });
   scriptState.addProjectsToExport(validProjectsFromDatasaur);
 
+  // from script state, retrieves all projects that are eligible for export
   const projectToExports = Array.from(scriptState.getTeamProjectsState().getProjects()).filter(
     ([_name, projectState]) => {
-      if (projectState.projectStatus in statusFilter) {
+      if (statusFilter.includes(projectState.projectStatus)) {
         return shouldExport(projectState);
       }
       return false;
     },
   );
-
-  const results: any[] = [];
-  for (const [name, project] of projectToExports) {
-    const retval = await exportProject(project.projectId, name, exportFormat, exportCustomScriptId);
-    results.push(retval);
-
-    console.log(retval);
+  if (projectToExports.length === 0) {
+    getLogger().info(`no projects left to export, exiting script...`);
     return;
   }
-  // // wait
-  //  // upload to destined bucket
-  // update state along the way
-  // summarize what the script did in this run (success/fail count)
+  getLogger().info(`found ${projectToExports.length} projects to export`);
+
+  const results: Array<{ projectName: string; exportId: string; jobStatus: JobStatus | 'PUBLISHED' }> = [];
+  for (const [_key, [name, project]] of projectToExports.entries()) {
+    const temp = {
+      projectName: project.projectName,
+      jobStatus: project.export?.jobStatus ?? JobStatus.NONE,
+      exportId: project.export?.jobId ?? '',
+    };
+
+    getLogger().info('submitting export job to Datasaur...', {
+      project: {
+        id: project.projectId,
+        name: project.projectName,
+        format: exportFormat,
+        customScriptId: exportCustomScriptId,
+      },
+    });
+    const retval = await exportProject(project.projectId as string, name, exportFormat, exportCustomScriptId);
+    temp.exportId = retval.exportId;
+    temp.jobStatus = retval.queued ? JobStatus.QUEUED : JobStatus.IN_PROGRESS;
+
+    scriptState.updateStateByProjectName(project.projectName, {
+      export: {
+        jobId: temp.exportId,
+        jobStatus: temp.jobStatus,
+        statusOnLastExport: project.projectStatus,
+      },
+    });
+
+    const jobResult = (await pollJobsUntilCompleted([retval.exportId]))[0];
+    getLogger().info(`export job finished`, { ...jobResult });
+    temp.jobStatus = jobResult.status;
+    scriptState.updateStatesFromProjectExportJobs([jobResult]);
+    await scriptState.save();
+
+    try {
+      await publishZipFile(retval.fileUrl, `${project.projectName}-${project.projectId}`);
+      scriptState.updateStatesFromProjectExportJobs([{ ...jobResult, status: 'PUBLISHED' as JobStatus }]);
+      await scriptState.save();
+      temp.jobStatus = 'PUBLISHED';
+    } catch (error) {
+      getLogger().error(`fail to publish exported project to ${source}`, {
+        error: { ...error, message: error.message },
+      });
+    }
+    results.push(temp);
+  }
+
+  const exportOK = results.filter((r) => r.jobStatus === 'PUBLISHED' || r.jobStatus === JobStatus.DELIVERED);
+  const exportFail = results.filter((r) => !(r.jobStatus === 'PUBLISHED' || r.jobStatus === JobStatus.DELIVERED));
+  getLogger().info(
+    `completed ${results.length} export jobs; ${exportOK.length}} successful and ${exportFail.length} failed`,
+    {
+      success: exportOK,
+      fail: exportFail,
+    },
+  );
+  await scriptState.save();
+  getLogger().info('exiting script...');
 }
 
 function shouldExport(state: ProjectState) {

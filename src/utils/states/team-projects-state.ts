@@ -1,5 +1,5 @@
 import { DeepPartial } from '../interfaces';
-import { ProjectState } from './interfaces';
+import { CreateJobState, ExportJobState, ProjectState } from './interfaces';
 
 export class TeamProjectsState {
   private projects: Map<string, ProjectState>;
@@ -15,8 +15,8 @@ export class TeamProjectsState {
     } else {
       this.id = args.id;
       this.projects = new Map<string, ProjectState>();
-      args.projects.forEach((p: Required<ProjectState>, key) => {
-        this.projects.set(key, {
+      ((args.projects as unknown) as Array<ProjectState>).forEach((p: Required<ProjectState>) => {
+        this.projects.set(p.projectName, {
           ...p,
           createdAt: new Date(p.createdAt).getTime(),
           updatedAt: new Date(p.updatedAt).getTime(),
@@ -25,11 +25,26 @@ export class TeamProjectsState {
     }
   }
 
-  push(newProject: ProjectState) {
-    this.projects.set(newProject.projectName, { ...newProject, createdAt: Date.now(), updatedAt: Date.now() });
+  addOrUpdateByProjectName(projectName: string, projectData: DeepPartial<ProjectState>) {
+    if (this.projects.get(projectName)) {
+      return this.updateByProjectName(projectName, projectData);
+    }
+
+    this.push({ ...projectData, documents: [] } as ProjectState);
+    return projectName;
   }
 
-  updateByCreateJobId(jobid: string, newProjectData: DeepPartial<ProjectState>) {
+  push(newProject: ProjectState) {
+    this.projects.set(newProject.projectName, {
+      ...newProject,
+      create: { ...(newProject.create as CreateJobState), createdAt: Date.now(), updatedAt: Date.now() },
+      export: { ...(newProject.export as ExportJobState), createdAt: Date.now(), updatedAt: Date.now() },
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+    });
+  }
+
+  updateByCreateJobId(jobid: string, newProjectState: DeepPartial<ProjectState>) {
     let identifier = '';
     for (const [key, project] of this.projects) {
       if (project.create?.jobId === jobid) {
@@ -38,11 +53,23 @@ export class TeamProjectsState {
       }
     }
 
-    return this.update(identifier, { ...newProjectData });
+    return this.update(identifier, newProjectState);
   }
 
-  updateByProjectName(projectName: string, newProjectData: DeepPartial<ProjectState>) {
-    return this.update(projectName, newProjectData);
+  updateByExportJobId(jobId: string, newProjectState: DeepPartial<ProjectState>) {
+    let identifier = '';
+    for (const [key, project] of this.projects) {
+      if (project.export?.jobId === jobId) {
+        identifier = key;
+        break;
+      }
+    }
+
+    return this.update(identifier, newProjectState);
+  }
+
+  updateByProjectName(projectName: string, newProjectState: DeepPartial<ProjectState>) {
+    return this.update(projectName, newProjectState);
   }
 
   getProjects() {
@@ -53,24 +80,24 @@ export class TeamProjectsState {
     return this.id;
   }
 
-  private update(identifier: string, newProjectData: DeepPartial<ProjectState>) {
+  private update(identifier: string, newProjectState: DeepPartial<ProjectState>) {
     if (!identifier) return -1;
 
     const existingData = this.projects.get(identifier);
     if (!existingData) return -1;
 
+    newProjectState = populateTimeStamp(newProjectState);
     this.projects.set(identifier, {
       ...existingData,
-      ...newProjectData,
+      ...newProjectState,
       create: {
         ...existingData.create,
-        ...newProjectData.create,
+        ...newProjectState.create,
       },
       export: {
         ...existingData.export,
-        ...newProjectData.export,
+        ...newProjectState.export,
       },
-      createdAt: Date.now(),
       updatedAt: Date.now(),
     } as ProjectState);
     return identifier;
@@ -81,6 +108,19 @@ export class TeamProjectsState {
     for (const [key, project] of this.projects) {
       arrayProjects.push({
         ...project,
+
+        create: {
+          ...project.create,
+          createdAt: project.create?.createdAt ? new Date(project.create.createdAt as number).toISOString() : undefined,
+          updatedAt: project.create?.updatedAt ? new Date(project.create.updatedAt as number).toISOString() : undefined,
+        },
+
+        export: {
+          ...project.export,
+          createdAt: project.export?.createdAt ? new Date(project.export.createdAt as number).toISOString() : undefined,
+          updatedAt: project.export?.updatedAt ? new Date(project.export.updatedAt as number).toISOString() : undefined,
+        },
+
         createdAt: new Date(project.createdAt as number).toISOString(),
         updatedAt: new Date(project.updatedAt as number).toISOString(),
       });
@@ -92,4 +132,26 @@ export class TeamProjectsState {
     };
     return retvalObject;
   }
+}
+
+// helper function to populate nested timestamp field
+
+function populateTimeStamp(state: DeepPartial<ProjectState>): ProjectState {
+  const creationState: Partial<CreateJobState> = { ...state.create };
+  if (state.create) {
+    creationState.updatedAt = Date.now();
+  }
+
+  const exportState: Partial<ExportJobState> = { ...state.export };
+  if (state.export) {
+    exportState.updatedAt = Date.now();
+  }
+
+  return {
+    ...state,
+    create: { ...creationState },
+    export: { ...exportState },
+    createdAt: Date.now(),
+    updatedAt: Date.now(),
+  } as ProjectState;
 }

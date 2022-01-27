@@ -1,4 +1,6 @@
 import { Storage } from '@google-cloud/storage';
+import internal from 'stream';
+import { getLogger } from '../../logger';
 import { streamToString } from '../streamToString';
 import { getGCSConfig, normalizeFolderName } from './helper';
 import { BucketItem, ObjectStorageClient } from './interfaces';
@@ -47,11 +49,27 @@ export class GoogleCloudStorageClient implements ObjectStorageClient {
     return url[0];
   }
 
-  getFileContent(bucketName: string, objectName: string): Promise<string> {
+  getStringFileContent(bucketName: string, objectName: string): Promise<string> {
     const objectStream = GoogleCloudStorageClient.getClient().bucket(bucketName).file(objectName).createReadStream();
     return streamToString(objectStream);
   }
-  async setFileContent(bucketName: string, objectName: string, content: string): Promise<void> {
+
+  async setStringFileContent(bucketName: string, objectName: string, content: string): Promise<void> {
     await GoogleCloudStorageClient.getClient().bucket(bucketName).file(objectName).save(content);
+  }
+
+  async setFileContent(bucketName: string, objectName: string, content: internal.Readable): Promise<void> {
+    return new Promise((resolve, reject) => {
+      content.pipe(GoogleCloudStorageClient.getClient().bucket(bucketName).file(objectName).createWriteStream());
+      content.on('finish', (arg) => {
+        getLogger().info(`finished writing to GCS bucket`);
+        resolve();
+      });
+
+      content.on('error', (error) => {
+        getLogger().error(`error during writing to GCS bucket`, { error: { ...error, message: error.message } });
+        reject();
+      });
+    });
   }
 }

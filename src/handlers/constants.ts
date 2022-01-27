@@ -1,5 +1,5 @@
 export const enum ScriptAction {
-  PROJECT_CREATION,
-  PROJECT_EXPORT,
-  NONE,
+  PROJECT_CREATION = 'CREATION',
+  PROJECT_EXPORT = 'EXPORT',
+  NONE = 'NONE',
 }
