@@ -7,7 +7,7 @@
   "credentials": {
     "gcs": { "gcsCredentialJson": "config/google-cloud-storage/credential.json" }
   },
-  "state": {
+  "projectState": {
     "source": "gcs",
     "bucketName": "my-bucket",
     "path": "path/to/stateFile.json"

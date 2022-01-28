@@ -98,13 +98,13 @@ Here are a couple important details about the storage configuration:
       3. storage.objects.create
       4. storage.objects.delete - used with storage.objects.create to update the statefile
 
-3. `config.state.path` => path to a JSON file.  
+3. `config.projectState.path` => path to a JSON file.  
    For GCS and S3, this means path without protocol (`gs://` or `s3://`) and bucketName.  
    For example, a file `my-file.json` at S3 bucket `my-bucket` in folder `my-folder` accessed as `s3://my-bucket/my-folder/my-file.json` should be written as follows:
 
    ```json
    {
-     "state": {
+     "projectState": {
        "source": "s3",
        "bucketName": "my-bucket",
        "path": "my-folder/my-file.json"
@@ -112,7 +112,7 @@ Here are a couple important details about the storage configuration:
    }
    ```
 
-4. `config.assignment.path` => same as `state.path` above  
+4. `config.assignment.path` => same as `projectState.path` above  
    if we want to create a project without any labelers or reviewers, we can remove the `assignment` key from the JSON altogether.
 5. `config.project.labelSetDirectory` => Optional. Relative or full path to a local folder containing labelsets  
    Currently, only labelsets in CSV format for token-based project are supported.  
@@ -129,9 +129,10 @@ Calling `create-projects` with a `remote` documents source is currently unsuppor
 
 ### Stateful Execution
 
-For the `create-projects` command, Robosaur can behave smarter with the help of a state file. This state file must be stored in the same `source` as the documents, meaning if we are using GCS bucket to store the documents, the state file needs to be somewhere in the same bucket as well.
+For the `create-projects` command, Robosaur can behave smarter with the help of a state file.
 
 The state file will keep track on what projects have been submitted to Datasaur for which teams.
 This allows the script to be used to create projects using the same bucket structure for different teams by only changing the relevant config (for example `teamId`, `assignment` and `customScriptId`)
 
-If this behavior is not wanted or needed, we can pass an emtpy string `''` to the `stateFilePath` config, and Robosaur will create a new in-memory state for each run. This will cause Robosaur to always create new projects based on the subfolders even if there are already projects with the same name in Datasaur.
+If this behavior is not wanted or needed, we can pass an emtpy string `''` to the `config.projectState.path` field or setting `config.projectState` to `{}`, and Robosaur will create a new in-memory state for each run.
+This will cause Robosaur to always create new projects based on the subfolders even if there are already projects with the same name in Datasaur.
