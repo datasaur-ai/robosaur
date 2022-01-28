@@ -22,6 +22,7 @@ program
 
 program
   .command(`export-projects <configFile>`)
+  .option('-u --unzip', 'Unzips the exported projects, only storing the final version accepted by reviewers')
   .description('Export all projects based on the given config file')
   .action(handleExportProjects);
 

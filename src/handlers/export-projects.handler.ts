@@ -5,13 +5,14 @@ import { JobStatus } from '../datasaur/get-jobs';
 import { getProjects } from '../datasaur/get-projects';
 import { getLogger } from '../logger';
 import { pollJobsUntilCompleted } from '../utils/polling.helper';
-import { publishZipFile } from '../utils/publishZipFile';
+import { publishFiles } from '../utils/publish/publishFiles';
+import { publishZipFile } from '../utils/publish/publishZipFile';
 import { getState } from '../utils/states/getStates';
 import { ProjectState } from '../utils/states/interfaces';
 import { isExportedStatusLower } from '../utils/states/isExportedStatusLower';
 import { ScriptAction } from './constants';
 
-export async function handleExportProjects(configFile: string) {
+export async function handleExportProjects(configFile: string, { unzip }: { unzip: boolean }) {
   setConfigByJSONFile(configFile, getProjectExportValidators(), ScriptAction.PROJECT_EXPORT);
 
   const scriptState = await getState();
@@ -81,7 +82,11 @@ export async function handleExportProjects(configFile: string) {
     await scriptState.save();
 
     try {
-      await publishZipFile(retval.fileUrl, `${project.projectName}-${project.projectId}`);
+      if (unzip) {
+        await publishFiles(retval.fileUrl, `${project.projectName}`);
+      } else {
+        await publishZipFile(retval.fileUrl, `${project.projectName}`);
+      }
       scriptState.updateStatesFromProjectExportJobs([{ ...jobResult, status: 'PUBLISHED' as JobStatus }]);
       await scriptState.save();
       temp.jobStatus = 'PUBLISHED';
@@ -91,6 +96,7 @@ export async function handleExportProjects(configFile: string) {
       });
     }
     results.push(temp);
+    return;
   }
 
   const exportOK = results.filter((r) => r.jobStatus === 'PUBLISHED' || r.jobStatus === JobStatus.DELIVERED);

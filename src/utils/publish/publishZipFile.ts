@@ -2,13 +2,17 @@ import axios, { AxiosResponse } from 'axios';
 import { createWriteStream, mkdirSync } from 'fs';
 import { resolve } from 'path';
 import internal from 'stream';
-import { getConfig } from '../config/config';
-import { StorageSources } from '../config/interfaces';
-import { getLogger } from '../logger';
-import { getStorageClient } from './object-storage';
-import { normalizeFolderName } from './object-storage/helper';
+import { getConfig } from '../../config/config';
+import { StorageSources } from '../../config/interfaces';
+import { getLogger } from '../../logger';
+import { getStorageClient } from '../object-storage';
+import { normalizeFolderName } from '../object-storage/helper';
 
-const IMPLEMENTED_EXPORT_STORAGE_SOURCES = [StorageSources.AMAZONS3, StorageSources.GOOGLE, StorageSources.LOCAL];
+export const IMPLEMENTED_EXPORT_STORAGE_SOURCES = [
+  StorageSources.AMAZONS3,
+  StorageSources.GOOGLE,
+  StorageSources.LOCAL,
+];
 
 export async function publishZipFile(url: string, projectName: string) {
   const { source, prefix, bucketName } = getConfig().export;
