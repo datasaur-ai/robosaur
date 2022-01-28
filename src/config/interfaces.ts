@@ -23,7 +23,7 @@ export interface Config {
     clientSecret: string;
   };
   credentials: CredentialsConfig;
-  state: StatefileConfig;
+  projectState: StatefileConfig;
 
   // project export
   export: ExportConfig;

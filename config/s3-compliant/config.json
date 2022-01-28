@@ -13,7 +13,7 @@
       "s3UseSSL": true
     }
   },
-  "state": {
+  "projectState": {
     "source": "s3",
     "bucketName": "my-bucket",
     "path": "path/to/stateFile.json"

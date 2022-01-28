@@ -3,6 +3,7 @@ import { ProjectStatus } from '../../datasaur/interfaces';
 
 export interface JobState {
   jobId: string | null;
+  errors: Array<any>;
   createdAt?: number;
   updatedAt?: number;
 }

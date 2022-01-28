@@ -50,7 +50,7 @@ function doSourcesNeedCredentials(config: Config) {
   const usedSources = [
     config.assignment?.source,
     config.documents?.source,
-    config.state?.source,
+    config.projectState?.source,
     config.export?.source,
   ];
 

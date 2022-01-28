@@ -43,7 +43,7 @@ export class ScriptState {
   }
 
   public static async fromConfig() {
-    ScriptState.stateConfig = getConfig().state;
+    ScriptState.stateConfig = getConfig().projectState;
     ScriptState.activeTeamId = getActiveTeamIdFromConfig();
     if (ScriptState.stateConfig?.path) {
       try {
@@ -81,7 +81,7 @@ export class ScriptState {
   updateStatesFromProjectCreationJobs(jobs: Job[]) {
     for (const job of jobs) {
       this.getTeamProjectsState().updateByCreateJobId(job.id, {
-        create: { jobStatus: job.status, jobId: job.id },
+        create: { jobStatus: job.status, jobId: job.id, errors: job.errors },
         projectId: job.resultId,
       });
     }

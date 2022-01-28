@@ -6,7 +6,7 @@ export async function getState() {
   try {
     return await ScriptState.fromConfig();
   } catch (error) {
-    getLogger().error(`no statefile found in ${JSON.stringify(getConfig().state)}`);
+    getLogger().error(`no statefile found in ${JSON.stringify(getConfig().projectState)}`);
     getLogger().info(`creating a new state`);
     return await createAndSaveNewState();
   }

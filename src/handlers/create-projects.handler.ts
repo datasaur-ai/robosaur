@@ -133,10 +133,13 @@ export async function handleCreateProjects(configFile: string, options) {
     getLogger().info(`sending query for ProjectLaunchJob status...`);
     const jobs = await pollJobsUntilCompleted(results.map((r) => r.job.id));
 
-    const createFail = jobs.filter((j) => j.status === JobStatus.FAILED).map((j) => j.id);
+    const createFail = jobs.filter((j) => j.status === JobStatus.FAILED);
     const createOK = jobs.filter((j) => j.status === JobStatus.DELIVERED).map((j) => j.id);
-    getLogger().info(`all ProjectLaunchJob finished.`, { success: createOK, fail: createFail });
+    getLogger().info(`all ProjectLaunchJob finished.`, { success: createOK, fail: createFail.map((j) => j.id) });
     getLogger().info(`completed ${jobs.length} jobs; ${createOK.length} successful and ${createFail.length} failed`);
+    for (const job of createFail) {
+      getLogger().error(`error for ${job.id}`, { ...job });
+    }
 
     scriptState.updateStatesFromProjectCreationJobs(jobs);
     await scriptState.save();
@@ -155,6 +158,7 @@ async function doCreateProjectAndUpdateState(projectConfiguration: ProjectConfig
     create: {
       jobId: result.job.id,
       jobStatus: JobStatus.IN_PROGRESS,
+      errors: result.job.errors,
     },
     projectId: undefined,
     projectStatus: ProjectStatus.CREATED,
