@@ -4,8 +4,13 @@ import { ProjectState } from './interfaces';
 import { ScriptState } from './script-state';
 import { TeamProjectsState } from './team-projects-state';
 
-export function dummyPopulateProjects(teamId: string, projectCount: number, state: ScriptState) {
-  dummyPopulateTeamProjectState(projectCount, state.getTeamProjectsState(teamId));
+export function dummyPopulateProjects(
+  teamId: string,
+  projectCount: number,
+  state: ScriptState,
+  template: DeepPartial<ProjectState> = { create: { jobStatus: JobStatus.NONE } },
+) {
+  dummyPopulateTeamProjectState(projectCount, state.getTeamProjectsState(teamId), template);
 }
 
 export function dummyPopulateTeamProjectState(
@@ -14,22 +19,22 @@ export function dummyPopulateTeamProjectState(
   template: DeepPartial<ProjectState> = { create: { jobStatus: JobStatus.NONE } },
 ) {
   for (let index = 0; index < projectCount; index++) {
-    const identifier = `${state.getTeamId()}-${index}`;
+    const stateLength = state.getProjects().size;
+    const identifier = `${state.getTeamId()}-${index + stateLength}`;
 
     // manually get team's state, and push a project to it
     state.push({
-      projectId: identifier,
-      projectName: identifier,
       ...template,
-
       create: {
-        jobId: `job-${identifier}`,
         ...template?.create,
+        jobId: `create-job-${identifier}`,
       },
-
       export: {
         ...template?.export,
+        jobId: `export-job-${identifier}`,
       },
+      projectId: identifier,
+      projectName: identifier,
     } as ProjectState);
   }
 }

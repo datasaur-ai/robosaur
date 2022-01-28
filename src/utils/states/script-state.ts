@@ -134,6 +134,10 @@ export class ScriptState {
     return ScriptState.activeTeamId;
   }
 
+  getProjectStateByProjectName(name: string) {
+    return this.getTeamProjectsState().getProjects().get(name);
+  }
+
   getTeamProjectsState(): TeamProjectsState;
   getTeamProjectsState(teamId: string): TeamProjectsState;
 
