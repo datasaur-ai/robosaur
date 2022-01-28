@@ -22,6 +22,7 @@ export interface Config {
      */
     clientSecret: string;
   };
+
   credentials: CredentialsConfig;
   projectState: StatefileConfig;
 

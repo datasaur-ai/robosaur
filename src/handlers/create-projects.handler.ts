@@ -131,6 +131,7 @@ export async function handleCreateProjects(configFile: string, options) {
   } else {
     await scriptState.save();
     getLogger().info(`sending query for ProjectLaunchJob status...`);
+
     const jobs = await pollJobsUntilCompleted(results.map((r) => r.job.id));
 
     const createFail = jobs.filter((j) => j.status === JobStatus.FAILED);
