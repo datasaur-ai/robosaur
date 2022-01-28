@@ -6,6 +6,7 @@ export interface JobState {
   jobStatus: JobStatus;
   createdAt?: number;
   updatedAt?: number;
+  errors: any;
 }
 export interface ProjectState {
   create?: JobState;

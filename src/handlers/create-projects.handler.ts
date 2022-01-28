@@ -47,7 +47,7 @@ export async function handleCreateProjects(configFile: string, options) {
       return handleCreateProject('New Robosaur Project', configFile);
   }
   const { bucketName, prefix: storagePrefix, source, path } = getConfig().documents;
-  const { path: stateFilePath } = getConfig().state;
+  const { path: stateFilePath } = getConfig().projectState;
 
   let scriptState: ScriptState;
   try {
@@ -170,6 +170,7 @@ async function doCreateProjectAndUpdateState(projectConfiguration: ProjectConfig
     create: {
       jobId: result.job.id,
       jobStatus: JobStatus.IN_PROGRESS,
+      errors: result.job.errors,
     },
     projectId: undefined,
   });
