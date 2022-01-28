@@ -22,21 +22,7 @@ export interface Config {
      */
     clientSecret: string;
   };
-  credentials: {
-    [StorageSources.AMAZONS3]: {
-      s3Endpoint: string;
-      s3Port: number;
-      s3AccessKey: string;
-      s3SecretKey: string;
-      s3UseSSL: boolean;
-    };
-    [StorageSources.GOOGLE]: {
-      /**
-       * @description Relative or absolute local file path to the credential file.
-       */
-      gcsCredentialJson: string;
-    };
-  };
+  credentials: CredentialsConfig;
   state: StatefileConfig;
 
   // project export
@@ -114,6 +100,22 @@ export interface Config {
      * @description Optional. Local path to a folder containing CSV files for TOKEN_BASED. If both labelSetDirectory and labelSets is provided, robosaur will pick labelSets
      */
     labelSetDirectory?: string;
+  };
+}
+
+export interface CredentialsConfig {
+  [StorageSources.AMAZONS3]: {
+    s3Endpoint: string;
+    s3Port: number;
+    s3AccessKey: string;
+    s3SecretKey: string;
+    s3UseSSL: boolean;
+  };
+  [StorageSources.GOOGLE]: {
+    /**
+     * @description Relative or absolute local file path to the credential file.
+     */
+    gcsCredentialJson: string;
   };
 }
 

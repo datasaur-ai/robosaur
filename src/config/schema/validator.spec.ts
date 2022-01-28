@@ -1,35 +1,21 @@
-import { getConfig, setConfigByJSONFile } from '../config';
-import { validateConfigAssignment, validateConfigDocuments, validateConfigExport } from './validator';
+import { setConfigByJSONFile } from '../config';
+import { getProjectCreationValidators, getProjectExportValidators } from './validator';
 
-describe(validateConfigAssignment.name, () => {
-  it.each([
-    ['config/google-cloud-storage/config.json'],
-    ['config/remote-files/config.json'],
-    ['config/s3-compliant/config.json'],
-  ])('sample file %s should pass assignment validation', (configFilePath: string) => {
-    setConfigByJSONFile(configFilePath, []);
-    expect(() => validateConfigAssignment(getConfig())).not.toThrow();
-  });
-});
+const filesToBeTested = [
+  'config/google-cloud-storage/config.json',
+  'config/remote-files/config.json',
+  'config/s3-compliant/config.json',
+  'config/local/config.json',
+];
 
-describe(validateConfigDocuments.name, () => {
-  it.each([
-    ['config/google-cloud-storage/config.json'],
-    ['config/remote-files/config.json'],
-    ['config/s3-compliant/config.json'],
-  ])('sample file %s should pass documents validation', (configFilePath: string) => {
-    setConfigByJSONFile(configFilePath, []);
-    expect(() => validateConfigDocuments(getConfig())).not.toThrow();
-  });
-});
-
-describe(validateConfigExport.name, () => {
-  it.each([
-    ['config/google-cloud-storage/config.json'],
-    ['config/remote-files/config.json'],
-    ['config/s3-compliant/config.json'],
-  ])('sample file %s should pass documents validation', (configFilePath: string) => {
-    setConfigByJSONFile(configFilePath, []);
-    expect(() => validateConfigExport(getConfig())).not.toThrow();
-  });
+describe.each([
+  [getProjectExportValidators.name, getProjectExportValidators()],
+  [getProjectCreationValidators.name, getProjectCreationValidators()],
+])('%s', (_fname, validateFunctions) => {
+  it.each(filesToBeTested.map((f) => [f]))(
+    'sample file %s should pass assignment validation',
+    (configFilePath: string) => {
+      expect(() => setConfigByJSONFile(configFilePath, validateFunctions)).not.toThrow();
+    },
+  );
 });
