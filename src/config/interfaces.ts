@@ -37,7 +37,7 @@ export interface Config {
       gcsCredentialJson: string;
     };
   };
-  state: StatefileConfig;
+  projectState: StatefileConfig;
 
   // project export
   export: ExportConfig;
