@@ -6,7 +6,8 @@ import { getLogger } from '../../logger';
 import { getStorageClient } from '../object-storage';
 import { normalizeFolderName } from '../object-storage/helper';
 import { readZipStream } from '../readZipFile';
-import { downloadFromPreSignedUrl, IMPLEMENTED_EXPORT_STORAGE_SOURCES } from './publishZipFile';
+import { IMPLEMENTED_EXPORT_STORAGE_SOURCES } from './constants';
+import { downloadFromPreSignedUrl } from './helper';
 
 export async function publishFiles(url: string, projectName: string) {
   const zipStream = await downloadFromPreSignedUrl(url);
@@ -35,6 +36,5 @@ export async function publishFiles(url: string, projectName: string) {
       throw new Error(
         `${source} is unsupported for handling project export. Please use one of ${IMPLEMENTED_EXPORT_STORAGE_SOURCES}`,
       );
-      break;
   }
 }

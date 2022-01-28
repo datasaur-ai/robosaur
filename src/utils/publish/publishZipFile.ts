@@ -1,18 +1,12 @@
-import axios, { AxiosResponse } from 'axios';
 import { createWriteStream, mkdirSync } from 'fs';
 import { resolve } from 'path';
-import internal from 'stream';
 import { getConfig } from '../../config/config';
 import { StorageSources } from '../../config/interfaces';
 import { getLogger } from '../../logger';
 import { getStorageClient } from '../object-storage';
 import { normalizeFolderName } from '../object-storage/helper';
-
-export const IMPLEMENTED_EXPORT_STORAGE_SOURCES = [
-  StorageSources.AMAZONS3,
-  StorageSources.GOOGLE,
-  StorageSources.LOCAL,
-];
+import { IMPLEMENTED_EXPORT_STORAGE_SOURCES } from './constants';
+import { downloadFromPreSignedUrl } from './helper';
 
 export async function publishZipFile(url: string, projectName: string) {
   const { source, prefix, bucketName } = getConfig().export;
@@ -42,9 +36,4 @@ export async function publishZipFile(url: string, projectName: string) {
         `${source} is unsupported for handling project export. Please use one of ${IMPLEMENTED_EXPORT_STORAGE_SOURCES}`,
       );
   }
-}
-
-export async function downloadFromPreSignedUrl(url: string) {
-  const result: AxiosResponse<internal.Readable> = await axios.get(url, { responseType: 'stream' });
-  return result;
 }
