@@ -38,6 +38,12 @@ export async function handleExportProjects(configFile: string, { unzip }: { unzi
       if (statusFilter.includes(projectState.projectStatus)) {
         return shouldExport(projectState);
       }
+      // special case: if export.statusFilter set to [],
+      // match datasaur.ai getProjects behavior
+      // return all projects
+      if (statusFilter.length === 0) {
+        return true;
+      }
       return false;
     },
   );
