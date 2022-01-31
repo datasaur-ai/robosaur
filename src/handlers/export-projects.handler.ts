@@ -93,7 +93,7 @@ export async function handleExportProjects(configFile: string, { unzip }: { unzi
 
     const jobResult = (await pollJobsUntilCompleted([retval.exportId]))[0];
     getLogger().info(`export job finished`, { ...jobResult });
-    temp.jobStatus = jobResult.status;
+    temp.jobStatus = jobResult?.status;
     scriptState.updateStatesFromProjectExportJobs([jobResult]);
     await scriptState.save();
 

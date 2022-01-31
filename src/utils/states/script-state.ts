@@ -69,7 +69,7 @@ export class ScriptState {
 
   addProjectsToExport(projects: Project[]) {
     for (const project of projects) {
-      this.getTeamProjectsState().addOrUpdateByProjectName(project.name, {
+      this.getTeamProjectsState().updateByProjectName(project.name, {
         projectId: project.id,
         projectName: project.name,
         updatedAt: Date.now(),

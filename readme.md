@@ -143,7 +143,8 @@ Calling `create-projects` with a `remote` documents source is currently unsuppor
 npm run start -- export-projects <pathToConfigJson> [--unzip]
 ```
 
-This command will export all projects matching the `config.export.statusFilter` specified. Similar to the `create-projects` command, `export-projects` also benefit from having a [statefile](#stateful-execution) configured. The optional `--unzip` option is used to extract the export results, and only save the documents from the `REVIEW` cabinet. This is useful if what we need is the final version of the project's document.  
+This command will export all projects matching the `config.export.statusFilter` specified. The optional `--unzip` option is used to extract the export results, and only save the documents from the `REVIEW` cabinet. This is useful if what we need is the final version of the project's document.  
+This command is intended to be used in combination with the stateful `create-projects` command, as this command will only export projects that are already listed in the statefile.  
 For in-depth project export config details, please refer to `config/interfaces.ts`, especially the `ExportConfig` interface.  
 Some notable ones are:
 
