@@ -44,7 +44,7 @@ export enum ProjectStatus {
   IN_PROGRESS = 'IN_PROGRESS',
   REVIEW_READY = 'REVIEW_READY',
   IN_REVIEW = 'IN_REVIEW',
-  COMPLETED = 'COMPLETED',
+  COMPLETE = 'COMPLETE',
 }
 
 export interface ExportResult {

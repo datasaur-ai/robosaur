@@ -28,6 +28,7 @@ export async function exportProject(
       format: format,
       fileName,
       method: 'FILE_STORAGE',
+      includedCommentType: ['COMMENT', 'SPAN_LABEL', 'ARROW_LABEL', 'SPAN_TEXT'],
     },
   };
   const data = await query(EXPORT_PROJECT_QUERY, variables);

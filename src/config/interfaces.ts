@@ -153,6 +153,12 @@ export interface AssignmentConfig extends WithStorage {
 }
 
 export interface ExportConfig extends WithStorage {
+  /**
+   * @description Projects' status to filter.
+   * Only projects matching the specified statuses will be exported by Robosaur.
+   * The possible statuses, in order are:
+   * CREATED, IN_PROGRESS, REVIEW_READY, IN_REVIEW, COMPLETE
+   */
   statusFilter: Array<ProjectStatus>;
 
   /**
