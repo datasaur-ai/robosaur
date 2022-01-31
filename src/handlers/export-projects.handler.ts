@@ -3,6 +3,7 @@ import { getProjectExportValidators } from '../config/schema/validator';
 import { exportProject } from '../datasaur/export-project';
 import { JobStatus } from '../datasaur/get-jobs';
 import { getProjects } from '../datasaur/get-projects';
+import { ExportResult } from '../datasaur/interfaces';
 import { getLogger } from '../logger';
 import { pollJobsUntilCompleted } from '../utils/polling.helper';
 import { publishProjectFiles } from '../utils/publish/publishProjectFiles';
@@ -69,7 +70,16 @@ export async function handleExportProjects(configFile: string, { unzip }: { unzi
         customScriptId: exportCustomScriptId,
       },
     });
-    const retval = await exportProject(project.projectId as string, name, exportFormat, exportCustomScriptId);
+    let retval: ExportResult | null = null;
+    try {
+      retval = await exportProject(project.projectId as string, name, exportFormat, exportCustomScriptId);
+    } catch (error) {
+      retval = {
+        exportId: 'dummyexport',
+        fileUrl: 'dummyfile',
+      } as ExportResult;
+      getLogger().error(`fail in exportProject query`, { error: { ...error, message: error.message } });
+    }
     temp.exportId = retval.exportId;
     temp.jobStatus = retval.queued ? JobStatus.QUEUED : JobStatus.IN_PROGRESS;
 
