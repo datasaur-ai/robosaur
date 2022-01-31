@@ -71,22 +71,18 @@ describe(ScriptState.name, () => {
       dummyPopulateProjects(OTHER_TEAM, 4, scriptState);
     });
 
-    it('should add project only to the current active team', () => {
+    it('should not add projects not in state', () => {
       // push project to the script state as a whole
-      // state should only push to active team state
+      // state should not add new projects not already in state
+      const previousSize = scriptState.getTeamProjectsState().getProjects().size;
       const dummyNewProject = {
         name: 'newly-added-project',
-        id: 'newly-added-project',
-        status: ProjectStatus.CREATED,
+        status: ProjectStatus.COMPLETE,
       } as Project;
       scriptState.addProjectsToExport([dummyNewProject]);
 
-      expect(scriptState.getTeamProjectsState().getProjects().size).toBeGreaterThan(
-        scriptState.getTeamProjectsState(OTHER_TEAM).getProjects().size,
-      );
-
-      expect(scriptState.getTeamProjectsState(ACTIVE_TEAM).getProjects().get(dummyNewProject.name)).toBeTruthy();
-
+      expect(scriptState.getTeamProjectsState().getProjects().size).toEqual(previousSize);
+      expect(scriptState.getTeamProjectsState(ACTIVE_TEAM).getProjects().get(dummyNewProject.name)).toBeFalsy();
       expect(scriptState.getTeamProjectsState(OTHER_TEAM).getProjects().get(dummyNewProject.name)).toBeFalsy();
     });
   });
