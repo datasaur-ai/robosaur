@@ -4,7 +4,7 @@ import { getProjectCreationValidators, getProjectExportValidators } from './vali
 const filesToBeTested = [
   'config/google-cloud-storage/config.json',
   'config/remote-files/config.json',
-  'config/s3-compliant/config.json',
+  'config/s3/config.json',
   'config/local/config.json',
 ];
 

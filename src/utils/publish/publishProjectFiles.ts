@@ -9,7 +9,7 @@ import { readZipStream } from '../readZipFile';
 import { IMPLEMENTED_EXPORT_STORAGE_SOURCES } from './constants';
 import { downloadFromPreSignedUrl } from './helper';
 
-export async function publishFiles(url: string, projectName: string) {
+export async function publishProjectFiles(url: string, projectName: string) {
   const zipStream = await downloadFromPreSignedUrl(url);
   const files = await readZipStream(zipStream.data);
   const { source, prefix, bucketName } = getConfig().export;

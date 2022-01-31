@@ -102,7 +102,7 @@ Here are a couple important details about the storage configuration:
    To enable [stateful](#stateful-execution) script execution, the script also need write access to a specific file inside the bucket.  
    Assuming we are using the same bucket for both storing the project documents as well as keeping the state file, here are the permission required
 
-   1. For S3-compliant bucket, these are the IAM Roles required:
+   1. For S3 bucket, these are the IAM Roles required:
       1. s3:GetObject
       2. s3:GetObjectAcl
       3. s3:PutObject

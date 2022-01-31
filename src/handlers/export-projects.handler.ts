@@ -5,7 +5,7 @@ import { JobStatus } from '../datasaur/get-jobs';
 import { getProjects } from '../datasaur/get-projects';
 import { getLogger } from '../logger';
 import { pollJobsUntilCompleted } from '../utils/polling.helper';
-import { publishFiles } from '../utils/publish/publishFiles';
+import { publishProjectFiles } from '../utils/publish/publishProjectFiles';
 import { publishZipFile } from '../utils/publish/publishZipFile';
 import { getState } from '../utils/states/getStates';
 import { ProjectState } from '../utils/states/interfaces';
@@ -83,7 +83,7 @@ export async function handleExportProjects(configFile: string, { unzip }: { unzi
 
     try {
       if (unzip) {
-        await publishFiles(retval.fileUrl, `${project.projectName}`);
+        await publishProjectFiles(retval.fileUrl, `${project.projectName}`);
       } else {
         await publishZipFile(retval.fileUrl, `${project.projectName}`);
       }

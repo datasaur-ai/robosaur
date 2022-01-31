@@ -5,9 +5,9 @@ import * as ObjectStorage from '../object-storage';
 import * as ReadZipFile from '../readZipFile';
 import { IMPLEMENTED_EXPORT_STORAGE_SOURCES } from './constants';
 import * as PublishHelper from './helper';
-import { publishFiles } from './publishFiles';
+import { publishProjectFiles } from './publishProjectFiles';
 
-describe(publishFiles.name, () => {
+describe(publishProjectFiles.name, () => {
   beforeEach(() => {
     jest.spyOn(ReadZipFile, 'readZipStream').mockResolvedValue([{ filename: 'dummy-file', content: 'dummy-content' }]);
     jest.spyOn(PublishHelper, 'downloadFromPreSignedUrl').mockResolvedValue({ data: new internal.Readable() } as any);
@@ -38,7 +38,7 @@ describe(publishFiles.name, () => {
         },
       } as any);
 
-      return expect(() => publishFiles('dummy-url', 'dummy-name')).not.toThrow();
+      return expect(() => publishProjectFiles('dummy-url', 'dummy-name')).not.toThrow();
     },
   );
 
@@ -48,6 +48,6 @@ describe(publishFiles.name, () => {
         source: 'INVALID_EXPORT_SOURCE',
       },
     } as any);
-    return expect(() => publishFiles('dummy-url', 'dummy-name')).rejects.toThrow();
+    return expect(() => publishProjectFiles('dummy-url', 'dummy-name')).rejects.toThrow();
   });
 });
