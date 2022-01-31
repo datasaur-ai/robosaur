@@ -107,7 +107,7 @@ describe(TeamProjectsState.name, () => {
     it('when updating, it should not squash / remove any existing properties', () => {
       const [_key, beforeUpdate] = Array.from(teamState.getProjects())[0];
       teamState.addOrUpdateByProjectName(beforeUpdate.projectName, {
-        projectStatus: ProjectStatus.COMPLETED,
+        projectStatus: ProjectStatus.COMPLETE,
       });
       const afterUpdate = teamState.getProjects().get(beforeUpdate.projectName) as ProjectState;
 

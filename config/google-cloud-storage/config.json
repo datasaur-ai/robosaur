@@ -17,7 +17,7 @@
     "bucketName": "my-export-bucket",
     "prefix": "path/to/export/root",
     "teamId": "<TEAM_ID>",
-    "statusFilter": ["COMPLETED"],
+    "statusFilter": ["COMPLETE"],
     "format": "CUSTOM",
     "customScriptId": "<CUSTOM_SCRIPT_ID>"
   },

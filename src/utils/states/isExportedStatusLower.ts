@@ -20,7 +20,7 @@ function compareProjectStatus(firstStatus: ProjectStatus, secondStatus: ProjectS
     ProjectStatus.IN_PROGRESS,
     ProjectStatus.REVIEW_READY,
     ProjectStatus.IN_REVIEW,
-    ProjectStatus.COMPLETED,
+    ProjectStatus.COMPLETE,
   ];
 
   return order.findIndex((s) => s === firstStatus) - order.findIndex((s) => s === secondStatus);

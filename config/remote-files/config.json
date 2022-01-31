@@ -8,7 +8,7 @@
     "source": "local",
     "prefix": "path/to/export/root",
     "teamId": "<TEAM_ID>",
-    "statusFilter": ["COMPLETED"],
+    "statusFilter": ["COMPLETE"],
     "format": "JSON_ADVANCED",
     "customScriptId": null
   },
