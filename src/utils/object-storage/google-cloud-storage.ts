@@ -58,20 +58,8 @@ export class GoogleCloudStorageClient implements ObjectStorageClient {
     await GoogleCloudStorageClient.getClient().bucket(bucketName).file(objectName).save(content);
   }
 
-  async setFileContent(bucketName: string, objectName: string, content: internal.Readable): Promise<void> {
+  async setFileContent(bucketName: string, objectName: string, content: Buffer): Promise<void> {
     getLogger().info(`writing to ${bucketName} ${objectName}`);
-    return new Promise((resolve, reject) => {
-      content.pipe(GoogleCloudStorageClient.getClient().bucket(bucketName).file(objectName).createWriteStream());
-
-      content.on('finish', (arg) => {
-        getLogger().info(`finished writing to GCS bucket`);
-        resolve();
-      });
-
-      content.on('error', (error) => {
-        getLogger().error(`error during writing to GCS bucket`, { error: { ...error, message: error.message } });
-        reject();
-      });
-    });
+    await GoogleCloudStorageClient.getClient().bucket(bucketName).file(objectName).save(content);
   }
 }

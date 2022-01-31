@@ -37,7 +37,7 @@ export class S3CompatibleClient implements ObjectStorageClient {
     await S3CompatibleClient.getClient().putObject(bucketName, objectName, content);
   }
 
-  async setFileContent(bucketName: string, objectName: string, content: internal.Readable): Promise<void> {
+  async setFileContent(bucketName: string, objectName: string, content: Buffer): Promise<void> {
     await S3CompatibleClient.getClient().putObject(bucketName, objectName, content);
   }
 }

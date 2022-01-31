@@ -6,7 +6,7 @@ export interface ObjectStorageClient {
   getObjectUrl(bucketName: string, objectName: string): Promise<string>;
   getStringFileContent(bucketName: string, objectName: string): Promise<string>;
   setStringFileContent(bucketName: string, objectName: string, content: string): Promise<void>;
-  setFileContent(bucketName: string, objectName: string, content: internal.Readable): Promise<void>;
+  setFileContent(bucketName: string, objectName: string, content: Buffer): Promise<void>;
 }
 
 export interface BucketItem {
