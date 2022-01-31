@@ -1,7 +1,7 @@
 import { Storage } from '@google-cloud/storage';
 import internal from 'stream';
 import { getLogger } from '../../logger';
-import { streamToString } from '../streamToString';
+import { streamToString } from '../stream/streamToString';
 import { getGCSConfig, normalizeFolderName } from './helper';
 import { BucketItem, ObjectStorageClient } from './interfaces';
 

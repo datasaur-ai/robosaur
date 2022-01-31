@@ -22,5 +22,12 @@ export function getMinioConfig(): ClientOptions {
 export function normalizeFolderName(folder: string) {
   if (folder.length === 0) return folder;
   if (folder[folder.length - 1] !== '/') folder = folder + '/';
-  return folder;
+  return safeDirectoryName(folder);
+}
+
+export function safeDirectoryName(directory: string) {
+  // https://github.com/cthackers/adm-zip/pull/279
+  // escape regex literal by using double backslashes
+  // eslint-disable-next-line no-useless-escape
+  return directory.replace(/[\\|\{\}\(\)\[\]\^\$\+\*\?\.@\/]/g, '_');
 }

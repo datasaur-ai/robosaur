@@ -4,7 +4,7 @@ import { getConfig } from '../../config/config';
 import { StorageSources } from '../../config/interfaces';
 import { getLogger } from '../../logger';
 import { getStorageClient } from '../object-storage';
-import { normalizeFolderName } from '../object-storage/helper';
+import { normalizeFolderName, safeDirectoryName } from '../object-storage/helper';
 import { readZipStream } from '../readZipFile';
 import { IMPLEMENTED_EXPORT_STORAGE_SOURCES } from './constants';
 import { downloadFromPreSignedUrl } from './helper';
@@ -18,14 +18,15 @@ export async function publishProjectFiles(url: string, projectName: string) {
       const dirname = resolve(process.cwd(), prefix, projectName);
       mkdirSync(dirname, { recursive: true });
       for (const file of files) {
-        writeFileSync(resolve(dirname, file.filename), file.content);
+        const fullFilePath = safeDirectoryName(resolve(dirname, file.filename));
+        writeFileSync(fullFilePath, file.content);
       }
       break;
     case StorageSources.AMAZONS3:
     case StorageSources.GOOGLE:
       for (const file of files) {
         const prefixPlusProjectName = normalizeFolderName(prefix) + projectName;
-        const fullObjectPath = normalizeFolderName(prefixPlusProjectName) + file.filename;
+        const fullObjectPath = safeDirectoryName(normalizeFolderName(prefixPlusProjectName) + file.filename);
         await getStorageClient(source).setStringFileContent(bucketName, fullObjectPath, file.content);
       }
       break;

@@ -88,15 +88,15 @@ export async function handleExportProjects(configFile: string, { unzip }: { unzi
         await publishZipFile(retval.fileUrl, `${project.projectName}`);
       }
       scriptState.updateStatesFromProjectExportJobs([{ ...jobResult, status: 'PUBLISHED' as JobStatus }]);
-      await scriptState.save();
       temp.jobStatus = 'PUBLISHED';
     } catch (error) {
       getLogger().error(`fail to publish exported project to ${source}`, {
         error: { ...error, message: error.message },
       });
+      scriptState.updateStatesFromProjectExportJobs([{ ...jobResult, status: JobStatus.FAILED as JobStatus }]);
     }
+    await scriptState.save();
     results.push(temp);
-    return;
   }
 
   const exportOK = results.filter((r) => r.jobStatus === 'PUBLISHED' || r.jobStatus === JobStatus.DELIVERED);
@@ -113,12 +113,7 @@ export async function handleExportProjects(configFile: string, { unzip }: { unzi
 }
 
 function shouldExport(state: ProjectState) {
-  if (
-    !state.export ||
-    state.export.jobStatus !== 'PUBLISHED' ||
-    isExportedStatusLower(state) ||
-    new Date(state.export.exportedFileUrlExpiredAt).getTime() <= Date.now()
-  ) {
+  if (!state.export || state.export.jobStatus !== 'PUBLISHED' || isExportedStatusLower(state)) {
     return true;
   }
 

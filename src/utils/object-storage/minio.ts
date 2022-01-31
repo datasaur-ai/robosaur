@@ -1,7 +1,7 @@
 import { BucketItem as MinioBucketItem, Client } from 'minio';
 import internal from 'stream';
-import { streamToArray } from '../streamToArray';
-import { streamToString } from '../streamToString';
+import { streamToArray } from '../stream/streamToArray';
+import { streamToString } from '../stream/streamToString';
 import { getMinioConfig, normalizeFolderName } from './helper';
 import { BucketItem, ObjectStorageClient } from './interfaces';
 

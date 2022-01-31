@@ -2,7 +2,7 @@ import { getJobs, JobStatus } from '../datasaur/get-jobs';
 import { getLogger } from '../logger';
 import { sleep } from './sleep';
 
-export async function pollJobsUntilCompleted(jobIds: string[]) {
+export async function pollJobsUntilCompleted(jobIds: string[], pollingTimeInMs = 5000) {
   getLogger().info(`polling jobs... `, { jobIds });
   while (true) {
     const jobs = await getJobs(jobIds);
@@ -17,6 +17,6 @@ export async function pollJobsUntilCompleted(jobIds: string[]) {
 
     const remainingIds = unfinishedJobs.map((j) => j.id);
     getLogger().info(`polling jobs ...`, { jobIds: remainingIds });
-    await sleep(5000);
+    await sleep(pollingTimeInMs);
   }
 }
