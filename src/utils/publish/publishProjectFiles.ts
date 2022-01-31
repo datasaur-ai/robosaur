@@ -18,7 +18,7 @@ export async function publishProjectFiles(url: string, projectName: string) {
       const dirname = resolve(process.cwd(), prefix, projectName);
       mkdirSync(dirname, { recursive: true });
       for (const file of files) {
-        const fullFilePath = safeDirectoryName(resolve(dirname, file.filename));
+        const fullFilePath = resolve(dirname, safeDirectoryName(file.filename));
         writeFileSync(fullFilePath, file.content);
       }
       break;
@@ -26,7 +26,7 @@ export async function publishProjectFiles(url: string, projectName: string) {
     case StorageSources.GOOGLE:
       for (const file of files) {
         const prefixPlusProjectName = normalizeFolderName(prefix) + projectName;
-        const fullObjectPath = safeDirectoryName(normalizeFolderName(prefixPlusProjectName) + file.filename);
+        const fullObjectPath = normalizeFolderName(prefixPlusProjectName) + safeDirectoryName(file.filename);
         await getStorageClient(source).setStringFileContent(bucketName, fullObjectPath, file.content);
       }
       break;

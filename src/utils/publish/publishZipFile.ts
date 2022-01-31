@@ -17,13 +17,13 @@ export async function publishZipFile(url: string, projectName: string) {
     case StorageSources.GOOGLE:
       return await getStorageClient(source).setFileContent(
         bucketName,
-        safeDirectoryName(`${normalizeFolderName(prefix)}${projectName}.zip`),
+        `${normalizeFolderName(prefix)}${safeDirectoryName(projectName)}.zip`,
         httpResponse.data,
       );
     case StorageSources.LOCAL:
       const dirpath = resolvePath(process.cwd(), prefix);
       mkdirSync(dirpath, { recursive: true });
-      const filename = safeDirectoryName(resolvePath(process.cwd(), prefix, `${projectName}.zip`));
+      const filename = resolvePath(process.cwd(), prefix, `${safeDirectoryName(projectName)}.zip`);
       const writeStream = createWriteStream(filename);
       httpResponse.data.pipe(writeStream);
       return new Promise<void>((res, rej) => {

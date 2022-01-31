@@ -22,7 +22,7 @@ export function getMinioConfig(): ClientOptions {
 export function normalizeFolderName(folder: string) {
   if (folder.length === 0) return folder;
   if (folder[folder.length - 1] !== '/') folder = folder + '/';
-  return safeDirectoryName(folder);
+  return folder;
 }
 
 export function safeDirectoryName(directory: string) {
