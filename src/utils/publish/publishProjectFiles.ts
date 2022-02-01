@@ -1,4 +1,4 @@
-import { mkdirSync, writeFileSync } from 'fs';
+import { mkdirSync } from 'fs';
 import { resolve } from 'path';
 import { getConfig } from '../../config/config';
 import { StorageSources } from '../../config/interfaces';
@@ -7,7 +7,7 @@ import { getStorageClient } from '../object-storage';
 import { normalizeFolderName, safeDirectoryName } from '../object-storage/helper';
 import { readZipStream } from '../readZipFile';
 import { IMPLEMENTED_EXPORT_STORAGE_SOURCES } from './constants';
-import { downloadFromPreSignedUrl } from './helper';
+import { downloadFromPreSignedUrl, saveFileToLocalFileSystem } from './helper';
 
 export async function publishProjectFiles(url: string, projectName: string) {
   const zipStream = await downloadFromPreSignedUrl(url);
@@ -18,8 +18,7 @@ export async function publishProjectFiles(url: string, projectName: string) {
       const dirname = resolve(process.cwd(), prefix, projectName);
       mkdirSync(dirname, { recursive: true });
       for (const file of files) {
-        const fullFilePath = resolve(dirname, safeDirectoryName(file.filename));
-        writeFileSync(fullFilePath, file.content);
+        saveFileToLocalFileSystem(dirname, safeDirectoryName(file.filename), file.content);
       }
       break;
     case StorageSources.AMAZONS3:
@@ -38,4 +37,5 @@ export async function publishProjectFiles(url: string, projectName: string) {
         `${source} is unsupported for handling project export. Please use one of ${IMPLEMENTED_EXPORT_STORAGE_SOURCES}`,
       );
   }
+  return true;
 }

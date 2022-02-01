@@ -1,20 +1,20 @@
-import fs from 'fs';
-import internal from 'stream';
+import { AxiosResponse } from 'axios';
 import * as ConfigModule from '../../config/config';
 import * as ObjectStorage from '../object-storage';
+import * as StreamToBufferHelper from '../stream/streamToBuffer';
 import { IMPLEMENTED_EXPORT_STORAGE_SOURCES } from './constants';
 import * as PublishHelper from './helper';
 import { publishZipFile } from './publishZipFile';
 
 describe(publishZipFile.name, () => {
   beforeEach(() => {
-    jest.spyOn(internal, 'Readable').mockReturnValue({
-      pipe: jest.fn(),
-      on: jest.fn(),
-    } as any);
-    jest.spyOn(PublishHelper, 'downloadFromPreSignedUrl').mockResolvedValue({ data: new internal.Readable() } as any);
-    jest.spyOn(fs, 'createWriteStream').mockImplementation();
-    jest.spyOn(fs, 'mkdirSync').mockImplementation();
+    jest.spyOn(PublishHelper, 'downloadFromPreSignedUrl').mockResolvedValue({ data: {}, status: 200 } as AxiosResponse);
+    jest.spyOn(PublishHelper, 'saveFileToLocalFileSystem').mockReturnValue(undefined);
+
+    jest.spyOn(StreamToBufferHelper, 'streamToBuffer').mockImplementation(async () => {
+      return Buffer.from('dummy');
+    });
+
     jest
       .spyOn(ObjectStorage, 'getStorageClient')
       .mockName('mockGetStorageClient')

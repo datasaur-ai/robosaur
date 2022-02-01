@@ -1,5 +1,4 @@
 import internal from 'stream';
-import fs from 'fs';
 import * as ConfigModule from '../../config/config';
 import * as ObjectStorage from '../object-storage';
 import * as ReadZipFile from '../readZipFile';
@@ -11,8 +10,7 @@ describe(publishProjectFiles.name, () => {
   beforeEach(() => {
     jest.spyOn(ReadZipFile, 'readZipStream').mockResolvedValue([{ filename: 'dummy-file', content: 'dummy-content' }]);
     jest.spyOn(PublishHelper, 'downloadFromPreSignedUrl').mockResolvedValue({ data: new internal.Readable() } as any);
-    jest.spyOn(fs, 'mkdirSync').mockImplementation();
-    jest.spyOn(fs, 'writeFileSync').mockImplementation();
+    jest.spyOn(PublishHelper, 'saveFileToLocalFileSystem').mockReturnValue(undefined);
     jest
       .spyOn(ObjectStorage, 'getStorageClient')
       .mockName('mockGetStorageClient')
