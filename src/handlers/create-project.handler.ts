@@ -9,10 +9,11 @@ import { getDocuments } from '../documents/get-documents';
 import { getLogger } from '../logger';
 import { getLabelSetsFromDirectory } from '../utils/labelset';
 import { sleep } from '../utils/sleep';
+import { ScriptAction } from './constants';
 
 export async function handleCreateProject(projectName: string, configFile: string) {
   const cwd = process.cwd();
-  setConfigByJSONFile(resolve(cwd, configFile), getProjectCreationValidators());
+  setConfigByJSONFile(resolve(cwd, configFile), getProjectCreationValidators(), ScriptAction.PROJECT_CREATION);
 
   const projectSetting = getConfig().project;
   const documents = getDocuments();

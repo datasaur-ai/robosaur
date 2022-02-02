@@ -7,16 +7,19 @@ import { getConfig, setConfigByJSONFile } from '../config/config';
 import { StorageSources } from '../config/interfaces';
 import { getProjectCreationValidators } from '../config/schema/validator';
 import { createProject } from '../datasaur/create-project';
-import { getJobs, JobStatus } from '../datasaur/get-jobs';
+import { JobStatus } from '../datasaur/get-jobs';
+import { ProjectStatus } from '../datasaur/interfaces';
 import { getLocalDocuments } from '../documents/get-local-documents';
 import { getObjectStorageDocuments } from '../documents/get-object-storage-documents';
 import { LocalDocument, RemoteDocument } from '../documents/interfaces';
 import { getLogger } from '../logger';
 import { getLabelSetsFromDirectory } from '../utils/labelset';
 import { getStorageClient } from '../utils/object-storage';
-import { ObjectStorageClient } from '../utils/object-storage/interface';
-import { sleep } from '../utils/sleep';
+import { ObjectStorageClient } from '../utils/object-storage/interfaces';
+import { pollJobsUntilCompleted } from '../utils/polling.helper';
+import { getState } from '../utils/states/getStates';
 import { ScriptState } from '../utils/states/script-state';
+import { ScriptAction } from './constants';
 import { handleCreateProject } from './create-project.handler';
 
 interface ProjectConfiguration {
@@ -36,7 +39,7 @@ const PROJECT_BEFORE_SAVE = 5;
 export async function handleCreateProjects(configFile: string, options) {
   const { dryRun } = options;
   const cwd = process.cwd();
-  setConfigByJSONFile(resolve(cwd, configFile), getProjectCreationValidators());
+  setConfigByJSONFile(resolve(cwd, configFile), getProjectCreationValidators(), ScriptAction.PROJECT_CREATION);
 
   const documentSource = getConfig().documents.source;
   switch (documentSource) {
@@ -47,17 +50,9 @@ export async function handleCreateProjects(configFile: string, options) {
       return handleCreateProject('New Robosaur Project', configFile);
   }
   const { bucketName, prefix: storagePrefix, source, path } = getConfig().documents;
-  const { path: stateFilePath } = getConfig().projectState;
 
-  let scriptState: ScriptState;
-  try {
-    scriptState = await ScriptState.fromConfig();
-  } catch (error) {
-    getLogger().info(`no stateFile found in ${stateFilePath}. Robosaur will create a new one`, { error });
-    scriptState = await createAndSaveNewState();
-  }
-
-  await scriptState.updateInProgressStates();
+  const scriptState = await getState();
+  await scriptState.updateInProgressProjectCreationStates();
 
   let projectsToCreate: { name: string; fullPath: string }[];
   projectsToCreate = await getProjectNamesFromFolderNames(source, { bucketName, prefix: storagePrefix, path });
@@ -113,9 +108,13 @@ export async function handleCreateProjects(configFile: string, options) {
           counterRetry = LIMIT_RETRY + 1;
         } catch (error) {
           if (counterRetry >= LIMIT_RETRY) {
-            getLogger().error(`reached retry limit for ${projectDetails.name}, skipping...`, { error });
+            getLogger().error(`reached retry limit for ${projectDetails.name}, skipping...`, {
+              error: { ...error, message: error.message },
+            });
           } else {
-            getLogger().warn(`error creating ${projectDetails.name}, retrying...`, { error });
+            getLogger().warn(`error creating ${projectDetails.name}, retrying...`, {
+              error: { ...error, message: error.message },
+            });
           }
         }
       }
@@ -132,32 +131,19 @@ export async function handleCreateProjects(configFile: string, options) {
   } else {
     await scriptState.save();
     getLogger().info(`sending query for ProjectLaunchJob status...`);
-    while (true) {
-      await sleep(5000);
-      const jobs = await getJobs(results.map((result) => result.job.id));
 
-      const notFinishedStatuses = [JobStatus.IN_PROGRESS, JobStatus.NONE, JobStatus.QUEUED];
-      const notFinishedJobs = jobs.filter((job) => notFinishedStatuses.includes(job.status));
-      if (notFinishedJobs.length === 0) {
-        const failedJobs = jobs.filter((j) => j.status === JobStatus.FAILED);
-        const deliveredJobs = jobs.filter((j) => j.status === JobStatus.DELIVERED).map((j) => j.id);
-        getLogger().info(`all ProjectLaunchJob finished.`, { failedJobs: failedJobs.map((j) => j.id), deliveredJobs });
-        const okCount = deliveredJobs.length;
-        const failCount = failedJobs.length;
-        const totalCount = okCount + failCount;
-        getLogger().info(`completed ${totalCount} jobs; ${okCount} successful and ${failCount} failed`);
-        for (const job of failedJobs) {
-          getLogger().error(`error ${job.id}`, { ...job });
-        }
+    const jobs = await pollJobsUntilCompleted(results.map((r) => r.job.id));
 
-        scriptState.updateStatesFromProjectCreationJobs(jobs);
-        await scriptState.save();
-
-        getLogger().info('exiting script...');
-        break;
-      }
-      getLogger().info(`found ${notFinishedJobs.length} unfinished job, re-sending query...`);
+    const createFail = jobs.filter((j) => j.status === JobStatus.FAILED);
+    const createOK = jobs.filter((j) => j.status === JobStatus.DELIVERED).map((j) => j.id);
+    getLogger().info(`all ProjectLaunchJob finished.`, { success: createOK, fail: createFail.map((j) => j.id) });
+    getLogger().info(`completed ${jobs.length} jobs; ${createOK.length} successful and ${createFail.length} failed`);
+    for (const job of createFail) {
+      getLogger().error(`error for ${job.id}`, { ...job });
     }
+
+    scriptState.updateStatesFromProjectCreationJobs(jobs);
+    await scriptState.save();
   }
 }
 
@@ -176,6 +162,7 @@ async function doCreateProjectAndUpdateState(projectConfiguration: ProjectConfig
       errors: result.job.errors,
     },
     projectId: undefined,
+    projectStatus: ProjectStatus.CREATED,
   });
   return result;
 }
@@ -199,16 +186,5 @@ async function getProjectNamesFromFolderNames(
       name: foldername.replace(getConfig().documents.prefix, '').replace(/\//g, ''),
       fullPath: foldername,
     }));
-  }
-}
-
-async function createAndSaveNewState() {
-  try {
-    const state = new ScriptState();
-    await state.save();
-    return state;
-  } catch (error) {
-    getLogger().error(`fail in creating & saving new state file`);
-    throw error;
   }
 }

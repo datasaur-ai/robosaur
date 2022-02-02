@@ -1,7 +1,9 @@
 import { Storage } from '@google-cloud/storage';
-import { streamToString } from '../streamToString';
+import internal from 'stream';
+import { getLogger } from '../../logger';
+import { streamToString } from '../stream/streamToString';
 import { getGCSConfig, normalizeFolderName } from './helper';
-import { BucketItem, ObjectStorageClient } from './interface';
+import { BucketItem, ObjectStorageClient } from './interfaces';
 
 const URL_EXPIRATION_DAYS = 1 * 24 * 60 * 60; // GCS v4 max is 7 days
 
@@ -47,11 +49,17 @@ export class GoogleCloudStorageClient implements ObjectStorageClient {
     return url[0];
   }
 
-  getFileContent(bucketName: string, objectName: string): Promise<string> {
+  getStringFileContent(bucketName: string, objectName: string): Promise<string> {
     const objectStream = GoogleCloudStorageClient.getClient().bucket(bucketName).file(objectName).createReadStream();
     return streamToString(objectStream);
   }
-  async setFileContent(bucketName: string, objectName: string, content: string): Promise<void> {
+
+  async setStringFileContent(bucketName: string, objectName: string, content: string): Promise<void> {
+    await GoogleCloudStorageClient.getClient().bucket(bucketName).file(objectName).save(content);
+  }
+
+  async setFileContent(bucketName: string, objectName: string, content: Buffer): Promise<void> {
+    getLogger().info(`writing to ${bucketName} ${objectName}`);
     await GoogleCloudStorageClient.getClient().bucket(bucketName).file(objectName).save(content);
   }
 }

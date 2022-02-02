@@ -1,8 +1,9 @@
-import { Client, BucketItem as MinioBucketItem } from 'minio';
-import { streamToArray } from '../streamToArray';
-import { streamToString } from '../streamToString';
+import { BucketItem as MinioBucketItem, Client } from 'minio';
+import internal from 'stream';
+import { streamToArray } from '../stream/streamToArray';
+import { streamToString } from '../stream/streamToString';
 import { getMinioConfig, normalizeFolderName } from './helper';
-import { BucketItem, ObjectStorageClient } from './interface';
+import { BucketItem, ObjectStorageClient } from './interfaces';
 
 export class S3CompatibleClient implements ObjectStorageClient {
   static client: Client;
@@ -27,12 +28,16 @@ export class S3CompatibleClient implements ObjectStorageClient {
     return S3CompatibleClient.getClient().presignedUrl('get', bucketName, objectName);
   }
 
-  async getFileContent(bucketName: string, objectPath: string): Promise<string> {
+  async getStringFileContent(bucketName: string, objectPath: string): Promise<string> {
     const readableStream = await S3CompatibleClient.getClient().getObject(bucketName, objectPath);
     return streamToString(readableStream);
   }
 
-  async setFileContent(bucketName: string, objectName: string, content: string): Promise<void> {
+  async setStringFileContent(bucketName: string, objectName: string, content: string): Promise<void> {
+    await S3CompatibleClient.getClient().putObject(bucketName, objectName, content);
+  }
+
+  async setFileContent(bucketName: string, objectName: string, content: Buffer): Promise<void> {
     await S3CompatibleClient.getClient().putObject(bucketName, objectName, content);
   }
 }

@@ -12,6 +12,15 @@
     "bucketName": "my-bucket",
     "path": "path/to/stateFile.json"
   },
+  "export": {
+    "source": "gcs",
+    "bucketName": "my-export-bucket",
+    "prefix": "path/to/export/root",
+    "teamId": "<TEAM_ID>",
+    "statusFilter": ["COMPLETE"],
+    "format": "CUSTOM",
+    "customScriptId": "<CUSTOM_SCRIPT_ID>"
+  },
   "documents": {
     "source": "gcs",
     "bucketName": "my-bucket",

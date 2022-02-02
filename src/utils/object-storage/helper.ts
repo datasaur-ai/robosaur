@@ -25,14 +25,9 @@ export function normalizeFolderName(folder: string) {
   return folder;
 }
 
-export function getBucketName(fullObjectPath: string) {
-  const parts = fullObjectPath.split('//');
-  const [bucket, ...rest] = parts[1].split('/');
-  return bucket;
-}
-
-export function getObjectName(fullObjectPath: string) {
-  const parts = fullObjectPath.split('//');
-  const [bucket, ...rest] = parts[1].split('/');
-  return rest.join('/');
+export function safeDirectoryName(directory: string) {
+  // https://github.com/cthackers/adm-zip/pull/279
+  // escape regex literal by using double backslashes
+  // eslint-disable-next-line no-useless-escape
+  return directory.replace(/[\\|\{\}\(\)\[\]\^\$\+\*\?\.@\/]/g, '_');
 }

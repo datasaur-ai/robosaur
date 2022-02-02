@@ -4,6 +4,14 @@
     "clientId": "<DATASAUR_CLIENT_ID> See the guide here https://datasaurai.gitbook.io/datasaur/advanced/datasaur-apis/oauth-2.0#generate-oauth-credentials-menu",
     "clientSecret": "<DATASAUR_CLIENT_SECRET> See the guide here https://datasaurai.gitbook.io/datasaur/advanced/datasaur-apis/oauth-2.0#generate-oauth-credentials-menu"
   },
+  "export": {
+    "source": "local",
+    "prefix": "path/to/export/root",
+    "teamId": "<TEAM_ID>",
+    "statusFilter": ["COMPLETE"],
+    "format": "JSON_ADVANCED",
+    "customScriptId": null
+  },
   "documents": {
     "source": "remote",
     "path": "./documents.json"

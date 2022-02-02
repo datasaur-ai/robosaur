@@ -1,4 +1,5 @@
 import { gql } from 'graphql-request';
+import { ExportFormat, ExportResult } from './interfaces';
 import { query } from './query';
 
 const EXPORT_PROJECT_QUERY = gql`
@@ -8,11 +9,17 @@ const EXPORT_PROJECT_QUERY = gql`
       queued
       fileUrl
       fileUrlExpiredAt
+      exportId
     }
   }
 `;
 
-export async function exportProject(projectId, fileName, format, customScriptId?: string) {
+export async function exportProject(
+  projectId: string,
+  fileName: string,
+  format: ExportFormat,
+  customScriptId?: string,
+): Promise<ExportResult> {
   const variables = {
     input: {
       projectIds: [projectId],
@@ -21,7 +28,9 @@ export async function exportProject(projectId, fileName, format, customScriptId?
       format: format,
       fileName,
       method: 'FILE_STORAGE',
+      includedCommentType: ['COMMENT', 'SPAN_LABEL', 'ARROW_LABEL', 'SPAN_TEXT'],
     },
   };
-  return await query(EXPORT_PROJECT_QUERY, variables);
+  const data = await query(EXPORT_PROJECT_QUERY, variables);
+  return data.result;
 }

@@ -2,7 +2,7 @@ import { readFileSync } from 'fs';
 import * as ConfigModule from '../config/config';
 import { Config, StorageSources } from '../config/interfaces';
 import * as ObjectStorage from '../utils/object-storage';
-import { ObjectStorageClient } from '../utils/object-storage/interface';
+import { ObjectStorageClient } from '../utils/object-storage/interfaces';
 import { parseAssignment } from './parse-assignment';
 
 describe(parseAssignment.name, () => {
@@ -14,11 +14,12 @@ describe(parseAssignment.name, () => {
       .mockName('mockGetStorageClient')
       .mockImplementation(() => {
         return {
-          getFileContent: jest.fn(async () => JSON.stringify({ functionCalled: 'getFileContent' })),
+          getStringFileContent: jest.fn(async () => JSON.stringify({ functionCalled: 'getFileContent' })),
           getObjectUrl: jest.fn(async () => 'getObjectUrl'),
           listItemsInBucket: jest.fn(async () => []),
           listSubfoldersOfPrefix: jest.fn(async () => ['listSubfolders']),
           setFileContent: jest.fn(),
+          setStringFileContent: jest.fn(),
         };
       });
   });
