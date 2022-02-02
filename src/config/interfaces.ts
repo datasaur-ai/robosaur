@@ -22,21 +22,8 @@ export interface Config {
      */
     clientSecret: string;
   };
-  credentials: {
-    [StorageSources.AMAZONS3]: {
-      s3Endpoint: string;
-      s3Port: number;
-      s3AccessKey: string;
-      s3SecretKey: string;
-      s3UseSSL: boolean;
-    };
-    [StorageSources.GOOGLE]: {
-      /**
-       * @description Relative or absolute local file path to the credential file.
-       */
-      gcsCredentialJson: string;
-    };
-  };
+
+  credentials: CredentialsConfig;
   projectState: StatefileConfig;
 
   // project export
@@ -117,6 +104,22 @@ export interface Config {
   };
 }
 
+export interface CredentialsConfig {
+  [StorageSources.AMAZONS3]: {
+    s3Endpoint: string;
+    s3Port: number;
+    s3AccessKey: string;
+    s3SecretKey: string;
+    s3UseSSL: boolean;
+  };
+  [StorageSources.GOOGLE]: {
+    /**
+     * @description Relative or absolute local file path to the credential file.
+     */
+    gcsCredentialJson: string;
+  };
+}
+
 export interface StatefileConfig extends WithStorage {
   /**
    * @description For 'gcs' and 's3' sources
@@ -149,7 +152,13 @@ export interface AssignmentConfig extends WithStorage {
   path: string;
 }
 
-interface ExportConfig extends WithStorage {
+export interface ExportConfig extends WithStorage {
+  /**
+   * @description Projects' status to filter.
+   * Only projects matching the specified statuses will be exported by Robosaur.
+   * The possible statuses, in order are:
+   * CREATED, IN_PROGRESS, REVIEW_READY, IN_REVIEW, COMPLETE
+   */
   statusFilter: Array<ProjectStatus>;
 
   /**

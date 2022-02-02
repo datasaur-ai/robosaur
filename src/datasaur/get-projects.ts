@@ -1,11 +1,6 @@
 import { gql } from 'graphql-request';
+import { Project } from './interfaces';
 import { requestAllPages } from './utils/request-all-pages';
-
-export interface ExistingProject {
-  id: string;
-  name: string;
-  tags: Array<{ id: string; name: string }>;
-}
 
 const GET_PROJECTS_QUERY = gql`
   query GetProjectsQuery($input: GetProjectsPaginatedInput!) {
@@ -18,6 +13,7 @@ const GET_PROJECTS_QUERY = gql`
           name
         }
         __typename
+        status
       }
       pageInfo {
         nextCursor
@@ -28,6 +24,6 @@ const GET_PROJECTS_QUERY = gql`
   }
 `;
 
-export async function getProjects(filter): Promise<ExistingProject[]> {
+export async function getProjects(filter): Promise<Project[]> {
   return requestAllPages(GET_PROJECTS_QUERY, filter);
 }

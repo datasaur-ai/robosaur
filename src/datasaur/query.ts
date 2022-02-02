@@ -34,7 +34,9 @@ async function getClient() {
         },
       });
     } catch (error) {
-      getLogger().error(`fails to get access token`, { error: { message: error.message, stack: error?.stack } });
+      getLogger().error(`fails to get access token`, {
+        error: { ...error, message: error.message, stack: error?.stack },
+      });
       throw new Error('fails to get access token');
     }
   }

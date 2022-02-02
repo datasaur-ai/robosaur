@@ -1,5 +1,5 @@
 import { GoogleCloudStorageClient } from './google-cloud-storage';
-import { ObjectStorageClient } from './interface';
+import { ObjectStorageClient } from './interfaces';
 import { S3CompatibleClient } from './minio';
 import { StorageSources } from '../../config/interfaces';
 import { getConfig } from '../../config/config';

@@ -16,7 +16,7 @@ export async function parseAssignment(): Promise<{ labelers: string[]; reviewers
       return JSON.parse(readFileSync(resolve(process.cwd(), path), { encoding: 'utf-8' }));
     case StorageSources.AMAZONS3:
     case StorageSources.GOOGLE:
-      return JSON.parse(await getStorageClient(source).getFileContent(bucketName, path));
+      return JSON.parse(await getStorageClient(source).getStringFileContent(bucketName, path));
     default:
       throw new Error(
         `${source} is not implemented for project assignment parsing. Please use one of ${JSON.stringify(

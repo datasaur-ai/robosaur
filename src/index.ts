@@ -2,6 +2,7 @@ import { Command } from 'commander';
 import packageJson from '../package.json';
 import { handleCreateProject } from './handlers/create-project.handler';
 import { handleCreateProjects } from './handlers/create-projects.handler';
+import { handleExportProjects } from './handlers/export-projects.handler';
 import { getLogger } from './logger';
 
 const program = new Command();
@@ -19,12 +20,18 @@ program
   .description('Create Datasaur projects based on the given config file')
   .action(handleCreateProjects);
 
+program
+  .command(`export-projects <configFile>`)
+  .option('-u --unzip', 'Unzips the exported projects, only storing the final version accepted by reviewers')
+  .description('Export all projects based on the given config file')
+  .action(handleExportProjects);
+
 program.parseAsync(process.argv);
 
 process.on('unhandledRejection', (error) => exitHandler('unhandledRejection', error));
 process.on('uncaughtException', (error) => exitHandler('uncaughtException', error));
 
 function exitHandler(event: string, error: any) {
-  getLogger().error(`encountered ${event}`, { error: error.message });
+  getLogger().error(`encountered ${event}`, { ...error, error: error.message, stack: error.stack });
   getLogger().on('finish', () => process.exit(-1));
 }

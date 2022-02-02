@@ -1,11 +1,17 @@
 import { readdirSync } from 'fs';
-import { basename, resolve, parse } from 'path';
-import { getLogger } from '../logger';
-import { LabelItem, LabelSet } from '../datasaur/interfaces';
-import { defaultCSVConfig, readCSVFile } from './readCSVFile';
+import { basename, parse, resolve } from 'path';
 import { Config } from '../config/interfaces';
+import { LabelItem, LabelSet } from '../datasaur/interfaces';
+import { getLogger } from '../logger';
+import { defaultCSVConfig, readCSVFile } from './readCSVFile';
 
-const LABELSET_COUNT_LIMIT = 5;
+interface LabelCSVContent {
+  id: string;
+  label: string;
+  color: string;
+}
+
+const LABELSET_COUNT_LIMIT = 10;
 
 export function getLabelSetsFromDirectory({ project }: Config): LabelSet[] {
   const directory = project.labelSetDirectory;
@@ -36,11 +42,6 @@ export function getLabelSetsFromDirectory({ project }: Config): LabelSet[] {
   }
 }
 
-interface LabelCSVContent {
-  id: string;
-  label: string;
-  color: string;
-}
 function parseCSVToLabelSet(filepath: string): LabelSet {
   const content = readCSVFile(filepath, 'utf-8', { ...defaultCSVConfig, header: true });
   const items: LabelItem[] = content.data.map(({ id, label, color }: LabelCSVContent, index) => {
@@ -53,7 +54,7 @@ function parseCSVToLabelSet(filepath: string): LabelSet {
   });
 
   return {
-    label: parse(basename(filepath)).name,
+    label: removeLeadingNumber(parse(basename(filepath)).name),
     config: {
       options: items,
     },
@@ -64,4 +65,8 @@ function getParentId(id: string) {
   const parts = id.split('.');
   parts.pop();
   return parts.join('.');
+}
+
+function removeLeadingNumber(text: string) {
+  return text.replace(/^(\d*)/, '').trim();
 }

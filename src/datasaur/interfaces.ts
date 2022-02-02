@@ -2,6 +2,7 @@ export interface Project {
   id: string;
   name: string;
   tags: Tag[];
+  status: ProjectStatus;
 }
 
 export interface Tag {
@@ -43,5 +44,13 @@ export enum ProjectStatus {
   IN_PROGRESS = 'IN_PROGRESS',
   REVIEW_READY = 'REVIEW_READY',
   IN_REVIEW = 'IN_REVIEW',
-  COMPLETED = 'COMPLETED',
+  COMPLETE = 'COMPLETE',
+}
+
+export interface ExportResult {
+  redirect: string | null;
+  queued: boolean | null;
+  fileUrl: string;
+  fileUrlExpiredAt: string;
+  exportId: string;
 }
