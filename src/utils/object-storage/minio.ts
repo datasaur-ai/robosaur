@@ -25,7 +25,7 @@ export class S3CompatibleClient implements ObjectStorageClient {
 
   async listKeysInBucket(bucketName: string, folderName = ''): Promise<MinioBucketItem[]> {    
     const client = S3CompatibleClient.getClient();
-    const objectStream = client.listObjects(bucketName, normalizeFolderName(folderName), false)
+    const objectStream = client.listObjects(bucketName, normalizeFolderName(folderName), false);
     return streamToArray(objectStream);
   }
 
