@@ -1,4 +1,5 @@
-import { existsSync, readFileSync, writeFileSync } from 'fs';
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs';
+import path from 'path';
 import packageJson from '../../../package.json';
 import { getActiveTeamId as getActiveTeamIdFromConfig, getConfig } from '../../config/config';
 import { StatefileConfig, StorageSources } from '../../config/interfaces';
@@ -220,6 +221,7 @@ export class ScriptState {
         );
         return;
       case StorageSources.LOCAL:
+        mkdirSync(path.dirname(ScriptState.stateConfig.path), { recursive: true });
         return writeFileSync(ScriptState.stateConfig.path, JSON.stringify(content), { encoding: 'utf-8' });
       default:
         getLogger().error(

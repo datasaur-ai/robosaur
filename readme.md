@@ -1,189 +1,225 @@
 # Robosaur
 
-This is a project template to start automating your labeling workflow with Datasaur.
+Automation tool to get us started using [Datasaur.ai](https://datasaur.ai) API and team workspace
+
+## Quickstart
+
+Before running any Robosaur commands, we need to [generate our OAuth credentials](https://datasaurai.gitbook.io/datasaur/advanced/apis-docs/oauth-2.0#generate-oauth-credentials-menu) and obtain our teamId from the URL.  
+Before running this quickstart, we need to open [quickstart.json](sample/config/quickstart.json) and do these two things:
+
+1. Replace all `<TEAM_ID>` with the correct teamId
+2. Replace `<DATASAUR_CLIENT_ID>` and `<DATASAUR_CLIENT_SECRET>` with the correct values
+
+Then we can run this command to create multiple projects at once:
+
+```bash
+npm ci # install Robosaur dependencies, run once on setup
+
+npm run start -- create-projects sample/config/quickstart.json
+```
+
+To export the newly created projects, we can run this command:
+
+```bash
+npm run start -- export-projects sample/config/quickstart.json
+```
 
 ## Contents
 
 - [Robosaur](#robosaur)
+  - [Quickstart](#quickstart)
   - [Contents](#contents)
   - [Requirements](#requirements)
-  - [Installation](#installation)
   - [Usage](#usage)
-    - [Create Project](#create-project)
-    - [Create Multiple Projects](#create-multiple-projects)
-    - [Export Multiple Projects](#export-multiple-projects)
-  - [Stateful Execution](#stateful-execution)
+    - [`create-projects`](#create-projects)
+    - [`export-projects`](#export-projects)
+  - [Stateful execution](#stateful-execution)
+  - [Configuration](#configuration)
+    - [Script-wide configuration](#script-wide-configuration)
+    - [Per-command configuration](#per-command-configuration)
+    - [Storage configuration](#storage-configuration)
 
 ## Requirements
 
-- NodeJS v16.13.2 or newer
-- NPM 8 or newer
+Robosaur is developed using TypeScript and Node.js. We recommend using these versions:
 
-## Installation
-
-```bash
-npm ci
-```
+- [Node.js](https://nodejs.org/en/) v16.13.2
+- NPM v8 (should be bundled with Node.js)
 
 ## Usage
 
-Obtain Oauth Credentials from this guide: <https://datasaurai.gitbook.io/datasaur/advanced/apis-docs/oauth-2.0>
+Currently Robosaur supports two command: `create-projects` & `export-projects`. Please note that `export-projects` is designed to only process projects previously created by `create-projects` command.
 
-### Create Project
+For the explanation in this readme, we will use the file [quickstart.json](sample/config/quickstart.json) as reference
 
-1. Create a config based on the sample file provided in config folder.
-   See src/config/interfaces.ts for the whole schema and description of the config file.
-2. Run the script below:
-
-   ```console
-   npm run start -- create-project <projectName> <configFile>
-   ```
-
-   - projectName: Name of the project you wish to create.
-   - configFile: Path to the configuration of project relative to the current working directory or absolute path.
-
----
-
-### Create Multiple Projects
+### `create-projects`
 
 ```console
-npm run start -- create-projects <pathToConfigJson>
+$ npm run start -- create-projects -h
+Usage: robosaur create-projects [options] <configFile>
+
+Create Datasaur projects based on the given config file
+
+Options:
+--dry-run   Simulates what the script is doing without creating the projects
+-h, --help  display help for command
 ```
 
-This command will create multiple project with the same configuration but different documents.  
-Currently, the documents have to be stored in an S3-compliant bucket, a GCS bucket or in a local folder.  
-The general structure for the folder should match this:
-
-```txt
-bucketName
-|__prefix
-|   |____A
-|   | |____<project documents here>
-|   | |____...
-|   |____B
-|   | |____...
-|   |____C
-|   | |____...
-
-path
-|____A
-| |____<project documents here>
-| |____...
-|____B
-| |____...
-|____C
-| |____...
-```
-
-In the above example, each subfolders, [`A`, `B`, `C`] will be created into a separate project in Datasaur. The subfolders' name will become the project name.
-
-Create a config file to set all the common project configuration.  
-Sample config files for GCS and S3 are available in `config/google-cloud-storage` and `config/s3-compliant`.
-Additional configs like project assignment and labelset for all projects can also be configured here.  
-Here are a couple important details about the storage configuration:
-
-1. `config.credentials` => a JSON object with two possible keys: `s3` or `gcs`  
-   For `s3`, we need to provide five values: `s3Endpoint`, `s3Port`, `s3AccessKey`, `s3SecretKey`, and `s3UseSSL`.  
-   Typical AWS S3 config would be as follows:
-
-   ```json
-   {
-     "s3Endpoint": "s3.amazonaws.com",
-     "s3Port": 443,
-     "s3AccessKey": "<accessKey>",
-     "s3SecretKey": "<secretKey>",
-     "s3UseSSL": true
-   }
-   ```
-
-   For GCS, there is only one value, `gcsCredentialJSON` which should be a local file path pointing to a JSON file similar to the one available in `config/google-cloud-storage/credential.json`.
-
-2. `config.documents.source` => `local`, `s3` or `gcs`  
-   To enable [stateful](#stateful-execution) script execution, the script also need write access to a specific file inside the bucket.  
-   Assuming we are using the same bucket for both storing the project documents as well as keeping the state file, here are the permission required
-
-   1. For S3 bucket, these are the IAM Roles required:
-      1. s3:GetObject
-      2. s3:GetObjectAcl
-      3. s3:PutObject
-      4. s3:PutObjectAcl
-      5. s3:DeleteObject
-   2. For GCS bucket, we can use the `Storage Object Admin` role. The specific IAM permissions required are as follows:
-      1. storage.objects.list
-      2. storage.objects.get
-      3. storage.objects.create
-      4. storage.objects.delete - used with storage.objects.create to update the statefile
-
-3. `config.projectState.path` => path to a JSON file.  
-   For GCS and S3, this means path without protocol (`gs://` or `s3://`) and bucketName.  
-   For example, a file `my-file.json` at S3 bucket `my-bucket` in folder `my-folder` accessed as `s3://my-bucket/my-folder/my-file.json` should be written as follows:
-
-   ```json
-   {
-     "projectState": {
-       "source": "s3",
-       "bucketName": "my-bucket",
-       "path": "my-folder/my-file.json"
-     }
-   }
-   ```
-
-4. `config.assignment.path` => same as `projectState.path` above  
-   if we want to create a project without any labelers or reviewers, we can remove the `assignment` key from the JSON altogether.
-5. `config.project.labelSetDirectory` => Optional. Relative or full path to a local folder containing labelsets  
-   Currently, only labelsets in CSV format for token-based project are supported.  
-   See [our gitbook](https://datasaurai.gitbook.io/datasaur/basics/creating-a-project/label-sets#token-based-labeling) for detailed information on the format. Sample files are also provided in the config/labelset directory
-   The files in this directory will be listed and then sorted by its name in ascending order. The files will be converted to labelset in that order. To force a particular order, we could prefix the filenames with number, for example `filename.csv` -> `1 filename.csv`. The leading number will be removed using `String.replace` with this RegEx pattern: `/^(\d*)/`
-
-Calling `create-projects` with a `remote` documents source is currently unsupported, and the command will fallback to creating just one project using `create-project`
-
-### Export Multiple Projects
-
-```console
-npm run start -- export-projects <pathToConfigJson> [--unzip]
-```
-
-This command will export all projects matching the `config.export.statusFilter` specified. The optional `--unzip` option is used to extract the export results, and only save the documents from the `REVIEW` cabinet. This is useful if what we need is the final version of the project's document.  
-This command is intended to be used in combination with the stateful `create-projects` command, as this command will only export projects that are already listed in the statefile.  
-For in-depth project export config details, please refer to `config/interfaces.ts`, especially the `ExportConfig` interface.  
-Some notable ones are:
-
-1. `statusFilter` => used to filter which projects will be exported by Robosaur  
-The filter are applied using logical OR operation, for example specifying `["IN_PROGRESS", "COMPLETE"]` as the filter means all projects that is either IN_PROGRESS or COMPLETE will be exported.  
-A common example would be to do the export when the project has been marked completed by the labeler. To do this, we would apply the `["REVIEW_READY", "IN_REVIEW"]` filter. If we also want to export reviewed projects, we can add `"COMPLETE"` to the filter.
-2. `format` => what export format to export the project with  
-Please note that not all types of project can be exported to all export format. For more complete details, please refer to Datasaur's GitBook [here](https://datasaurai.gitbook.io/datasaur/advanced/apis-docs/export-project#export-all-files)
-3. `customScriptId` => which custom export script to use
-This field is only used when the `format` field is set to `CUSTOM`.  
-The ID itself can be obtained from the custom script URL in this format: `https://datasaur.ai/teams/{teamId}/custom-scripts/{custom-script-id}`.  
-For more details in creating and / or using your own custom export script, please refer to Datasaur GitBook [here](https://datasaurai.gitbook.io/datasaur/basics/workforce-management/custom-scripts)  
-4. `source`, `prefix` => where the export results should be saved.  
-`source` can be either `local`, `s3` or `gcs`. For `s3` and `gcs`, we will also need to specify `bucketName` and `config.credentials` to give Robosaur access to the bucket.  
-`prefix` sets the folder that will contain the export results. If we want Robosaur to save in the root directory (for example to the root directory of S3 bucket) we can set `prefix` to an empty string `""`.
-
-## Stateful Execution
-
-For the `create-projects` command, Robosaur can behave smarter with the help of a state file.
-
-In case of project creation using `create-projects`, the state file will keep track on what projects have been submitted to Datasaur, and for which teams.
-This allows the script to be used to create projects using the same bucket structure for different teams by only changing the relevant config (for example `teamId`, `assignment` and `customScriptId`)
-
-For project export using `export-projects`, the state file will keep track which projects have been exported from which teams. In subsequent runs, any projects that have been previously exported will only be exported again if there is a change in the project status.  
-
-For example, if we run the `export-projects` command with the filter set as `[IN_PROGRESS, REVIEW_READY, IN_REVIEW]`, and project `A` is in progress, it will be exported. The IN_PROGRESS status will also be recorded like so in the statefile.
+Robosaur will try to create a project for each folder inside the `documents.path` folder.
 
 ```json
-"projects": {
-   "projectName": "A",
-   "export": {
-      "statusOnLastExport": "IN_PROGRESS",
-   }
+{
+  "documents": {
+    "source": "local",
+    "path": "quickstart/create/documents"
+  },
 }
 ```
 
-The next time we run the script again, if project `A` is still IN_PROGRESS, it will not be exported again. However, should the status move forward into `REVIEW_READY` (labeler has marked the project as complete, but no reviewer has opened the project yet) or `IN_REVIEW` (any reviewer has opened the project at least once), Project `A` will be exported again.  
-If project `A` was marked as complete by the reviewer, the status will update to `COMPLETE`. In this case, the project will not be exported because `COMPLETE` was not specified in the filter. 
+In this example, there should be two folders, `Project 1` & `Project 2`, each with a single file
 
+```console
+$ ls -lR quickstart/create/documents
+total 0
+drwxr-xr-x  3 user  group  Project 1
+drwxr-xr-x  3 user  group  Project 2
 
-If these behaviors are not wanted or needed, we can pass an emtpy string `''` to the `config.projectState.path` field or setting `config.projectState` to `{}`, and Robosaur will create a new in-memory state for each run.
-This will cause Robosaur to always create new projects based on the subfolders even if there are already projects with the same name in Datasaur.
+quickstart/create/documents/Project 1:
+total 8
+-rw-r--r--  1 user  group  lorem.txt
+
+quickstart/create/documents/Project 2:
+total 8
+-rw-r--r--  1 user  group  little prince.txt
+```
+
+### `export-projects`
+
+```console
+$ npm run start -- export-projects -h
+Usage: robosaur export-projects [options] <configFile>
+
+Export all projects based on the given config file
+
+Options:
+  -u --unzip  Unzips the exported projects, only storing the final version accepted by reviewers
+  -h, --help  display help for command
+```
+
+Robosaur will try to export each projects previously created by the `create-projects` command. Each project will be saved as a separate zipfile under the supplied directory in `export.prefix`. For example, in `quickstart.json`, this is set to be `quickstart/export` like so:
+
+```json
+{
+  "export": {
+    "source": "local",
+    "prefix": "quickstart/export",
+  }
+}
+```
+
+By default, Robosaur will request for a full project export - with each labelers' version of the project document included. For simpler workflows, where we only need the final version of the document, we can use the `--unzip` option. With this option set, Robosaur will only save the final version of the document to the export destination.
+
+Robosaur supports filtering which project to export by the project status. Overall, there are five different project statuses, from earliest to latest as follows: `CREATED`, `IN_PROGRESS`, `REVIEW_READY`, `IN_REVIEW`, `COMPLETE`
+This can be set in the `export.statusFilter` inside the config JSON. In `quickstart.json`, the filter is set to an empty array `[]`. This will cause Robosaur to export all projects, regardless of their state. On the other hand, if we want to export completed projects only, we can set it to be like this:
+
+```json
+{
+  "export": {
+    "statusFilter": ["COMPLETE"],
+  }
+}
+```
+
+## Stateful execution
+
+For both commands, Robosaur can behave a bit smarter with the help of a JSON statefile.  
+
+In multiple project creation using the `create-projects` command, the statefile can help keeping track which projects have been created previously, and Robosaur will not create the project again if it had been successfully created before.  
+
+In project export using `export-projects`, the JSON statefile is treated as source of truth. Only projects found in the statefile will be checked against the `statusFilter` and exported.  
+Robosaur will also record the project state when it was last exported, and subsequent runs will only export the project if there had been a forward change in the project status
+
+## Configuration
+
+In this part we will explain each part of the Robosaur config file. We will use `quickstart.json` as an example. An in-depth breakdown is also available as a TypeScript file in `src/config/interfaces.ts` [here](src/config/interfaces.ts)
+
+### Script-wide configuration
+
+1. `"datasaur"`  
+  Contains our OAuth `clientId` and `clientSecret`. These credentials are only enabled for Growth and Enterprise plans. For more information, please reach out to [Datasaur](https://datasaur.ai)
+2. `"projectState"`  
+  Where we want our statefile to be saved. `projectState.path` can be a full or a relative path to a JSON file. For now, keep `source` as `local` for all `source`s.
+
+### Per-command configuration
+
+1. Project creation (`create-projects`)
+   1. `"documents"`  
+   Where our project folders are located. A bit different from `projectState.path`, `documents.path` should be a folder path - relative or full.
+   2. `"assignment"`  
+   Where our assignment file is located. `assignment.path` is similar to `projectState.path`, it should be a full or relative path pointing to a JSON file.
+   3. `"project"`  
+   This is the Datasaur project configuration.  
+   More options can be seen by creating a project via the web UI, and then clicking the `View Script` button.  
+   In general, we want to keep these mostly unchanged, except for `project.teamId` and `project.customScriptId`
+2. Project export (`export-projects`)
+   1. `"export"`  
+   This changes Robosaur's export behavior.  
+   `export.prefix` is the folder path where Robosaur will save the export result - make sure Robosaur has write permission to the folder.  
+   `export.format` & `export.customScriptId` affects how Datasaur will export our projects. See this [gitbook link](https://datasaurai.gitbook.io/datasaur/advanced/apis-docs/export-project#export-all-files) for more details.
+
+### Storage configuration
+
+There are numerous `"source": "local"` in many places, and we said to keep them as-is. For most use cases, creating and exporting projects to and from local storage is the simplest approach. However, Robosaur also supports project creation from files located in S3 buckets and GCS buckets! All we need to do is set the correct credentials, and change the `source` to `s3` or `gcs`. 
+
+Here are the examples for credentials and other configs:  
+
+1. Google Cloud Storage - `config/google-cloud-storage/config.json`
+
+    ```json
+    {
+      "credentials": {
+        "gcs": { "gcsCredentialJson": "config/google-cloud-storage/credential.json" }
+      },
+      "documents": {
+        "source": "gcs",
+        "bucketName": "my-bucket",
+        "prefix": "projects"
+      },
+    }
+    ```
+
+    To fully use Robosaur with a GCS bucket, we can use the `Storage Object Admin` role.  
+    The specific IAM permissions required are as follows:
+    - storage.objects.list
+    - storage.objects.get
+    - storage.objects.create - to save export results to GCS bucket
+    - storage.objects.delete - used with storage.objects.create to update the statefile
+
+2. Amazon S3 Buckets - `config/s3/config.json`
+
+    ```json
+    {  
+      "credentials": {
+        "s3": {
+          "s3Endpoint": "s3.amazonaws.com",
+          "s3Port": 443,
+          "s3AccessKey": "accesskey",
+          "s3SecretKey": "secretkey",
+          "s3UseSSL": true
+        }
+      },
+      "projectState": {
+        "source": "s3",
+        "bucketName": "my-bucket",
+        "path": "path/to/stateFile.json"
+      },
+    }
+    ```
+
+    To fully use Robosaur with S3 buckets, these are the IAM Roles required:
+    - s3:GetObject
+    - s3:GetObjectAcl
+    - s3:PutObject
+    - s3:PutObjectAcl
+    - s3:DeleteObject
+
