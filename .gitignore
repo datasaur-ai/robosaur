@@ -3,3 +3,5 @@
 
 config/*.json
 logs/
+sample/export
+sample/state
