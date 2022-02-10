@@ -18,7 +18,7 @@
   },
   "documents": {
     "source": "local",
-    "prefix": "quickstart/create/documents"
+    "path": "quickstart/create/documents"
   },
   "assignment": {
     "source": "local",
