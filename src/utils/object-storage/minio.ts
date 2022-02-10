@@ -14,13 +14,18 @@ export class S3CompatibleClient implements ObjectStorageClient {
   }
 
   async listSubfoldersOfPrefix(bucketName: string, rootPrefix = '') {
-    const bucketItems: MinioBucketItem[] = await this.listItemsInBucket(bucketName, rootPrefix);
+    const bucketItems: MinioBucketItem[] = await this.listKeysInBucket(bucketName, rootPrefix);
     return bucketItems.filter((item: BucketItem) => item.prefix).map((item) => item.prefix);
   }
 
-  async listItemsInBucket(bucketName: string, folderName = ''): Promise<MinioBucketItem[]> {
+  async listItemsInBucket(bucketName: string, folderName = ''): Promise<MinioBucketItem[]> {    
+    const objects = await this.listKeysInBucket(bucketName, folderName)
+    return objects.filter((item) => item.size > 0);
+  }
+
+  async listKeysInBucket(bucketName: string, folderName = ''): Promise<MinioBucketItem[]> {    
     const client = S3CompatibleClient.getClient();
-    const objectStream = client.listObjects(bucketName, normalizeFolderName(folderName), false);
+    const objectStream = client.listObjects(bucketName, normalizeFolderName(folderName), false)
     return streamToArray(objectStream);
   }
 
