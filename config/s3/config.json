@@ -24,7 +24,7 @@
     "source": "s3",
     "bucketName": "my-export-bucket",
     "prefix": "",
-    "statusFilter": ["IN_REVIEW", "REVIEW_READY", "COMPLETED"]
+    "statusFilter": ["IN_REVIEW", "REVIEW_READY", "COMPLETE"]
   },
 
   "documents": {
