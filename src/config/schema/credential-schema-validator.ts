@@ -16,6 +16,7 @@ const CredentialsSchema: JSONSchemaType<CredentialsConfig> = {
         s3UseSSL: { type: 'boolean' },
         s3AccessKey: { type: 'string' },
         s3SecretKey: { type: 'string' },
+        s3Region: { type: 'string', nullable: true },
       },
       required: ['s3Endpoint', 's3Port', 's3UseSSL', 's3AccessKey', 's3SecretKey'],
     },
