@@ -10,12 +10,16 @@ export function getGCSConfig(): StorageOptions {
 }
 
 export function getMinioConfig(): ClientOptions {
+  const s3Credentials = getConfig().credentials[StorageSources.AMAZONS3];
   return {
-    endPoint: getConfig().credentials[StorageSources.AMAZONS3].s3Endpoint,
-    port: getConfig().credentials[StorageSources.AMAZONS3].s3Port,
-    accessKey: getConfig().credentials[StorageSources.AMAZONS3].s3AccessKey,
-    secretKey: getConfig().credentials[StorageSources.AMAZONS3].s3SecretKey,
-    useSSL: getConfig().credentials[StorageSources.AMAZONS3].s3UseSSL,
+    endPoint: s3Credentials.s3Endpoint,
+    port: s3Credentials.s3Port,
+    accessKey: s3Credentials.s3AccessKey,
+    secretKey: s3Credentials.s3SecretKey,
+    useSSL: s3Credentials.s3UseSSL,
+    // in some cases, Minio will throw S3: Access Denied when region is set to null
+    // even when `aws s3 ls <bucket> returns correct results`
+    region: s3Credentials.s3Region,
   };
 }
 

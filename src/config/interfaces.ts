@@ -139,6 +139,7 @@ export interface CredentialsConfig {
     s3AccessKey: string;
     s3SecretKey: string;
     s3UseSSL: boolean;
+    s3Region: string;
   };
   [StorageSources.GOOGLE]: {
     /**

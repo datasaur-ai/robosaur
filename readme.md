@@ -216,7 +216,8 @@ Here are the examples for credentials and other configs:
           "s3Port": 443,
           "s3AccessKey": "accesskey",
           "s3SecretKey": "secretkey",
-          "s3UseSSL": true
+          "s3UseSSL": true,
+          "s3Region": "bucket-region-or-null",
         }
       },
       "projectState": {
@@ -226,6 +227,11 @@ Here are the examples for credentials and other configs:
       },
     }
     ```
+
+    `s3Region` is an optional parameter, indicating where your S3 bucket is located.  
+    However, we have encountered some cases where we got `S3: Access Denied` error when it is not defined.  
+    We recommend setting this property whenever possible.     
+    Usually, these are identified by access keys starting with `ASIA...`     
 
     To fully use Robosaur with S3 buckets, these are the IAM Roles required:
     - s3:GetObject
