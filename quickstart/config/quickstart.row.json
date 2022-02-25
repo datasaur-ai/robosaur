@@ -1,0 +1,129 @@
+{
+  "datasaur": {
+    "host": "https://datasaur.ai",
+    "clientId": "<DATASAUR_CLIENT_ID>",
+    "clientSecret": "<DATASAUR_CLIENT_SECRET>"
+  },
+  "projectState": {
+    "source": "local",
+    "path": "quickstart/state/projectState.json"
+  },
+  "export": {
+    "source": "local",
+    "prefix": "quickstart/export",
+    "teamId": "<TEAM_ID>",
+    "statusFilter": [],
+    "format": "JSON_ADVANCED",
+    "customScriptId": null
+  },
+  "documents": {
+    "source": "local",
+    "path": "quickstart/create/row-based/document"
+  },
+  "assignment": {
+    "source": "local",
+    "path": "quickstart/create/assignment/assignment.json"
+  },
+  "project": {
+    "teamId": "<TEAM_ID>",
+    "projectSettings": {
+      "consensus": 1,
+      "enableEditLabelSet": false,
+      "enableEditSentence": false,
+      "hideLabelerNamesDuringReview": false,
+      "hideRejectedLabelsDuringReview": true,
+      "hideLabelsFromInactiveLabelSetDuringReview": false
+    },
+    "documentSettings": {
+      "firstRowAsHeader": true,
+      "kind": "ROW_BASED",
+      "customScriptId": null,
+
+      "allowCharacterBasedLabeling": false,
+      "allowArcDrawing": true,
+      "allowMultiLabels": true,
+      "allTokensMustBeLabeled": false,
+      "textLabelMaxTokenLength": 999999,
+      "sentenceSeparator": "\n",
+      "tokenizer": "WINK"
+    },
+
+    "questionSetFile": "quickstart/create/row-based/question-set.json",
+    "docFileOptions": {
+      "firstRowAsHeader": true,
+      "customHeaderColumns": [
+        {
+          "name": "Shown to all",
+          "displayed": true,
+          "labelerRestricted": false
+        },
+        {
+          "name": "Hidden from Labeler",
+          "displayed": true,
+          "labelerRestricted": true
+        },
+        {
+          "name": "Hidden from all",
+          "displayed": false,
+          "labelerRestricted": true
+        },
+        {
+          "name": "Hidden from all",
+          "displayed": false,
+          "labelerRestricted": false
+        },
+        {
+          "name": "Year",
+          "displayed": true,
+          "labelerRestricted": false
+        },
+        {
+          "name": "City",
+          "displayed": true,
+          "labelerRestricted": false
+        },
+        {
+          "name": "Code",
+          "displayed": false,
+          "labelerRestricted": false
+        },
+        {
+          "name": "Location",
+          "displayed": false,
+          "labelerRestricted": false
+        },
+        {
+          "name": "State",
+          "displayed": false,
+          "labelerRestricted": false
+        },
+        {
+          "name": "Avg Temp",
+          "displayed": true,
+          "labelerRestricted": false
+        },
+        {
+          "name": "Max Temp",
+          "displayed": false,
+          "labelerRestricted": false
+        },
+        {
+          "name": "Min Temp",
+          "displayed": false,
+          "labelerRestricted": false
+        },
+        {
+          "name": "Wind.Direction",
+          "displayed": true,
+          "labelerRestricted": false
+        },
+        {
+          "name": "Wind.Speed",
+          "displayed": true,
+          "labelerRestricted": false
+        }
+      ]
+    }
+
+  }
+}

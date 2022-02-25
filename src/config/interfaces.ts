@@ -84,6 +84,10 @@ export interface Config {
      */
     questions?: any[];
     /**
+     * @description Optional. Local path to a JSON file containing list of questions. For information on structure, please refer to: https://datasaurai.gitbook.io/datasaur/advanced/apis-docs/create-new-project/questions
+     */
+    questionSetFile?: string;
+    /**
      * @description Label sets configurations. Only applicable when documentSettings.kind is TOKEN_BASED
      */
     labelSets?: Array<null | {
@@ -101,6 +105,29 @@ export interface Config {
      * @description Optional. Local path to a folder containing CSV files for TOKEN_BASED. If both labelSetDirectory and labelSets is provided, robosaur will pick labelSets
      */
     labelSetDirectory?: string;
+    /**
+     * @description Optional. Configuration for ROW_BASED projects.
+     */
+    docFileOptions?: {
+      firstRowAsHeader?: boolean;
+      /**
+       * @description Array of column header
+       */
+      customHeaderColumns?: Array<{
+        /**
+         * @description true: Display column to all; false: Hide column to all. REVIEWER can change it in their workspace
+         */
+        displayed: boolean;
+        /**
+         * @description true: Hidden from LABELER, cannot be changed by LABELER.
+         */
+        labelerRestricted: boolean;
+        /**
+         * @description Column text
+         */
+        name: string;
+      }>;
+    };
   };
 }
 

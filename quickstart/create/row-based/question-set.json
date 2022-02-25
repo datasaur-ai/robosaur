@@ -1,0 +1,84 @@
+[
+  {
+    "type": "NESTED",
+    "config": {
+      "multiple": true,
+      "questions": [
+        {
+          "type": "TEXT",
+          "config": {
+            "pattern": "\\w+"
+          },
+          "name": "Q1.1",
+          "label": "Text inside nested",
+          "required": false
+        },
+        {
+          "type": "TIME",
+          "config": {
+            "format": "HH:mm",
+            "defaultValue": "NOW"
+          },
+          "name": "Q1.2",
+          "label": "Time nested",
+          "required": false
+        }
+      ]
+    },
+    "bindToColumn": "Data.Wind.Direction",
+    "name": "Q1",
+    "label": "Nested required question",
+    "required": true
+  },
+  {
+    "type": "TEXT",
+    "config": {},
+    "name": "Q2",
+    "label": "Regular text field",
+    "required": true
+  },
+  {
+    "type": "DROPDOWN",
+    "config": {
+      "multiple": false,
+      "options": [
+        {
+          "id": "1",
+          "label": "option 1"
+        },
+        {
+          "id": "2",
+          "label": "option 2"
+        },
+        {
+          "id": "3",
+          "label": "option 3"
+        }
+      ]
+    },
+    "name": "Q3",
+    "label": "Choose one from dropdown",
+    "required": true
+  },
+  {
+    "type": "SLIDER",
+    "config": {
+      "min": 1,
+      "max": 10,
+      "step": 1,
+      "theme": "PLAIN"
+    },
+    "name": "Q4",
+    "label": "slider",
+    "required": true
+  },
+  {
+    "type": "CHECKBOX",
+    "config": {
+      "hint": "question hint can be written here"
+    },
+    "name": "Q5",
+    "label": "yes no checkbox",
+    "required": true
+  }
+]
