@@ -1,63 +1,17 @@
 [
   {
-    "type": "NESTED",
-    "config": {
-      "multiple": true,
-      "questions": [
-        {
-          "type": "TEXT",
-          "config": {
-            "pattern": "\\w+"
-          },
-          "name": "Q1.1",
-          "label": "Text inside nested",
-          "required": false
-        },
-        {
-          "type": "TIME",
-          "config": {
-            "format": "HH:mm",
-            "defaultValue": "NOW"
-          },
-          "name": "Q1.2",
-          "label": "Time nested",
-          "required": false
-        }
-      ]
-    },
-    "bindToColumn": "Data.Wind.Direction",
+    "type": "TEXT",
+    "config": {},
     "name": "Q1",
-    "label": "Nested required question",
+    "label": "Bound to Wind.Speed",
+    "bindToColumn": "Wind.Speed",
     "required": true
   },
   {
     "type": "TEXT",
     "config": {},
-    "name": "Q2",
-    "label": "Regular text field",
-    "required": true
-  },
-  {
-    "type": "DROPDOWN",
-    "config": {
-      "multiple": false,
-      "options": [
-        {
-          "id": "1",
-          "label": "option 1"
-        },
-        {
-          "id": "2",
-          "label": "option 2"
-        },
-        {
-          "id": "3",
-          "label": "option 3"
-        }
-      ]
-    },
-    "name": "Q3",
-    "label": "Choose one from dropdown",
+    "label": "Not bound, will add new column",
+    "name": "with this name",
     "required": true
   },
   {
@@ -66,19 +20,42 @@
       "min": 1,
       "max": 10,
       "step": 1,
-      "theme": "PLAIN"
+      "theme": "GRADIENT"
     },
-    "name": "Q4",
-    "label": "slider",
-    "required": true
+    "name": "Q3",
+    "label": "Slider",
+    "required": false
   },
   {
     "type": "CHECKBOX",
     "config": {
-      "hint": "question hint can be written here"
+      "hint": "Description, or hint will be displayed here"
+    },
+    "name": "Q4",
+    "label": "This is a checkbox question",
+    "required": false
+  },
+  {
+    "type": "DROPDOWN",
+    "config": {
+      "multiple": false,
+      "options": [
+        {
+          "id": "1",
+          "label": "Option 1"
+        },
+        {
+          "id": "2",
+          "label": "Option 2"
+        },
+        {
+          "id": "3",
+          "label": "Option 3"
+        }
+      ]
     },
     "name": "Q5",
-    "label": "yes no checkbox",
-    "required": true
+    "label": "Choose one answer from dropdown",
+    "required": false
   }
 ]

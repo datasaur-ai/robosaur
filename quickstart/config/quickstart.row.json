@@ -35,19 +35,15 @@
       "hideLabelsFromInactiveLabelSetDuringReview": false
     },
     "documentSettings": {
-      "firstRowAsHeader": true,
       "kind": "ROW_BASED",
       "customScriptId": null,
-
-      "allowCharacterBasedLabeling": false,
-      "allowArcDrawing": true,
-      "allowMultiLabels": true,
-      "allTokensMustBeLabeled": false,
-      "textLabelMaxTokenLength": 999999,
-      "sentenceSeparator": "\n",
-      "tokenizer": "WINK"
+      "displayedRows": 10,
+      "mediaDisplayStrategy": "THUMBNAIL",
+      "firstRowAsHeader": true,
+      "viewer": "TABULAR",
+      "viewerConfig": {},
+      "enableTabularMarkdownParsing": false
     },
-
     "questionSetFile": "quickstart/create/row-based/question-set.json",
     "docFileOptions": {
       "firstRowAsHeader": true,
@@ -124,6 +120,5 @@
         }
       ]
     }
-
   }
 }

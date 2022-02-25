@@ -78,6 +78,7 @@ export interface Config {
       viewerConfig?: {
         urlColumnNames: string[];
       };
+      enableTabularMarkdownParsing: boolean;
     };
     /**
      * @description Question configurations. Only applicable when documentSettings.kind is ROW_BASED
