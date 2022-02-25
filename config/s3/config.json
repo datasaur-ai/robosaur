@@ -10,7 +10,8 @@
       "s3Port": 9000,
       "s3AccessKey": "accesskey",
       "s3SecretKey": "secretkey",
-      "s3UseSSL": true
+      "s3UseSSL": true,
+      "s3Region": "bucket region"
     }
   },
   "projectState": {
