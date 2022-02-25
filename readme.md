@@ -1,11 +1,12 @@
 # Robosaur
 
-Automation tool to get us started using [Datasaur.ai](https://datasaur.ai) API and team workspace
+Automation tool to get us started using [Datasaur.ai](https://datasaur.ai) API and team workspace.
 
 ## Quickstart
 
 Before running any Robosaur commands, we need to [generate our OAuth credentials](https://datasaurai.gitbook.io/datasaur/advanced/apis-docs/oauth-2.0#generate-oauth-credentials-menu) and obtain our teamId from the URL.  
-Before running this quickstart, we need to open [quickstart.json](sample/config/quickstart.json) and do these two things:
+
+Before running this quickstart, we need to open [quickstart.json](quickstart/config/quickstart.json) and do these two things:
 
 1. Replace all `<TEAM_ID>` with the correct teamId
 2. Replace `<DATASAUR_CLIENT_ID>` and `<DATASAUR_CLIENT_SECRET>` with the correct values
@@ -15,14 +16,24 @@ Then we can run this command to create multiple projects at once:
 ```bash
 npm ci # install Robosaur dependencies, run once on setup
 
-npm run start -- create-projects sample/config/quickstart.json
+npm run start -- create-projects quickstart/config/quickstart.json
 ```
 
 To export the newly created projects, we can run this command:
 
 ```bash
-npm run start -- export-projects sample/config/quickstart.json
+npm run start -- export-projects quickstart/config/quickstart.json
 ```
+
+[quickstart.json](quickstart/config/quickstart.json) is a sample configuration file for creating `"TOKEN_BASED"` projects.  
+To create `"ROW_BASED"` projects, we need a slightly different configuration file, an example is provided in [quickstart.row.json](quickstart/config/quickstart.row.json).  
+You can try to create row-based projects using the same commands as above just by changing the configuration files: 
+
+```bash
+npm run start -- create-projects quickstart/config/quickstart.row.json
+```
+
+For more in-depth breakdown, please refer to [row-based.md](row-based.md)
 
 ## Contents
 
@@ -50,7 +61,7 @@ Robosaur is developed using TypeScript and Node.js. We recommend using these ver
 
 Currently Robosaur supports two command: `create-projects` & `export-projects`. Please note that `export-projects` is designed to only process projects previously created by `create-projects` command.
 
-For the explanation in this readme, we will use the file [quickstart.json](sample/config/quickstart.json) as reference
+For the explanation in this readme, we will use the file [quickstart.json](quickstart/config/quickstart.json) as reference
 
 ### `create-projects`
 
@@ -160,7 +171,7 @@ In this part we will explain each part of the Robosaur config file. We will use 
    3. `"project"`  
    This is the Datasaur project configuration.  
    More options can be seen by creating a project via the web UI, and then clicking the `View Script` button.  
-   In general, we want to keep these mostly unchanged, except for `project.teamId` and `project.customScriptId`
+   In general, we want to keep these mostly unchanged, except for `project.teamId` and `project.customScriptId`  
 2. Project export (`export-projects`)
    1. `"export"`  
    This changes Robosaur's export behavior.  

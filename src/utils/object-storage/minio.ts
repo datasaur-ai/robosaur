@@ -1,5 +1,4 @@
 import { BucketItem as MinioBucketItem, Client } from 'minio';
-import internal from 'stream';
 import { streamToArray } from '../stream/streamToArray';
 import { streamToString } from '../stream/streamToString';
 import { getMinioConfig, normalizeFolderName } from './helper';
@@ -18,12 +17,12 @@ export class S3CompatibleClient implements ObjectStorageClient {
     return bucketItems.filter((item: BucketItem) => item.prefix).map((item) => item.prefix);
   }
 
-  async listItemsInBucket(bucketName: string, folderName = ''): Promise<MinioBucketItem[]> {    
-    const objects = await this.listKeysInBucket(bucketName, folderName)
+  async listItemsInBucket(bucketName: string, folderName = ''): Promise<MinioBucketItem[]> {
+    const objects = await this.listKeysInBucket(bucketName, folderName);
     return objects.filter((item) => item.size > 0);
   }
 
-  async listKeysInBucket(bucketName: string, folderName = ''): Promise<MinioBucketItem[]> {    
+  async listKeysInBucket(bucketName: string, folderName = ''): Promise<MinioBucketItem[]> {
     const client = S3CompatibleClient.getClient();
     const objectStream = client.listObjects(bucketName, normalizeFolderName(folderName), false);
     return streamToArray(objectStream);

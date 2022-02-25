@@ -1,4 +1,4 @@
-import { readdirSync, writeFileSync } from 'fs';
+import { writeFileSync } from 'fs';
 import { resolve } from 'path';
 import { assignAllDocuments } from '../assignment/assign-all-documents';
 import { getAssignmentConfig } from '../assignment/get-assignment-config';
@@ -6,21 +6,18 @@ import { DocumentAssignment } from '../assignment/interfaces';
 import { getConfig, setConfigByJSONFile } from '../config/config';
 import { StorageSources } from '../config/interfaces';
 import { getProjectCreationValidators } from '../config/schema/validator';
-import { createProject } from '../datasaur/create-project';
 import { JobStatus } from '../datasaur/get-jobs';
-import { ProjectStatus } from '../datasaur/interfaces';
 import { getLocalDocuments } from '../documents/get-local-documents';
 import { getObjectStorageDocuments } from '../documents/get-object-storage-documents';
 import { LocalDocument, RemoteDocument } from '../documents/interfaces';
 import { getLogger } from '../logger';
 import { getLabelSetsFromDirectory } from '../utils/labelset';
-import { getStorageClient } from '../utils/object-storage';
-import { ObjectStorageClient } from '../utils/object-storage/interfaces';
 import { pollJobsUntilCompleted } from '../utils/polling.helper';
+import { getQuestionSetFromFile } from '../utils/questionset';
 import { getState } from '../utils/states/getStates';
-import { ScriptState } from '../utils/states/script-state';
 import { ScriptAction } from './constants';
 import { handleCreateProject } from './create-project.handler';
+import { doCreateProjectAndUpdateState, getProjectNamesFromFolderNames } from './creation/helper';
 
 interface ProjectConfiguration {
   projectName: string;
@@ -68,7 +65,28 @@ export async function handleCreateProjects(configFile: string, options) {
   getLogger().info(`found ${projectsToCreate.length} projects to create: ${JSON.stringify(projectsToCreate)}`);
 
   const updatedProjectConfig = getConfig().project;
-  updatedProjectConfig.labelSets = getLabelSetsFromDirectory(getConfig());
+  const projectKind = updatedProjectConfig.documentSettings.kind;
+  switch (projectKind) {
+    case 'TOKEN_BASED':
+      updatedProjectConfig.labelSets = getLabelSetsFromDirectory(getConfig());
+      break;
+    case 'ROW_BASED':
+      if (updatedProjectConfig.questions) break;
+      if (updatedProjectConfig.questionSetFile) {
+        updatedProjectConfig.questions = getQuestionSetFromFile(getConfig());
+        break;
+      }
+      getLogger().warn(`no 'questions' or 'questionSetFile' is configured in ${configFile}`);
+      if (getConfig().project.labelSetDirectory) {
+        getLogger().warn(
+          `Robosaur does not support ROW_BASED project creation using TOKEN_BASED csv labelsets. Please refer to our JSON documentation on how to structure ROW_BASED questions`,
+          { link: 'https://datasaurai.gitbook.io/datasaur/advanced/apis-docs/create-new-project/questions' },
+        );
+      }
+      break;
+    default:
+      getLogger().warn(`unrecognized project kind: ${projectKind}...`);
+  }
 
   getLogger().info('validating project assignment...');
   const assignees = await getAssignmentConfig();
@@ -144,47 +162,5 @@ export async function handleCreateProjects(configFile: string, options) {
 
     scriptState.updateStatesFromProjectCreationJobs(jobs);
     await scriptState.save();
-  }
-}
-
-async function doCreateProjectAndUpdateState(projectConfiguration: ProjectConfiguration, state: ScriptState) {
-  const { projectName, documents, documentAssignments, projectConfig } = projectConfiguration;
-  const result = await createProject(projectName, documents, documentAssignments, projectConfig);
-  getLogger().info(`ProjectLaunchJob for ${projectName} submitted: Job ID: ${result.job.id}`);
-  state.addProject({
-    projectName: projectName,
-    documents: documents.map((doc) => ({
-      name: doc.fileName,
-    })),
-    create: {
-      jobId: result.job.id,
-      jobStatus: JobStatus.IN_PROGRESS,
-      errors: result.job.errors,
-    },
-    projectId: undefined,
-    projectStatus: ProjectStatus.CREATED,
-  });
-  return result;
-}
-
-async function getProjectNamesFromFolderNames(
-  source: StorageSources,
-  { bucketName, prefix, path }: { bucketName: string; prefix: string; path: string },
-) {
-  if (source === StorageSources.LOCAL) {
-    getLogger().info(`retrieving folders in local directory ${path} `);
-    const dirpath = resolve(process.cwd(), getConfig().documents.path);
-    const directories = readdirSync(dirpath, { withFileTypes: true }).filter((p) => p.isDirectory());
-    return directories.map((dir) => ({ name: dir.name, fullPath: resolve(dirpath, dir.name) }));
-  } else {
-    getLogger().info(`retrieving folders in bucket ${bucketName} with prefix: '${prefix}'`);
-    const storageClient: ObjectStorageClient = getStorageClient(source);
-    const foldersInBucket = await storageClient.listSubfoldersOfPrefix(bucketName, prefix);
-    getLogger().info(`found folders: ${JSON.stringify(foldersInBucket)}`);
-
-    return foldersInBucket.map((foldername) => ({
-      name: foldername.replace(getConfig().documents.prefix, '').replace(/\//g, ''),
-      fullPath: foldername,
-    }));
   }
 }
