@@ -29,7 +29,10 @@ export async function createProject(
     return {
       ...document,
       customScriptId: settings.documentSettings.customScriptId ?? undefined,
-      docFileOptions: { firstRowAsHeader: settings.documentSettings?.firstRowAsHeader },
+      docFileOptions: {
+        ...settings.docFileOptions,
+        firstRowAsHeader: settings?.docFileOptions?.firstRowAsHeader ?? !!settings.documentSettings?.firstRowAsHeader,
+      },
     };
   });
 
