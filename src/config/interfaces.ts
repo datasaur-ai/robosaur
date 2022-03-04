@@ -194,6 +194,13 @@ export interface AssignmentConfig extends WithStorage {
    * @description local or remote path to assignment file
    */
   path: string;
+
+  /**
+   * @description document assignment strategy. 
+   * ALL -> all documents will be assigned to all labelers
+   * AUTO -> round-robin assignment for labelers 
+   */
+  strategy: 'ALL' | 'AUTO'
 }
 
 export interface ExportConfig extends WithStorage {
