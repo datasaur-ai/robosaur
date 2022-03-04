@@ -7,11 +7,12 @@ export enum StorageSources {
   AMAZONS3 = 's3',
 }
 
-export enum SplitDocumentStrategy{
+export enum SplitDocumentStrategy {
   /**
-   * @description Split each document into n equal parts, basedd on the `number` value
+   * @description Split each document into n equal parts, based on the `number` value
    */
-  BY_PARTS = "BY_PARTS"
+  BY_PARTS = 'BY_PARTS',
+  DONT_SPLIT = 'DONT_SPLIT',
 }
 
 export interface Config {
@@ -196,11 +197,11 @@ export interface AssignmentConfig extends WithStorage {
   path: string;
 
   /**
-   * @description document assignment strategy. 
+   * @description document assignment strategy.
    * ALL -> all documents will be assigned to all labelers
-   * AUTO -> round-robin assignment for labelers 
+   * AUTO -> round-robin assignment for labelers
    */
-  strategy: 'ALL' | 'AUTO'
+  strategy: 'ALL' | 'AUTO';
 }
 
 export interface ExportConfig extends WithStorage {

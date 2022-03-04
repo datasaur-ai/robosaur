@@ -64,7 +64,7 @@ export async function createProject(
       labelerExtensions: EXTENSIONS[settings.documentSettings.kind].LABELER,
       reviewerExtensions: EXTENSIONS[settings.documentSettings.kind].REVIEWER,
       labelSetIDs,
-      splitDocumentOption: settings.splitDocumentOption
+      splitDocumentOption: settings.splitDocumentOption,
     },
   };
 
