@@ -41,7 +41,7 @@ will need 3 headers in `customHeaderColumns` like so:
 
 ## Question Sets
 
-Currently, Datasaur supports one question set per project. Each question set can have up to <?> questions in it.
+Currently, Datasaur supports one question set per project. Each question set can have up to 100 questions in it.
 
 The provided `quickstart.row.json` uses the [question-set.json](quickstart/create/row-based/question-set.json). Inside are a few examples of how we can define our questions.  
 Here are a few examples, along with some explanations:

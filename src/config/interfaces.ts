@@ -7,6 +7,14 @@ export enum StorageSources {
   AMAZONS3 = 's3',
 }
 
+export enum SplitDocumentStrategy {
+  /**
+   * @description Split each document into n equal parts, based on the `number` value
+   */
+  BY_PARTS = 'BY_PARTS',
+  DONT_SPLIT = 'DONT_SPLIT',
+}
+
 export interface Config {
   datasaur: {
     /**
@@ -129,6 +137,14 @@ export interface Config {
         name: string;
       }>;
     };
+
+    /**
+     * @description Optional. Configuration for splitting documents in a project
+     */
+    splitDocumentOption?: {
+      strategy: SplitDocumentStrategy;
+      number: number;
+    };
   };
 }
 
@@ -179,6 +195,13 @@ export interface AssignmentConfig extends WithStorage {
    * @description local or remote path to assignment file
    */
   path: string;
+
+  /**
+   * @description document assignment strategy.
+   * ALL -> all documents will be assigned to all labelers
+   * AUTO -> round-robin assignment for labelers
+   */
+  strategy: 'ALL' | 'AUTO';
 }
 
 export interface ExportConfig extends WithStorage {
