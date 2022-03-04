@@ -1,7 +1,7 @@
 import { writeFileSync } from 'fs';
 import { resolve } from 'path';
-import { assignAllDocuments } from '../assignment/assign-all-documents';
 import { getAssignmentConfig } from '../assignment/get-assignment-config';
+import { getDocumentAssignment } from '../assignment/get-document-assignment';
 import { DocumentAssignment } from '../assignment/interfaces';
 import { getConfig, setConfigByJSONFile } from '../config/config';
 import { StorageSources } from '../config/interfaces';
@@ -107,7 +107,7 @@ export async function handleCreateProjects(configFile: string, options) {
       const newProjectConfiguration: ProjectConfiguration = {
         projectName: projectDetails.name,
         documents,
-        documentAssignments: assignAllDocuments(assignees, documents),
+        documentAssignments: getDocumentAssignment(assignees, documents),
         projectConfig: updatedProjectConfig,
       };
 
