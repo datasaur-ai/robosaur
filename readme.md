@@ -4,7 +4,7 @@ Automation tool to get us started using [Datasaur.ai](https://datasaur.ai) API a
 
 ## Quickstart
 
-Before running any Robosaur commands, we need to [generate our OAuth credentials](https://datasaurai.gitbook.io/datasaur/advanced/apis-docs/oauth-2.0#generate-oauth-credentials-menu) and obtain our teamId from the URL.  
+Before running any Robosaur commands, we need to [generate our OAuth credentials](https://datasaurai.gitbook.io/datasaur/advanced/apis-docs/oauth-2.0#generate-oauth-credentials-menu) and obtain our teamId from the URL.
 
 Before running this quickstart, we need to open [quickstart.json](quickstart/config/quickstart.json) and do these two things:
 
@@ -27,7 +27,7 @@ npm run start -- export-projects quickstart/config/quickstart.json
 
 [quickstart.json](quickstart/config/quickstart.json) is a sample configuration file for creating `"TOKEN_BASED"` projects.  
 To create `"ROW_BASED"` projects, we need a slightly different configuration file, an example is provided in [quickstart.row.json](quickstart/config/quickstart.row.json).  
-You can try to create row-based projects using the same commands as above just by changing the configuration files: 
+You can try to create row-based projects using the same commands as above just by changing the configuration files:
 
 ```bash
 npm run start -- create-projects quickstart/config/quickstart.row.json
@@ -83,7 +83,7 @@ Robosaur will try to create a project for each folder inside the `documents.path
   "documents": {
     "source": "local",
     "path": "quickstart/create/documents"
-  },
+  }
 }
 ```
 
@@ -123,7 +123,7 @@ Robosaur will try to export each projects previously created by the `create-proj
 {
   "export": {
     "source": "local",
-    "prefix": "quickstart/export",
+    "prefix": "quickstart/export"
   }
 }
 ```
@@ -136,16 +136,16 @@ This can be set in the `export.statusFilter` inside the config JSON. In `quickst
 ```json
 {
   "export": {
-    "statusFilter": ["COMPLETE"],
+    "statusFilter": ["COMPLETE"]
   }
 }
 ```
 
 ## Stateful execution
 
-For both commands, Robosaur can behave a bit smarter with the help of a JSON statefile.  
+For both commands, Robosaur can behave a bit smarter with the help of a JSON statefile.
 
-In multiple project creation using the `create-projects` command, the statefile can help keeping track which projects have been created previously, and Robosaur will not create the project again if it had been successfully created before.  
+In multiple project creation using the `create-projects` command, the statefile can help keeping track which projects have been created previously, and Robosaur will not create the project again if it had been successfully created before.
 
 In project export using `export-projects`, the JSON statefile is treated as source of truth. Only projects found in the statefile will be checked against the `statusFilter` and exported.  
 Robosaur will also record the project state when it was last exported, and subsequent runs will only export the project if there had been a forward change in the project status
@@ -157,86 +157,89 @@ In this part we will explain each part of the Robosaur config file. We will use 
 ### Script-wide configuration
 
 1. `"datasaur"`  
-  Contains our OAuth `clientId` and `clientSecret`. These credentials are only enabled for Growth and Enterprise plans. For more information, please reach out to [Datasaur](https://datasaur.ai)
+   Contains our OAuth `clientId` and `clientSecret`. These credentials are only enabled for Growth and Enterprise plans. For more information, please reach out to [Datasaur](https://datasaur.ai)
 2. `"projectState"`  
-  Where we want our statefile to be saved. `projectState.path` can be a full or a relative path to a JSON file. For now, keep `source` as `local` for all `source`s.
+   Where we want our statefile to be saved. `projectState.path` can be a full or a relative path to a JSON file. For now, keep `source` as `local` for all `source`s.
 
 ### Per-command configuration
 
 1. Project creation (`create-projects`)
    1. `"documents"`  
-   Where our project folders are located. A bit different from `projectState.path`, `documents.path` should be a folder path - relative or full.
+      Where our project folders are located. A bit different from `projectState.path`, `documents.path` should be a folder path - relative or full.
    2. `"assignment"`  
-   Where our assignment file is located. `assignment.path` is similar to `projectState.path`, it should be a full or relative path pointing to a JSON file.
+      Where our assignment file is located. `assignment.path` is similar to `projectState.path`, it should be a full or relative path pointing to a JSON file.
    3. `"project"`  
-   This is the Datasaur project configuration.  
-   More options can be seen by creating a project via the web UI, and then clicking the `View Script` button.  
-   In general, we want to keep these mostly unchanged, except for `project.teamId` and `project.customScriptId`  
+      This is the Datasaur project configuration.  
+      More options can be seen by creating a project via the web UI, and then clicking the `View Script` button.  
+      In general, we want to keep these mostly unchanged, except for `project.teamId` and `project.customScriptId`  
+       1. `docFileOptions` - Configuration specific for `ROW_BASED` configs. Refer to [`row-based.md`](row-based.md) for more information.
+       2. `splitDocumentOption` - Allows splitting each document to several parts, based on the `strategy` and `number` option. For more information, see <https://datasaurai.gitbook.io/datasaur/basics/workforce-management/split-files>
 2. Project export (`export-projects`)
    1. `"export"`  
-   This changes Robosaur's export behavior.  
-   `export.prefix` is the folder path where Robosaur will save the export result - make sure Robosaur has write permission to the folder.  
-   `export.format` & `export.customScriptId` affects how Datasaur will export our projects. See this [gitbook link](https://datasaurai.gitbook.io/datasaur/advanced/apis-docs/export-project#export-all-files) for more details.
+      This changes Robosaur's export behavior.  
+      `export.prefix` is the folder path where Robosaur will save the export result - make sure Robosaur has write permission to the folder.  
+      `export.format` & `export.customScriptId` affects how Datasaur will export our projects. See this [gitbook link](https://datasaurai.gitbook.io/datasaur/advanced/apis-docs/export-project#export-all-files) for more details.
 
 ### Storage configuration
 
-There are numerous `"source": "local"` in many places, and we said to keep them as-is. For most use cases, creating and exporting projects to and from local storage is the simplest approach. However, Robosaur also supports project creation from files located in S3 buckets and GCS buckets! All we need to do is set the correct credentials, and change the `source` to `s3` or `gcs`. 
+There are numerous `"source": "local"` in many places, and we said to keep them as-is. For most use cases, creating and exporting projects to and from local storage is the simplest approach. However, Robosaur also supports project creation from files located in S3 buckets and GCS buckets! All we need to do is set the correct credentials, and change the `source` to `s3` or `gcs`.
 
-Here are the examples for credentials and other configs:  
+Here are the examples for credentials and other configs:
 
 1. Google Cloud Storage - `config/google-cloud-storage/config.json`
 
-    ```json
-    {
-      "credentials": {
-        "gcs": { "gcsCredentialJson": "config/google-cloud-storage/credential.json" }
-      },
-      "documents": {
-        "source": "gcs",
-        "bucketName": "my-bucket",
-        "prefix": "projects"
-      },
-    }
-    ```
+   ```json
+   {
+     "credentials": {
+       "gcs": { "gcsCredentialJson": "config/google-cloud-storage/credential.json" }
+     },
+     "documents": {
+       "source": "gcs",
+       "bucketName": "my-bucket",
+       "prefix": "projects"
+     }
+   }
+   ```
 
-    To fully use Robosaur with a GCS bucket, we can use the `Storage Object Admin` role.  
-    The specific IAM permissions required are as follows:
-    - storage.objects.list
-    - storage.objects.get
-    - storage.objects.create - to save export results to GCS bucket
-    - storage.objects.delete - used with storage.objects.create to update the statefile
+   To fully use Robosaur with a GCS bucket, we can use the `Storage Object Admin` role.  
+   The specific IAM permissions required are as follows:
+
+   - storage.objects.list
+   - storage.objects.get
+   - storage.objects.create - to save export results to GCS bucket
+   - storage.objects.delete - used with storage.objects.create to update the statefile
 
 2. Amazon S3 Buckets - `config/s3/config.json`
 
-    ```json
-    {  
-      "credentials": {
-        "s3": {
-          "s3Endpoint": "s3.amazonaws.com",
-          "s3Port": 443,
-          "s3AccessKey": "accesskey",
-          "s3SecretKey": "secretkey",
-          "s3UseSSL": true,
-          "s3Region": "bucket-region-or-null",
-        }
-      },
-      "projectState": {
-        "source": "s3",
-        "bucketName": "my-bucket",
-        "path": "path/to/stateFile.json"
-      },
-    }
-    ```
+   ```json
+   {
+     "credentials": {
+       "s3": {
+         "s3Endpoint": "s3.amazonaws.com",
+         "s3Port": 443,
+         "s3AccessKey": "accesskey",
+         "s3SecretKey": "secretkey",
+         "s3UseSSL": true,
+         "s3Region": "bucket-region-or-null"
+       }
+     },
+     "projectState": {
+       "source": "s3",
+       "bucketName": "my-bucket",
+       "path": "path/to/stateFile.json"
+     }
+   }
+   ```
 
-    `s3Region` is an optional parameter, indicating where your S3 bucket is located.  
-    However, we have encountered some cases where we got `S3: Access Denied` error when it is not defined.  
-    We recommend setting this property whenever possible.     
-    Usually, these are identified by access keys starting with `ASIA...`     
+   `s3Region` is an optional parameter, indicating where your S3 bucket is located.  
+   However, we have encountered some cases where we got `S3: Access Denied` error when it is not defined.  
+   We recommend setting this property whenever possible.  
+   Usually, these are identified by access keys starting with `ASIA...`
 
-    To fully use Robosaur with S3 buckets, these are the IAM Roles required:
-    - s3:GetObject
-    - s3:GetObjectAcl
-    - s3:PutObject
-    - s3:PutObjectAcl
-    - s3:DeleteObject
+   To fully use Robosaur with S3 buckets, these are the IAM Roles required:
 
+   - s3:GetObject
+   - s3:GetObjectAcl
+   - s3:PutObject
+   - s3:PutObjectAcl
+   - s3:DeleteObject

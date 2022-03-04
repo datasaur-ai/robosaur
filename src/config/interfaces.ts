@@ -7,6 +7,13 @@ export enum StorageSources {
   AMAZONS3 = 's3',
 }
 
+export enum SplitDocumentStrategy{
+  /**
+   * @description Split each document into n equal parts, basedd on the `number` value
+   */
+  BY_PARTS = "BY_PARTS"
+}
+
 export interface Config {
   datasaur: {
     /**
@@ -128,6 +135,14 @@ export interface Config {
          */
         name: string;
       }>;
+    };
+
+    /**
+     * @description Optional. Configuration for splitting documents in a project
+     */
+    splitDocumentOption?: {
+      strategy: SplitDocumentStrategy;
+      number: number;
     };
   };
 }
