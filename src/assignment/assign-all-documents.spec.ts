@@ -49,7 +49,7 @@ describe(assignAllDocuments.name, () => {
     });
   });
 
-  describe('BY_PARTS split strat', () => {
+  describe('BY_PARTS split strategy', () => {
     beforeAll(() => {
       assignment = {
         labelers: ['l-one@email.com', 'l-two@email.com', 'l-three@email.com'],
