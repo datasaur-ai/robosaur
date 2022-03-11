@@ -6,10 +6,11 @@ import { getLogger } from '../../logger';
 
 export async function downloadFromPreSignedUrl(url: string) {
   try {
+    getLogger().info(`downloading from url ${url}...`);
     const result: AxiosResponse<internal.Readable> = await axios.get(url, { responseType: 'stream' });
     return result;
   } catch (error) {
-    getLogger().error(`fail in downloading from presigned URL`, { error: { message: error.message } });
+    getLogger().error(`fail in downloading from presigned URL`, { error: { message: error.message, url: url } });
     throw new Error(`fail in downloading from presigned URL`);
   }
 }
