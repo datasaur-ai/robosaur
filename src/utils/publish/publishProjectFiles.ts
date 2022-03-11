@@ -15,6 +15,7 @@ export async function publishProjectFiles(url: string, projectName: string) {
   const { source, prefix, bucketName } = getConfig().export;
   switch (source) {
     case StorageSources.LOCAL:
+      getLogger().info(`publishing extracted files to ${source}...`, { data: { source, prefix } });
       const dirname = resolve(process.cwd(), prefix, projectName);
       mkdirSync(dirname, { recursive: true });
       for (const file of files) {
@@ -23,6 +24,7 @@ export async function publishProjectFiles(url: string, projectName: string) {
       break;
     case StorageSources.AMAZONS3:
     case StorageSources.GOOGLE:
+      getLogger().info(`publishing extracted files to ${source}...`, { data: { source, prefix, bucketName } });
       for (const file of files) {
         const prefixPlusProjectName = normalizeFolderName(prefix) + projectName;
         const fullObjectPath = normalizeFolderName(prefixPlusProjectName) + safeDirectoryName(file.filename);

@@ -13,7 +13,7 @@ export function getQuestionSetFromFile(config: Config) {
   try {
     content = readJSONFile(filepath);
   } catch (error) {
-    getLogger().error(`fail to parse ${filepath}`, { error });
+    getLogger().error(`fail to parse ${filepath}`, { error: JSON.stringify(error), message: error.message });
     throw new Error(`fail to parse ${filepath}`);
   }
 

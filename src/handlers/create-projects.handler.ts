@@ -127,11 +127,13 @@ export async function handleCreateProjects(configFile: string, options) {
         } catch (error) {
           if (counterRetry >= LIMIT_RETRY) {
             getLogger().error(`reached retry limit for ${projectDetails.name}, skipping...`, {
-              error: { ...error, message: error.message },
+              error: JSON.stringify(error),
+              message: error.message,
             });
           } else {
             getLogger().warn(`error creating ${projectDetails.name}, retrying...`, {
-              error: { ...error, message: error.message },
+              error: JSON.stringify(error),
+              message: error.message,
             });
           }
         }

@@ -53,7 +53,7 @@ export class ScriptState {
         getLogger().info('parsing state finished');
         return new ScriptState(scriptState);
       } catch (error) {
-        getLogger().error('error in parsing state', { error: { ...error, message: error.message } });
+        getLogger().error('error in parsing state', { error: JSON.stringify(error), message: error.message });
         throw new Error(`error parsing state file from ${ScriptState.stateConfig.path}`);
       }
     } else {
@@ -167,7 +167,9 @@ export class ScriptState {
         getLogger().info('saving finished');
       } catch (error) {
         getLogger().error('error when saving state', {
-          error: { ...error, code: error.code, message: error.message, stack: error?.stack },
+          error: JSON.stringify(error),
+          message: error.message,
+          stack: error?.stack,
         });
         throw new Error('error in saving state');
       }

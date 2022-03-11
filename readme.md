@@ -164,16 +164,29 @@ In this part we will explain each part of the Robosaur config file. We will use 
 ### Per-command configuration
 
 1. Project creation (`create-projects`)
+
    1. `"documents"`  
       Where our project folders are located. A bit different from `projectState.path`, `documents.path` should be a folder path - relative or full.
    2. `"assignment"`  
-      Where our assignment file is located. `assignment.path` is similar to `projectState.path`, it should be a full or relative path pointing to a JSON file.
+      Where our assignment file is located. `assignment.path` is similar to `projectState.path`, it should be a full or relative path pointing to a JSON file.  
+      `assignment.strategy` accepts one of two options: `"ALL"` or `"AUTO"`
+
+      - `"ALL"`: each labeler will receive a copy of all documents
+      - `"AUTO"`: Datasaur will assign documents in a round-robin way, with each labeler receiving at least 1 copy of a document.
+
+      For example, if we have a project with 3 different documents - `#1`, `#2`, `#3` - and 2 labeler, `Alice` and `Bob`, using
+
+      1. `"ALL"` means both `Alice` and `Bob` will get those 3 documents.
+      2. `"AUTO"` means `Alice` will get #1, `Bob` will get #2, and we then loop-back to `Alice` who will get #3  
+         So, with `"AUTO"` -> `Alice` gets 2 documents, and `Bob` gets 1 document
+
    3. `"project"`  
       This is the Datasaur project configuration.  
       More options can be seen by creating a project via the web UI, and then clicking the `View Script` button.  
-      In general, we want to keep these mostly unchanged, except for `project.teamId` and `project.customScriptId`  
-       1. `docFileOptions` - Configuration specific for `ROW_BASED` configs. Refer to [`row-based.md`](row-based.md) for more information.
-       2. `splitDocumentOption` - Allows splitting each document to several parts, based on the `strategy` and `number` option. For more information, see <https://datasaurai.gitbook.io/datasaur/basics/workforce-management/split-files>
+      In general, we want to keep these mostly unchanged, except for `project.teamId` and `project.customScriptId`
+      1. `docFileOptions` - Configuration specific for `ROW_BASED` configs. Refer to [`row-based.md`](row-based.md) for more information.
+      2. `splitDocumentOption` - Allows splitting each document to several parts, based on the `strategy` and `number` option. For more information, see <https://datasaurai.gitbook.io/datasaur/basics/workforce-management/split-files>
+
 2. Project export (`export-projects`)
    1. `"export"`  
       This changes Robosaur's export behavior.  
