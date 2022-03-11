@@ -16,6 +16,7 @@ export async function publishZipFile(url: string, projectName: string) {
   switch (source) {
     case StorageSources.AMAZONS3:
     case StorageSources.GOOGLE:
+      getLogger().info(`publishing zip-file to ${source}...`, { data: { bucketName, source, prefix, projectName } });
       await getStorageClient(source).setFileContent(
         bucketName,
         `${normalizeFolderName(prefix)}${safeDirectoryName(projectName)}.zip`,
@@ -25,6 +26,7 @@ export async function publishZipFile(url: string, projectName: string) {
     case StorageSources.LOCAL:
       const dirpath = resolvePath(process.cwd(), prefix);
       const filename = `${safeDirectoryName(projectName)}.zip`;
+      getLogger().info(`publishing zip-file to ${source}...`, { data: { dirpath, source, projectName } });
       saveFileToLocalFileSystem(dirpath, filename, httpResponseData);
       break;
     default:
