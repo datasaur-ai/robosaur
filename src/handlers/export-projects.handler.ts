@@ -78,7 +78,7 @@ export async function handleExportProjects(configFile: string, { unzip }: { unzi
         exportId: 'dummyexport',
         fileUrl: 'dummyfile',
       } as ExportResult;
-      getLogger().error(`fail in exportProject query`, { error: { ...error, message: error.message } });
+      getLogger().error(`fail in exportProject query`, { error: JSON.stringify(error), message: error.message });
     }
     temp.exportId = retval.exportId;
     temp.jobStatus = retval.queued ? JobStatus.QUEUED : JobStatus.IN_PROGRESS;
@@ -109,7 +109,8 @@ export async function handleExportProjects(configFile: string, { unzip }: { unzi
       temp.jobStatus = 'PUBLISHED';
     } catch (error) {
       getLogger().error(`fail to publish exported project to ${source}`, {
-        error: { ...error, message: error.message },
+        error: JSON.stringify(error),
+        message: error.message,
       });
       scriptState.updateStatesFromProjectExportJobs([{ ...jobResult, status: JobStatus.FAILED as JobStatus }]);
     }

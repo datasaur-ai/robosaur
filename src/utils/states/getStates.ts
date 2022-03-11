@@ -18,7 +18,7 @@ async function createAndSaveNewState() {
     await state.save();
     return state;
   } catch (error) {
-    getLogger().error(`fail in creating & saving new state file`);
+    getLogger().error(`fail in creating & saving new state file`, { error: JSON.stringify(error) });
     throw error;
   }
 }

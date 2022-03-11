@@ -10,7 +10,11 @@ export async function downloadFromPreSignedUrl(url: string) {
     const result: AxiosResponse<internal.Readable> = await axios.get(url, { responseType: 'stream' });
     return result;
   } catch (error) {
-    getLogger().error(`fail in downloading from presigned URL`, { error: { message: error.message, url: url } });
+    getLogger().error(`fail in downloading from presigned URL`, {
+      error: JSON.stringify(error),
+      message: error.message,
+      url,
+    });
     throw new Error(`fail in downloading from presigned URL`);
   }
 }
