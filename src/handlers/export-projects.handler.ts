@@ -88,6 +88,8 @@ export async function handleExportProjects(configFile: string, { unzip }: { unzi
         jobId: temp.exportId,
         jobStatus: temp.jobStatus,
         statusOnLastExport: project.projectStatus,
+        exportedFileUrl: retval.fileUrl,
+        exportedFileUrlExpiredAt: retval.fileUrlExpiredAt,
       },
     });
 
@@ -118,7 +120,7 @@ export async function handleExportProjects(configFile: string, { unzip }: { unzi
   const exportOK = results.filter((r) => r.jobStatus === 'PUBLISHED' || r.jobStatus === JobStatus.DELIVERED);
   const exportFail = results.filter((r) => !(r.jobStatus === 'PUBLISHED' || r.jobStatus === JobStatus.DELIVERED));
   getLogger().info(
-    `completed ${results.length} export jobs; ${exportOK.length}} successful and ${exportFail.length} failed`,
+    `completed ${results.length} export jobs; ${exportOK.length} successful and ${exportFail.length} failed`,
     {
       success: exportOK,
       fail: exportFail,
