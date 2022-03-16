@@ -26,7 +26,7 @@ npm run start -- export-projects quickstart/config/quickstart.json
 ```
 
 [quickstart.json](quickstart/config/quickstart.json) is a sample configuration file for creating `"TOKEN_BASED"` projects.  
-To create `"ROW_BASED"` projects, we need a slightly different configuration file, an example is provided in [quickstart.row.json](quickstart/config/quickstart.row.json).  
+To create `"ROW_BASED"` and `"DOCUMENT_BASED"` projects, we need a slightly different configuration file, an example is provided in [quickstart.row.json](quickstart/config/quickstart.row.json) for `"ROW_BASED"` project and [quickstart.doc.json](quickstart/config/quickstart.doc.json) for `"DOCUMENT_BASED"` project.  
 You can try to create row-based projects using the same commands as above just by changing the configuration files:
 
 ```bash
