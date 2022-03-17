@@ -1,10 +1,12 @@
 import { ExportFormat, ProjectStatus } from '../datasaur/interfaces';
+import { PCWPayload } from '../transformer/pcw-transformer/interfaces';
 
 export enum StorageSources {
   LOCAL = 'local',
   REMOTE = 'remote',
   GOOGLE = 'gcs',
   AMAZONS3 = 's3',
+  INLINE = 'inline',
 }
 
 export enum SplitDocumentStrategy {
@@ -46,6 +48,23 @@ export interface Config {
      * The ID can be obtained from your team workspace page in this format: https://datasaur.ai/teams/{teamId}
      */
     teamId: string;
+
+    /**
+     * @description Whether to use script shown in PCW or not
+     */
+    usePcwPayload?: boolean;
+
+    /**
+     * @description Source to get the PCW Payload
+     */
+    pcwPayloadSource?: StorageSources.AMAZONS3 | StorageSources.GOOGLE | StorageSources.LOCAL | StorageSources.INLINE;
+
+    /**
+     * @description local or remote path to assignment file if pcwPayloadSource is StorageSource
+     * PCWPayload if pcwPayloadSource is INLINE
+     */
+    pcwPayload?: string | PCWPayload;
+
     /**
      * Configuration from the 4th and 5th step of the Creation Wizard UI.
      */
