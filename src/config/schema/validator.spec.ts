@@ -2,10 +2,10 @@ import { setConfigByJSONFile } from '../config';
 import { getProjectCreationValidators, getProjectExportValidators } from './validator';
 
 const filesToBeTested = [
-  'config/google-cloud-storage/config.json',
-  'config/remote-files/config.json',
-  'config/s3/config.json',
-  'config/local/config.json',
+  'sample/storage/google-cloud-storage/config.json',
+  'sample/storage/remote-files/config.json',
+  'sample/storage/s3/config.json',
+  'sample/storage/local/config.json',
   'quickstart/config/quickstart.json',
 ];
 
