@@ -4,25 +4,32 @@
     "clientId": "<DATASAUR_CLIENT_ID> See the guide here https://datasaurai.gitbook.io/datasaur/advanced/datasaur-apis/oauth-2.0#generate-oauth-credentials-menu",
     "clientSecret": "<DATASAUR_CLIENT_SECRET> See the guide here https://datasaurai.gitbook.io/datasaur/advanced/datasaur-apis/oauth-2.0#generate-oauth-credentials-menu"
   },
+  "credentials": {
+    "gcs": { "gcsCredentialJson": "sample/storage/google-cloud-storage/credential.json" }
+  },
   "projectState": {
-    "source": "local",
-    "path": "path-to-local-state.json"
+    "source": "gcs",
+    "bucketName": "my-bucket",
+    "path": "path/to/stateFile.json"
   },
   "export": {
-    "source": "local",
+    "source": "gcs",
+    "bucketName": "my-export-bucket",
     "prefix": "path/to/export/root",
     "teamId": "<TEAM_ID>",
     "statusFilter": ["COMPLETE"],
     "format": "CUSTOM",
-    "customScriptId": "<CUSTOM SCRIPT ID>"
+    "customScriptId": "<CUSTOM_SCRIPT_ID>"
   },
   "documents": {
-    "source": "local",
-    "path": "path-to-local-folder"
+    "source": "gcs",
+    "bucketName": "my-bucket",
+    "prefix": "projects"
   },
   "assignment": {
-    "source": "local",
-    "path": "config/assignment/assignment.json"
+    "source": "gcs",
+    "bucketName": "my-bucket",
+    "path": "path/to/assignment.json"
   },
   "project": {
     "teamId": "<TEAM_ID>",
@@ -36,7 +43,7 @@
     },
     "documentSettings": {
       "kind": "TOKEN_BASED",
-      "customScriptId": null,
+      "customScriptId": "<CUSTOM SCRIPT ID>",
 
       "allowCharacterBasedLabeling": false,
       "allowArcDrawing": true,
@@ -46,6 +53,6 @@
       "sentenceSeparator": "\n",
       "tokenizer": "WINK"
     },
-    "labelSetDirectory": "config/labelset"
+    "labelSetDirectory": "sample/__shared__/labelset"
   }
 }
