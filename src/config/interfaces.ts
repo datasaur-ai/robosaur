@@ -1,5 +1,5 @@
 import { ExportFormat, ProjectStatus } from '../datasaur/interfaces';
-import { PCWPayload } from '../transformer/pcw-transformer/interfaces';
+import { PCWPayload, PCWWrapper } from '../transformer/pcw-transformer/interfaces';
 
 export enum StorageSources {
   LOCAL = 'local',
@@ -50,20 +50,17 @@ export interface Config {
     teamId: string;
 
     /**
-     * @description Whether to use script shown in PCW or not
+     * @description Required if --use-pcw is used
+     * Source to get the PCW Payload
      */
-    usePcwPayload?: boolean;
+    pcwPayloadSource?: PCWSource;
 
     /**
-     * @description Source to get the PCW Payload
-     */
-    pcwPayloadSource?: StorageSources.AMAZONS3 | StorageSources.GOOGLE | StorageSources.LOCAL | StorageSources.INLINE;
-
-    /**
-     * @description local or remote path to assignment file if pcwPayloadSource is StorageSource
+     * @description Required if --use-pcw is used
+     * local or remote path to assignment file if pcwPayloadSource is StorageSource
      * PCWPayload if pcwPayloadSource is INLINE
      */
-    pcwPayload?: string | PCWPayload;
+    pcwPayload?: string | (PCWWrapper & PCWPayload);
 
     /**
      * Configuration from the 4th and 5th step of the Creation Wizard UI.
@@ -108,7 +105,7 @@ export interface Config {
       enableTabularMarkdownParsing: boolean;
     };
     /**
-     * @description Question configurations. Only applicable when documentSettings.kind is ROW_BASED
+     * @description Question configurations. Only applicable when documentSettings.kind is ROW_BASED or DOCUMENT_BASED
      */
     questions?: any[];
     /**
@@ -206,6 +203,10 @@ export interface DocumentsConfig extends WithStorage {
    * if the source is `remote`, the path should point to a JSON file. See the sample at config/remote-files/documents.json
    */
   path: string;
+}
+
+export interface PCWSource extends WithStorage {
+  source: StorageSources.AMAZONS3 | StorageSources.GOOGLE | StorageSources.LOCAL | StorageSources.INLINE;
 }
 
 export interface AssignmentConfig extends WithStorage {

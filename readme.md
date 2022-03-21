@@ -49,6 +49,7 @@ For more in-depth breakdown, please refer to [row-based.md](row-based.md)
     - [Script-wide configuration](#script-wide-configuration)
     - [Per-command configuration](#per-command-configuration)
     - [Storage configuration](#storage-configuration)
+    - [Using Script from PCW](#using-script-from-pcw)
 
 ## Requirements
 
@@ -256,3 +257,78 @@ Here are the examples for credentials and other configs:
    - s3:PutObject
    - s3:PutObjectAcl
    - s3:DeleteObject
+
+### Using Script from PCW
+
+Robosaur's config file uses a different format compared to the **View Script** option during Project Creation Wizard (PCW). To use the script generated from PCW use the option `--use-pcw` on `create-projects` command.
+
+```bash
+npm run start -- create-projects <path-to-config-file> --use-pcw
+```
+
+When using `--use-pcw` option, provide both `pcwPayloadSource` and `pcwPayload` inside `project` in the config file.
+
+`pcwPayloadSource` supports these values:
+
+- `"inline"`: copy and paste the script from PCW directly inside `pcwPayload`
+
+Example:
+
+```json
+{
+  ...
+  "project": {
+    ...
+    "pcwPayloadSource": {
+      "source": "inline"
+    },
+    "pcwPayload": {
+      <pasted from PCW>
+    }
+    ...
+  }
+  ...
+}
+```
+
+- `"local"`: store the PCW script in a local file. `pcwPayload` should be a `string` containing path to the script file.
+
+Example:
+
+```json
+{
+  ...
+  "project": {
+    ...
+    "pcwPayloadSource": {
+      "source": "local"
+    },
+    "pcwPayload": "path/to/script/file.json"
+    ...
+  }
+  ...
+}
+```
+
+- `"gcs"` or `"s3"`: store the PCW script in an object cloud storage. `pcwPayloadSource` should contain another value called `bucketName` and `pcwPaylod` should be a `string` containing a url to the file in the object cloud storage. Don't forget to provide credentials to the chosen cloud provider (refer [here](#storage-configuration)).
+
+Example:
+
+```json
+{
+  ...
+  "credentials": {
+       "gcs": { "gcsCredentialJson": "config/google-cloud-storage/credential.json" }
+  },
+  "project": {
+    ...
+    "pcwPayloadSource": {
+      "source": "gcs",
+      "bucketName": "my-bucket-name"
+    },
+    "pcwPayload": "path/to/script/file.json"
+    ...
+  }
+  ...
+}
+```

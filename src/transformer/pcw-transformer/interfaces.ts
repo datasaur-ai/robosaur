@@ -12,6 +12,14 @@ import {
   TextDocumentType,
 } from '../../generated/graphql';
 
+export interface PCWWrapper {
+  operationName: string;
+  variables: {
+    input: PCWPayload;
+  };
+  query: string;
+}
+
 export interface PCWPayload {
   assignees?: ProjectAssignmentByNameInput[];
   documentAssignments?: DocumentAssignmentInput[];
@@ -23,7 +31,7 @@ export interface PCWPayload {
   labelSetId?: string;
   guidelineId?: string;
   projectCreationId?: string;
-  projectSettings?: ProjectSettingsInput;
+  projectSettings: ProjectSettingsInput;
   documentSettings: TextDocumentSettingsInput;
   documents?: CreateTextDocumentInput[];
   tagNames?: string[];

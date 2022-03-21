@@ -17,6 +17,7 @@ program
 program
   .command('create-projects <configFile>')
   .option('--dry-run', 'Simulates what the script is doing without creating the projects')
+  .option('--use-pcw', 'Whether to use the script shown during Project Creation Wizard in Datasaur UI', false)
   .description('Create Datasaur projects based on the given config file')
   .action(handleCreateProjects);
 
