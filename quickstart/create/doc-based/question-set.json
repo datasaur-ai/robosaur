@@ -1,61 +1,122 @@
 [
   {
+    "label": "Title book",
+    "required": true,
     "type": "TEXT",
-    "config": {},
-    "name": "Q1",
-    "label": "Bound to Wind.Speed",
-    "bindToColumn": "Wind.Speed",
-    "required": true
-  },
-  {
-    "type": "TEXT",
-    "config": {},
-    "label": "Not bound, will add new column",
-    "name": "with this name",
-    "required": true
-  },
-  {
-    "type": "SLIDER",
     "config": {
-      "min": 1,
-      "max": 10,
-      "step": 1,
-      "theme": "GRADIENT"
-    },
-    "name": "Q3",
-    "label": "Slider",
-    "required": false
+      "minLength": 2
+    }
   },
   {
-    "type": "CHECKBOX",
-    "config": {
-      "hint": "Description, or hint will be displayed here"
-    },
-    "name": "Q4",
-    "label": "This is a checkbox question",
-    "required": false
-  },
-  {
+    "label": "Book type",
+    "required": true,
     "type": "DROPDOWN",
     "config": {
       "multiple": false,
       "options": [
         {
           "id": "1",
-          "label": "Option 1"
+          "label": "Kids"
         },
         {
           "id": "2",
-          "label": "Option 2"
+          "label": "Adults"
+        }
+      ]
+    }
+  },
+  {
+    "label": "Do you like this book?",
+    "type": "SLIDER",
+    "config": {
+      "min": 1,
+      "max": 10
+    }
+  },
+  {
+    "label": "Genre",
+    "required": true,
+    "type": "HIERARCHICAL_DROPDOWN",
+    "config": {
+      "multiple": false,
+      "options": [
+        {
+          "id": "1",
+          "label": "Fiction"
+        },
+        {
+          "id": "2",
+          "label": "Science fiction",
+          "parentId": "1"
         },
         {
           "id": "3",
-          "label": "Option 3"
+          "label": "Fantasy",
+          "parentId": "1"
+        },
+        {
+          "id": "4",
+          "label": "Adventure",
+          "parentId": "1"
+        },
+        {
+          "id": "5",
+          "label": "Non-fiction"
+        },
+        {
+          "id": "6",
+          "label": "History",
+          "parentId": "5"
+        },
+        {
+          "id": "7",
+          "label": "Self-help",
+          "parentId": "5"
+        },
+        {
+          "id": "8",
+          "label": "Autobiography",
+          "parentId": "5"
         }
       ]
-    },
-    "name": "Q5",
-    "label": "Choose one answer from dropdown",
-    "required": false
+    }
+  },
+  {
+    "label": "Launch date",
+    "required": true,
+    "type": "DATE",
+    "config": {
+      "format": "MM/DD/YYYY"
+    }
+  },
+  {
+    "label": "Best time to read this book",
+    "required": true,
+    "type": "TIME",
+    "config": {
+      "format": "HH:mm:ss"
+    }
+  },
+  {
+    "label": "Best character",
+    "required": true,
+    "type": "NESTED",
+    "config": {
+      "multiple": true,
+      "questions": [
+        {
+          "label": "Antagonist",
+          "required": true,
+          "type": "TEXT",
+          "config": {}
+        },
+        {
+          "label": "Protagonist",
+          "required": true,
+          "type": "TEXT",
+          "config": {}
+        }
+      ]
+    }
   }
 ]
