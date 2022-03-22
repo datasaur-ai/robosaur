@@ -51,9 +51,9 @@
         "firstRowAsHeader": false,
         "customHeaderColumns": [
             {
-                "displayed": true,
-                "labelerRestricted": false,
-                "name": "Column 1"
+              "displayed": true,
+              "labelerRestricted": false,
+              "name": "Column 1"
             }
         ]
       }
