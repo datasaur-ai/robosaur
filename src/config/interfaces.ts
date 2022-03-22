@@ -62,7 +62,7 @@ export interface Config {
      */
     documentSettings: {
       /**
-       * @description determine the task type of the project. Can be TOKEN_BASED or ROW_BASED
+       * @description determine the task type of the project. Can be TOKEN_BASED or ROW_BASED or DOCUMENT_BASED
        */
       kind: string;
       /**
@@ -78,7 +78,7 @@ export interface Config {
       textLabelMaxTokenLength?: number;
       allowCharacterBasedLabeling?: boolean;
 
-      // ROW_BASED
+      // ROW_BASED or DOCUMENT_BASED
       displayedRows?: number;
       mediaDisplayStrategy?: string;
       firstRowAsHeader?: boolean;
@@ -89,7 +89,7 @@ export interface Config {
       enableTabularMarkdownParsing: boolean;
     };
     /**
-     * @description Question configurations. Only applicable when documentSettings.kind is ROW_BASED
+     * @description Question configurations. Only applicable when documentSettings.kind is ROW_BASED or DOCUMENT_BASED
      */
     questions?: any[];
     /**
