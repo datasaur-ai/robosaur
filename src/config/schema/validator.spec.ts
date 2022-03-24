@@ -6,7 +6,7 @@ const filesToBeTested = [
   'sample/storage/remote-files/config.json',
   'sample/storage/s3/config.json',
   'sample/storage/local/config.json',
-  'quickstart/config/quickstart.json',
+  'quickstart/token-based/config/config.json',
 ];
 
 describe.each([

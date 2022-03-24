@@ -1,8 +1,8 @@
 {
   "datasaur": {
-    "host": "https://datasaur.ai",
-    "clientId": "<DATASAUR_CLIENT_ID>",
-    "clientSecret": "<DATASAUR_CLIENT_SECRET>"
+    "host": "http://localhost:8080",
+    "clientId": "9cb9bc9e-96f6-46d1-bbdb-3f42ad5eb449",
+    "clientSecret": "8ae0b537-69fa-48bd-b7ae-43dd16d4a316"
   },
   "projectState": {
     "source": "local",
@@ -10,22 +10,22 @@
   },
   "export": {
     "source": "local",
-    "prefix": "quickstart/export",
-    "teamId": "<TEAM_ID>",
+    "prefix": "quickstart/row-based/export",
+    "teamId": "1",
     "statusFilter": [],
-    "format": "JSON_ADVANCED",
+    "format": "CSV",
     "customScriptId": null
   },
   "documents": {
     "source": "local",
-    "path": "quickstart/create/row-based/document"
+    "path": "quickstart/row-based/document"
   },
   "assignment": {
     "source": "local",
-    "path": "quickstart/create/assignment/assignment.json"
+    "path": "quickstart/row-based/config/assignment.json"
   },
   "project": {
-    "teamId": "<TEAM_ID>",
+    "teamId": "1",
     "projectSettings": {
       "consensus": 1,
       "enableEditLabelSet": false,
@@ -44,7 +44,7 @@
       "viewerConfig": {},
       "enableTabularMarkdownParsing": false
     },
-    "questionSetFile": "quickstart/create/row-based/question-set.json",
+    "questionSetFile": "quickstart/row-based/config/question-set.json",
     "docFileOptions": {
       "firstRowAsHeader": true,
       "customHeaderColumns": [

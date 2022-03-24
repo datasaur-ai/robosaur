@@ -10,7 +10,7 @@
   },
   "export": {
     "source": "local",
-    "prefix": "quickstart/export",
+    "prefix": "quickstart/token-based/export",
     "teamId": "<TEAM_ID>",
     "statusFilter": [],
     "format": "JSON_ADVANCED",
@@ -18,11 +18,11 @@
   },
   "documents": {
     "source": "local",
-    "path": "quickstart/create/token-based/documents"
+    "path": "quickstart/token-based/documents"
   },
   "assignment": {
     "source": "local",
-    "path": "quickstart/create/assignment/assignment.json"
+    "path": "quickstart/token-based/config/assignment.json"
   },
   "project": {
     "teamId": "<TEAM_ID>",
