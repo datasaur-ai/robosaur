@@ -258,7 +258,7 @@ Here are the examples for credentials and other configs:
    - s3:PutObjectAcl
    - s3:DeleteObject
 
-### Using Script from PCW
+## Using PCW Payload
 
 Robosaur's config file uses a different format compared to the **View Script** option during Project Creation Wizard (PCW). To use the script generated from PCW use the option `--use-pcw` on `create-projects` command.
 
@@ -318,7 +318,7 @@ Example:
 {
   ...
   "credentials": {
-       "gcs": { "gcsCredentialJson": "config/google-cloud-storage/credential.json" }
+    "gcs": { "gcsCredentialJson": "config/google-cloud-storage/credential.json" }
   },
   "project": {
     ...
@@ -327,6 +327,60 @@ Example:
       "bucketName": "my-bucket-name"
     },
     "pcwPayload": "path/to/script/file.json"
+    ...
+  }
+  ...
+}
+```
+
+### Providing Documents
+
+Robosaur **does not** support providing documents through PCW payload. The `documents` option inside `pcwPayload` is still required to get the `question sets` and/or the `docFileOptions`, but all documents provided will be ignored. Instead, documents should be provided through the usual Robosaur method (refer [here](#create-projects)).
+
+### Providing Labeler and Reviewer Assigments through PCW Payload
+
+Robosaur supports using PCW's labeler and reviewer assignment settings, but note that `assignment` option **should not** be provided. Also, `documents` option used for assigning specific documents for each labelers will be ignored. Instead, use `pcwAssignmentStrategy` option to specify `AUTO` or `ALL` assignment method.
+
+Example:
+
+```json
+{
+  ...
+  // "assignment": {
+  //    DO NOT provide this option
+  // }
+  "project": {
+    ...
+    "pcwPayloadSource": {
+      "source": "inline",
+    },
+    "pcwAssignmentStrategy": "AUTO",
+    "pcwPayload": {
+      ...
+      "documentAssignments": [
+        {
+          "teamMemberId": "1",
+          "documents": [ // this will be ignored
+            {
+              "fileName": "lorem.txt",
+              "part": 0
+            }
+          ],
+          "role": "LABELER_AND_REVIEWER"
+        },
+        {
+          "teamMemberId": "2",
+          "documents": [  // this will be ignored
+            {
+              "fileName": "lorem.txt",
+              "part": 0
+            }
+          ],
+          "role": "LABELER"
+        }
+      ],
+      ...
+    }
     ...
   }
   ...

@@ -13,7 +13,13 @@ export function assignAllDocuments(assignmentPool: AssignmentConfig, documents: 
   assignmentPool.reviewers.forEach((reviewer) => {
     members[reviewer] = { isLabeler: false || members[reviewer]?.isLabeler, isReviewer: true };
   });
-  return Object.entries(members).map(([memberEmail, { isLabeler, isReviewer }]) => {
-    return { email: memberEmail, role: getRole(isLabeler, isReviewer), documents: allDocuments };
-  });
+  if (assignmentPool.use_team_member_id) {
+    return Object.entries(members).map(([memberId, { isLabeler, isReviewer }]) => {
+      return { teamMemberId: memberId, role: getRole(isLabeler, isReviewer), documents: allDocuments };
+    });
+  } else {
+    return Object.entries(members).map(([memberEmail, { isLabeler, isReviewer }]) => {
+      return { email: memberEmail, role: getRole(isLabeler, isReviewer), documents: allDocuments };
+    });
+  }
 }

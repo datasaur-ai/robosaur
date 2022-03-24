@@ -1,5 +1,6 @@
 import { ExportFormat, ProjectStatus } from '../datasaur/interfaces';
 import { PCWPayload, PCWWrapper } from '../transformer/pcw-transformer/interfaces';
+import { AssignmentConfig as ParsedAssignment } from '../assignment/interfaces';
 
 export enum StorageSources {
   LOCAL = 'local',
@@ -61,6 +62,13 @@ export interface Config {
      * PCWPayload if pcwPayloadSource is INLINE
      */
     pcwPayload?: string | (PCWWrapper & PCWPayload);
+
+    pcwAssignmentStrategy?: 'ALL' | 'AUTO';
+
+    /**
+     * @description Used to store parsed assignments
+     */
+    assignments?: ParsedAssignment;
 
     /**
      * Configuration from the 4th and 5th step of the Creation Wizard UI.

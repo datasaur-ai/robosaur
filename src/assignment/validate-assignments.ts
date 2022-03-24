@@ -3,19 +3,32 @@ import { getLogger } from '../logger';
 import { getConfig } from '../config/config';
 import { getTeamMembers } from '../datasaur/get-team-members';
 
-export async function validateAssignment(assignees: { labelers: string[]; reviewers: string[] }) {
+export async function validateAssignment(assignees: {
+  labelers: string[];
+  reviewers: string[];
+  use_team_member_id?: boolean;
+}) {
+  getLogger().info('validating assignments...');
   const teamMembers = await getTeamMembers(getConfig().project.teamId);
-  const memberEmails = Array.from(
-    new Set(
-      teamMembers.map((member) => {
-        if (member.user && member.user.email) {
-          return member.user.email;
-        } else if (member.invitationEmail) {
-          return member.invitationEmail;
-        }
-      }),
-    ),
-  );
+  const use_team_member_id = assignees.use_team_member_id;
+  let memberIdentifiers;
+  if (use_team_member_id) {
+    memberIdentifiers = Array.from(new Set(teamMembers.map((member) => member.id)));
+  } else {
+    memberIdentifiers = Array.from(
+      new Set(
+        teamMembers.map((member) => {
+          if (member.user && member.user.email) {
+            return member.user.email;
+          } else if (member.invitationEmail) {
+            return member.invitationEmail;
+          }
+        }),
+      ),
+    );
+  }
+
+  getLogger().info('memberIdentifiers', memberIdentifiers);
 
   if (assignees.labelers.length === 0) {
     getLogger().warn(
@@ -23,7 +36,7 @@ export async function validateAssignment(assignees: { labelers: string[]; review
     );
   }
 
-  const labelerEmailDiferrences = difference(assignees.labelers, memberEmails);
+  const labelerEmailDiferrences = difference(assignees.labelers, memberIdentifiers);
   if (labelerEmailDiferrences.length > 0) {
     getLogger().error('there are some labelers that have not been registered to the team.', {
       labeler: [...labelerEmailDiferrences],
@@ -31,7 +44,7 @@ export async function validateAssignment(assignees: { labelers: string[]; review
     throw new Error(`there are some labelers that haven't been registered to the team.`);
   }
 
-  const reviewerEmailDiferrences = difference(assignees.reviewers, memberEmails);
+  const reviewerEmailDiferrences = difference(assignees.reviewers, memberIdentifiers);
   if (reviewerEmailDiferrences.length > 0) {
     getLogger().error('there are some reviewers that have not been registered to the team.', {
       reviewer: [...reviewerEmailDiferrences],

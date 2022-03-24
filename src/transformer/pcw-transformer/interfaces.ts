@@ -1,3 +1,4 @@
+import { AssignmentConfig } from '../../assignment/interfaces';
 import {
   CreateTextDocumentInput,
   DocumentAssignmentInput,
