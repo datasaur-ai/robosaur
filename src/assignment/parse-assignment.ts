@@ -15,7 +15,7 @@ export async function parseAssignment(): Promise<{
   const { source, bucketName, path } = getConfig()?.assignment ?? { source: false, path: false };
 
   getLogger().info('looking for assignments in project settings');
-  if (getConfig().project.assignments) {
+  if (getConfig()?.project?.assignments) {
     getLogger().info('found assignments');
     return getConfig().project.assignments || { labelers: [], reviewers: [] };
   }
