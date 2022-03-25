@@ -1,0 +1,61 @@
+{
+  "datasaur": {
+    "host": "https://datasaur.ai",
+    "clientId": "<DATASAUR_CLIENT_ID>",
+    "clientSecret": "<DATASAUR_CLIENT_SECRET>"
+  },
+  "projectState": {
+    "source": "local",
+    "path": "quickstart/state/doc-project-state.json"
+  },
+  "export": {
+    "source": "local",
+    "prefix": "quickstart/export",
+    "teamId": "<TEAM_ID>",
+    "statusFilter": [],
+    "format": "JSON_ADVANCED",
+    "customScriptId": null
+  },
+  "documents": {
+    "source": "local",
+    "path": "quickstart/create/doc-based/document"
+  },
+  "assignment": {
+    "source": "local",
+    "path": "quickstart/create/assignment/assignment.json"
+  },
+  "project": {
+    "teamId": "<TEAM_ID>",
+    "projectSettings": {
+      "consensus": 1,
+      "enableEditLabelSet": false,
+      "enableEditSentence": false,
+      "hideLabelerNamesDuringReview": false,
+      "hideRejectedLabelsDuringReview": true,
+      "hideLabelsFromInactiveLabelSetDuringReview": false
+    },
+    "documentSettings": {
+      "kind": "DOCUMENT_BASED",
+      "customScriptId": null,
+      "displayedRows": -1,
+      "mediaDisplayStrategy": "THUMBNAIL",
+      "firstRowAsHeader": false,
+      "viewer": "URL",
+      "viewerConfig": {
+        "urlColumnNames": []
+      },
+      "enableTabularMarkdownParsing": false
+    },
+    "questionSetFile": "quickstart/create/doc-based/question-set.json",
+    "docFileOptions": {
+      "firstRowAsHeader": false,
+      "customHeaderColumns": [
+        {
+          "displayed": true,
+          "labelerRestricted": false,
+          "name": "Column 1"
+        }
+      ]
+    }
+  }
+}

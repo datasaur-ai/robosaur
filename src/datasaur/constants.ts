@@ -26,6 +26,19 @@ export const EXTENSIONS = {
       ExtensionID.FILE_COLLECTION_EXTENSION_ID,
     ],
   },
+  DOCUMENT_BASED: {
+    LABELER: [
+      ExtensionID.DOCUMENT_LABELING_EXTENSION_ID,
+      ExtensionID.SEARCH_EXTENSION_ID,
+      ExtensionID.FILE_COLLECTION_EXTENSION_ID,
+    ],
+    REVIEWER: [
+      ExtensionID.REVIEW_EXTENSION_ID,
+      ExtensionID.DOCUMENT_LABELING_EXTENSION_ID,
+      ExtensionID.SEARCH_EXTENSION_ID,
+      ExtensionID.FILE_COLLECTION_EXTENSION_ID,
+    ],
+  },
   TOKEN_BASED: {
     LABELER: [
       ExtensionID.LABELS_EXTENSION_ID,
