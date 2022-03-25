@@ -1,8 +1,8 @@
 {
   "datasaur": {
-    "host": "http://localhost:8080",
-    "clientId": "9cb9bc9e-96f6-46d1-bbdb-3f42ad5eb449",
-    "clientSecret": "8ae0b537-69fa-48bd-b7ae-43dd16d4a316"
+    "host": "https://datasaur.ai",
+    "clientId": "<DATASAUR_CLIENT_ID>",
+    "clientSecret": "<DATASAUR_CLIENT_SECRET>"
   },
   "projectState": {
     "source": "local",
