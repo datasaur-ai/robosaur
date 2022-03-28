@@ -7,7 +7,7 @@ import { getLogger } from '../logger';
 
 export function getDocumentAssignment(assignees: AssignmentConfig, documents: Document[]) {
   let assignmentStrategy;
-  if (assignees.use_team_member_id) {
+  if (assignees.useTeamMemberId) {
     assignmentStrategy = getConfig()?.project?.pcwAssignmentStrategy;
   } else {
     assignmentStrategy = getConfig()?.assignment?.strategy;

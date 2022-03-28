@@ -13,7 +13,7 @@ export function assignAllDocuments(assignmentPool: AssignmentConfig, documents: 
   assignmentPool.reviewers.forEach((reviewer) => {
     members[reviewer] = { isLabeler: false || members[reviewer]?.isLabeler, isReviewer: true };
   });
-  if (assignmentPool.use_team_member_id) {
+  if (assignmentPool.useTeamMemberId) {
     return Object.entries(members).map(([memberId, { isLabeler, isReviewer }]) => {
       return { teamMemberId: memberId, role: getRole(isLabeler, isReviewer), documents: allDocuments };
     });

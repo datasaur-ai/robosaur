@@ -70,7 +70,7 @@ export function assignAutoDocuments(assignmentPool: AssignmentConfig, documents:
   });
 
   const retval: DocumentAssignment[] = [];
-  if (assignmentPool.use_team_member_id) {
+  if (assignmentPool.useTeamMemberId) {
     labelerAssignmentMap.forEach((value, key) => {
       retval.push({ teamMemberId: key, documents: value, role: getRoleFromIdentifier(key, members) });
     });

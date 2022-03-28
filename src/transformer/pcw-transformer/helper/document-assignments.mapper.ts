@@ -6,7 +6,7 @@ export const documentAssignmentsMapper = {
   ): {
     labelers: string[];
     reviewers: string[];
-    use_team_member_id?: boolean;
+    useTeamMemberId?: boolean;
   } => ({
     labelers:
       payload
@@ -18,6 +18,6 @@ export const documentAssignmentsMapper = {
         ?.filter((member) => member.role === 'LABELER_AND_REVIEWER' || member.role === 'REVIEWER')
         ?.map((member) => member.teamMemberId || '')
         ?.filter((memberId) => memberId !== '') || [],
-    use_team_member_id: true,
+    useTeamMemberId: true,
   }),
 };

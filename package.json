@@ -27,6 +27,8 @@
   },
   "devDependencies": {
     "@graphql-codegen/cli": "2.6.2",
+    "@graphql-codegen/introspection": "2.1.1",
+    "@graphql-codegen/typescript": "2.4.7",
     "@types/adm-zip": "0.4.34",
     "@types/graphql": "^14.5.0",
     "@types/jest": "27.4.0",
@@ -44,9 +46,7 @@
     "ts-jest": "26.5.6",
     "ts-loader": "5.4.5",
     "ts-node": "10.4.0",
-    "typescript": "3.9.10",
-    "@graphql-codegen/typescript": "2.4.7",
-    "@graphql-codegen/introspection": "2.1.1"
+    "typescript": "3.9.10"
   },
   "author": "Datasaur.ai (https://github.com/datasaur-ai)",
   "license": "MIT",

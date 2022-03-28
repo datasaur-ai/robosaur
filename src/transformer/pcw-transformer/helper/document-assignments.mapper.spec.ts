@@ -30,7 +30,7 @@ describe('documentAssignmentsMapper', () => {
     const mapped: AssignmentConfig = {
       labelers: ['1', '2'],
       reviewers: ['1'],
-      use_team_member_id: true,
+      useTeamMemberId: true,
     };
 
     const result = documentAssignmentsMapper.fromPcw(fromPcw);

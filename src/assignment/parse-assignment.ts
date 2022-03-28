@@ -10,7 +10,7 @@ const IMPLEMENTED_SOURCES = [StorageSources.LOCAL, StorageSources.AMAZONS3, Stor
 export async function parseAssignment(): Promise<{
   labelers: string[];
   reviewers: string[];
-  use_team_member_id?: boolean;
+  useTeamMemberId?: boolean;
 }> {
   const { source, bucketName, path } = getConfig()?.assignment ?? { source: false, path: false };
 

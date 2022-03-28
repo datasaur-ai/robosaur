@@ -6,13 +6,13 @@ import { getTeamMembers } from '../datasaur/get-team-members';
 export async function validateAssignment(assignees: {
   labelers: string[];
   reviewers: string[];
-  use_team_member_id?: boolean;
+  useTeamMemberId?: boolean;
 }) {
   getLogger().info('validating assignments...');
   const teamMembers = await getTeamMembers(getConfig().project.teamId);
-  const use_team_member_id = assignees.use_team_member_id;
+  const useTeamMemberId = assignees.useTeamMemberId;
   let memberIdentifiers;
-  if (use_team_member_id) {
+  if (useTeamMemberId) {
     memberIdentifiers = Array.from(new Set(teamMembers.map((member) => member.id)));
   } else {
     memberIdentifiers = Array.from(

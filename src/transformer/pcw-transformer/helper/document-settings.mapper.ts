@@ -1,5 +1,6 @@
 import { Config } from '../../../config/interfaces';
 import { TextDocumentSettingsInput } from '../../../generated/graphql';
+import { removeNulls } from './removeNull';
 
 export const documentSettingsMapper = {
   fromPcw: (payload: TextDocumentSettingsInput): Config['project']['documentSettings'] => {
@@ -8,19 +9,19 @@ export const documentSettingsMapper = {
     }
     return {
       kind: payload.kind,
-      customScriptId: payload.customScriptId!,
-      allTokensMustBeLabeled: payload.allTokensMustBeLabeled!,
-      allowArcDrawing: payload.allowArcDrawing!,
-      textLabelMaxTokenLength: payload.textLabelMaxTokenLength!,
-      allowCharacterBasedLabeling: payload.allowCharacterBasedLabeling!,
-      displayedRows: payload.displayedRows!,
-      mediaDisplayStrategy: payload.mediaDisplayStrategy!,
-      firstRowAsHeader: payload.firstRowAsHeader!,
-      viewer: payload.viewer!,
+      customScriptId: removeNulls(payload.customScriptId),
+      allTokensMustBeLabeled: removeNulls(payload.allTokensMustBeLabeled),
+      allowArcDrawing: removeNulls(payload.allowArcDrawing),
+      textLabelMaxTokenLength: removeNulls(payload.textLabelMaxTokenLength),
+      allowCharacterBasedLabeling: removeNulls(payload.allowCharacterBasedLabeling),
+      displayedRows: removeNulls(payload.displayedRows),
+      mediaDisplayStrategy: removeNulls(payload.mediaDisplayStrategy),
+      firstRowAsHeader: removeNulls(payload.firstRowAsHeader),
+      viewer: removeNulls(payload.viewer),
       viewerConfig: {
-        urlColumnNames: payload.viewerConfig?.urlColumnNames!,
+        urlColumnNames: removeNulls(payload.viewerConfig?.urlColumnNames),
       },
-      enableTabularMarkdownParsing: payload.enableTabularMarkdownParsing!,
+      enableTabularMarkdownParsing: removeNulls(payload.enableTabularMarkdownParsing),
     };
   },
 };
