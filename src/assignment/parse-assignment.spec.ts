@@ -47,7 +47,7 @@ describe(parseAssignment.name, () => {
   });
 
   it(`should read local file when source is ${StorageSources.LOCAL}`, async () => {
-    const LOCAL_ASSIGNMENT_PATH = 'config/assignment/assignment.json';
+    const LOCAL_ASSIGNMENT_PATH = 'sample/__shared__/assignment/assignment.json';
     jest
       .spyOn(ConfigModule, 'getConfig')
       .mockName('mockGetConfig')
