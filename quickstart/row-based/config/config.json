@@ -11,7 +11,7 @@
   "export": {
     "source": "local",
     "prefix": "quickstart/row-based/export",
-    "teamId": "1",
+    "teamId": "<TEAM_ID>",
     "statusFilter": [],
     "format": "CSV",
     "customScriptId": null
@@ -25,7 +25,7 @@
     "path": "quickstart/row-based/config/assignment.json"
   },
   "project": {
-    "teamId": "1",
+    "teamId": "<TEAM_ID>",
     "projectSettings": {
       "consensus": 1,
       "enableEditLabelSet": false,
