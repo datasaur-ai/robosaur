@@ -6,11 +6,11 @@
   },
   "projectState": {
     "source": "local",
-    "path": "quickstart/state/projectState.json"
+    "path": "quickstart/state/doc-project-state.json"
   },
   "export": {
     "source": "local",
-    "prefix": "quickstart/export",
+    "prefix": "quickstart/doc-based/export",
     "teamId": "<TEAM_ID>",
     "statusFilter": [],
     "format": "JSON_ADVANCED",
@@ -18,11 +18,11 @@
   },
   "documents": {
     "source": "local",
-    "path": "quickstart/create/documents"
+    "path": "quickstart/doc-based/document"
   },
   "assignment": {
     "source": "local",
-    "path": "quickstart/create/assignment/assignment.json"
+    "path": "quickstart/doc-based/config/assignment.json"
   },
   "project": {
     "teamId": "<TEAM_ID>",
@@ -35,16 +35,27 @@
       "hideLabelsFromInactiveLabelSetDuringReview": false
     },
     "documentSettings": {
-      "kind": "TOKEN_BASED",
+      "kind": "DOCUMENT_BASED",
       "customScriptId": null,
-
-      "allowCharacterBasedLabeling": false,
-      "allowArcDrawing": true,
-      "allowMultiLabels": true,
-      "allTokensMustBeLabeled": false,
-      "textLabelMaxTokenLength": 999999,
-      "sentenceSeparator": "\n",
-      "tokenizer": "WINK"
+      "displayedRows": -1,
+      "mediaDisplayStrategy": "THUMBNAIL",
+      "firstRowAsHeader": false,
+      "viewer": "URL",
+      "viewerConfig": {
+        "urlColumnNames": []
+      },
+      "enableTabularMarkdownParsing": false
+    },
+    "questionSetFile": "quickstart/doc-based/config/question-set.json",
+    "docFileOptions": {
+      "firstRowAsHeader": false,
+      "customHeaderColumns": [
+        {
+          "displayed": true,
+          "labelerRestricted": false,
+          "name": "Column 1"
+        }
+      ]
     }
   }
 }
