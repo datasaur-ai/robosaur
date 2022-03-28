@@ -10,7 +10,7 @@
   },
   "export": {
     "source": "local",
-    "prefix": "quickstart/export",
+    "prefix": "quickstart/doc-based/export",
     "teamId": "<TEAM_ID>",
     "statusFilter": [],
     "format": "JSON_ADVANCED",
@@ -18,11 +18,11 @@
   },
   "documents": {
     "source": "local",
-    "path": "quickstart/create/doc-based/document"
+    "path": "quickstart/doc-based/document"
   },
   "assignment": {
     "source": "local",
-    "path": "quickstart/create/assignment/assignment.json"
+    "path": "quickstart/doc-based/config/assignment.json"
   },
   "project": {
     "teamId": "<TEAM_ID>",
@@ -46,7 +46,7 @@
       },
       "enableTabularMarkdownParsing": false
     },
-    "questionSetFile": "quickstart/create/doc-based/question-set.json",
+    "questionSetFile": "quickstart/doc-based/config/question-set.json",
     "docFileOptions": {
       "firstRowAsHeader": false,
       "customHeaderColumns": [
