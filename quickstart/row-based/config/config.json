@@ -10,19 +10,19 @@
   },
   "export": {
     "source": "local",
-    "prefix": "quickstart/export",
+    "prefix": "quickstart/row-based/export",
     "teamId": "<TEAM_ID>",
     "statusFilter": [],
-    "format": "JSON_ADVANCED",
+    "format": "CSV",
     "customScriptId": null
   },
   "documents": {
     "source": "local",
-    "path": "quickstart/create/row-based/document"
+    "path": "quickstart/row-based/document"
   },
   "assignment": {
     "source": "local",
-    "path": "quickstart/create/assignment/assignment.json"
+    "path": "quickstart/row-based/config/assignment.json"
   },
   "project": {
     "teamId": "<TEAM_ID>",
@@ -44,7 +44,7 @@
       "viewerConfig": {},
       "enableTabularMarkdownParsing": false
     },
-    "questionSetFile": "quickstart/create/row-based/question-set.json",
+    "questionSetFile": "quickstart/row-based/config/question-set.json",
     "docFileOptions": {
       "firstRowAsHeader": true,
       "customHeaderColumns": [

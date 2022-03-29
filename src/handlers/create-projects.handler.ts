@@ -82,6 +82,7 @@ export async function handleCreateProjects(configFile: string, options) {
       if (updatedProjectConfig.labelSets) break;
       updatedProjectConfig.labelSets = getLabelSetsFromDirectory(getConfig());
       break;
+    case 'DOCUMENT_BASED':
     case 'ROW_BASED':
       if (updatedProjectConfig.questions) break;
       if (updatedProjectConfig.questionSetFile) {
