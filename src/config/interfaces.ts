@@ -21,7 +21,7 @@ export enum SplitDocumentStrategy {
 export interface Config {
   datasaur: {
     /**
-     * @description Target environment of Datasaur. To target our cloud environment, set to https://datasaur.ai
+     * @description Target environment of Datasaur. To target our cloud environment, set to https://app.datasaur.ai
      */
     host: string;
     /**
@@ -46,7 +46,7 @@ export interface Config {
   project: {
     /**
      * @description id of the team.
-     * The ID can be obtained from your team workspace page in this format: https://datasaur.ai/teams/{teamId}
+     * The ID can be obtained from your team workspace page in this format: https://app.datasaur.ai/teams/{teamId}
      */
     teamId: string;
 
@@ -91,7 +91,7 @@ export interface Config {
       kind: string;
       /**
        * @description determine the custom script to be used.
-       * The ID can be obtained from the custom script page in this format: https://datasaur.ai/teams/{teamId}/custom-scripts/{custom-script-id}
+       * The ID can be obtained from the custom script page in this format: https://app.datasaur.ai/teams/{teamId}/custom-scripts/{custom-script-id}
        */
       customScriptId?: string;
 
@@ -251,7 +251,7 @@ export interface ExportConfig extends WithStorage {
 
   /**
    * @description id of the team.
-   * The ID can be obtained from your team workspace page in this format: https://datasaur.ai/teams/{teamId}
+   * The ID can be obtained from your team workspace page in this format: https://app.datasaur.ai/teams/{teamId}
    */
   teamId: string;
 
@@ -264,7 +264,7 @@ export interface ExportConfig extends WithStorage {
   /**
    * @description custom export script to use
    * only used when format is CUSTOM
-   * The ID can be obtained from the custom script page in this format: https://datasaur.ai/teams/{teamId}/custom-scripts/{custom-script-id}
+   * The ID can be obtained from the custom script page in this format: https://app.datasaur.ai/teams/{teamId}/custom-scripts/{custom-script-id}
    */
   customScriptId: string;
 }

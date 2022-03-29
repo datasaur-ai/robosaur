@@ -1,0 +1,141 @@
+{
+  "datasaur": {
+    "host": "https://app.datasaur.ai",
+    "clientId": "<DATASAUR_CLIENT_ID> See the guide here https://datasaurai.gitbook.io/datasaur/advanced/datasaur-apis/oauth-2.0#generate-oauth-credentials-menu",
+    "clientSecret": "<DATASAUR_CLIENT_SECRET> See the guide here https://datasaurai.gitbook.io/datasaur/advanced/datasaur-apis/oauth-2.0#generate-oauth-credentials-menu"
+  },
+  "projectState": {
+    "source": "local",
+    "path": "path/to/stateFile.json"
+  },
+  "export": {
+    "source": "local",
+    "prefix": "path/to/export/root",
+    "teamId": "<TEAM)ID>",
+    "statusFilter": [],
+    "format": "JSON_ADVANCED",
+    "customScriptId": null
+  },
+  "documents": {
+    "source": "local",
+    "path": "path/to/document/root"
+  },
+  "project": {
+    "teamId": "<TEAM_ID>",
+    "pcwPayloadSource": {
+      "source": "inline"
+    },
+    "pcwAssignmentStrategy": "AUTO",
+    "pcwPayload": {
+      "operationName": "LaunchTextProjectAsyncMutation",
+      "variables": {
+        "input": {
+          "documentSettings": {
+            "allTokensMustBeLabeled": false,
+            "allowArcDrawing": false,
+            "allowCharacterBasedLabeling": false,
+            "allowMultiLabels": true,
+            "textLabelMaxTokenLength": 999999,
+            "sentenceSeparator": "\n",
+            "tokenizer": "WINK",
+            "displayedRows": -1,
+            "kind": "TOKEN_BASED",
+            "mediaDisplayStrategy": "THUMBNAIL",
+            "viewer": "TOKEN",
+            "viewerConfig": {},
+            "firstRowAsHeader": false,
+            "enableTabularMarkdownParsing": false,
+            "enableAnonymization": false,
+            "anonymizationEntityTypes": [
+              "PERSON",
+              "DATE_TIME",
+              "EMAIL_ADDRESS",
+              "PHONE_NUMBER",
+              "ORGANIZATION",
+              "LOCATION",
+              "DOMAIN_NAME",
+              "IP_ADDRESS",
+              "US_PASSPORT",
+              "CREDIT_CARD",
+              "US_SSN",
+              "US_ITIN",
+              "US_BANK_NUMBER",
+              "US_DRIVER_LICENSE",
+              "IBAN_CODE"
+            ]
+          },
+          "name": "lorem.txt",
+          "projectCreationId": "xxxxxxxxxxxxxxxxxx",
+          "purpose": "LABELING",
+          "labelSets": [
+            {
+              "name": "TestLabelSet",
+              "options": [
+                {
+                  "id": "dl9g4qMMRrRsje90azncy",
+                  "parentId": null,
+                  "label": "TestLabel",
+                  "color": null
+                }
+              ]
+            }
+          ],
+          "documentAssignments": [
+            {
+              "teamMemberId": "1",
+              "documents": [
+                {
+                  "fileName": "lorem.txt",
+                  "part": 0
+                }
+              ],
+              "role": "LABELER_AND_REVIEWER"
+            },
+            {
+              "teamMemberId": "2",
+              "documents": [
+                {
+                  "fileName": "lorem.txt",
+                  "part": 0
+                }
+              ],
+              "role": "LABELER"
+            }
+          ],
+          "splitDocumentOption": null,
+          "projectSettings": {
+            "enableEditLabelSet": true,
+            "enableEditSentence": true,
+            "hideLabelerNamesDuringReview": false,
+            "hideLabelsFromInactiveLabelSetDuringReview": false,
+            "hideOriginalSentencesDuringReview": true,
+            "hideRejectedLabelsDuringReview": true,
+            "consensus": 1
+          },
+          "teamId": "<TEAM_ID>",
+          "documents": [
+            {
+              "file": {
+                "path": "lorem.txt"
+              },
+              "fileName": "lorem.txt",
+              "name": "lorem.txt",
+              "settings": {},
+              "docFileOptions": {
+                "customHeaderColumns": [
+                  {
+                    "displayed": true,
+                    "labelerRestricted": false,
+                    "name": "Column 1"
+                  }
+                ],
+                "firstRowAsHeader": false
+              }
+            }
+          ]
+        }
+      },
+      "query": "mutation LaunchTextProjectAsyncMutation($input: LaunchTextProjectInput!) { launchTextProjectAsync(input: $input) { job { ...JobFragment __typename } name __typename }}fragment JobFragment on Job { id status progress errors { id stack args __typename } resultId __typename}"
+    }
+  }
+}
