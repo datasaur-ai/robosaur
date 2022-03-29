@@ -15,6 +15,11 @@ export enum SplitDocumentStrategy {
   DONT_SPLIT = 'DONT_SPLIT',
 }
 
+export enum StateConfig {
+  STATEFUL = 'stateful',
+  STATELESS = 'stateless',
+}
+
 export interface Config {
   datasaur: {
     /**
@@ -212,6 +217,23 @@ export interface ExportConfig extends WithStorage {
    * CREATED, IN_PROGRESS, REVIEW_READY, IN_REVIEW, COMPLETE
    */
   statusFilter: Array<ProjectStatus>;
+
+  /**
+   * @description Specify what method the projects to be exported are created with.
+   */
+  createdWith?: StateConfig;
+
+  /**
+   * @description Required if createdWith is 'PCW'
+   * A filter on which projects to export
+   */
+  projectFilter?: {
+    kind: string;
+    date?: {
+      newestDate: Date;
+      oldestDate?: Date;
+    };
+  };
 
   /**
    * @description Required for 'gcs' and 's3' sources.
