@@ -221,10 +221,10 @@ export interface ExportConfig extends WithStorage {
   /**
    * @description Specify what method the projects to be exported are created with.
    */
-  createdWith?: StateConfig;
+  executionMode?: StateConfig;
 
   /**
-   * @description Required if createdWith is 'PCW'
+   * @description Required if executionMode is 'stateless'
    * A filter on which projects to export
    */
   projectFilter?: {

@@ -110,7 +110,7 @@ const handleStateless = async (unzip: boolean) => {
 export async function handleExportProjects(configFile: string, { unzip }: { unzip: boolean }) {
   setConfigByJSONFile(configFile, getProjectExportValidators(), ScriptAction.PROJECT_EXPORT);
 
-  const stateless = getConfig().export.createdWith === StateConfig.STATELESS;
+  const stateless = getConfig().export.executionMode === StateConfig.STATELESS;
 
   if (stateless) {
     getLogger().info('executing stateless export using filter from config');
