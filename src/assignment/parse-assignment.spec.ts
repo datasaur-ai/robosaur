@@ -33,10 +33,12 @@ describe(parseAssignment.name, () => {
       .mockName('mockGetConfig')
       .mockImplementation(() => {
         return {
-          assignment: {
-            source: source,
-            path: 'path/to/file.json',
-            bucketName: 'bucket-name',
+          project: {
+            assignment: {
+              source: source,
+              path: 'path/to/file.json',
+              bucketName: 'bucket-name',
+            },
           },
         } as Config;
       });
@@ -53,9 +55,11 @@ describe(parseAssignment.name, () => {
       .mockName('mockGetConfig')
       .mockImplementation(() => {
         return {
-          assignment: {
-            source: StorageSources.LOCAL,
-            path: LOCAL_ASSIGNMENT_PATH,
+          project: {
+            assignment: {
+              source: StorageSources.LOCAL,
+              path: LOCAL_ASSIGNMENT_PATH,
+            },
           },
         } as Config;
       });

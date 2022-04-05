@@ -34,10 +34,10 @@ describe(assignAllDocuments.name, () => {
         .mockName('mockGetConfig')
         .mockImplementation(() => {
           return {
-            assignment: {
-              strategy: 'ALL',
-            },
             project: {
+              assignment: {
+                strategy: 'ALL',
+              },
               projectSettings: {
                 consensus: 1,
               },
@@ -68,10 +68,10 @@ describe(assignAllDocuments.name, () => {
         .mockName('mockGetConfig')
         .mockImplementation(() => {
           return {
-            assignment: {
-              strategy: 'ALL',
-            },
             project: {
+              assignment: {
+                strategy: 'ALL',
+              },
               splitDocumentOption: splitDocumentOption,
               projectSettings: {
                 consensus: 1,

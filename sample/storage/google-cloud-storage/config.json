@@ -21,18 +21,18 @@
     "format": "CUSTOM",
     "customScriptId": "<CUSTOM_SCRIPT_ID>"
   },
-  "documents": {
-    "source": "gcs",
-    "bucketName": "my-bucket",
-    "prefix": "projects"
-  },
-  "assignment": {
-    "source": "gcs",
-    "bucketName": "my-bucket",
-    "path": "path/to/assignment.json"
-  },
   "project": {
     "teamId": "<TEAM_ID>",
+    "documents": {
+      "source": "gcs",
+      "bucketName": "my-bucket",
+      "prefix": "projects"
+    },
+    "assignment": {
+      "source": "gcs",
+      "bucketName": "my-bucket",
+      "path": "path/to/assignment.json"
+    },
     "projectSettings": {
       "consensus": 1,
       "enableEditLabelSet": false,

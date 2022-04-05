@@ -35,10 +35,10 @@ describe(assignAutoDocuments.name, () => {
         .mockName('mockGetConfig')
         .mockImplementation(() => {
           return {
-            assignment: {
-              strategy: 'AUTO',
-            },
             project: {
+              assignment: {
+                strategy: 'AUTO',
+              },
               projectSettings: {
                 consensus: consensusNumber,
               },
@@ -67,10 +67,10 @@ describe(assignAutoDocuments.name, () => {
         .mockName('mockGetConfig')
         .mockImplementation(() => {
           return {
-            assignment: {
-              strategy: 'AUTO',
-            },
             project: {
+              assignment: {
+                strategy: 'AUTO',
+              },
               projectSettings: {
                 consensus: 1,
               },
@@ -113,10 +113,10 @@ describe(assignAutoDocuments.name, () => {
         .mockName('mockGetConfig')
         .mockImplementation(() => {
           return {
-            assignment: {
-              strategy: 'AUTO',
-            },
             project: {
+              assignment: {
+                strategy: 'AUTO',
+              },
               splitDocumentOption: splitDocumentOption,
               projectSettings: {
                 consensus: 1,

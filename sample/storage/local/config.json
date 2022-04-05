@@ -16,16 +16,16 @@
     "format": "CUSTOM",
     "customScriptId": "<CUSTOM SCRIPT ID>"
   },
-  "documents": {
-    "source": "local",
-    "path": "path-to-local-folder"
-  },
-  "assignment": {
-    "source": "local",
-    "path": "sample/__shared__/assignment/assignment.json"
-  },
   "project": {
     "teamId": "<TEAM_ID>",
+    "documents": {
+      "source": "local",
+      "path": "path-to-local-folder"
+    },
+    "assignment": {
+      "source": "local",
+      "path": "sample/__shared__/assignment/assignment.json"
+    },
     "projectSettings": {
       "consensus": 1,
       "enableEditLabelSet": false,
