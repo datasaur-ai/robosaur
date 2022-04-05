@@ -6,7 +6,7 @@ Automation tool to get us started using [Datasaur.ai](https://datasaur.ai) API a
 
 Before running any Robosaur commands, we need to [generate our OAuth credentials](https://datasaurai.gitbook.io/datasaur/advanced/apis-docs/oauth-2.0#generate-oauth-credentials-menu) and obtain our teamId from the URL.
 
-Before running this quickstart, we need to open [quickstart.json](quickstart/config/quickstart.json) and do these two things:
+Before running this quickstart, we need to open [config.json](quickstart/token-based/config/config.json) and do these two things:
 
 1. Replace all `<TEAM_ID>` with the correct teamId
 2. Replace `<DATASAUR_CLIENT_ID>` and `<DATASAUR_CLIENT_SECRET>` with the correct values
@@ -16,21 +16,21 @@ Then we can run this command to create multiple projects at once:
 ```bash
 npm ci # install Robosaur dependencies, run once on setup
 
-npm run start -- create-projects quickstart/config/quickstart.json
+npm run start -- create-projects quickstart/token-based/config/config.json
 ```
 
 To export the newly created projects, we can run this command:
 
 ```bash
-npm run start -- export-projects quickstart/config/quickstart.json
+npm run start -- export-projects quickstart/token-based/config/config.json
 ```
 
-[quickstart.json](quickstart/config/quickstart.json) is a sample configuration file for creating `"TOKEN_BASED"` projects.  
-To create `"ROW_BASED"` and `"DOCUMENT_BASED"` projects, we need a slightly different configuration file, an example is provided in [quickstart.row.json](quickstart/config/quickstart.row.json) for `"ROW_BASED"` project and [quickstart.doc.json](quickstart/config/quickstart.doc.json) for `"DOCUMENT_BASED"` project.  
+[config.json](quickstart/token-based/config/config.json) is a sample configuration file for creating `"TOKEN_BASED"` projects.  
+To create `"ROW_BASED"` projects, we need a slightly different configuration file, an example is provided in [config.json](quickstart/row-based/config/config.json).  
 You can try to create row-based projects using the same commands as above just by changing the configuration files:
 
 ```bash
-npm run start -- create-projects quickstart/config/quickstart.row.json
+npm run start -- create-projects quickstart/row-based/config/config.json
 ```
 
 For more in-depth breakdown, please refer to [row-based.md](row-based.md)
@@ -61,7 +61,7 @@ Robosaur is developed using TypeScript and Node.js. We recommend using these ver
 
 Currently Robosaur supports two command: `create-projects` & `export-projects`. Please note that `export-projects` is designed to only process projects previously created by `create-projects` command.
 
-For the explanation in this readme, we will use the file [quickstart.json](quickstart/config/quickstart.json) as reference
+For the explanation in this readme, we will use the file [config.json](quickstart/token-based/config/config.json) as reference
 
 ### `create-projects`
 
@@ -82,7 +82,7 @@ Robosaur will try to create a project for each folder inside the `documents.path
 {
   "documents": {
     "source": "local",
-    "path": "quickstart/create/documents"
+    "path": "quickstart/token-based/documents"
   }
 }
 ```
@@ -90,16 +90,16 @@ Robosaur will try to create a project for each folder inside the `documents.path
 In this example, there should be two folders, `Project 1` & `Project 2`, each with a single file
 
 ```console
-$ ls -lR quickstart/create/documents
+$ ls -lR quickstart/token-based/documents
 total 0
 drwxr-xr-x  3 user  group  Project 1
 drwxr-xr-x  3 user  group  Project 2
 
-quickstart/create/documents/Project 1:
+quickstart/token-based/documents/Project 1:
 total 8
 -rw-r--r--  1 user  group  lorem.txt
 
-quickstart/create/documents/Project 2:
+quickstart/token-based/documents/Project 2:
 total 8
 -rw-r--r--  1 user  group  little prince.txt
 ```
@@ -117,13 +117,13 @@ Options:
   -h, --help  display help for command
 ```
 
-Robosaur will try to export each projects previously created by the `create-projects` command. Each project will be saved as a separate zipfile under the supplied directory in `export.prefix`. For example, in `quickstart.json`, this is set to be `quickstart/export` like so:
+Robosaur will try to export each projects previously created by the `create-projects` command. Each project will be saved as a separate zipfile under the supplied directory in `export.prefix`. For example, in `config.json`, this is set to be `quickstart/token-based/export` like so:
 
 ```json
 {
   "export": {
     "source": "local",
-    "prefix": "quickstart/export"
+    "prefix": "quickstart/token-based/export"
   }
 }
 ```
@@ -141,7 +141,9 @@ This can be set in the `export.statusFilter` inside the config JSON. In `quickst
 }
 ```
 
-## Stateful execution
+## Execution Modes
+
+### Stateful Project Creation & Export
 
 For both commands, Robosaur can behave a bit smarter with the help of a JSON statefile.
 
@@ -150,9 +152,58 @@ In multiple project creation using the `create-projects` command, the statefile 
 In project export using `export-projects`, the JSON statefile is treated as source of truth. Only projects found in the statefile will be checked against the `statusFilter` and exported.  
 Robosaur will also record the project state when it was last exported, and subsequent runs will only export the project if there had been a forward change in the project status
 
+### Stateless project export
+
+Robosaur now supports exporting project not created by Robosaur (stateless). To do this add the following options to the configuration file:
+
+1. `"executionMode"`
+
+   Specifies whether the projects to be exported is created with Robosaur or not. Fill with `"stateless"` for projects created outside Robosaur and `"stateful"` for projects created with Robosaur. The default value is `"stateful"`.
+
+2. `"projectFilter"`
+
+   Specifies which projects to be exported. Contains the following value:
+
+   - `"kind"` (required)
+
+     `TOKEN_BASED`, `ROW_BASED`, or `DOCUMENT_BASED`
+
+   - `"date"`
+
+     - `"newestDate"` (required)
+
+       Ignores all projects created after this date.
+
+     - `"oldestDate"`
+
+       Ignores all projects created before this date.
+
+Example:
+
+```json
+...
+"export": {
+  "source": "local",
+  "prefix": "quickstart/token-based/export",
+  "teamId": "1",
+  "statusFilter": [],
+  "executionMode": "stateless",
+  "projectFilter": {
+    "kind": "TOKEN_BASED",
+    "date": {
+      "newestDate": "2022-03-11",
+      "oldestDate": "2022-03-07"
+    }
+  },
+  "format": "JSON_ADVANCED",
+  "customScriptId": null
+},
+...
+```
+
 ## Configuration
 
-In this part we will explain each part of the Robosaur config file. We will use `quickstart.json` as an example. An in-depth breakdown is also available as a TypeScript file in `src/config/interfaces.ts` [here](src/config/interfaces.ts)
+In this part we will explain each part of the Robosaur config file. We will use `config.json` as an example. An in-depth breakdown is also available as a TypeScript file in `src/config/interfaces.ts` [here](src/config/interfaces.ts)
 
 ### Script-wide configuration
 
