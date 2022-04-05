@@ -76,7 +76,7 @@ Options:
 -h, --help  display help for command
 ```
 
-Robosaur will try to create a project for each folder inside the `documents.path` folder.
+Robosaur will try to create a project for each folder inside the `project.documents.path` folder.
 
 ```json
 {

@@ -46,7 +46,7 @@ export async function getProjectNamesFromFolderNames(
 ) {
   if (source === StorageSources.LOCAL) {
     getLogger().info(`retrieving folders in local directory ${path} `);
-    const dirpath = resolve(process.cwd(), getConfig().documents.path);
+    const dirpath = resolve(process.cwd(), getConfig().project.documents.path);
     const directories = readdirSync(dirpath, { withFileTypes: true }).filter((p) => p.isDirectory());
     return directories.map((dir) => ({ name: dir.name, fullPath: resolve(dirpath, dir.name) }));
   } else {
@@ -56,7 +56,7 @@ export async function getProjectNamesFromFolderNames(
     getLogger().info(`found folders: ${JSON.stringify(foldersInBucket)}`);
 
     return foldersInBucket.map((foldername) => ({
-      name: foldername.replace(getConfig().documents.prefix, '').replace(/\//g, ''),
+      name: foldername.replace(getConfig().project.documents.prefix, '').replace(/\//g, ''),
       fullPath: foldername,
     }));
   }

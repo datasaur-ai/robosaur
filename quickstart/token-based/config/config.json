@@ -1,8 +1,8 @@
 {
   "datasaur": {
-    "host": "https://datasaur.ai",
-    "clientId": "<DATASAUR_CLIENT_ID>",
-    "clientSecret": "<DATASAUR_CLIENT_SECRET>"
+    "host": "http://localhost:8080",
+    "clientId": "1fd5de2a-5330-4eb8-9f4a-1574afb43fa5",
+    "clientSecret": "7d05f46d-fb7d-460b-ac2d-f149cdf2515e"
   },
   "projectState": {
     "source": "local",
@@ -11,21 +11,21 @@
   "export": {
     "source": "local",
     "prefix": "quickstart/token-based/export",
-    "teamId": "<TEAM_ID>",
+    "teamId": "1",
     "statusFilter": [],
     "format": "JSON_ADVANCED",
     "customScriptId": null
   },
-  "documents": {
-    "source": "local",
-    "path": "quickstart/create/token-based/documents"
-  },
-  "assignment": {
-    "source": "local",
-    "path": "quickstart/token-based/config/assignment.json"
-  },
   "project": {
-    "teamId": "<TEAM_ID>",
+    "teamId": "1",
+    "documents": {
+      "source": "local",
+      "path": "quickstart/token-based/documents"
+    },
+    "assignment": {
+      "source": "local",
+      "path": "quickstart/token-based/config/assignment.json"
+    },
     "projectSettings": {
       "consensus": 1,
       "enableEditLabelSet": false,

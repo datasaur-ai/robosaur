@@ -6,7 +6,7 @@ import { Document } from '../documents/interfaces';
 import { getLogger } from '../logger';
 
 export function getDocumentAssignment(assignees: AssignmentConfig, documents: Document[]) {
-  const assignmentStrategy = getConfig()?.assignment?.strategy;
+  const assignmentStrategy = getConfig()?.project?.assignment?.strategy;
   if (!assignmentStrategy) {
     getLogger().info('no assignment strategy specified, assign all documents to all labelers...');
     return assignAllDocuments(assignees, documents);

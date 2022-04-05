@@ -43,14 +43,17 @@ export interface Config {
   export: ExportConfig;
 
   // project creation
-  documents: DocumentsConfig;
-  assignment: AssignmentConfig;
   project: {
     /**
      * @description id of the team.
      * The ID can be obtained from your team workspace page in this format: https://datasaur.ai/teams/{teamId}
      */
     teamId: string;
+
+    documents: DocumentsConfig;
+
+    assignment: AssignmentConfig;
+
     /**
      * Configuration from the 4th and 5th step of the Creation Wizard UI.
      */

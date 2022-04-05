@@ -38,7 +38,7 @@ export async function handleCreateProjects(configFile: string, options) {
   const cwd = process.cwd();
   setConfigByJSONFile(resolve(cwd, configFile), getProjectCreationValidators(), ScriptAction.PROJECT_CREATION);
 
-  const documentSource = getConfig().documents.source;
+  const documentSource = getConfig().project.documents.source;
   switch (documentSource) {
     case StorageSources.REMOTE:
       getLogger().warn(
@@ -46,7 +46,7 @@ export async function handleCreateProjects(configFile: string, options) {
       );
       return handleCreateProject('New Robosaur Project', configFile);
   }
-  const { bucketName, prefix: storagePrefix, source, path } = getConfig().documents;
+  const { bucketName, prefix: storagePrefix, source, path } = getConfig().project.documents;
 
   const scriptState = await getState();
   await scriptState.updateInProgressProjectCreationStates();

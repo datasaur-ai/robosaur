@@ -16,16 +16,16 @@
     "format": "CSV",
     "customScriptId": null
   },
-  "documents": {
-    "source": "local",
-    "path": "quickstart/doc-based/document"
-  },
-  "assignment": {
-    "source": "local",
-    "path": "quickstart/doc-based/config/assignment.json"
-  },
   "project": {
     "teamId": "<TEAM_ID>",
+    "documents": {
+      "source": "local",
+      "path": "quickstart/doc-based/document"
+    },
+    "assignment": {
+      "source": "local",
+      "path": "quickstart/doc-based/config/assignment.json"
+    },
     "projectSettings": {
       "consensus": 1,
       "enableEditLabelSet": false,
