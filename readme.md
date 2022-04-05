@@ -1,6 +1,6 @@
 # Robosaur
 
-Automation tool to get us started using [Datasaur.ai](https://app.datasaur.ai) API and team workspace.
+Automation tool to get us started using [Datasaur.ai](https://datasaur.ai) API and team workspace.
 
 ## Quickstart
 
@@ -158,7 +158,7 @@ In this part we will explain each part of the Robosaur config file. We will use 
 ### Script-wide configuration
 
 1. `"datasaur"`  
-   Contains our OAuth `clientId` and `clientSecret`. These credentials are only enabled for Growth and Enterprise plans. For more information, please reach out to [Datasaur](https://app.datasaur.ai)
+   Contains our OAuth `clientId` and `clientSecret`. These credentials are only enabled for Growth and Enterprise plans. For more information, please reach out to [Datasaur](https://datasaur.ai)
 2. `"projectState"`  
    Where we want our statefile to be saved. `projectState.path` can be a full or a relative path to a JSON file. For now, keep `source` as `local` for all `source`s.
 
