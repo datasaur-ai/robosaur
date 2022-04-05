@@ -141,7 +141,9 @@ This can be set in the `export.statusFilter` inside the config JSON. In `quickst
 }
 ```
 
-## Stateful execution
+## Execution Modes
+
+### Stateful Project Creation & Export
 
 For both commands, Robosaur can behave a bit smarter with the help of a JSON statefile.
 
@@ -149,6 +151,55 @@ In multiple project creation using the `create-projects` command, the statefile 
 
 In project export using `export-projects`, the JSON statefile is treated as source of truth. Only projects found in the statefile will be checked against the `statusFilter` and exported.  
 Robosaur will also record the project state when it was last exported, and subsequent runs will only export the project if there had been a forward change in the project status
+
+### Stateless project export
+
+Robosaur now supports exporting project not created by Robosaur (stateless). To do this add the following options to the configuration file:
+
+1. `"executionMode"`
+
+   Specifies whether the projects to be exported is created with Robosaur or not. Fill with `"stateless"` for projects created outside Robosaur and `"stateful"` for projects created with Robosaur. The default value is `"stateful"`.
+
+2. `"projectFilter"`
+
+   Specifies which projects to be exported. Contains the following value:
+
+   - `"kind"` (required)
+
+     `TOKEN_BASED`, `ROW_BASED`, or `DOCUMENT_BASED`
+
+   - `"date"`
+
+     - `"newestDate"` (required)
+
+       Ignores all projects created after this date.
+
+     - `"oldestDate"`
+
+       Ignores all projects created before this date.
+
+Example:
+
+```json
+...
+"export": {
+  "source": "local",
+  "prefix": "quickstart/token-based/export",
+  "teamId": "1",
+  "statusFilter": [],
+  "executionMode": "stateless",
+  "projectFilter": {
+    "kind": "TOKEN_BASED",
+    "date": {
+      "newestDate": "2022-03-11",
+      "oldestDate": "2022-03-07"
+    }
+  },
+  "format": "JSON_ADVANCED",
+  "customScriptId": null
+},
+...
+```
 
 ## Configuration
 

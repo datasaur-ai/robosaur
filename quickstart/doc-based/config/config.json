@@ -13,7 +13,7 @@
     "prefix": "quickstart/doc-based/export",
     "teamId": "<TEAM_ID>",
     "statusFilter": [],
-    "format": "JSON_ADVANCED",
+    "format": "CSV",
     "customScriptId": null
   },
   "documents": {
