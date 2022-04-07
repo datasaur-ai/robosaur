@@ -19,20 +19,20 @@ export function assignAutoDocuments(assignmentPool: AssignmentConfig, documents:
   const consensus = getConfig()?.project?.projectSettings?.consensus ?? 1;
 
   const labelerAssignmentMap = new Map<string, Array<{ fileName: string; part: number }>>();
-  const labelerIdentifier: string[] = [];
-  const reviewerIdentifier: string[] = [];
+  const labelerIdentifiers: string[] = [];
+  const reviewerIdentifiers: string[] = [];
   Object.entries(members).forEach(([identifier, { isLabeler, isReviewer }]) => {
     if (isLabeler) {
       // labeler and labeler_and_reviewer can be assigned documents
       labelerAssignmentMap.set(identifier, []);
-      labelerIdentifier.push(identifier);
+      labelerIdentifiers.push(identifier);
     } else if (isReviewer) {
       // reviewers does not need to be assigned - they can access all
-      reviewerIdentifier.push(identifier);
+      reviewerIdentifiers.push(identifier);
     }
   });
 
-  if (consensus > labelerIdentifier.length) {
+  if (consensus > labelerIdentifiers.length) {
     getLogger().error('Consensus lower than number of labelers');
     throw new Error('Consensus should be smaller or equal to number of labelers');
   }
@@ -43,14 +43,14 @@ export function assignAutoDocuments(assignmentPool: AssignmentConfig, documents:
 
     let numberOfAssignments = 0;
     while (numberOfAssignments < consensus) {
-      const currentLabeler = labelerIdentifier[labelerIndex];
+      const currentLabeler = labelerIdentifiers[labelerIndex];
       const assignedDocs = labelerAssignmentMap.get(currentLabeler);
       labelerAssignmentMap.set(currentLabeler, [
         ...assignedDocs!,
         { fileName: document.fileName, part: document.part },
       ]);
       numberOfAssignments += 1;
-      labelerIndex = (labelerIndex + 1) % labelerIdentifier.length;
+      labelerIndex = (labelerIndex + 1) % labelerIdentifiers.length;
     }
   }
 
@@ -74,14 +74,14 @@ export function assignAutoDocuments(assignmentPool: AssignmentConfig, documents:
     labelerAssignmentMap.forEach((value, key) => {
       retval.push({ teamMemberId: key, documents: value, role: getRoleFromIdentifier(key, members) });
     });
-    reviewerIdentifier.forEach((teamMemberId) => {
+    reviewerIdentifiers.forEach((teamMemberId) => {
       retval.push({ teamMemberId, role: getRoleFromIdentifier(teamMemberId, members) });
     });
   } else {
     labelerAssignmentMap.forEach((value, key) => {
       retval.push({ email: key, documents: value, role: getRoleFromIdentifier(key, members) });
     });
-    reviewerIdentifier.forEach((email) => {
+    reviewerIdentifiers.forEach((email) => {
       retval.push({ email, role: getRoleFromIdentifier(email, members) });
     });
   }
