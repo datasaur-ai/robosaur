@@ -11,7 +11,7 @@ import { getLocalDocuments } from '../documents/get-local-documents';
 import { getObjectStorageDocuments } from '../documents/get-object-storage-documents';
 import { LocalDocument, RemoteDocument } from '../documents/interfaces';
 import { getLogger } from '../logger';
-import { pcwTransformer } from '../transformer/pcw-transformer/pcw.transformer';
+import { setConfigFromPcw } from '../transformer/pcw-transformer/setConfigFromPcw';
 import { getLabelSetsFromDirectory } from '../utils/labelset';
 import { pollJobsUntilCompleted } from '../utils/polling.helper';
 import { getQuestionSetFromFile } from '../utils/questionset';
@@ -41,7 +41,7 @@ export async function handleCreateProjects(configFile: string, options) {
 
   if (usePcw) {
     getLogger().info('usePcw is set to true, parsing pcwPayload...');
-    await pcwTransformer(getConfig());
+    await setConfigFromPcw(getConfig());
   } else {
     if (getConfig().project.pcwPayload) {
       getLogger().error('usePcw option is not set but pcwPayload is given');

@@ -4,7 +4,7 @@ import { removeNulls } from './removeNull';
 
 export type ConfigProjectSettings = Config['project']['projectSettings'];
 
-export const projectSettingsMapper = {
+export const mapProjectSettings = {
   fromPcw: (payload: ProjectSettingsInput): ConfigProjectSettings => ({
     consensus: removeNulls(payload.consensus),
     enableEditLabelSet: removeNulls(payload.enableEditLabelSet),

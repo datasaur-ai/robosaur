@@ -3,7 +3,7 @@ import { LabelSetTextProjectInput } from '../../../generated/graphql';
 
 export type ConfigLabelSets = Config['project']['labelSets'];
 
-export const labelSetMapper = {
+export const mapLabelSet = {
   fromPcw: (payload: LabelSetTextProjectInput[]): ConfigLabelSets => {
     return payload.map((labelSet) => ({
       label: labelSet.name,

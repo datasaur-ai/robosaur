@@ -6,7 +6,7 @@ import { readJSONFile } from '../../../utils/readJSONFile';
 import { WrongPcwPayloadType } from '../error/wrong-pcw-payload-type.error';
 import { PCWPayload, PCWWrapper } from '../interfaces';
 
-const processInline = (pcwPayload: string | (PCWWrapper & PCWPayload)) => {
+const getFromInline = (pcwPayload: string | (PCWWrapper & PCWPayload)) => {
   if (typeof pcwPayload === 'string') {
     getLogger().error('pcwPayloadSource is "inline" but pcwPayload is given a string');
     throw new WrongPcwPayloadType('INLINE', 'string');
@@ -15,7 +15,7 @@ const processInline = (pcwPayload: string | (PCWWrapper & PCWPayload)) => {
   return pcwPayload?.variables.input || pcwPayload;
 };
 
-const processLocal = (pcwPayloadSource: PCWSource, pcwPayload: string | (PCWWrapper & PCWPayload)) => {
+const getFromLocal = (pcwPayloadSource: PCWSource, pcwPayload: string | (PCWWrapper & PCWPayload)) => {
   getLogger().info(`retrieving folders in local directory ${pcwPayload} `);
   if (typeof pcwPayload !== 'string') {
     getLogger().error(`pcwPayloadSource is ${pcwPayloadSource?.source} but pcwPayload is not given a string`);
@@ -25,7 +25,7 @@ const processLocal = (pcwPayloadSource: PCWSource, pcwPayload: string | (PCWWrap
   return readResult?.variables.input || readResult;
 };
 
-const processCloud = async (pcwPayloadSource: PCWSource, pcwPayload: string | (PCWWrapper & PCWPayload)) => {
+const getFromCloud = async (pcwPayloadSource: PCWSource, pcwPayload: string | (PCWWrapper & PCWPayload)) => {
   getLogger().info(`retrieving pcw configuration in bucket ${pcwPayloadSource?.bucketName}`);
   if (typeof pcwPayload !== 'string') {
     getLogger().error(`pcwPayloadSource is ${pcwPayloadSource?.source} but pcwPayload is not given a string`);
@@ -41,12 +41,12 @@ const processCloud = async (pcwPayloadSource: PCWSource, pcwPayload: string | (P
   return readResult?.variables.input || readResult;
 };
 
-export const processPcw = async (pcwPayloadSource: PCWSource, pcwPayload: string | (PCWWrapper & PCWPayload)) => {
+export const parsePcw = async (pcwPayloadSource: PCWSource, pcwPayload: string | (PCWWrapper & PCWPayload)) => {
   if (pcwPayloadSource?.source === StorageSources.INLINE) {
-    return processInline(pcwPayload);
+    return getFromInline(pcwPayload);
   } else if (pcwPayloadSource?.source === StorageSources.LOCAL) {
-    return processLocal(pcwPayloadSource, pcwPayload);
+    return getFromLocal(pcwPayloadSource, pcwPayload);
   } else {
-    return processCloud(pcwPayloadSource, pcwPayload);
+    return getFromCloud(pcwPayloadSource, pcwPayload);
   }
 };

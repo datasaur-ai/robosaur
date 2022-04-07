@@ -1,6 +1,6 @@
 import { DocumentAssignmentInput } from '../../../generated/graphql';
 
-export const documentAssignmentsMapper = {
+export const mapDocumentAssignments = {
   fromPcw: (
     payload: DocumentAssignmentInput[],
   ): {

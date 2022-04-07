@@ -6,9 +6,9 @@ import {
 
 export type ConfigSplitDocumentOption = Config['project']['splitDocumentOption'];
 
-export const splitDocumentOptionsMapper = {
+export const mapSplitDocumentOptions = {
   fromPcw: (payload: SplitDocumentOptionInput): ConfigSplitDocumentOption => ({
-    strategy: splitDocumentOptionsMapper.strategyConverter(payload.strategy),
+    strategy: mapSplitDocumentOptions.strategyConverter(payload.strategy),
     number: payload.number,
   }),
   strategyConverter: (fromPcw: SplitDocumentStrategyPCW) => {

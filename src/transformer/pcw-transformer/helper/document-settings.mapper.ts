@@ -4,7 +4,7 @@ import { removeNulls } from './removeNull';
 
 export type ConfigDocumentSettings = Config['project']['documentSettings'];
 
-export const documentSettingsMapper = {
+export const mapDocumentSettings = {
   fromPcw: (payload: TextDocumentSettingsInput): ConfigDocumentSettings => {
     if (!payload.kind || payload.kind === null) {
       throw new Error();
