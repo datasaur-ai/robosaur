@@ -2,8 +2,10 @@ import { Config } from '../../../config/interfaces';
 import { ProjectSettingsInput } from '../../../generated/graphql';
 import { removeNulls } from './removeNull';
 
+export type ConfigProjectSettings = Config['project']['projectSettings'];
+
 export const projectSettingsMapper = {
-  fromPcw: (payload: ProjectSettingsInput): Config['project']['projectSettings'] => ({
+  fromPcw: (payload: ProjectSettingsInput): ConfigProjectSettings => ({
     consensus: removeNulls(payload.consensus),
     enableEditLabelSet: removeNulls(payload.enableEditLabelSet),
     enableEditSentence: removeNulls(payload.enableEditSentence),

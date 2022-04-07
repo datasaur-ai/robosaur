@@ -2,8 +2,10 @@ import { Config } from '../../../config/interfaces';
 import { TextDocumentSettingsInput } from '../../../generated/graphql';
 import { removeNulls } from './removeNull';
 
+export type ConfigDocumentSettings = Config['project']['documentSettings'];
+
 export const documentSettingsMapper = {
-  fromPcw: (payload: TextDocumentSettingsInput): Config['project']['documentSettings'] => {
+  fromPcw: (payload: TextDocumentSettingsInput): ConfigDocumentSettings => {
     if (!payload.kind || payload.kind === null) {
       throw new Error();
     }

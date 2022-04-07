@@ -4,8 +4,10 @@ import {
   SplitDocumentStrategy as SplitDocumentStrategyPCW,
 } from '../../../generated/graphql';
 
+export type ConfigSplitDocumentOption = Config['project']['splitDocumentOption'];
+
 export const splitDocumentOptionsMapper = {
-  fromPcw: (payload: SplitDocumentOptionInput): Config['project']['splitDocumentOption'] => ({
+  fromPcw: (payload: SplitDocumentOptionInput): ConfigSplitDocumentOption => ({
     strategy: splitDocumentOptionsMapper.strategyConverter(payload.strategy),
     number: payload.number,
   }),

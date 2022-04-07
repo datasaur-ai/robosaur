@@ -2,8 +2,10 @@ import { Config } from '../../../config/interfaces';
 import { DocFileOptionsInput } from '../../../generated/graphql';
 import { removeNulls } from './removeNull';
 
+export type ConfigDocFileOption = Config['project']['docFileOptions'];
+
 export const docFileOptionsMapper = {
-  fromPcw: (payload: DocFileOptionsInput): Config['project']['docFileOptions'] => ({
+  fromPcw: (payload: DocFileOptionsInput): ConfigDocFileOption => ({
     firstRowAsHeader: removeNulls(payload.firstRowAsHeader),
     customHeaderColumns: removeNulls(payload.customHeaderColumns),
   }),
