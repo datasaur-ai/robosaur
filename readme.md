@@ -339,10 +339,6 @@ Robosaur **does not** support providing documents through PCW payload. The `docu
 
 ### Providing Labeler and Reviewer Assigments through PCW Payload
 
-Robosaur supports using PCW's labeler and reviewer assignment settings, but note that `assignment` option **should not** be provided. Also, `documents` option used for assigning specific documents for each labelers will be ignored. Instead, use `pcwAssignmentStrategy` option to specify `AUTO` or `ALL` assignment method.
-
-Example:
-
 ```json
 {
   ...
@@ -386,3 +382,5 @@ Example:
   ...
 }
 ```
+
+Robosaur supports using PCW's labeler and reviewer assignment settings, but note that `assignment` option **should not** be provided. Also, `documents` option used for assigning specific documents for each labelers will be ignored. Instead, use `pcwAssignmentStrategy` option to specify `AUTO` or `ALL` assignment method.
