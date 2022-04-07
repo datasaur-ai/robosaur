@@ -1,6 +1,6 @@
 import { Config } from '../../../config/interfaces';
 import { ProjectSettingsInput } from '../../../generated/graphql';
-import { projectSettingsMapper } from './project-settings.mapper';
+import { mapProjectSettings } from './project-settings.mapper';
 
 describe('projectSettingsMapper', () => {
   it('should map projectSettings from PCW to robosaur config', () => {
@@ -23,7 +23,7 @@ describe('projectSettingsMapper', () => {
       consensus: 1,
     };
 
-    const result = projectSettingsMapper.fromPcw(fromPcw);
+    const result = mapProjectSettings.fromPcw(fromPcw);
 
     expect(result).toEqual(mapped);
   });

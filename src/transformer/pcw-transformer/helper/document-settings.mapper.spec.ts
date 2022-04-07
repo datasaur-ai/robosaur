@@ -5,7 +5,7 @@ import {
   TextDocumentSettingsInput,
   TextDocumentViewer,
 } from '../../../generated/graphql';
-import { documentSettingsMapper } from './document-settings.mapper';
+import { mapDocumentSettings } from './document-settings.mapper';
 
 describe('documentSettingsMapper', () => {
   it('should map documentSettings from PCW to robosaur config', () => {
@@ -64,7 +64,7 @@ describe('documentSettingsMapper', () => {
       customScriptId: '1',
     };
 
-    const result = documentSettingsMapper.fromPcw(fromPcw);
+    const result = mapDocumentSettings.fromPcw(fromPcw);
 
     expect(result).toEqual(mapped);
   });

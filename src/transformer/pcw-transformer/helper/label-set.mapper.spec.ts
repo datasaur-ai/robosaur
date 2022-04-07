@@ -1,6 +1,6 @@
 import { Config } from '../../../config/interfaces';
 import { LabelSetTextProjectInput } from '../../../generated/graphql';
-import { labelSetMapper } from './label-set.mapper';
+import { mapLabelSet } from './label-set.mapper';
 
 describe('labelSetMapper', () => {
   it('should map labelSetMapper from PCW to robosaur config', () => {
@@ -34,7 +34,7 @@ describe('labelSetMapper', () => {
       },
     ];
 
-    const result = labelSetMapper.fromPcw(fromPcw);
+    const result = mapLabelSet.fromPcw(fromPcw);
 
     expect(result).toEqual(mapped);
   });

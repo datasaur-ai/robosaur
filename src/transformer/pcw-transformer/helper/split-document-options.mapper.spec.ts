@@ -3,7 +3,7 @@ import {
   SplitDocumentOptionInput,
   SplitDocumentStrategy as SplitDocumentStrategyPCW,
 } from '../../../generated/graphql';
-import { splitDocumentOptionsMapper } from './split-document-options.mapper';
+import { mapSplitDocumentOptions } from './split-document-options.mapper';
 
 describe('splitDocumentOptionsMapper', () => {
   it('should map splitDocumentOptions from PCW to robosaur config', () => {
@@ -17,7 +17,7 @@ describe('splitDocumentOptionsMapper', () => {
       number: 2,
     };
 
-    const result = splitDocumentOptionsMapper.fromPcw(fromPcw);
+    const result = mapSplitDocumentOptions.fromPcw(fromPcw);
 
     expect(result).toEqual(mapped);
   });

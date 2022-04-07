@@ -1,6 +1,6 @@
 import { AssignmentConfig } from '../../../assignment/interfaces';
 import { DocumentAssignmentInput, ProjectAssignmentRole } from '../../../generated/graphql';
-import { documentAssignmentsMapper } from './document-assignments.mapper';
+import { mapDocumentAssignments } from './document-assignments.mapper';
 
 describe('documentAssignmentsMapper', () => {
   it('should map documentAssignments from PCW to robosaur config', () => {
@@ -33,7 +33,7 @@ describe('documentAssignmentsMapper', () => {
       useTeamMemberId: true,
     };
 
-    const result = documentAssignmentsMapper.fromPcw(fromPcw);
+    const result = mapDocumentAssignments.fromPcw(fromPcw);
 
     expect(result).toEqual(mapped);
   });

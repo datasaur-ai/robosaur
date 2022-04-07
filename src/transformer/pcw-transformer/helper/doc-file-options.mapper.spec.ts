@@ -1,6 +1,6 @@
 import { Config } from '../../../config/interfaces';
 import { DocFileOptionsInput } from '../../../generated/graphql';
-import { docFileOptionsMapper } from './doc-file-options.mapper';
+import { mapDocFileOptions } from './doc-file-options.mapper';
 
 describe('docFileOptionsMapper', () => {
   it('should map docFileOptions from PCW to robosaur config', () => {
@@ -26,7 +26,7 @@ describe('docFileOptionsMapper', () => {
       ],
     };
 
-    const result = docFileOptionsMapper.fromPcw(fromPcw);
+    const result = mapDocFileOptions.fromPcw(fromPcw);
 
     expect(result).toEqual(mapped);
   });
