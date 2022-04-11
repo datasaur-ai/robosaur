@@ -3,11 +3,14 @@ import packageJson from '../package.json';
 import { handleCreateProject } from './handlers/create-project.handler';
 import { handleCreateProjects } from './handlers/create-projects.handler';
 import { handleExportProjects } from './handlers/export-projects.handler';
+import { handleExtractZip } from './handlers/extract-zip.handler';
 import { getLogger } from './logger';
 
 const program = new Command();
 
 program.name(packageJson.name).version(packageJson.version);
+
+program.command('extract-zip <configFile>').action(handleExtractZip);
 
 program
   .command('create-project <projectName> <configFile>')
@@ -17,6 +20,7 @@ program
 program
   .command('create-projects <configFile>')
   .option('--dry-run', 'Simulates what the script is doing without creating the projects')
+  .option('--from-zip', 'Extract zip files and turn them into csv before creating project')
   .description('Create Datasaur projects based on the given config file')
   .action(handleCreateProjects);
 

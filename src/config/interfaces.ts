@@ -153,6 +153,28 @@ export interface Config {
   };
 }
 
+export interface KontextConfig extends WithStorage {
+  /**
+   * @description Local file path where the folder containing zip files are located
+   */
+  zipRootPath: string;
+
+  /**
+   * @description Local folder path to store extract result for the zip files. Leave it empty to use the zipRootPath
+   */
+  stagingFolderPath: string;
+
+  /**
+   * @description Path to a folder in the cloud storage to store the extract results
+   */
+  uploadPath: string;
+
+  /**
+   * @description Name of the folder inside the zip file containing the Images. Leave it empty if its the root folder.
+   */
+  containingFolder?: string;
+}
+
 export interface CredentialsConfig {
   [StorageSources.AMAZONS3]: {
     s3Endpoint: string;
@@ -192,6 +214,8 @@ export interface DocumentsConfig extends WithStorage {
    * if the source is `remote`, the path should point to a JSON file. See the sample at config/remote-files/documents.json
    */
   path: string;
+
+  kontext?: KontextConfig;
 }
 
 export interface AssignmentConfig extends WithStorage {

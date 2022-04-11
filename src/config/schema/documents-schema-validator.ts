@@ -12,6 +12,7 @@ const DocumentsSchema: JSONSchemaType<DocumentsConfig> = {
     path: { type: 'string' },
     bucketName: { type: 'string' },
     prefix: { type: 'string' },
+    kontext: { type: 'object', required: ['uploadPath', 'stagingFolderPath', 'zipRootPath'], nullable: true },
   },
   required: ['source'],
   oneOf: [{ required: ['source', 'path'] }, { required: ['source', 'bucketName', 'prefix'] }],

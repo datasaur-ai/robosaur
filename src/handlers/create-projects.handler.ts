@@ -11,6 +11,7 @@ import { getLocalDocuments } from '../documents/get-local-documents';
 import { getObjectStorageDocuments } from '../documents/get-object-storage-documents';
 import { LocalDocument, RemoteDocument } from '../documents/interfaces';
 import { getLogger } from '../logger';
+import { handleFromZip } from '../utils/kontext/handleFromZip';
 import { getLabelSetsFromDirectory } from '../utils/labelset';
 import { pollJobsUntilCompleted } from '../utils/polling.helper';
 import { getQuestionSetFromFile } from '../utils/questionset';
@@ -34,9 +35,13 @@ const LIMIT_RETRY = 3;
 const PROJECT_BEFORE_SAVE = 5;
 
 export async function handleCreateProjects(configFile: string, options) {
-  const { dryRun } = options;
+  const { dryRun, fromZip } = options;
   const cwd = process.cwd();
   setConfigByJSONFile(resolve(cwd, configFile), getProjectCreationValidators(), ScriptAction.PROJECT_CREATION);
+
+  if (fromZip) {
+    await handleFromZip(getConfig().documents);
+  }
 
   const documentSource = getConfig().documents.source;
   switch (documentSource) {
