@@ -1,5 +1,5 @@
 import { readdirSync } from 'fs';
-import { DocumentsConfig } from '../../../config/interfaces';
+import { DocumentsConfig, StorageSources } from '../../../config/interfaces';
 import { KontextConfigNotFoundError } from '../errors/kontextConfigNotFoundError';
 import { WrongZipRootFolderStructure } from '../errors/wrongZipRootFolderStructure';
 
@@ -15,6 +15,10 @@ const validateFolderStructure = (zipRootPath: string) => {
 export const validateKontext = (documentConfig: DocumentsConfig) => {
   if (!documentConfig?.kontext) {
     throw new KontextConfigNotFoundError();
+  }
+
+  if (documentConfig.source !== StorageSources.LOCAL) {
+    throw new Error('only local source is supported for document.source when using --from-zip option');
   }
 
   validateFolderStructure(documentConfig.kontext.zipRootPath);
