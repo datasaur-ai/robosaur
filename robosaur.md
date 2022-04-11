@@ -149,17 +149,17 @@ For in-depth project export config details, please refer to `config/interfaces.t
 Some notable ones are:
 
 1. `statusFilter` => used to filter which projects will be exported by Robosaur  
-The filter are applied using logical OR operation, for example specifying `["IN_PROGRESS", "COMPLETE"]` as the filter means all projects that is either IN_PROGRESS or COMPLETE will be exported.  
-A common example would be to do the export when the project has been marked completed by the labeler. To do this, we would apply the `["REVIEW_READY", "IN_REVIEW"]` filter. If we also want to export reviewed projects, we can add `"COMPLETE"` to the filter.
+   The filter are applied using logical OR operation, for example specifying `["IN_PROGRESS", "COMPLETE"]` as the filter means all projects that is either IN_PROGRESS or COMPLETE will be exported.  
+   A common example would be to do the export when the project has been marked completed by the labeler. To do this, we would apply the `["REVIEW_READY", "IN_REVIEW"]` filter. If we also want to export reviewed projects, we can add `"COMPLETE"` to the filter.
 2. `format` => what export format to export the project with  
-Please note that not all types of project can be exported to all export format. For more complete details, please refer to Datasaur's GitBook [here](https://datasaurai.gitbook.io/datasaur/advanced/apis-docs/export-project#export-all-files)
+   Please note that not all types of project can be exported to all export format. For more complete details, please refer to Datasaur's GitBook [here](https://datasaurai.gitbook.io/datasaur/advanced/apis-docs/export-project#export-all-files)
 3. `customScriptId` => which custom export script to use
-This field is only used when the `format` field is set to `CUSTOM`.  
-The ID itself can be obtained from the custom script URL in this format: `https://datasaur.ai/teams/{teamId}/custom-scripts/{custom-script-id}`.  
-For more details in creating and / or using your own custom export script, please refer to Datasaur GitBook [here](https://datasaurai.gitbook.io/datasaur/basics/workforce-management/custom-scripts)  
+   This field is only used when the `format` field is set to `CUSTOM`.  
+   The ID itself can be obtained from the custom script URL in this format: `https://app.datasaur.ai/teams/{teamId}/custom-scripts/{custom-script-id}`.  
+   For more details in creating and / or using your own custom export script, please refer to Datasaur GitBook [here](https://datasaurai.gitbook.io/datasaur/basics/workforce-management/custom-scripts)
 4. `source`, `prefix` => where the export results should be saved.  
-`source` can be either `local`, `s3` or `gcs`. For `s3` and `gcs`, we will also need to specify `bucketName` and `config.credentials` to give Robosaur access to the bucket.  
-`prefix` sets the folder that will contain the export results. If we want Robosaur to save in the root directory (for example to the root directory of S3 bucket) we can set `prefix` to an empty string `""`.
+   `source` can be either `local`, `s3` or `gcs`. For `s3` and `gcs`, we will also need to specify `bucketName` and `config.credentials` to give Robosaur access to the bucket.  
+   `prefix` sets the folder that will contain the export results. If we want Robosaur to save in the root directory (for example to the root directory of S3 bucket) we can set `prefix` to an empty string `""`.
 
 ## Stateful Execution
 
@@ -168,7 +168,7 @@ For the `create-projects` command, Robosaur can behave smarter with the help of 
 In case of project creation using `create-projects`, the state file will keep track on what projects have been submitted to Datasaur, and for which teams.
 This allows the script to be used to create projects using the same bucket structure for different teams by only changing the relevant config (for example `teamId`, `assignment` and `customScriptId`)
 
-For project export using `export-projects`, the state file will keep track which projects have been exported from which teams. In subsequent runs, any projects that have been previously exported will only be exported again if there is a change in the project status.  
+For project export using `export-projects`, the state file will keep track which projects have been exported from which teams. In subsequent runs, any projects that have been previously exported will only be exported again if there is a change in the project status.
 
 For example, if we run the `export-projects` command with the filter set as `[IN_PROGRESS, REVIEW_READY, IN_REVIEW]`, and project `A` is in progress, it will be exported. The IN_PROGRESS status will also be recorded like so in the statefile.
 
@@ -182,8 +182,7 @@ For example, if we run the `export-projects` command with the filter set as `[IN
 ```
 
 The next time we run the script again, if project `A` is still IN_PROGRESS, it will not be exported again. However, should the status move forward into `REVIEW_READY` (labeler has marked the project as complete, but no reviewer has opened the project yet) or `IN_REVIEW` (any reviewer has opened the project at least once), Project `A` will be exported again.  
-If project `A` was marked as complete by the reviewer, the status will update to `COMPLETE`. In this case, the project will not be exported because `COMPLETE` was not specified in the filter. 
-
+If project `A` was marked as complete by the reviewer, the status will update to `COMPLETE`. In this case, the project will not be exported because `COMPLETE` was not specified in the filter.
 
 If these behaviors are not wanted or needed, we can pass an emtpy string `''` to the `config.projectState.path` field or setting `config.projectState` to `{}`, and Robosaur will create a new in-memory state for each run.
 This will cause Robosaur to always create new projects based on the subfolders even if there are already projects with the same name in Datasaur.

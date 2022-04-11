@@ -5,8 +5,8 @@ import { validateAssignment } from './validate-assignments';
 
 describe(validateAssignment.name, () => {
   const dummyMembers: Array<GetTeamMembersModule.TeamMember> = [
-    { user: { email: 'dummy-email' }, invitationEmail: null, invitationStatus: 'ACCEPTED' },
-    { user: null, invitationEmail: 'dummy-email-pending', invitationStatus: 'SENT' },
+    { id: '1', user: { email: 'dummy-email' }, invitationEmail: null, invitationStatus: 'ACCEPTED' },
+    { id: '2', user: null, invitationEmail: 'dummy-email-pending', invitationStatus: 'SENT' },
   ];
 
   beforeEach(() => {
