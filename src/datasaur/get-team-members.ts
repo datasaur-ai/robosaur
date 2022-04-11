@@ -5,6 +5,7 @@ const TEAM_MEMBER_QUERY = gql`
   query GetTeamMembersQuery($input: GetTeamMembersPaginatedInput!) {
     result: getTeamMembersPaginated(input: $input) {
       nodes {
+        id
         user {
           email
         }
@@ -22,6 +23,7 @@ const TEAM_MEMBER_QUERY = gql`
 `;
 
 export interface TeamMember {
+  id: string | number;
   user: {
     email: string;
   } | null;

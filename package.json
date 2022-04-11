@@ -6,7 +6,8 @@
   "scripts": {
     "test:ci": "jest --runInBand --ci",
     "test": "jest",
-    "start": "ts-node src/index.ts"
+    "start": "ts-node src/index.ts",
+    "codegen": "graphql-codegen --config codegen.yml"
   },
   "dependencies": {
     "@google-cloud/storage": "5.18.0",
@@ -25,7 +26,11 @@
     "winston": "3.4.0"
   },
   "devDependencies": {
+    "@graphql-codegen/cli": "2.6.2",
+    "@graphql-codegen/introspection": "2.1.1",
+    "@graphql-codegen/typescript": "2.4.7",
     "@types/adm-zip": "0.4.34",
+    "@types/graphql": "^14.5.0",
     "@types/jest": "27.4.0",
     "@types/minio": "7.0.11",
     "@types/node": "16.11.21",
