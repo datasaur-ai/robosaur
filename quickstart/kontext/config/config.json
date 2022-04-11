@@ -1,8 +1,8 @@
 {
   "datasaur": {
-    "host": "http://localhost:8080",
-    "clientId": "153a21e0-92e7-438d-ba91-d26251625642",
-    "clientSecret": "6f4ad16f-b8b7-4026-a62a-aecd77c1c29d"
+    "host": "https://app.datasaur.ai",
+    "clientId": "<DATASAUR_CLIENT_ID>",
+    "clientSecret": "<DATASAUR_CLIENT_SECRET>"
   },
   "projectState": {
     "source": "local",
@@ -11,7 +11,7 @@
   "export": {
     "source": "local",
     "prefix": "quickstart/row-based/export",
-    "teamId": "1",
+    "teamId": "<TEAM_ID>",
     "statusFilter": [],
     "format": "CSV",
     "customScriptId": null
@@ -42,7 +42,7 @@
     "path": "quickstart/row-based/config/assignment.json"
   },
   "project": {
-    "teamId": "1",
+    "teamId": "<TEAM_ID>",
     "projectSettings": {
       "consensus": 1,
       "enableEditLabelSet": false,
