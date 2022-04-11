@@ -16,7 +16,7 @@
     "format": "JSON_ADVANCED",
     "customScriptId": null
   },
-  "documents": {
+  "files": {
     "source": "local",
     "path": "path/to/document/root"
   },

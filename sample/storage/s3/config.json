@@ -29,7 +29,7 @@
   },
   "project": {
     "teamId": "<TEAM_ID>",
-    "documents": {
+    "files": {
       "source": "s3",
       "bucketName": "my-other-bucket",
       "prefix": "projects"

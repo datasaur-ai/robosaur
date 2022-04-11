@@ -18,7 +18,7 @@
   },
   "project": {
     "teamId": "<TEAM_ID>",
-    "documents": {
+    "files": {
       "source": "local",
       "path": "quickstart/doc-based/document"
     },

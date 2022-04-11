@@ -14,7 +14,7 @@ export function getProjectExportValidators() {
 }
 
 function validateConfigDocuments(config: Config) {
-  if (!documentsSchemaValidator(config.project.documents)) {
+  if (!documentsSchemaValidator(config.project.files)) {
     getLogger().error(`config.documents has some errors`, { errors: documentsSchemaValidator.errors });
     throw new Error(`config.documents has some errors: ${JSON.stringify(documentsSchemaValidator.errors)}`);
   }
@@ -49,7 +49,7 @@ function doSourcesNeedCredentials(config: Config) {
   const sourcesNeedCredentials = [StorageSources.AMAZONS3, StorageSources.GOOGLE];
   const usedSources = [
     config.project.assignment?.source,
-    config.project.documents?.source,
+    config.project.files?.source,
     config.projectState?.source,
     config.export?.source,
   ];

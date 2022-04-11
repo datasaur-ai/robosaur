@@ -14,7 +14,7 @@
   },
   "project": {
     "teamId": "<TEAM_ID>",
-    "documents": {
+    "files": {
       "source": "remote",
       "path": "./documents.json"
     },

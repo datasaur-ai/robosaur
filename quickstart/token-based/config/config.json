@@ -18,7 +18,7 @@
   },
   "project": {
     "teamId": "1",
-    "documents": {
+    "files": {
       "source": "local",
       "path": "quickstart/token-based/documents"
     },

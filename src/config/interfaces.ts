@@ -53,7 +53,7 @@ export interface Config {
      */
     teamId: string;
 
-    documents: DocumentsConfig;
+    files: FilesConfig;
 
     assignment: AssignmentConfig;
     /**
@@ -203,7 +203,7 @@ export interface StatefileConfig extends WithStorage {
   path: string;
 }
 
-export interface DocumentsConfig extends WithStorage {
+export interface FilesConfig extends WithStorage {
   /**
    * @description Required for 'gcs' and 's3' sources.
    * Path to the folder containing sub-folders, without leading slash (/)
