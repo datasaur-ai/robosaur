@@ -1,6 +1,10 @@
 export interface AssignmentConfig {
   labelers: string[];
   reviewers: string[];
+  /**
+   * @description whether the labelers and reviewers contain email or teamMemberId
+   */
+  useTeamMemberId?: boolean;
 }
 
 export interface DocumentAssignment {

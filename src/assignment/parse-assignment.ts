@@ -2,14 +2,27 @@ import { readFileSync } from 'fs';
 import { resolve } from 'path';
 import { getConfig } from '../config/config';
 import { StorageSources } from '../config/interfaces';
+import { getLogger } from '../logger';
 import { getStorageClient } from '../utils/object-storage';
 
 const IMPLEMENTED_SOURCES = [StorageSources.LOCAL, StorageSources.AMAZONS3, StorageSources.GOOGLE];
 
-export async function parseAssignment(): Promise<{ labelers: string[]; reviewers: string[] }> {
+export async function parseAssignment(): Promise<{
+  labelers: string[];
+  reviewers: string[];
+  useTeamMemberId?: boolean;
+}> {
   const { source, bucketName, path } = getConfig()?.project?.assignment ?? { source: false, path: false };
 
-  if (!source) return { labelers: [], reviewers: [] };
+  getLogger().info('looking for assignments in project settings');
+  if (getConfig()?.project?.assignments) {
+    getLogger().info('found assignments');
+    return getConfig().project.assignments || { labelers: [], reviewers: [] };
+  }
+
+  if (!source) {
+    return { labelers: [], reviewers: [] };
+  }
 
   switch (source) {
     case StorageSources.LOCAL:

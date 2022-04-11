@@ -1,10 +1,13 @@
 import { ExportFormat, ProjectStatus } from '../datasaur/interfaces';
+import { PCWPayload, PCWWrapper } from '../transformer/pcw-transformer/interfaces';
+import { AssignmentConfig as ParsedAssignment } from '../assignment/interfaces';
 
 export enum StorageSources {
   LOCAL = 'local',
   REMOTE = 'remote',
   GOOGLE = 'gcs',
   AMAZONS3 = 's3',
+  INLINE = 'inline',
 }
 
 export enum SplitDocumentStrategy {
@@ -23,7 +26,7 @@ export enum StateConfig {
 export interface Config {
   datasaur: {
     /**
-     * @description Target environment of Datasaur. To target our cloud environment, set to https://datasaur.ai
+     * @description Target environment of Datasaur. To target our cloud environment, set to https://app.datasaur.ai
      */
     host: string;
     /**
@@ -46,13 +49,32 @@ export interface Config {
   project: {
     /**
      * @description id of the team.
-     * The ID can be obtained from your team workspace page in this format: https://datasaur.ai/teams/{teamId}
+     * The ID can be obtained from your team workspace page in this format: https://app.datasaur.ai/teams/{teamId}
      */
     teamId: string;
 
     documents: DocumentsConfig;
 
     assignment: AssignmentConfig;
+    /**
+     * @description Required if --use-pcw is used
+     * Source to get the PCW Payload
+     */
+    pcwPayloadSource?: PCWSource;
+
+    /**
+     * @description Required if --use-pcw is used
+     * local or remote path to assignment file if pcwPayloadSource is StorageSource
+     * PCWPayload if pcwPayloadSource is INLINE
+     */
+    pcwPayload?: string | (PCWWrapper & PCWPayload);
+
+    pcwAssignmentStrategy?: 'ALL' | 'AUTO';
+
+    /**
+     * @description Used to store parsed assignments
+     */
+    assignments?: ParsedAssignment;
 
     /**
      * Configuration from the 4th and 5th step of the Creation Wizard UI.
@@ -75,7 +97,7 @@ export interface Config {
       kind: string;
       /**
        * @description determine the custom script to be used.
-       * The ID can be obtained from the custom script page in this format: https://datasaur.ai/teams/{teamId}/custom-scripts/{custom-script-id}
+       * The ID can be obtained from the custom script page in this format: https://app.datasaur.ai/teams/{teamId}/custom-scripts/{custom-script-id}
        */
       customScriptId?: string;
 
@@ -197,6 +219,10 @@ export interface DocumentsConfig extends WithStorage {
   path: string;
 }
 
+export interface PCWSource extends WithStorage {
+  source: StorageSources.AMAZONS3 | StorageSources.GOOGLE | StorageSources.LOCAL | StorageSources.INLINE;
+}
+
 export interface AssignmentConfig extends WithStorage {
   source: StorageSources.AMAZONS3 | StorageSources.GOOGLE | StorageSources.LOCAL;
   /**
@@ -248,7 +274,7 @@ export interface ExportConfig extends WithStorage {
 
   /**
    * @description id of the team.
-   * The ID can be obtained from your team workspace page in this format: https://datasaur.ai/teams/{teamId}
+   * The ID can be obtained from your team workspace page in this format: https://app.datasaur.ai/teams/{teamId}
    */
   teamId: string;
 
@@ -261,7 +287,7 @@ export interface ExportConfig extends WithStorage {
   /**
    * @description custom export script to use
    * only used when format is CUSTOM
-   * The ID can be obtained from the custom script page in this format: https://datasaur.ai/teams/{teamId}/custom-scripts/{custom-script-id}
+   * The ID can be obtained from the custom script page in this format: https://app.datasaur.ai/teams/{teamId}/custom-scripts/{custom-script-id}
    */
   customScriptId: string;
 }
