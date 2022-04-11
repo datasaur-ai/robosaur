@@ -1,0 +1,71 @@
+{
+  "datasaur": {
+    "host": "http://localhost:8080",
+    "clientId": "153a21e0-92e7-438d-ba91-d26251625642",
+    "clientSecret": "6f4ad16f-b8b7-4026-a62a-aecd77c1c29d"
+  },
+  "projectState": {
+    "source": "local",
+    "path": "quickstart/state/projectState.json"
+  },
+  "export": {
+    "source": "local",
+    "prefix": "quickstart/row-based/export",
+    "teamId": "1",
+    "statusFilter": [],
+    "format": "CSV",
+    "customScriptId": null
+  },
+  "credentials": {
+    "s3": {
+      "s3Endpoint": "localhost",
+      "s3Port": 9000,
+      "s3AccessKey": "vulcan",
+      "s3SecretKey": "miniovulcan",
+      "s3UseSSL": true
+    }
+  },
+  "documents": {
+    "source": "local",
+    "path": "quickstart/kontext/document",
+    "kontext": {
+      "zipRootPath": "quickstart/kontext/upload",
+      "stagingFolderPath": "quickstart/kontext/staging",
+      "containingFolder": "Image",
+      "uploadPath": "kontext",
+      "source": "s3",
+      "bucketName": "datasaur"
+    }
+  },
+  "assignment": {
+    "source": "local",
+    "path": "quickstart/row-based/config/assignment.json"
+  },
+  "project": {
+    "teamId": "1",
+    "projectSettings": {
+      "consensus": 1,
+      "enableEditLabelSet": false,
+      "enableEditSentence": false,
+      "hideLabelerNamesDuringReview": false,
+      "hideRejectedLabelsDuringReview": true,
+      "hideLabelsFromInactiveLabelSetDuringReview": false
+    },
+    "documentSettings": {
+      "kind": "ROW_BASED",
+      "customScriptId": null,
+      "displayedRows": 10,
+      "mediaDisplayStrategy": "THUMBNAIL",
+      "firstRowAsHeader": true,
+      "viewer": "URL",
+      "viewerConfig": {
+        "urlColumnNames": ["url"]
+      },
+      "enableTabularMarkdownParsing": true
+    },
+    "docFileOptions": {
+      "firstRowAsHeader": true,
+      "customHeaderColumns": []
+    }
+  }
+}
