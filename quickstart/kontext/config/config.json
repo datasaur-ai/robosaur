@@ -18,10 +18,10 @@
   },
   "credentials": {
     "s3": {
-      "s3Endpoint": "localhost",
-      "s3Port": 9000,
-      "s3AccessKey": "vulcan",
-      "s3SecretKey": "miniovulcan",
+      "s3Endpoint": "s3.amazonaws.com",
+      "s3Port": 443,
+      "s3AccessKey": "<ACCESS_KEY>",
+      "s3SecretKey": "<SECRET_KEY>",
       "s3UseSSL": true
     }
   },
@@ -29,8 +29,7 @@
     "source": "local",
     "path": "quickstart/kontext/document",
     "kontext": {
-      "zipRootPath": "quickstart/kontext/upload",
-      "stagingFolderPath": "quickstart/kontext/staging",
+      "inputPath": "quickstart/kontext/input",
       "containingFolder": "Image",
       "uploadPath": "kontext",
       "source": "s3",
@@ -51,6 +50,7 @@
       "hideRejectedLabelsDuringReview": true,
       "hideLabelsFromInactiveLabelSetDuringReview": false
     },
+    "questionSetFile": "quickstart/kontext/config/question-set.json",
     "documentSettings": {
       "kind": "ROW_BASED",
       "customScriptId": null,
@@ -61,7 +61,7 @@
       "viewerConfig": {
         "urlColumnNames": ["url"]
       },
-      "enableTabularMarkdownParsing": true
+      "enableTabularMarkdownParsing": false
     },
     "docFileOptions": {
       "firstRowAsHeader": true,

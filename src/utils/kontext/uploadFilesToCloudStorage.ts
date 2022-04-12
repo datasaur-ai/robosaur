@@ -5,6 +5,7 @@ import { getConfig } from '../../config/config';
 import { StorageSources } from '../../config/interfaces';
 import { getLogger } from '../../logger';
 import { getStorageClient } from '../object-storage';
+import { StorageSourceNotSupportedError } from './errors/storageSourceNotSupported';
 
 export const uploadFilesToCloudStorage = (
   uploadPath: string,
@@ -45,6 +46,8 @@ export const uploadFilesToCloudStorage = (
       endPoint += `${getConfig().credentials.s3.s3Port}`;
     } else if (getConfig().documents.kontext?.source === StorageSources.GOOGLE) {
       endPoint += 'https://storage.cloud.google.com';
+    } else {
+      throw new StorageSourceNotSupportedError(getConfig().documents.kontext?.source!, 'uploading files to cloud');
     }
 
     csvObject.data.push([`${endPoint}/${bucketName}/${uploadPath}/${clientName}/${projectName}/${image.name}`]);

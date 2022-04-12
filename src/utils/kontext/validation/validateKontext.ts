@@ -21,5 +21,5 @@ export const validateKontext = (documentConfig: DocumentsConfig) => {
     throw new Error('only local source is supported for document.source when using --from-zip option');
   }
 
-  validateFolderStructure(documentConfig.kontext.zipRootPath);
+  validateFolderStructure(documentConfig.kontext.inputPath);
 };

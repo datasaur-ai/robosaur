@@ -181,20 +181,15 @@ export interface KontextConfig extends WithStorage {
   /**
    * @description Local file path where the folder containing zip files are located
    */
-  zipRootPath: string;
+  inputPath: string;
 
   /**
-   * @description Local folder path to store extract result for the zip files. Leave it empty to use the zipRootPath
-   */
-  stagingFolderPath: string;
-
-  /**
-   * @description Path to a folder in the cloud storage to store the extract results
+   * @description Specifies where to put the extraction results in the chosen cloud storage
    */
   uploadPath: string;
 
   /**
-   * @description Name of the folder inside the zip file containing the Images. Leave it empty if its the root folder.
+   * @description Name of the folder inside the zip file containing the images. Leave it empty if its the root folder.
    */
   containingFolder?: string;
 }

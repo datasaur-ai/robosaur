@@ -12,7 +12,7 @@ import { getObjectStorageDocuments } from '../documents/get-object-storage-docum
 import { LocalDocument, RemoteDocument } from '../documents/interfaces';
 import { getLogger } from '../logger';
 import { setConfigFromPcw } from '../transformer/pcw-transformer/setConfigFromPcw';
-import { handleFromZip } from '../utils/kontext/handleFromZip';
+import { prepareCsvFromZip } from '../utils/kontext/prepareCsvFromZip';
 import { getLabelSetsFromDirectory } from '../utils/labelset';
 import { pollJobsUntilCompleted } from '../utils/polling.helper';
 import { getQuestionSetFromFile } from '../utils/questionset';
@@ -41,7 +41,7 @@ export async function handleCreateProjects(configFile: string, options) {
   setConfigByJSONFile(resolve(cwd, configFile), getProjectCreationValidators(), ScriptAction.PROJECT_CREATION);
 
   if (fromZip) {
-    await handleFromZip(getConfig().documents);
+    await prepareCsvFromZip(getConfig().documents);
   }
 
   if (usePcw) {

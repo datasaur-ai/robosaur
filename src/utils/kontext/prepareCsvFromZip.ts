@@ -1,13 +1,12 @@
-import { mkdirSync, readdirSync } from 'fs';
+import { mkdirSync, readdirSync, rmdirSync } from 'fs';
 import { resolve } from 'path';
 import { DocumentsConfig } from '../../config/interfaces';
-import { getLogger } from '../../logger';
-import { clearDirectory } from './clearDirectory';
 import { createCsvFile } from './createCsvFile';
 import { extractAllZipFiles } from './extractAllZipFiles';
 import { getClientNames } from './getClientNames';
 import { uploadFilesToCloudStorage } from './uploadFilesToCloudStorage';
 import { validateKontext } from './validation/validateKontext';
+import { deleteAllFilesFromDirectory } from './deleteAllFilesFromDirectory';
 
 const createClientFolders = (
   client: {
@@ -23,18 +22,16 @@ const createClientFolders = (
   return clientFolder;
 };
 
-export const handleFromZip = async (documentConfig: DocumentsConfig) => {
+export const prepareCsvFromZip = async (documentConfig: DocumentsConfig) => {
   validateKontext(documentConfig);
 
-  const { zipRootPath, uploadPath, containingFolder, stagingFolderPath, source, bucketName } = documentConfig.kontext!;
+  const { inputPath: zipRootPath, uploadPath, containingFolder, source, bucketName } = documentConfig.kontext!;
+  const stagingFolderPath = resolve(zipRootPath, 'staging');
+  mkdirSync(stagingFolderPath);
 
-  const clientNames = await getClientNames(zipRootPath);
+  const clientNames = (await getClientNames(zipRootPath)).filter((file) => file.name !== 'staging');
 
-  getLogger().info(`clearing ${stagingFolderPath} directory`);
-  clearDirectory(stagingFolderPath);
-
-  getLogger().info(`clearing ${documentConfig.path} directory`);
-  clearDirectory(documentConfig.path);
+  deleteAllFilesFromDirectory([stagingFolderPath, documentConfig.path], true);
 
   clientNames.forEach((clientName) => {
     const clientFolder = createClientFolders(clientName, stagingFolderPath);
@@ -60,4 +57,7 @@ export const handleFromZip = async (documentConfig: DocumentsConfig) => {
       createCsvFile(documentConfig.path, clientName, file, csv);
     });
   });
+
+  deleteAllFilesFromDirectory([stagingFolderPath]);
+  rmdirSync(stagingFolderPath);
 };
