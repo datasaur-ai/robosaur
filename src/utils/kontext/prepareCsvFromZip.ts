@@ -36,17 +36,17 @@ export const prepareCsvFromZip = async (documentConfig: DocumentsConfig) => {
     source,
     bucketName,
   } = documentConfig.kontext!;
-  const stagingFolderPath = resolve(zipRootPath, TEMP_FOLDER_NAME);
-  if (!existsSync(stagingFolderPath)) {
-    mkdirSync(stagingFolderPath);
+  const tempFolderPath = resolve(zipRootPath, TEMP_FOLDER_NAME);
+  if (!existsSync(tempFolderPath)) {
+    mkdirSync(tempFolderPath);
   }
 
   const clientNames = (await getClientNames(zipRootPath)).filter((file) => file.name !== TEMP_FOLDER_NAME);
 
-  deleteAllFilesFromDirectory([stagingFolderPath, documentConfig.path], true);
+  deleteAllFilesFromDirectory([tempFolderPath, documentConfig.path], true);
 
   clientNames.forEach((clientName) => {
-    const clientFolder = createClientFolders(clientName, stagingFolderPath);
+    const clientFolder = createClientFolders(clientName, tempFolderPath);
     const directories = readdirSync(clientName.fullPath, { withFileTypes: true });
 
     directories.forEach((file) => {
@@ -70,6 +70,6 @@ export const prepareCsvFromZip = async (documentConfig: DocumentsConfig) => {
     });
   });
 
-  deleteAllFilesFromDirectory([stagingFolderPath]);
-  rmdirSync(stagingFolderPath);
+  deleteAllFilesFromDirectory([tempFolderPath]);
+  rmdirSync(tempFolderPath);
 };

@@ -8,7 +8,7 @@ This build is created specifically for Kontext's use case
 
 2. Next, Robosaur will create a temporary folder called `temp` to extract the zip files while still retaining the original folder structure.
 
-3. After that, those extracted images will be uploaded to the chosen cloud object storage while still in the same original folder structure even the cloud. While uploading, Robosaur will save the url and compile them into 1 csv file for each project saved in document.path.
+3. After that, those extracted images will be uploaded to the chosen cloud object storage while still in the same original folder structure, even in the cloud. While uploading, Robosaur will save the url and compile them into 1 csv file for each project saved in document.path.
 
 4. Finally, the resulting csv files in document.path folder will be used to create projects.
 
@@ -55,7 +55,7 @@ input/
 3. Important options to specify inside `documents.kontext`
 
    - `inputPath`, the local path to the `input` folder speficied in step 1.
-   - `containingFolder`, use this option if the images inside the zip file is contained in another folder. Note that the folder structure inside all zip files should be the same. e.g.
+   - `rootFolderPathInsideZip`, use this option if the images inside the zip file is contained in another folder. Note that the folder structure inside all zip files should be the same. e.g.
 
    ```
    (inside zip file)

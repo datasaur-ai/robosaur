@@ -1,6 +1,6 @@
 import { existsSync, mkdirSync } from 'fs';
 import { getLogger } from '../../../logger';
-import { FolderDoesntExist } from '../errors/folderDoesntExists';
+import { FolderNotFound } from '../errors/folderNotFound';
 
 export const validateFolderExists = (path: string, createIfNotExists = false) => {
   if (!existsSync(path)) {
@@ -9,7 +9,7 @@ export const validateFolderExists = (path: string, createIfNotExists = false) =>
 
       mkdirSync(path, { recursive: true });
     } else {
-      throw new FolderDoesntExist(path);
+      throw new FolderNotFound(path);
     }
   }
 };

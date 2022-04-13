@@ -1,5 +1,4 @@
 import PromptSync from 'prompt-sync';
-import { createInterface } from 'readline';
 import { getLogger } from '../../logger';
 import { clearDirectory } from './clearDirectory';
 
@@ -13,11 +12,13 @@ export const deleteAllFilesFromDirectory = async (paths: Array<string>, withProm
     if (response === 'N' || response === 'n') {
       getLogger().info('canceling process');
       process.exit(0);
+    } else if (response === 'Y' || response === 'y') {
+      paths.forEach((path) => {
+        getLogger().info(`clearing ${path} directory`);
+        clearDirectory(path);
+      });
+    } else {
+      throw new Error(`${response} is not an acceptable option`);
     }
   }
-
-  paths.forEach((path) => {
-    getLogger().info(`clearing ${path} directory`);
-    clearDirectory(path);
-  });
 };
