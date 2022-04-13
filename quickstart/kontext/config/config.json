@@ -30,7 +30,7 @@
     "path": "quickstart/kontext/document",
     "kontext": {
       "inputPath": "quickstart/kontext/input",
-      "containingFolder": "Image",
+      "rootFolderPathInsideZip": "Image",
       "uploadPath": "kontext",
       "source": "s3",
       "bucketName": "datasaur"

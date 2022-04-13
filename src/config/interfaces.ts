@@ -191,7 +191,7 @@ export interface KontextConfig extends WithStorage {
   /**
    * @description Name of the folder inside the zip file containing the images. Leave it empty if its the root folder.
    */
-  containingFolder?: string;
+  rootFolderPathInsideZip?: string;
 }
 
 export interface CredentialsConfig {
