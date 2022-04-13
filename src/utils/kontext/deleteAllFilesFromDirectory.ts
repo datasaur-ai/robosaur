@@ -20,5 +20,10 @@ export const deleteAllFilesFromDirectory = async (paths: Array<string>, withProm
     } else {
       throw new Error(`${response} is not an acceptable option`);
     }
+  } else {
+    paths.forEach((path) => {
+      getLogger().info(`clearing ${path} directory`);
+      clearDirectory(path);
+    });
   }
 };
