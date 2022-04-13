@@ -4,7 +4,35 @@ This build is created specifically for Kontext's use case
 
 ## How it Works
 
-//
+1. First, Robosaur will read the input folder containing folders related to client names. Inside each client folder is multiple zip files that contain images. Each zip file will be created as a single project.
+
+2. Next, Robosaur will create a temporary folder called `temp` to extract the zip files while still retaining the original folder structure.
+
+3. After that, those extracted images will be uploaded to the chosen cloud object storage while still in the same original folder structure even the cloud. While uploading, Robosaur will save the url and compile them into 1 csv file for each project saved in document.path.
+
+4. Finally, the resulting csv files in document.path folder will be used to create projects.
+
+Final folder structure will look like this:
+
+```
+kontext/
+  input/
+    Client1/
+      Project1.zip
+      Project2.zip
+    Client2/
+      ProjectA.zip
+      ProjectB.zip
+  documents/
+    Client1_Project1/
+      image_url.csv
+    Client1_Project2/
+      image_url.csv
+    Client2_ProjectA/
+      image_url.csv
+    Client2_ProjectB/
+      image_url.csv
+```
 
 ## Getting Started
 
