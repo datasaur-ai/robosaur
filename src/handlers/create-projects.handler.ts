@@ -12,6 +12,7 @@ import { getObjectStorageDocuments } from '../documents/get-object-storage-docum
 import { LocalDocument, RemoteDocument } from '../documents/interfaces';
 import { getLogger } from '../logger';
 import { setConfigFromPcw } from '../transformer/pcw-transformer/setConfigFromPcw';
+import { prepareCsvFromZip } from '../utils/kontext/prepareCsvFromZip';
 import { getLabelSetsFromDirectory } from '../utils/labelset';
 import { pollJobsUntilCompleted } from '../utils/polling.helper';
 import { getQuestionSetFromFile } from '../utils/questionset';
@@ -35,9 +36,13 @@ const LIMIT_RETRY = 3;
 const PROJECT_BEFORE_SAVE = 5;
 
 export async function handleCreateProjects(configFile: string, options) {
-  const { dryRun, usePcw } = options;
+  const { dryRun, usePcw, fromZip } = options;
   const cwd = process.cwd();
   setConfigByJSONFile(resolve(cwd, configFile), getProjectCreationValidators(), ScriptAction.PROJECT_CREATION);
+
+  if (fromZip) {
+    await prepareCsvFromZip(getConfig().documents);
+  }
 
   if (usePcw) {
     getLogger().info('usePcw is set to true, parsing pcwPayload...');

@@ -1,0 +1,71 @@
+{
+  "datasaur": {
+    "host": "https://app.datasaur.ai",
+    "clientId": "<DATASAUR_CLIENT_ID>",
+    "clientSecret": "<DATASAUR_CLIENT_SECRET>"
+  },
+  "projectState": {
+    "source": "local",
+    "path": "quickstart/state/projectState.json"
+  },
+  "export": {
+    "source": "local",
+    "prefix": "quickstart/row-based/export",
+    "teamId": "<TEAM_ID>",
+    "statusFilter": [],
+    "format": "CSV",
+    "customScriptId": null
+  },
+  "credentials": {
+    "s3": {
+      "s3Endpoint": "s3.amazonaws.com",
+      "s3Port": 443,
+      "s3AccessKey": "<ACCESS_KEY>",
+      "s3SecretKey": "<SECRET_KEY>",
+      "s3UseSSL": true
+    }
+  },
+  "documents": {
+    "source": "local",
+    "path": "quickstart/kontext/document",
+    "kontext": {
+      "inputPath": "quickstart/kontext/input",
+      "rootFolderPathInsideZip": "Image",
+      "uploadPath": "kontext",
+      "source": "s3",
+      "bucketName": "datasaur"
+    }
+  },
+  "assignment": {
+    "source": "local",
+    "path": "quickstart/row-based/config/assignment.json"
+  },
+  "project": {
+    "teamId": "<TEAM_ID>",
+    "projectSettings": {
+      "consensus": 1,
+      "enableEditLabelSet": false,
+      "enableEditSentence": false,
+      "hideLabelerNamesDuringReview": false,
+      "hideRejectedLabelsDuringReview": true,
+      "hideLabelsFromInactiveLabelSetDuringReview": false
+    },
+    "questionSetFile": "quickstart/kontext/config/question-set.json",
+    "documentSettings": {
+      "kind": "ROW_BASED",
+      "customScriptId": null,
+      "displayedRows": 10,
+      "mediaDisplayStrategy": "THUMBNAIL",
+      "firstRowAsHeader": true,
+      "viewer": "URL",
+      "viewerConfig": {
+        "urlColumnNames": ["url"]
+      },
+      "enableTabularMarkdownParsing": false
+    },
+    "docFileOptions": {
+      "firstRowAsHeader": true,
+      "customHeaderColumns": []
+    }
+  }
+}
