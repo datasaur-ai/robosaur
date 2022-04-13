@@ -21,7 +21,7 @@
     "format": "CUSTOM",
     "customScriptId": "<CUSTOM_SCRIPT_ID>"
   },
-  "project": {
+  "create": {
     "teamId": "<TEAM_ID>",
     "files": {
       "source": "gcs",

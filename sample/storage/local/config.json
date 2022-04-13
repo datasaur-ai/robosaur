@@ -16,7 +16,7 @@
     "format": "CUSTOM",
     "customScriptId": "<CUSTOM SCRIPT ID>"
   },
-  "project": {
+  "create": {
     "teamId": "<TEAM_ID>",
     "files": {
       "source": "local",

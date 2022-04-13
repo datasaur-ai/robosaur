@@ -11,13 +11,13 @@
   "export": {
     "source": "local",
     "prefix": "quickstart/token-based/export",
-    "teamId": "1",
+    "teamId": "<TEAM_ID>",
     "statusFilter": [],
     "format": "JSON_ADVANCED",
     "customScriptId": null
   },
-  "project": {
-    "teamId": "1",
+  "create": {
+    "teamId": "<TEAM_ID>",
     "files": {
       "source": "local",
       "path": "quickstart/token-based/documents"

@@ -4,7 +4,7 @@ import { Document } from '../documents/interfaces';
 import { getLogger } from '../logger';
 
 export function getDocumentsWithPart(documents: Document[]) {
-  const splitDocumentOption = getConfig()?.project?.splitDocumentOption;
+  const splitDocumentOption = getConfig()?.create?.splitDocumentOption;
 
   const documentsWithPartInformation = documents.map((document) => ({
     fileName: document.fileName,
@@ -34,7 +34,7 @@ export function getDocumentsWithPart(documents: Document[]) {
   return documentsWithPartInformation;
 }
 
-function isSplitDocumentOptionValid(splitDocumentOption: Config['project']['splitDocumentOption'] | undefined) {
+function isSplitDocumentOptionValid(splitDocumentOption: Config['create']['splitDocumentOption'] | undefined) {
   return (
     Boolean(splitDocumentOption) &&
     splitDocumentOption?.strategy === SplitDocumentStrategy.BY_PARTS &&

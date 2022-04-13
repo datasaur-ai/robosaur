@@ -15,7 +15,7 @@ describe(validateAssignment.name, () => {
       .spyOn(ConfigModule, 'getConfig')
       .mockName('mockGetConfig')
       .mockImplementation(() => {
-        return { project: { teamId: 'dummy-teamId' } } as Config;
+        return { create: { teamId: 'dummy-teamId' } } as Config;
       });
   });
 

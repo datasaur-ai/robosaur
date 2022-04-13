@@ -27,7 +27,7 @@
     "prefix": "",
     "statusFilter": ["IN_REVIEW", "REVIEW_READY", "COMPLETE"]
   },
-  "project": {
+  "create": {
     "teamId": "<TEAM_ID>",
     "files": {
       "source": "s3",

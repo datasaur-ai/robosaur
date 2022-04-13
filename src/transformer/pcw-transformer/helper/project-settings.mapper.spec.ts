@@ -14,7 +14,7 @@ describe('projectSettingsMapper', () => {
       consensus: 1,
     };
 
-    const mapped: Config['project']['projectSettings'] = {
+    const mapped: Config['create']['projectSettings'] = {
       enableEditLabelSet: true,
       enableEditSentence: true,
       hideLabelerNamesDuringReview: false,

@@ -34,7 +34,7 @@ describe(assignAllDocuments.name, () => {
         .mockName('mockGetConfig')
         .mockImplementation(() => {
           return {
-            project: {
+            create: {
               assignment: {
                 strategy: 'ALL',
               },
@@ -68,7 +68,7 @@ describe(assignAllDocuments.name, () => {
         .mockName('mockGetConfig')
         .mockImplementation(() => {
           return {
-            project: {
+            create: {
               assignment: {
                 strategy: 'ALL',
               },

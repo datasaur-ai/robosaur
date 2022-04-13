@@ -20,7 +20,7 @@
     "source": "local",
     "path": "path/to/document/root"
   },
-  "project": {
+  "create": {
     "teamId": "<TEAM_ID>",
     "pcwPayloadSource": {
       "source": "inline"

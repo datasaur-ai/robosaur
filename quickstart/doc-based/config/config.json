@@ -16,7 +16,7 @@
     "format": "CSV",
     "customScriptId": null
   },
-  "project": {
+  "create": {
     "teamId": "<TEAM_ID>",
     "files": {
       "source": "local",

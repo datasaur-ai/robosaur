@@ -55,7 +55,7 @@ const handleStateless = async (unzip: boolean) => {
     };
 
     getLogger().info('submitting export job to Datasaur...', {
-      project: {
+      create: {
         id: project.id,
         name: filename,
         format: exportFormat,
@@ -176,7 +176,7 @@ export async function handleExportProjects(configFile: string, { unzip }: { unzi
     };
 
     getLogger().info('submitting export job to Datasaur...', {
-      project: {
+      create: {
         id: project.projectId,
         name: project.projectName,
         format: exportFormat,

@@ -9,7 +9,7 @@ export async function validateAssignment(assignees: {
   useTeamMemberId?: boolean;
 }) {
   getLogger().info('validating assignments...');
-  const teamMembers = await getTeamMembers(getConfig().project.teamId);
+  const teamMembers = await getTeamMembers(getConfig().create.teamId);
   const useTeamMemberId = assignees.useTeamMemberId;
   let memberIdentifiers;
   if (useTeamMemberId) {

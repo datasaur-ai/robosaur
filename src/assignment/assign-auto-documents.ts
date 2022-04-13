@@ -16,7 +16,7 @@ export function assignAutoDocuments(assignmentPool: AssignmentConfig, documents:
     members[reviewer] = { isLabeler: false || members[reviewer]?.isLabeler, isReviewer: true };
   });
 
-  const consensus = getConfig()?.project?.projectSettings?.consensus ?? 1;
+  const consensus = getConfig()?.create?.projectSettings?.consensus ?? 1;
 
   const labelerAssignmentMap = new Map<string, Array<{ fileName: string; part: number }>>();
   const labelerIdentifiers: string[] = [];

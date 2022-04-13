@@ -4,7 +4,7 @@ import { getLogger } from '../logger';
 import { readJSONFile } from './readJSONFile';
 
 export function getQuestionSetFromFile(config: Config) {
-  const filepath = getConfig().project.questionSetFile;
+  const filepath = getConfig().create.questionSetFile;
   if (!filepath) {
     getLogger().warn('no questionSetFile is set');
     return [];

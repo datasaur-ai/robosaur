@@ -46,7 +46,7 @@ export interface Config {
   export: ExportConfig;
 
   // project creation
-  project: {
+  create: {
     /**
      * @description id of the team.
      * The ID can be obtained from your team workspace page in this format: https://app.datasaur.ai/teams/{teamId}
