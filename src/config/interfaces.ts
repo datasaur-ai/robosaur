@@ -1,5 +1,5 @@
 import { ExportFormat, ProjectStatus } from '../datasaur/interfaces';
-import { PCWPayload, PCWWrapper } from '../transformer/pcw-transformer/interfaces';
+import { PCWWrapper } from '../transformer/pcw-transformer/interfaces';
 import { AssignmentConfig as ParsedAssignment } from '../assignment/interfaces';
 
 export enum StorageSources {
@@ -48,132 +48,128 @@ export interface Config {
   // project creation
   documents: DocumentsConfig;
   assignment: AssignmentConfig;
-  project: {
-    /**
-     * @description id of the team.
-     * The ID can be obtained from your team workspace page in this format: https://app.datasaur.ai/teams/{teamId}
-     */
-    teamId: string;
+  create: PCWWrapper | CreateConfig;
+  project: CreateConfig;
+}
 
-    /**
-     * @description Required if --use-pcw is used
-     * Source to get the PCW Payload
-     */
-    pcwPayloadSource?: PCWSource;
+export interface CreateConfig {
+  /**
+   * @description id of the team.
+   * The ID can be obtained from your team workspace page in this format: https://app.datasaur.ai/teams/{teamId}
+   */
+  teamId: string;
 
-    /**
-     * @description Required if --use-pcw is used
-     * local or remote path to assignment file if pcwPayloadSource is StorageSource
-     * PCWPayload if pcwPayloadSource is INLINE
-     */
-    pcwPayload?: string | (PCWWrapper & PCWPayload);
+  /**
+   * @description Required if --use-pcw is used
+   * local or remote path to assignment file if pcwPayloadSource is StorageSource
+   * PCWPayload if pcwPayloadSource is INLINE
+   */
 
-    pcwAssignmentStrategy?: 'ALL' | 'AUTO';
+  pcwAssignmentStrategy?: 'ALL' | 'AUTO';
 
-    /**
-     * @description Used to store parsed assignments
-     */
-    assignments?: ParsedAssignment;
+  /**
+   * @description Used to store parsed assignments
+   */
+  assignments?: ParsedAssignment;
 
+  /**
+   * Configuration from the 4th and 5th step of the Creation Wizard UI.
+   */
+  projectSettings: {
+    consensus: number;
+    enableEditLabelSet: boolean;
+    enableEditSentence: boolean;
+    hideLabelerNamesDuringReview: boolean;
+    hideRejectedLabelsDuringReview: boolean;
+    hideLabelsFromInactiveLabelSetDuringReview: boolean;
+  };
+  /**
+   * @description Configuration from the 2nd and 3rd step of the Creation Wizard UI
+   */
+  documentSettings: {
     /**
-     * Configuration from the 4th and 5th step of the Creation Wizard UI.
+     * @description determine the task type of the project. Can be TOKEN_BASED or ROW_BASED or DOCUMENT_BASED
      */
-    projectSettings: {
-      consensus: number;
-      enableEditLabelSet: boolean;
-      enableEditSentence: boolean;
-      hideLabelerNamesDuringReview: boolean;
-      hideRejectedLabelsDuringReview: boolean;
-      hideLabelsFromInactiveLabelSetDuringReview: boolean;
+    kind: string;
+    /**
+     * @description determine the custom script to be used.
+     * The ID can be obtained from the custom script page in this format: https://app.datasaur.ai/teams/{teamId}/custom-scripts/{custom-script-id}
+     */
+    customScriptId?: string;
+
+    // TOKEN_BASED
+    allTokensMustBeLabeled?: boolean;
+    allowArcDrawing?: boolean;
+    allowMultiLabels?: boolean;
+    textLabelMaxTokenLength?: number;
+    allowCharacterBasedLabeling?: boolean;
+
+    // ROW_BASED or DOCUMENT_BASED
+    displayedRows?: number;
+    mediaDisplayStrategy?: string;
+    firstRowAsHeader?: boolean;
+    viewer?: string;
+    viewerConfig?: {
+      urlColumnNames: string[];
     };
-    /**
-     * @description Configuration from the 2nd and 3rd step of the Creation Wizard UI
-     */
-    documentSettings: {
-      /**
-       * @description determine the task type of the project. Can be TOKEN_BASED or ROW_BASED or DOCUMENT_BASED
-       */
-      kind: string;
-      /**
-       * @description determine the custom script to be used.
-       * The ID can be obtained from the custom script page in this format: https://app.datasaur.ai/teams/{teamId}/custom-scripts/{custom-script-id}
-       */
-      customScriptId?: string;
-
-      // TOKEN_BASED
-      allTokensMustBeLabeled?: boolean;
-      allowArcDrawing?: boolean;
-      allowMultiLabels?: boolean;
-      textLabelMaxTokenLength?: number;
-      allowCharacterBasedLabeling?: boolean;
-
-      // ROW_BASED or DOCUMENT_BASED
-      displayedRows?: number;
-      mediaDisplayStrategy?: string;
-      firstRowAsHeader?: boolean;
-      viewer?: string;
-      viewerConfig?: {
-        urlColumnNames: string[];
-      };
-      enableTabularMarkdownParsing: boolean;
-    };
-    /**
-     * @description Question configurations. Only applicable when documentSettings.kind is ROW_BASED or DOCUMENT_BASED
-     */
-    questions?: any[];
-    /**
-     * @description Optional. Local path to a JSON file containing list of questions. For information on structure, please refer to: https://datasaurai.gitbook.io/datasaur/advanced/apis-docs/create-new-project/questions
-     */
-    questionSetFile?: string;
-    /**
-     * @description Label sets configurations. Only applicable when documentSettings.kind is TOKEN_BASED
-     */
-    labelSets?: Array<null | {
-      label: string;
-      config: {
-        options: Array<{
-          id: string;
-          parentId?: string | null;
-          label: string;
-          color?: string | null;
-        }>;
-      };
-    }>;
-    /**
-     * @description Optional. Local path to a folder containing CSV files for TOKEN_BASED. If both labelSetDirectory and labelSets is provided, robosaur will pick labelSets
-     */
-    labelSetDirectory?: string;
-    /**
-     * @description Optional. Configuration for ROW_BASED projects.
-     */
-    docFileOptions?: {
-      firstRowAsHeader?: boolean;
-      /**
-       * @description Array of column header
-       */
-      customHeaderColumns?: Array<{
-        /**
-         * @description true: Display column to all; false: Hide column to all. REVIEWER can change it in their workspace
-         */
-        displayed: boolean;
-        /**
-         * @description true: Hidden from LABELER, cannot be changed by LABELER.
-         */
-        labelerRestricted: boolean;
-        /**
-         * @description Column text
-         */
-        name: string;
+    enableTabularMarkdownParsing: boolean;
+  };
+  /**
+   * @description Question configurations. Only applicable when documentSettings.kind is ROW_BASED or DOCUMENT_BASED
+   */
+  questions?: any[];
+  /**
+   * @description Optional. Local path to a JSON file containing list of questions. For information on structure, please refer to: https://datasaurai.gitbook.io/datasaur/advanced/apis-docs/create-new-project/questions
+   */
+  questionSetFile?: string;
+  /**
+   * @description Label sets configurations. Only applicable when documentSettings.kind is TOKEN_BASED
+   */
+  labelSets?: Array<null | {
+    label: string;
+    config: {
+      options: Array<{
+        id: string;
+        parentId?: string | null;
+        label: string;
+        color?: string | null;
       }>;
     };
-
+  }>;
+  /**
+   * @description Optional. Local path to a folder containing CSV files for TOKEN_BASED. If both labelSetDirectory and labelSets is provided, robosaur will pick labelSets
+   */
+  labelSetDirectory?: string;
+  /**
+   * @description Optional. Configuration for ROW_BASED projects.
+   */
+  docFileOptions?: {
+    firstRowAsHeader?: boolean;
     /**
-     * @description Optional. Configuration for splitting documents in a project
+     * @description Array of column header
      */
-    splitDocumentOption?: {
-      strategy: SplitDocumentStrategy;
-      number: number;
-    };
+    customHeaderColumns?: Array<{
+      /**
+       * @description true: Display column to all; false: Hide column to all. REVIEWER can change it in their workspace
+       */
+      displayed: boolean;
+      /**
+       * @description true: Hidden from LABELER, cannot be changed by LABELER.
+       */
+      labelerRestricted: boolean;
+      /**
+       * @description Column text
+       */
+      name: string;
+    }>;
+  };
+
+  /**
+   * @description Optional. Configuration for splitting documents in a project
+   */
+  splitDocumentOption?: {
+    strategy: SplitDocumentStrategy;
+    number: number;
   };
 }
 

@@ -1,7 +1,8 @@
 import { ScriptAction } from '../handlers/constants';
 import { getLogger } from '../logger';
+import { PCWPayload, PCWWrapper } from '../transformer/pcw-transformer/interfaces';
 import { readJSONFile } from '../utils/readJSONFile';
-import { Config } from './interfaces';
+import { Config, CreateConfig } from './interfaces';
 
 let config: Config | null = null;
 let configPath: string | null = null;
@@ -47,7 +48,8 @@ export function getActiveTeamId() {
 function setActiveTeamId(context: ScriptAction) {
   switch (context) {
     case ScriptAction.PROJECT_CREATION:
-      activeTeamId = getConfig().project.teamId;
+      activeTeamId =
+        (getConfig().create as CreateConfig).teamId || (getConfig().create as PCWWrapper).variables.input.teamId!;
       break;
     case ScriptAction.PROJECT_EXPORT:
       activeTeamId = getConfig().export.teamId;

@@ -4,6 +4,7 @@ import { getAssignmentConfig } from '../assignment/get-assignment-config';
 import { getDocumentAssignment } from '../assignment/get-document-assignment';
 import { DocumentAssignment } from '../assignment/interfaces';
 import { getConfig, setConfigByJSONFile } from '../config/config';
+import { setConfigFromSchema } from '../config/helper/setConfigFromSchema';
 import { StorageSources } from '../config/interfaces';
 import { getProjectCreationValidators } from '../config/schema/validator';
 import { JobStatus } from '../datasaur/get-jobs';
@@ -35,18 +36,15 @@ const LIMIT_RETRY = 3;
 const PROJECT_BEFORE_SAVE = 5;
 
 export async function handleCreateProjects(configFile: string, options) {
-  const { dryRun, usePcw } = options;
+  const { dryRun, withoutPcw } = options;
   const cwd = process.cwd();
   setConfigByJSONFile(resolve(cwd, configFile), getProjectCreationValidators(), ScriptAction.PROJECT_CREATION);
 
-  if (usePcw) {
-    getLogger().info('usePcw is set to true, parsing pcwPayload...');
-    await setConfigFromPcw(getConfig());
+  if (withoutPcw) {
+    getLogger().info('withoutPcw is set to true, parsing config...');
+    setConfigFromSchema();
   } else {
-    if (getConfig().project.pcwPayload) {
-      getLogger().error('usePcw option is not set but pcwPayload is given');
-      throw new Error('usePcw option is not set but pcwPayload is given');
-    }
+    await setConfigFromPcw(getConfig());
   }
 
   const documentSource = getConfig().documents.source;
