@@ -1,4 +1,4 @@
-import { writeFileSync } from 'fs';
+import { existsSync, rmdirSync, writeFileSync } from 'fs';
 import { resolve } from 'path';
 import { getAssignmentConfig } from '../assignment/get-assignment-config';
 import { getDocumentAssignment } from '../assignment/get-document-assignment';
@@ -12,7 +12,8 @@ import { getObjectStorageDocuments } from '../documents/get-object-storage-docum
 import { LocalDocument, RemoteDocument } from '../documents/interfaces';
 import { getLogger } from '../logger';
 import { setConfigFromPcw } from '../transformer/pcw-transformer/setConfigFromPcw';
-import { prepareCsvFromZip } from '../utils/kontext/prepareCsvFromZip';
+import { deleteAllFilesFromDirectory } from '../utils/kontext/deleteAllFilesFromDirectory';
+import { prepareCsvFromZip, TEMP_FOLDER_NAME } from '../utils/kontext/prepareCsvFromZip';
 import { getLabelSetsFromDirectory } from '../utils/labelset';
 import { pollJobsUntilCompleted } from '../utils/polling.helper';
 import { getQuestionSetFromFile } from '../utils/questionset';
@@ -41,7 +42,19 @@ export async function handleCreateProjects(configFile: string, options) {
   setConfigByJSONFile(resolve(cwd, configFile), getProjectCreationValidators(), ScriptAction.PROJECT_CREATION);
 
   if (fromZip) {
-    await prepareCsvFromZip(getConfig().documents);
+    try {
+      await prepareCsvFromZip(getConfig().documents);
+    } catch (e) {
+      getLogger().error('error when preparing csv from zip', e);
+      if (getConfig().documents.kontext?.inputPath) {
+        const tempFolderPath = resolve(getConfig().documents.kontext?.inputPath!, TEMP_FOLDER_NAME);
+        if (existsSync(tempFolderPath)) {
+          await deleteAllFilesFromDirectory([tempFolderPath]);
+          rmdirSync(tempFolderPath);
+        }
+      }
+      throw e;
+    }
   }
 
   if (usePcw) {

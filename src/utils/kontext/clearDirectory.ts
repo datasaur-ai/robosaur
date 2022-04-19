@@ -1,7 +1,10 @@
-import { readdirSync, rmdirSync, unlinkSync } from 'fs';
+import { existsSync, readdirSync, rmdirSync, unlinkSync } from 'fs';
 import { resolve } from 'path';
 
 export const clearDirectory = (dirPath: string) => {
+  if (!existsSync(dirPath)) {
+    return;
+  }
   const dir = readdirSync(dirPath, { withFileTypes: true });
   dir.forEach((file) => {
     if (file.isFile()) {

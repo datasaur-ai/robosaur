@@ -1,12 +1,14 @@
 import { readdirSync } from 'fs';
 import { DocumentsConfig, StorageSources } from '../../../config/interfaces';
+import { getLogger } from '../../../logger';
 import { KontextConfigNotFoundError } from '../errors/kontextConfigNotFoundError';
 import { WrongZipRootFolderStructure } from '../errors/wrongZipRootFolderStructure';
 
 const validateFolderStructure = (zipRootPath: string) => {
   const dir = readdirSync(zipRootPath, { withFileTypes: true });
   dir.forEach((content) => {
-    if (!content.isDirectory()) {
+    if (!content.isDirectory() && content.name[0] !== '.') {
+      getLogger().error(`${content.name} is not a directory`);
       throw new WrongZipRootFolderStructure();
     }
   });
