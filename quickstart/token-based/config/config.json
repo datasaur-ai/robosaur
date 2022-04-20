@@ -18,7 +18,7 @@
   },
   "documents": {
     "source": "local",
-    "path": "quickstart/create/token-based/documents"
+    "path": "quickstart/token-based/documents"
   },
   "assignment": {
     "source": "local",
