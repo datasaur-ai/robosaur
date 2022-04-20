@@ -57,6 +57,8 @@ export async function createProject(
       name,
       teamId: settings.teamId,
       documentSettings: settings.documentSettings,
+      type: settings.type,
+      kinds: settings.kinds,
       projectSettings: settings.projectSettings,
       documentAssignments,
       tagNames,

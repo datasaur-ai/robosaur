@@ -44,6 +44,8 @@ const populateConfig = (payload: PCWPayload) => {
   if (payload.documentAssignments && payload.documentAssignments.length > 0) {
     getConfig().project.assignments = mapDocumentAssignments.fromPcw(payload.documentAssignments);
   }
+  getConfig().create.type = payload.type;
+  getConfig().create.kinds = payload.kinds || [];
 };
 
 export const setConfigFromPcw = async (input: Config) => {

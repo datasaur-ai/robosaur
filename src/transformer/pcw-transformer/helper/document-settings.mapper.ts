@@ -24,6 +24,11 @@ export const mapDocumentSettings = {
         urlColumnNames: removeNulls(payload.viewerConfig?.urlColumnNames),
       },
       enableTabularMarkdownParsing: removeNulls(payload.enableTabularMarkdownParsing),
+      transcriptMethod: removeNulls(payload.transcriptMethod),
+      tokenizer: removeNulls(payload.tokenizer),
+      allowMultiLabels: removeNulls(payload.allowMultiLabels),
+      autoScrollWhenLabeling: removeNulls(payload.autoScrollWhenLabeling),
+      sentenceSeparator: removeNulls(payload.sentenceSeparator),
     };
   },
 };
