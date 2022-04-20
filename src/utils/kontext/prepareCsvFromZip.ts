@@ -8,8 +8,9 @@ import { uploadFilesToCloudStorage } from './uploadFilesToCloudStorage';
 import { validateKontext } from './validation/validateKontext';
 import { deleteAllFilesFromDirectory } from './deleteAllFilesFromDirectory';
 import { validateFolderExists } from './validation/validateFolderExists';
+import { getProgressBar } from '../progress-bar';
 
-const TEMP_FOLDER_NAME = 'temp';
+export const TEMP_FOLDER_NAME = '__temp__';
 
 const createClientFolders = (
   client: {
@@ -36,27 +37,35 @@ export const prepareCsvFromZip = async (documentConfig: DocumentsConfig) => {
     source,
     bucketName,
   } = documentConfig.kontext!;
+
   const tempFolderPath = resolve(zipRootPath, TEMP_FOLDER_NAME);
+
   if (!existsSync(tempFolderPath)) {
     mkdirSync(tempFolderPath);
+  } else {
+    await deleteAllFilesFromDirectory([tempFolderPath]);
   }
 
   const clientNames = (await getClientNames(zipRootPath)).filter((file) => file.name !== TEMP_FOLDER_NAME);
 
-  deleteAllFilesFromDirectory([tempFolderPath, documentConfig.path], true);
+  await deleteAllFilesFromDirectory([documentConfig.path], true);
 
-  clientNames.forEach((clientName) => {
+  const bar = getProgressBar();
+
+  for (const clientName of clientNames) {
     const clientFolder = createClientFolders(clientName, tempFolderPath);
     const directories = readdirSync(clientName.fullPath, { withFileTypes: true });
 
-    directories.forEach((file) => {
+    for (const file of directories) {
       const projectFolder = resolve(clientFolder, file.name.replace(/\..*/, ''));
 
       extractAllZipFiles(file, projectFolder, clientName.fullPath);
 
       const imagesPath = resolve(projectFolder, containingFolder || '');
       const imagesFolder = readdirSync(imagesPath, { withFileTypes: true });
-      const csv = uploadFilesToCloudStorage(
+
+      bar.start(imagesFolder.length, 0, { task: `${clientName.name} - ${file.name.replace(/\..*/, '')}` });
+      const csv = await uploadFilesToCloudStorage(
         uploadPath,
         source,
         bucketName,
@@ -65,11 +74,14 @@ export const prepareCsvFromZip = async (documentConfig: DocumentsConfig) => {
         clientName.name,
         file.name.replace(/\..*/, ''),
       );
+      bar.stop();
 
       createCsvFile(documentConfig.path, clientName, file, csv);
-    });
-  });
+    }
+  }
 
-  deleteAllFilesFromDirectory([tempFolderPath]);
-  rmdirSync(tempFolderPath);
+  if (existsSync(tempFolderPath)) {
+    await deleteAllFilesFromDirectory([tempFolderPath]);
+    rmdirSync(tempFolderPath);
+  }
 };

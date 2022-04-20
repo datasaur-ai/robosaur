@@ -5,9 +5,10 @@ import { getConfig } from '../../config/config';
 import { StorageSources } from '../../config/interfaces';
 import { getLogger } from '../../logger';
 import { getStorageClient } from '../object-storage';
+import { getProgressBar } from '../progress-bar';
 import { StorageSourceNotSupportedError } from './errors/storageSourceNotSupported';
 
-export const uploadFilesToCloudStorage = (
+export const uploadFilesToCloudStorage = async (
   uploadPath: string,
   source: StorageSources,
   bucketName: string,
@@ -31,12 +32,18 @@ export const uploadFilesToCloudStorage = (
     data: [],
   };
 
-  imageDir.forEach((image) => {
+  for (const image of imageDir) {
     const fullPath = resolve(imagesPath, image.name);
 
     const fileContent = readFileSync(fullPath);
 
-    storageClient.setFileContent(bucketName, `${uploadPath}/${clientName}/${projectName}/${image.name}`, fileContent);
+    await storageClient.setFileContent(
+      bucketName,
+      `${uploadPath}/${clientName}/${projectName}/${image.name}`,
+      fileContent,
+    );
+
+    getProgressBar().increment();
 
     let endPoint = '';
 
@@ -51,7 +58,7 @@ export const uploadFilesToCloudStorage = (
     }
 
     csvObject.data.push([`${endPoint}/${bucketName}/${uploadPath}/${clientName}/${projectName}/${image.name}`]);
-  });
+  }
 
   return Papa.unparse(csvObject);
 };
