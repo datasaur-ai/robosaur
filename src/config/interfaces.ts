@@ -1,6 +1,7 @@
 import { ExportFormat, ProjectStatus } from '../datasaur/interfaces';
 import { PCWPayload, PCWWrapper } from '../transformer/pcw-transformer/interfaces';
 import { AssignmentConfig as ParsedAssignment } from '../assignment/interfaces';
+import { TextDocumentType, TokenizationMethod, TranscriptMethod } from '../generated/graphql';
 
 export enum StorageSources {
   LOCAL = 'local',
@@ -87,6 +88,8 @@ export interface Config {
       hideRejectedLabelsDuringReview: boolean;
       hideLabelsFromInactiveLabelSetDuringReview: boolean;
     };
+    type?: TextDocumentType;
+    kinds: string[];
     /**
      * @description Configuration from the 2nd and 3rd step of the Creation Wizard UI
      */
@@ -117,6 +120,15 @@ export interface Config {
         urlColumnNames: string[];
       };
       enableTabularMarkdownParsing: boolean;
+
+      /**
+       * @description Audio project configuration
+       */
+      transcriptMethod?: TranscriptMethod;
+      tokenizer?: TokenizationMethod;
+
+      autoScrollWhenLabeling?: boolean;
+      sentenceSeparator?: string;
     };
     /**
      * @description Question configurations. Only applicable when documentSettings.kind is ROW_BASED or DOCUMENT_BASED
