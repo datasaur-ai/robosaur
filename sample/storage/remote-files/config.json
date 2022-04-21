@@ -12,16 +12,16 @@
     "format": "JSON_ADVANCED",
     "customScriptId": null
   },
-  "documents": {
-    "source": "remote",
-    "path": "./documents.json"
-  },
-  "assignment": {
-    "source": "local",
-    "path": "sample/__shared__/assignment/assignment.json"
-  },
-  "project": {
+  "create": {
     "teamId": "<TEAM_ID>",
+    "files": {
+      "source": "remote",
+      "path": "./documents.json"
+    },
+    "assignment": {
+      "source": "local",
+      "path": "sample/__shared__/assignment/assignment.json"
+    },
     "projectSettings": {
       "consensus": 1,
       "enableEditLabelSet": false,

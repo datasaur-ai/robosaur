@@ -47,15 +47,16 @@ export interface Config {
   export: ExportConfig;
 
   // project creation
-  documents: DocumentsConfig;
-  assignment: AssignmentConfig;
-  project: {
+  create: {
     /**
      * @description id of the team.
      * The ID can be obtained from your team workspace page in this format: https://app.datasaur.ai/teams/{teamId}
      */
     teamId: string;
 
+    files: FilesConfig;
+
+    assignment: AssignmentConfig;
     /**
      * @description Required if --use-pcw is used
      * Source to get the PCW Payload
@@ -214,7 +215,7 @@ export interface StatefileConfig extends WithStorage {
   path: string;
 }
 
-export interface DocumentsConfig extends WithStorage {
+export interface FilesConfig extends WithStorage {
   /**
    * @description Required for 'gcs' and 's3' sources.
    * Path to the folder containing sub-folders, without leading slash (/)

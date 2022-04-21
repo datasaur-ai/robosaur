@@ -8,9 +8,9 @@ import { getLogger } from '../logger';
 export function getDocumentAssignment(assignees: AssignmentConfig, documents: Document[]) {
   let assignmentStrategy;
   if (assignees.useTeamMemberId) {
-    assignmentStrategy = getConfig()?.project?.pcwAssignmentStrategy;
+    assignmentStrategy = getConfig()?.create?.pcwAssignmentStrategy;
   } else {
-    assignmentStrategy = getConfig()?.assignment?.strategy;
+    assignmentStrategy = getConfig()?.create?.assignment?.strategy;
   }
   if (!assignmentStrategy) {
     getLogger().info('no assignment strategy specified, assign all documents to all labelers...');

@@ -47,14 +47,14 @@ export function getActiveTeamId() {
 function setActiveTeamId(context: ScriptAction) {
   switch (context) {
     case ScriptAction.PROJECT_CREATION:
-      activeTeamId = getConfig().project.teamId;
+      activeTeamId = getConfig().create.teamId;
       break;
     case ScriptAction.PROJECT_EXPORT:
       activeTeamId = getConfig().export.teamId;
       break;
     case ScriptAction.NONE:
       getLogger().warn('unspecified script context, attempt to set teamId automatically');
-      const projectCreationTeam = getConfig().project?.teamId;
+      const projectCreationTeam = getConfig().create?.teamId;
       const projectExportTeam = getConfig().export?.teamId;
       activeTeamId = projectCreationTeam ?? projectExportTeam;
       break;

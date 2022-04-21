@@ -51,7 +51,7 @@ describe('documentSettingsMapper', () => {
       customScriptId: '1',
     };
 
-    const mapped: Config['project']['documentSettings'] = {
+    const mapped: Config['create']['documentSettings'] = {
       allTokensMustBeLabeled: false,
       allowArcDrawing: false,
       allowCharacterBasedLabeling: false,

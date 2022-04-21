@@ -35,10 +35,10 @@ describe(assignAutoDocuments.name, () => {
         .mockName('mockGetConfig')
         .mockImplementation(() => {
           return {
-            assignment: {
-              strategy: 'AUTO',
-            },
-            project: {
+            create: {
+              assignment: {
+                strategy: 'AUTO',
+              },
               projectSettings: {
                 consensus: consensusNumber,
               },
@@ -67,10 +67,10 @@ describe(assignAutoDocuments.name, () => {
         .mockName('mockGetConfig')
         .mockImplementation(() => {
           return {
-            assignment: {
-              strategy: 'AUTO',
-            },
-            project: {
+            create: {
+              assignment: {
+                strategy: 'AUTO',
+              },
               projectSettings: {
                 consensus: 1,
               },
@@ -113,10 +113,10 @@ describe(assignAutoDocuments.name, () => {
         .mockName('mockGetConfig')
         .mockImplementation(() => {
           return {
-            assignment: {
-              strategy: 'AUTO',
-            },
-            project: {
+            create: {
+              assignment: {
+                strategy: 'AUTO',
+              },
               splitDocumentOption: splitDocumentOption,
               projectSettings: {
                 consensus: 1,
@@ -169,7 +169,7 @@ function checkAllLabelerHaveDocuments(documentAssignments: DocumentAssignment[],
 function documentsToHaveBeenSplit(
   documentAssignments: DocumentAssignment[],
   documents: Document[],
-  splitDocumentOption: Config['project']['splitDocumentOption'],
+  splitDocumentOption: Config['create']['splitDocumentOption'],
 ) {
   const splitCount = splitDocumentOption?.number ?? 0;
   const documentMap = new Map<string, number>();

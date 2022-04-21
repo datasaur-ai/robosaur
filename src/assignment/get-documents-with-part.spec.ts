@@ -14,7 +14,7 @@ describe(getDocumentsWithPart.name, () => {
       const N_PARTS = 5;
       jest.spyOn(ConfigModule, 'getConfig').mockImplementation(() => {
         return {
-          project: {
+          create: {
             splitDocumentOption: {
               strategy: SplitDocumentStrategy.BY_PARTS,
               number: N_PARTS,

@@ -18,7 +18,7 @@ describe('labelSetMapper', () => {
       },
     ];
 
-    const mapped: Config['project']['labelSets'] = [
+    const mapped: Config['create']['labelSets'] = [
       {
         label: 'LabelSet1',
         config: {

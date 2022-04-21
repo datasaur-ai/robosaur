@@ -98,7 +98,7 @@ Here are a couple important details about the storage configuration:
 
    For GCS, there is only one value, `gcsCredentialJSON` which should be a local file path pointing to a JSON file similar to the one available in `config/google-cloud-storage/credential.json`.
 
-2. `config.documents.source` => `local`, `s3` or `gcs`  
+2. `config.files.source` => `local`, `s3` or `gcs`  
    To enable [stateful](#stateful-execution) script execution, the script also need write access to a specific file inside the bucket.  
    Assuming we are using the same bucket for both storing the project documents as well as keeping the state file, here are the permission required
 
@@ -135,7 +135,7 @@ Here are a couple important details about the storage configuration:
    See [our gitbook](https://datasaurai.gitbook.io/datasaur/basics/creating-a-project/label-sets#token-based-labeling) for detailed information on the format. Sample files are also provided in the config/labelset directory
    The files in this directory will be listed and then sorted by its name in ascending order. The files will be converted to labelset in that order. To force a particular order, we could prefix the filenames with number, for example `filename.csv` -> `1 filename.csv`. The leading number will be removed using `String.replace` with this RegEx pattern: `/^(\d*)/`
 
-Calling `create-projects` with a `remote` documents source is currently unsupported, and the command will fallback to creating just one project using `create-project`
+Calling `create-projects` with a `remote` files source is currently unsupported, and the command will fallback to creating just one project using `create-project`
 
 ### Export Multiple Projects
 

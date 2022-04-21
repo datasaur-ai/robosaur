@@ -2,7 +2,7 @@ import { Config } from '../../../config/interfaces';
 import { TextDocumentSettingsInput } from '../../../generated/graphql';
 import { removeNulls } from './removeNull';
 
-export type ConfigDocumentSettings = Config['project']['documentSettings'];
+export type ConfigDocumentSettings = Config['create']['documentSettings'];
 
 export const mapDocumentSettings = {
   fromPcw: (payload: TextDocumentSettingsInput): ConfigDocumentSettings => {
