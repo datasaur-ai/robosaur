@@ -77,7 +77,7 @@ Options:
 -h, --help  display help for command
 ```
 
-Robosaur will try to create a project for each folder inside the `project.files.path` folder.
+Robosaur will try to create a project for each folder inside the `create.files.path` folder.
 
 ```json
 {
@@ -218,9 +218,9 @@ In this part we will explain each part of the Robosaur config file. We will use 
 1. Project creation (`create-projects`)
 
    1. `"files"`  
-      Where our project folders are located. A bit different from `projectState.path`, `project.files.path` should be a folder path - relative or full.
+      Where our project folders are located. A bit different from `projectState.path`, `create.files.path` should be a folder path - relative or full.
    2. `"assignment"`  
-      Where our assignment file is located. `project.assignment.path` is similar to `projectState.path`, it should be a full or relative path pointing to a JSON file.  
+      Where our assignment file is located. `create.assignment.path` is similar to `projectState.path`, it should be a full or relative path pointing to a JSON file.  
       `assignment.strategy` accepts one of two options: `"ALL"` or `"AUTO"`
 
       - `"ALL"`: each labeler will receive a copy of all documents
