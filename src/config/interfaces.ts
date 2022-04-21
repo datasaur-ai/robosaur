@@ -92,7 +92,7 @@ export interface CreateConfig {
     /**
      * @description determine the task type of the project. Can be TOKEN_BASED or ROW_BASED or DOCUMENT_BASED
      */
-    kind: string;
+    kind?: string;
     /**
      * @description determine the custom script to be used.
      * The ID can be obtained from the custom script page in this format: https://app.datasaur.ai/teams/{teamId}/custom-scripts/{custom-script-id}

@@ -37,6 +37,8 @@ const populateConfig = (payload: PCWPayload) => {
         ? mapDocumentAssignments.fromPcw(payload.documentAssignments)
         : undefined,
     teamId: payload.teamId,
+    kinds: payload.kinds,
+    type: payload.type,
     files: { source: StorageSources.LOCAL, path: '', bucketName: '', prefix: '' },
   };
 };
