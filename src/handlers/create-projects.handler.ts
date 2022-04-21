@@ -47,7 +47,7 @@ export async function handleCreateProjects(configFile: string, options) {
     await setConfigFromPcw(getConfig());
   }
 
-  const documentSource = getConfig().documents.source;
+  const documentSource = getConfig().project.files.source;
   switch (documentSource) {
     case StorageSources.REMOTE:
       getLogger().warn(
@@ -55,7 +55,7 @@ export async function handleCreateProjects(configFile: string, options) {
       );
       return handleCreateProject('New Robosaur Project', configFile);
   }
-  const { bucketName, prefix: storagePrefix, source, path } = getConfig().documents;
+  const { bucketName, prefix: storagePrefix, source, path } = getConfig().project.files;
 
   const scriptState = await getState();
   await scriptState.updateInProgressProjectCreationStates();

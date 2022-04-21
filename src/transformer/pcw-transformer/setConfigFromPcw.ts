@@ -1,5 +1,5 @@
 import { getConfig } from '../../config/config';
-import { Config, CreateConfig } from '../../config/interfaces';
+import { Config, CreateConfig, StorageSources } from '../../config/interfaces';
 import { getLogger } from '../../logger';
 import { mapDocFileOptions } from './helper/doc-file-options.mapper';
 import { mapDocumentAssignments } from './helper/document-assignments.mapper';
@@ -37,6 +37,7 @@ const populateConfig = (payload: PCWPayload) => {
         ? mapDocumentAssignments.fromPcw(payload.documentAssignments)
         : undefined,
     teamId: payload.teamId,
+    files: { source: StorageSources.LOCAL, path: '', bucketName: '', prefix: '' },
   };
 };
 
@@ -53,5 +54,7 @@ export const setConfigFromPcw = async (input: Config) => {
   getLogger().info(`transforming payload to robosaur format...`);
   populateConfig(payload);
   getConfig().project.pcwAssignmentStrategy = pcwPayload.pcwAssignmentStrategy;
+  getConfig().project.files = pcwPayload.files;
+
   getLogger().info('finished transforming payload, continue to creating projects...');
 };

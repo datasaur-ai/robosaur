@@ -1,3 +1,4 @@
+import { FilesConfig } from '../../config/interfaces';
 import {
   CreateTextDocumentInput,
   DocumentAssignmentInput,
@@ -26,6 +27,7 @@ export interface PCWWrapper {
    */
 
   pcwAssignmentStrategy?: 'ALL' | 'AUTO';
+  files: FilesConfig;
 }
 
 export interface PCWPayload {

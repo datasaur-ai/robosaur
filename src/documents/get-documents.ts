@@ -8,7 +8,7 @@ import { StorageSources } from '../config/interfaces';
 const IMPLEMENTED_SOURCES = [StorageSources.LOCAL, StorageSources.REMOTE];
 
 export function getDocuments(): Document[] {
-  const documents = getConfig().documents;
+  const documents = getConfig().project.files;
   const configPath = getConfigPath();
   const configDir = dirname(configPath);
 

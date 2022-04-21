@@ -16,16 +16,16 @@
     "format": "JSON_ADVANCED",
     "customScriptId": null
   },
-  "documents": {
-    "source": "local",
-    "path": "quickstart/create/token-based/documents"
-  },
-  "assignment": {
-    "source": "local",
-    "path": "quickstart/token-based/config/assignment.json"
-  },
-  "project": {
+  "create": {
     "teamId": "<TEAM_ID>",
+    "files": {
+      "source": "local",
+      "path": "quickstart/token-based/documents"
+    },
+    "assignment": {
+      "source": "local",
+      "path": "quickstart/token-based/config/assignment.json"
+    },
     "projectSettings": {
       "consensus": 1,
       "enableEditLabelSet": false,

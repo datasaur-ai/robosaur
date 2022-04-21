@@ -6,7 +6,7 @@ import { getConfig } from '../../config/config';
 
 const IMPLEMENTED_STORAGE_CLIENT = [StorageSources.AMAZONS3, StorageSources.GOOGLE];
 
-export function getStorageClient(identifier = getConfig().documents.source): ObjectStorageClient {
+export function getStorageClient(identifier = getConfig().project.files.source): ObjectStorageClient {
   switch (identifier) {
     case StorageSources.GOOGLE:
       return new GoogleCloudStorageClient();

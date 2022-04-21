@@ -16,11 +16,11 @@
     "format": "JSON_ADVANCED",
     "customScriptId": null
   },
-  "documents": {
-    "source": "local",
-    "path": "path/to/document/folder"
-  },
   "create": {
+    "files": {
+      "source": "local",
+      "path": "path/to/document/folder"
+    },
     "pcwAssignmentStrategy": "AUTO",
     "operationName": "LaunchTextProjectAsyncMutation",
     "variables": {

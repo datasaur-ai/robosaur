@@ -1,6 +1,7 @@
 import { ExportFormat, ProjectStatus } from '../datasaur/interfaces';
 import { PCWWrapper } from '../transformer/pcw-transformer/interfaces';
 import { AssignmentConfig as ParsedAssignment } from '../assignment/interfaces';
+import { TextDocumentType, TokenizationMethod, TranscriptMethod } from '../generated/graphql';
 
 export enum StorageSources {
   LOCAL = 'local',
@@ -46,8 +47,6 @@ export interface Config {
   export: ExportConfig;
 
   // project creation
-  documents: DocumentsConfig;
-  assignment: AssignmentConfig;
   create: PCWWrapper | CreateConfig;
   project: CreateConfig;
 }
@@ -58,6 +57,9 @@ export interface CreateConfig {
    * The ID can be obtained from your team workspace page in this format: https://app.datasaur.ai/teams/{teamId}
    */
   teamId: string;
+
+  files: FilesConfig;
+  assignment?: AssignmentConfig;
 
   /**
    * @description Required if --use-pcw is used
@@ -113,7 +115,18 @@ export interface CreateConfig {
       urlColumnNames: string[];
     };
     enableTabularMarkdownParsing: boolean;
+
+    /**
+     * @description Audio project configuration
+     */
+    transcriptMethod?: TranscriptMethod;
+    tokenizer?: TokenizationMethod;
+
+    autoScrollWhenLabeling?: boolean;
+    sentenceSeparator?: string;
   };
+  type?: TextDocumentType;
+  kinds?: string[];
   /**
    * @description Question configurations. Only applicable when documentSettings.kind is ROW_BASED or DOCUMENT_BASED
    */
@@ -198,7 +211,7 @@ export interface StatefileConfig extends WithStorage {
   path: string;
 }
 
-export interface DocumentsConfig extends WithStorage {
+export interface FilesConfig extends WithStorage {
   /**
    * @description Required for 'gcs' and 's3' sources.
    * Path to the folder containing sub-folders, without leading slash (/)

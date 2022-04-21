@@ -10,7 +10,7 @@ export function getDocumentAssignment(assignees: AssignmentConfig, documents: Do
   if (assignees.useTeamMemberId) {
     assignmentStrategy = getConfig()?.project?.pcwAssignmentStrategy;
   } else {
-    assignmentStrategy = getConfig()?.assignment?.strategy;
+    assignmentStrategy = getConfig()?.project?.assignment?.strategy;
   }
   if (!assignmentStrategy) {
     getLogger().info('no assignment strategy specified, assign all documents to all labelers...');
