@@ -3,7 +3,7 @@ import { getLabelSetsFromDirectory } from './labelset';
 describe(getLabelSetsFromDirectory.name, () => {
   it('should parse sample labelsets correctly', () => {
     const labelsets = getLabelSetsFromDirectory({
-      project: { labelSetDirectory: 'sample/__shared__/labelset' },
+      create: { labelSetDirectory: 'sample/__shared__/labelset' },
     } as any);
 
     expect(labelsets.length).toEqual(3);

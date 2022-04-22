@@ -23,7 +23,7 @@ export async function createProject(
   name: string,
   documents: Document[],
   documentAssignments: DocumentAssignment[],
-  settings: Config['project'],
+  settings: Config['create'],
   tagNames: string[] = [],
 ) {
   const projectDocuments = documents.map((document) => {

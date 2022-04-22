@@ -1,5 +1,5 @@
 import { ExportFormat, ProjectStatus } from '../datasaur/interfaces';
-import { PCWWrapper } from '../transformer/pcw-transformer/interfaces';
+import { PCWPayload, PCWWrapper } from '../transformer/pcw-transformer/interfaces';
 import { AssignmentConfig as ParsedAssignment } from '../assignment/interfaces';
 import { TextDocumentType, TokenizationMethod, TranscriptMethod } from '../generated/graphql';
 
@@ -47,8 +47,7 @@ export interface Config {
   export: ExportConfig;
 
   // project creation
-  create: PCWWrapper | CreateConfig;
-  project: CreateConfig;
+  create: CreateConfig;
 }
 
 export interface CreateConfig {
@@ -63,10 +62,22 @@ export interface CreateConfig {
 
   /**
    * @description Required if --use-pcw is used
+   * Source to get the PCW Payload
+   */
+  pcwPayloadSource?: PCWSource;
+
+  /**
+   * @description Required if --use-pcw is used
    * local or remote path to assignment file if pcwPayloadSource is StorageSource
    * PCWPayload if pcwPayloadSource is INLINE
    */
+  pcwPayload?: string | (PCWWrapper & PCWPayload);
 
+  /**
+   * @description Required if --use-pcw is used
+   * local or remote path to assignment file if pcwPayloadSource is StorageSource
+   * PCWPayload if pcwPayloadSource is INLINE
+   */
   pcwAssignmentStrategy?: 'ALL' | 'AUTO';
 
   /**

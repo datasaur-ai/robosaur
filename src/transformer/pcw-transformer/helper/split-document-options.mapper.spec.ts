@@ -12,7 +12,7 @@ describe('splitDocumentOptionsMapper', () => {
       number: 2,
     };
 
-    const mapped: Config['project']['splitDocumentOption'] = {
+    const mapped: Config['create']['splitDocumentOption'] = {
       strategy: SplitDocumentStrategy.BY_PARTS,
       number: 2,
     };

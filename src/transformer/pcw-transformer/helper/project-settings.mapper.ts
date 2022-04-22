@@ -2,7 +2,7 @@ import { Config } from '../../../config/interfaces';
 import { ProjectSettingsInput } from '../../../generated/graphql';
 import { removeNulls } from './removeNull';
 
-export type ConfigProjectSettings = Config['project']['projectSettings'];
+export type ConfigProjectSettings = Config['create']['projectSettings'];
 
 export const mapProjectSettings = {
   fromPcw: (payload: ProjectSettingsInput): ConfigProjectSettings => ({

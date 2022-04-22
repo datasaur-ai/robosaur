@@ -24,7 +24,7 @@ describe(parseAssignment.name, () => {
       });
   });
 
-  xit.each([
+  it.each([
     [StorageSources.AMAZONS3, 1],
     [StorageSources.GOOGLE, 1],
   ])('should call the correct method per source', async (source, callTimes) => {

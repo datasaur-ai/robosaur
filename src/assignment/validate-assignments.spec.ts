@@ -15,8 +15,9 @@ describe(validateAssignment.name, () => {
       .spyOn(ConfigModule, 'getConfig')
       .mockName('mockGetConfig')
       .mockImplementation(() => {
-        return { project: { teamId: 'dummy-teamId' } } as Config;
+        return { create: { teamId: 'dummy-teamId' } } as Config;
       });
+    jest.spyOn(ConfigModule, 'getActiveTeamId').mockReturnValue('dummy-teamId');
   });
 
   it.each([
@@ -35,7 +36,7 @@ describe(validateAssignment.name, () => {
       'when both labelers and reviewers in team',
       { assignee: { labelers: getEmail(dummyMembers), reviewers: getEmail(dummyMembers) } },
     ],
-  ])('shoud pass when %s', (_desc, { assignee }) => {
+  ])('shoud pass %s', (_desc, { assignee }) => {
     return expect(validateAssignment(assignee)).resolves.not.toThrow();
   });
 

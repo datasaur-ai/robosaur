@@ -11,125 +11,131 @@
   "export": {
     "source": "local",
     "prefix": "path/to/export/root",
-    "teamId": "<TEAM_ID>",
+    "teamId": "<TEAM)ID>",
     "statusFilter": [],
     "format": "JSON_ADVANCED",
     "customScriptId": null
   },
+  "files": {
+    "source": "local",
+    "path": "path/to/document/root"
+  },
   "create": {
-    "files": {
-      "source": "local",
-      "path": "path/to/document/folder"
+    "teamId": "<TEAM_ID>",
+    "pcwPayloadSource": {
+      "source": "inline"
     },
     "pcwAssignmentStrategy": "AUTO",
-    "operationName": "LaunchTextProjectAsyncMutation",
-    "variables": {
-      "input": {
-        "documentSettings": {
-          "allTokensMustBeLabeled": false,
-          "allowArcDrawing": false,
-          "allowCharacterBasedLabeling": false,
-          "allowMultiLabels": true,
-          "textLabelMaxTokenLength": 999999,
-          "sentenceSeparator": "\n",
-          "tokenizer": "WINK",
-          "displayedRows": -1,
-          "kind": "TOKEN_BASED",
-          "mediaDisplayStrategy": "THUMBNAIL",
-          "viewer": "TOKEN",
-          "viewerConfig": {},
-          "firstRowAsHeader": false,
-          "enableTabularMarkdownParsing": false,
-          "enableAnonymization": false,
-          "anonymizationEntityTypes": [
-            "PERSON",
-            "DATE_TIME",
-            "EMAIL_ADDRESS",
-            "PHONE_NUMBER",
-            "ORGANIZATION",
-            "LOCATION",
-            "DOMAIN_NAME",
-            "IP_ADDRESS",
-            "US_PASSPORT",
-            "CREDIT_CARD",
-            "US_SSN",
-            "US_ITIN",
-            "US_BANK_NUMBER",
-            "US_DRIVER_LICENSE",
-            "IBAN_CODE"
-          ]
-        },
-        "name": "lorem.txt",
-        "projectCreationId": "xxxxxxxxxxxxxxxxxx",
-        "purpose": "LABELING",
-        "labelSets": [
-          {
-            "name": "TestLabelSet",
-            "options": [
-              {
-                "id": "dl9g4qMMRrRsje90azncy",
-                "parentId": null,
-                "label": "TestLabel",
-                "color": null
-              }
+    "pcwPayload": {
+      "operationName": "LaunchTextProjectAsyncMutation",
+      "variables": {
+        "input": {
+          "documentSettings": {
+            "allTokensMustBeLabeled": false,
+            "allowArcDrawing": false,
+            "allowCharacterBasedLabeling": false,
+            "allowMultiLabels": true,
+            "textLabelMaxTokenLength": 999999,
+            "sentenceSeparator": "\n",
+            "tokenizer": "WINK",
+            "displayedRows": -1,
+            "kind": "TOKEN_BASED",
+            "mediaDisplayStrategy": "THUMBNAIL",
+            "viewer": "TOKEN",
+            "viewerConfig": {},
+            "firstRowAsHeader": false,
+            "enableTabularMarkdownParsing": false,
+            "enableAnonymization": false,
+            "anonymizationEntityTypes": [
+              "PERSON",
+              "DATE_TIME",
+              "EMAIL_ADDRESS",
+              "PHONE_NUMBER",
+              "ORGANIZATION",
+              "LOCATION",
+              "DOMAIN_NAME",
+              "IP_ADDRESS",
+              "US_PASSPORT",
+              "CREDIT_CARD",
+              "US_SSN",
+              "US_ITIN",
+              "US_BANK_NUMBER",
+              "US_DRIVER_LICENSE",
+              "IBAN_CODE"
             ]
-          }
-        ],
-        "documentAssignments": [
-          {
-            "teamMemberId": "1",
-            "documents": [
-              {
-                "fileName": "lorem.txt",
-                "part": 0
-              }
-            ],
-            "role": "LABELER_AND_REVIEWER"
           },
-          {
-            "teamMemberId": "2",
-            "documents": [
-              {
-                "fileName": "lorem.txt",
-                "part": 0
-              }
-            ],
-            "role": "LABELER"
-          }
-        ],
-        "splitDocumentOption": null,
-        "projectSettings": {
-          "enableEditLabelSet": true,
-          "enableEditSentence": true,
-          "hideLabelerNamesDuringReview": false,
-          "hideLabelsFromInactiveLabelSetDuringReview": false,
-          "hideOriginalSentencesDuringReview": true,
-          "hideRejectedLabelsDuringReview": true,
-          "consensus": 1
-        },
-        "teamId": "<TEAM_ID>",
-        "documents": [
-          {
-            "file": {
-              "path": "lorem.txt"
-            },
-            "fileName": "lorem.txt",
-            "name": "lorem.txt",
-            "settings": {},
-            "docFileOptions": {
-              "customHeaderColumns": [
+          "name": "lorem.txt",
+          "projectCreationId": "xxxxxxxxxxxxxxxxxx",
+          "purpose": "LABELING",
+          "labelSets": [
+            {
+              "name": "TestLabelSet",
+              "options": [
                 {
-                  "displayed": true,
-                  "labelerRestricted": false,
-                  "name": "Column 1"
+                  "id": "dl9g4qMMRrRsje90azncy",
+                  "parentId": null,
+                  "label": "TestLabel",
+                  "color": null
+                }
+              ]
+            }
+          ],
+          "documentAssignments": [
+            {
+              "teamMemberId": "1",
+              "documents": [
+                {
+                  "fileName": "lorem.txt",
+                  "part": 0
                 }
               ],
-              "firstRowAsHeader": false
+              "role": "LABELER_AND_REVIEWER"
+            },
+            {
+              "teamMemberId": "2",
+              "documents": [
+                {
+                  "fileName": "lorem.txt",
+                  "part": 0
+                }
+              ],
+              "role": "LABELER"
             }
-          }
-        ]
-      }
-    },
-    "query": "mutation LaunchTextProjectAsyncMutation($input: LaunchTextProjectInput!) { launchTextProjectAsync(input: $input) { job { ...JobFragment __typename } name __typename }}fragment JobFragment on Job { id status progress errors { id stack args __typename } resultId __typename}"
+          ],
+          "splitDocumentOption": null,
+          "projectSettings": {
+            "enableEditLabelSet": true,
+            "enableEditSentence": true,
+            "hideLabelerNamesDuringReview": false,
+            "hideLabelsFromInactiveLabelSetDuringReview": false,
+            "hideOriginalSentencesDuringReview": true,
+            "hideRejectedLabelsDuringReview": true,
+            "consensus": 1
+          },
+          "teamId": "<TEAM_ID>",
+          "documents": [
+            {
+              "file": {
+                "path": "lorem.txt"
+              },
+              "fileName": "lorem.txt",
+              "name": "lorem.txt",
+              "settings": {},
+              "docFileOptions": {
+                "customHeaderColumns": [
+                  {
+                    "displayed": true,
+                    "labelerRestricted": false,
+                    "name": "Column 1"
+                  }
+                ],
+                "firstRowAsHeader": false
+              }
+            }
+          ]
+        }
+      },
+      "query": "mutation LaunchTextProjectAsyncMutation($input: LaunchTextProjectInput!) { launchTextProjectAsync(input: $input) { job { ...JobFragment __typename } name __typename }}fragment JobFragment on Job { id status progress errors { id stack args __typename } resultId __typename}"
+    }
   }
 }
