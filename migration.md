@@ -47,12 +47,9 @@ Previously, we need `--use-pcw` in order to use payload from Datasaur app, speci
 
 See the example below.
 
-### 0.1.0 (Before)
-
-1. npm run start -- create-projects <path-to-config-file>
-2. npm run start -- create-projects <path-to-config-file> --use-pcw
-
-### 1.0.0 (After)
-
-1. npm run start -- create-projects <path-to-config-file> --without-pcw
-2. npm run start -- create-projects <path-to-config-file>
+1. Project creation with PCW payload: no breaking changes
+   - Before: `npm run start -- create-projects <path-to-config-file> --use-pcw`
+   - After: `npm run start -- create-projects <path-to-config-file>` or could be the same
+2. Project creation without PCW payload: must be adjusted, i.e. breaking changes
+   - Before: `npm run start -- create-projects <path-to-config-file>`
+   - After: `npm run start -- create-projects <path-to-config-file> --without-pcw`
