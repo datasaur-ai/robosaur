@@ -35,13 +35,13 @@ const LIMIT_RETRY = 3;
 const PROJECT_BEFORE_SAVE = 5;
 
 export async function handleCreateProjects(configFile: string, options) {
-  const { dryRun, withoutPcw } = options;
+  const { dryRun, withoutPcw, usePcw } = options;
   const cwd = process.cwd();
   setConfigByJSONFile(resolve(cwd, configFile), getProjectCreationValidators(), ScriptAction.PROJECT_CREATION);
 
   if (withoutPcw) {
     getLogger().info('withoutPcw is set to true, parsing config...');
-  } else {
+  } else if (usePcw) {
     await setConfigFromPcw(getConfig());
   }
 

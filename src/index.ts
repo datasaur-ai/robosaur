@@ -17,7 +17,8 @@ program
 program
   .command('create-projects <configFile>')
   .option('--dry-run', 'Simulates what the script is doing without creating the projects')
-  .option('--without-pcw', 'Whether to not use the payload from Project Creation Wizard in Datasaur UI', false)
+  .option('--without-pcw', 'Use legacy Robosaur configuration', false)
+  .option('--use-pcw', 'Use the payload from Project Creation Wizard in Datasaur UI', true)
   .description('Create Datasaur projects based on the given config file')
   .action(handleCreateProjects);
 
