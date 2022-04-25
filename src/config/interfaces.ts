@@ -61,20 +61,20 @@ export interface CreateConfig {
   assignment?: AssignmentConfig;
 
   /**
-   * @description Required if --use-pcw is used
+   * @description Not required if --without-pcw is used
    * Source to get the PCW Payload
    */
   pcwPayloadSource?: PCWSource;
 
   /**
-   * @description Required if --use-pcw is used
+   * @description Not required if --without-pcw is used
    * local or remote path to assignment file if pcwPayloadSource is StorageSource
    * PCWPayload if pcwPayloadSource is INLINE
    */
   pcwPayload?: string | (PCWWrapper & PCWPayload);
 
   /**
-   * @description Required if --use-pcw is used
+   * @description Not required if --without-pcw is used
    * local or remote path to assignment file if pcwPayloadSource is StorageSource
    * PCWPayload if pcwPayloadSource is INLINE
    */
