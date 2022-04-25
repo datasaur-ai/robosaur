@@ -6,11 +6,8 @@ export type ConfigDocumentSettings = Config['create']['documentSettings'];
 
 export const mapDocumentSettings = {
   fromPcw: (payload: TextDocumentSettingsInput): ConfigDocumentSettings => {
-    if (!payload.kind || payload.kind === null) {
-      throw new Error();
-    }
     return {
-      kind: payload.kind,
+      kind: removeNulls(payload.kind),
       customScriptId: removeNulls(payload.customScriptId),
       allTokensMustBeLabeled: removeNulls(payload.allTokensMustBeLabeled),
       allowArcDrawing: removeNulls(payload.allowArcDrawing),

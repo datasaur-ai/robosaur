@@ -5,10 +5,10 @@ import { mapDocFileOptions } from './helper/doc-file-options.mapper';
 import { mapDocumentAssignments } from './helper/document-assignments.mapper';
 import { mapDocumentSettings } from './helper/document-settings.mapper';
 import { mapLabelSet } from './helper/label-set.mapper';
-import { validatePcw } from './helper/validatePcw';
 import { parsePcw } from './helper/parsePcw';
 import { mapProjectSettings } from './helper/project-settings.mapper';
 import { mapSplitDocumentOptions } from './helper/split-document-options.mapper';
+import { validatePcw } from './helper/validatePcw';
 import { PCWPayload } from './interfaces';
 
 const populateConfig = (payload: PCWPayload) => {
@@ -40,8 +40,8 @@ const populateConfig = (payload: PCWPayload) => {
   if (payload.documentAssignments && payload.documentAssignments.length > 0) {
     getConfig().create.assignments = mapDocumentAssignments.fromPcw(payload.documentAssignments);
   }
-  getConfig().project.type = payload.type;
-  getConfig().project.kinds = payload.kinds || [];
+  getConfig().create.type = payload.type;
+  getConfig().create.kinds = payload.kinds || [];
 };
 
 export const setConfigFromPcw = async (input: Config) => {
@@ -57,5 +57,6 @@ export const setConfigFromPcw = async (input: Config) => {
 
   getLogger().info(`transforming payload to robosaur format...`);
   populateConfig(payload);
+
   getLogger().info('finished transforming payload, continue to creating projects...');
 };

@@ -1,6 +1,6 @@
 import { difference } from 'lodash';
 import { getLogger } from '../logger';
-import { getConfig } from '../config/config';
+import { getActiveTeamId, getConfig } from '../config/config';
 import { getTeamMembers } from '../datasaur/get-team-members';
 
 export async function validateAssignment(assignees: {
@@ -9,7 +9,7 @@ export async function validateAssignment(assignees: {
   useTeamMemberId?: boolean;
 }) {
   getLogger().info('validating assignments...');
-  const teamMembers = await getTeamMembers(getConfig().create.teamId);
+  const teamMembers = await getTeamMembers(getActiveTeamId());
   const useTeamMemberId = assignees.useTeamMemberId;
   let memberIdentifiers;
   if (useTeamMemberId) {

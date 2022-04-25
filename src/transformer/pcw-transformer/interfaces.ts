@@ -1,4 +1,4 @@
-import { AssignmentConfig } from '../../assignment/interfaces';
+import { FilesConfig } from '../../config/interfaces';
 import {
   CreateTextDocumentInput,
   DocumentAssignmentInput,
@@ -19,6 +19,15 @@ export interface PCWWrapper {
     input: PCWPayload;
   };
   query: string;
+
+  /**
+   * @description Not required if --without-pcw is used
+   * local or remote path to assignment file if pcwPayloadSource is StorageSource
+   * PCWPayload if pcwPayloadSource is INLINE
+   */
+
+  pcwAssignmentStrategy?: 'ALL' | 'AUTO';
+  files: FilesConfig;
 }
 
 export interface PCWPayload {
@@ -40,4 +49,5 @@ export interface PCWPayload {
   labelerExtensions?: ExtensionId[];
   reviewerExtensions?: ExtensionId[];
   splitDocumentOption?: SplitDocumentOptionInput;
+  teamId: string;
 }

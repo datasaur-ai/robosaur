@@ -14,14 +14,14 @@ export function getProjectExportValidators() {
 }
 
 function validateConfigDocuments(config: Config) {
-  if (!documentsSchemaValidator(config.create.files)) {
+  if (!documentsSchemaValidator(config.create?.files)) {
     getLogger().error(`config.documents has some errors`, { errors: documentsSchemaValidator.errors });
     throw new Error(`config.documents has some errors: ${JSON.stringify(documentsSchemaValidator.errors)}`);
   }
 }
 
 function validateConfigAssignment(config: Config) {
-  if (config.create.assignment) {
+  if (config.create?.assignment) {
     if (!assignmentSchemaValidator(config.create.assignment)) {
       getLogger().error(`config.assignment has some errors`, { errors: assignmentSchemaValidator.errors });
       throw new Error(`config.assignment has some errors: ${JSON.stringify(assignmentSchemaValidator.errors)}`);
@@ -48,11 +48,11 @@ function validateConfigCredentials(config: Config) {
 function doSourcesNeedCredentials(config: Config) {
   const sourcesNeedCredentials = [StorageSources.AMAZONS3, StorageSources.GOOGLE];
   const usedSources = [
-    config.create.assignment?.source,
-    config.create.files?.source,
+    config.create?.assignment?.source,
+    config.create?.files?.source,
     config.projectState?.source,
     config.export?.source,
   ];
 
-  return usedSources.some((source) => sourcesNeedCredentials.includes(source));
+  return usedSources.some((source) => (source ? sourcesNeedCredentials.includes(source) : false));
 }

@@ -6,6 +6,7 @@ import { EXTENSIONS } from './constants';
 import { createLabelSet } from './create-label-set';
 import { Config } from '../config/interfaces';
 import { getLogger } from '../logger';
+import { getExtensions } from './utils/get-extensions';
 
 const CREATE_PROJECT_MUTATION = gql`
   mutation LaunchTextProjectAsyncMutation($input: LaunchTextProjectInput!) {
@@ -63,8 +64,12 @@ export async function createProject(
       documentAssignments,
       tagNames,
       documents: projectDocuments,
-      labelerExtensions: EXTENSIONS[settings.documentSettings.kind].LABELER,
-      reviewerExtensions: EXTENSIONS[settings.documentSettings.kind].REVIEWER,
+      labelerExtensions: settings.kinds
+        ? getExtensions(settings.kinds || []).LABELER
+        : EXTENSIONS[settings.documentSettings.kind || 'TOKEN_BASED'].LABELER,
+      reviewerExtensions: settings.kinds
+        ? getExtensions(settings.kinds || []).REVIEWER
+        : EXTENSIONS[settings.documentSettings.kind || 'TOKEN_BASED'].REVIEWER,
       labelSetIDs,
       splitDocumentOption: settings.splitDocumentOption,
     },

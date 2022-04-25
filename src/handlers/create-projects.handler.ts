@@ -35,18 +35,14 @@ const LIMIT_RETRY = 3;
 const PROJECT_BEFORE_SAVE = 5;
 
 export async function handleCreateProjects(configFile: string, options) {
-  const { dryRun, usePcw } = options;
+  const { dryRun, withoutPcw, usePcw } = options;
   const cwd = process.cwd();
   setConfigByJSONFile(resolve(cwd, configFile), getProjectCreationValidators(), ScriptAction.PROJECT_CREATION);
 
-  if (usePcw) {
-    getLogger().info('usePcw is set to true, parsing pcwPayload...');
+  if (withoutPcw) {
+    getLogger().info('withoutPcw is set to true, parsing config...');
+  } else if (usePcw) {
     await setConfigFromPcw(getConfig());
-  } else {
-    if (getConfig().create.pcwPayload) {
-      getLogger().error('usePcw option is not set but pcwPayload is given');
-      throw new Error('usePcw option is not set but pcwPayload is given');
-    }
   }
 
   const documentSource = getConfig().create.files.source;
