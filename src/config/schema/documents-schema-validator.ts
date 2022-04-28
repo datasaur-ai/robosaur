@@ -1,11 +1,11 @@
 import Ajv, { JSONSchemaType } from 'ajv';
-import { DocumentsConfig } from '../interfaces';
+import { FilesConfig } from '../interfaces';
 
 const schemaValidator = new Ajv({
   allErrors: true,
 });
 
-const DocumentsSchema: JSONSchemaType<DocumentsConfig> = {
+const DocumentsSchema: JSONSchemaType<FilesConfig> = {
   type: 'object',
   properties: {
     source: { type: 'string' },

@@ -4,6 +4,8 @@ import {
   TextDocumentKind,
   TextDocumentSettingsInput,
   TextDocumentViewer,
+  TokenizationMethod,
+  TranscriptMethod,
 } from '../../../generated/graphql';
 import { mapDocumentSettings } from './document-settings.mapper';
 
@@ -14,9 +16,11 @@ describe('documentSettingsMapper', () => {
       allowArcDrawing: false,
       allowCharacterBasedLabeling: false,
       allowMultiLabels: true,
+      autoScrollWhenLabeling: true,
       textLabelMaxTokenLength: 999999,
       sentenceSeparator: '\n',
       tokenizer: 'WINK',
+      transcriptMethod: TranscriptMethod.Transcription,
       displayedRows: -1,
       kind: TextDocumentKind.TokenBased,
       mediaDisplayStrategy: MediaDisplayStrategy.Thumbnail,
@@ -47,14 +51,19 @@ describe('documentSettingsMapper', () => {
       customScriptId: '1',
     };
 
-    const mapped: Config['project']['documentSettings'] = {
+    const mapped: Config['create']['documentSettings'] = {
       allTokensMustBeLabeled: false,
       allowArcDrawing: false,
       allowCharacterBasedLabeling: false,
       textLabelMaxTokenLength: 999999,
+      allowMultiLabels: true,
+      sentenceSeparator: '\n',
+      autoScrollWhenLabeling: true,
       displayedRows: -1,
       kind: TextDocumentKind.TokenBased,
       mediaDisplayStrategy: MediaDisplayStrategy.Thumbnail,
+      tokenizer: TokenizationMethod.Wink,
+      transcriptMethod: TranscriptMethod.Transcription,
       viewer: TextDocumentViewer.Token,
       viewerConfig: {
         urlColumnNames: [],

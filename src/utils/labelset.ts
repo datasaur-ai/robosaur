@@ -13,7 +13,7 @@ interface LabelCSVContent {
 
 const LABELSET_COUNT_LIMIT = 10;
 
-export function getLabelSetsFromDirectory({ project }: Config): LabelSet[] {
+export function getLabelSetsFromDirectory({ create: project }: Config): LabelSet[] {
   const directory = project.labelSetDirectory;
 
   if (directory) {

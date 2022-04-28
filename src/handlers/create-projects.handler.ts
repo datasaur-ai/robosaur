@@ -35,21 +35,17 @@ const LIMIT_RETRY = 3;
 const PROJECT_BEFORE_SAVE = 5;
 
 export async function handleCreateProjects(configFile: string, options) {
-  const { dryRun, usePcw } = options;
+  const { dryRun, withoutPcw, usePcw } = options;
   const cwd = process.cwd();
   setConfigByJSONFile(resolve(cwd, configFile), getProjectCreationValidators(), ScriptAction.PROJECT_CREATION);
 
-  if (usePcw) {
-    getLogger().info('usePcw is set to true, parsing pcwPayload...');
+  if (withoutPcw) {
+    getLogger().info('withoutPcw is set to true, parsing config...');
+  } else if (usePcw) {
     await setConfigFromPcw(getConfig());
-  } else {
-    if (getConfig().project.pcwPayload) {
-      getLogger().error('usePcw option is not set but pcwPayload is given');
-      throw new Error('usePcw option is not set but pcwPayload is given');
-    }
   }
 
-  const documentSource = getConfig().documents.source;
+  const documentSource = getConfig().create.files.source;
   switch (documentSource) {
     case StorageSources.REMOTE:
       getLogger().warn(
@@ -57,7 +53,7 @@ export async function handleCreateProjects(configFile: string, options) {
       );
       return handleCreateProject('New Robosaur Project', configFile);
   }
-  const { bucketName, prefix: storagePrefix, source, path } = getConfig().documents;
+  const { bucketName, prefix: storagePrefix, source, path } = getConfig().create.files;
 
   const scriptState = await getState();
   await scriptState.updateInProgressProjectCreationStates();
@@ -75,7 +71,7 @@ export async function handleCreateProjects(configFile: string, options) {
   }
   getLogger().info(`found ${projectsToCreate.length} projects to create: ${JSON.stringify(projectsToCreate)}`);
 
-  const updatedProjectConfig = getConfig().project;
+  const updatedProjectConfig = getConfig().create;
   const projectKind = updatedProjectConfig.documentSettings.kind;
   switch (projectKind) {
     case 'TOKEN_BASED':
@@ -90,7 +86,7 @@ export async function handleCreateProjects(configFile: string, options) {
         break;
       }
       getLogger().warn(`no 'questions' or 'questionSetFile' is configured in ${configFile}`);
-      if (getConfig().project.labelSetDirectory) {
+      if (getConfig().create.labelSetDirectory) {
         getLogger().warn(
           `Robosaur does not support ROW_BASED project creation using TOKEN_BASED csv labelsets. Please refer to our JSON documentation on how to structure ROW_BASED questions`,
           { link: 'https://datasaurai.gitbook.io/datasaur/advanced/apis-docs/create-new-project/questions' },

@@ -1,5 +1,6 @@
 import { ScriptAction } from '../handlers/constants';
 import { getLogger } from '../logger';
+import { PCWPayload, PCWWrapper } from '../transformer/pcw-transformer/interfaces';
 import { readJSONFile } from '../utils/readJSONFile';
 import { Config } from './interfaces';
 
@@ -47,14 +48,20 @@ export function getActiveTeamId() {
 function setActiveTeamId(context: ScriptAction) {
   switch (context) {
     case ScriptAction.PROJECT_CREATION:
-      activeTeamId = getConfig().project.teamId;
+      activeTeamId =
+        getConfig().create.teamId ||
+        (getConfig().create.pcwPayload as PCWPayload).teamId ||
+        (getConfig().create.pcwPayload as PCWWrapper).variables.input.teamId;
       break;
     case ScriptAction.PROJECT_EXPORT:
       activeTeamId = getConfig().export.teamId;
       break;
     case ScriptAction.NONE:
       getLogger().warn('unspecified script context, attempt to set teamId automatically');
-      const projectCreationTeam = getConfig().project?.teamId;
+      const projectCreationTeam =
+        getConfig().create.teamId ||
+        (getConfig().create.pcwPayload as PCWPayload).teamId ||
+        (getConfig().create.pcwPayload as PCWWrapper).variables.input.teamId;
       const projectExportTeam = getConfig().export?.teamId;
       activeTeamId = projectCreationTeam ?? projectExportTeam;
       break;

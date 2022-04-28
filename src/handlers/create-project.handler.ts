@@ -15,7 +15,7 @@ export async function handleCreateProject(projectName: string, configFile: strin
   const cwd = process.cwd();
   setConfigByJSONFile(resolve(cwd, configFile), getProjectCreationValidators(), ScriptAction.PROJECT_CREATION);
 
-  const projectSetting = getConfig().project;
+  const projectSetting = getConfig().create;
   const documents = getDocuments();
   const assignmentPool = await getAssignmentConfig();
 

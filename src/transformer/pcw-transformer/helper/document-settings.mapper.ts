@@ -2,15 +2,12 @@ import { Config } from '../../../config/interfaces';
 import { TextDocumentSettingsInput } from '../../../generated/graphql';
 import { removeNulls } from './removeNull';
 
-export type ConfigDocumentSettings = Config['project']['documentSettings'];
+export type ConfigDocumentSettings = Config['create']['documentSettings'];
 
 export const mapDocumentSettings = {
   fromPcw: (payload: TextDocumentSettingsInput): ConfigDocumentSettings => {
-    if (!payload.kind || payload.kind === null) {
-      throw new Error();
-    }
     return {
-      kind: payload.kind,
+      kind: removeNulls(payload.kind),
       customScriptId: removeNulls(payload.customScriptId),
       allTokensMustBeLabeled: removeNulls(payload.allTokensMustBeLabeled),
       allowArcDrawing: removeNulls(payload.allowArcDrawing),
@@ -24,6 +21,11 @@ export const mapDocumentSettings = {
         urlColumnNames: removeNulls(payload.viewerConfig?.urlColumnNames),
       },
       enableTabularMarkdownParsing: removeNulls(payload.enableTabularMarkdownParsing),
+      transcriptMethod: removeNulls(payload.transcriptMethod),
+      tokenizer: removeNulls(payload.tokenizer),
+      allowMultiLabels: removeNulls(payload.allowMultiLabels),
+      autoScrollWhenLabeling: removeNulls(payload.autoScrollWhenLabeling),
+      sentenceSeparator: removeNulls(payload.sentenceSeparator),
     };
   },
 };

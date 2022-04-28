@@ -10,7 +10,7 @@ export interface ProjectConfiguration {
   /**
    * @description taken from getConfig().project
    */
-  projectConfig: Config['project'];
+  projectConfig: Config['create'];
 }
 
 export const PROJECT_CREATION_CONFIG = {

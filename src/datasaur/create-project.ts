@@ -6,6 +6,7 @@ import { EXTENSIONS } from './constants';
 import { createLabelSet } from './create-label-set';
 import { Config } from '../config/interfaces';
 import { getLogger } from '../logger';
+import { getExtensions } from './utils/get-extensions';
 
 const CREATE_PROJECT_MUTATION = gql`
   mutation LaunchTextProjectAsyncMutation($input: LaunchTextProjectInput!) {
@@ -22,7 +23,7 @@ export async function createProject(
   name: string,
   documents: Document[],
   documentAssignments: DocumentAssignment[],
-  settings: Config['project'],
+  settings: Config['create'],
   tagNames: string[] = [],
 ) {
   const projectDocuments = documents.map((document) => {
@@ -57,12 +58,18 @@ export async function createProject(
       name,
       teamId: settings.teamId,
       documentSettings: settings.documentSettings,
+      type: settings.type,
+      kinds: settings.kinds,
       projectSettings: settings.projectSettings,
       documentAssignments,
       tagNames,
       documents: projectDocuments,
-      labelerExtensions: EXTENSIONS[settings.documentSettings.kind].LABELER,
-      reviewerExtensions: EXTENSIONS[settings.documentSettings.kind].REVIEWER,
+      labelerExtensions: settings.kinds
+        ? getExtensions(settings.kinds || []).LABELER
+        : EXTENSIONS[settings.documentSettings.kind || 'TOKEN_BASED'].LABELER,
+      reviewerExtensions: settings.kinds
+        ? getExtensions(settings.kinds || []).REVIEWER
+        : EXTENSIONS[settings.documentSettings.kind || 'TOKEN_BASED'].REVIEWER,
       labelSetIDs,
       splitDocumentOption: settings.splitDocumentOption,
     },

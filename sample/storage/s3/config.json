@@ -27,19 +27,18 @@
     "prefix": "",
     "statusFilter": ["IN_REVIEW", "REVIEW_READY", "COMPLETE"]
   },
-
-  "documents": {
-    "source": "s3",
-    "bucketName": "my-other-bucket",
-    "prefix": "projects"
-  },
-  "assignment": {
-    "source": "s3",
-    "bucketName": "my-bucket",
-    "path": "assignment-file-in-bucket-root.json"
-  },
-  "project": {
+  "create": {
     "teamId": "<TEAM_ID>",
+    "files": {
+      "source": "s3",
+      "bucketName": "my-other-bucket",
+      "prefix": "projects"
+    },
+    "assignment": {
+      "source": "s3",
+      "bucketName": "my-bucket",
+      "path": "assignment-file-in-bucket-root.json"
+    },
     "projectSettings": {
       "consensus": 1,
       "enableEditLabelSet": false,

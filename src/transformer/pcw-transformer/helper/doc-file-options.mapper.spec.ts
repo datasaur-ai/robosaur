@@ -15,7 +15,7 @@ describe('docFileOptionsMapper', () => {
       ],
     };
 
-    const mapped: Config['project']['docFileOptions'] = {
+    const mapped: Config['create']['docFileOptions'] = {
       firstRowAsHeader: false,
       customHeaderColumns: [
         {

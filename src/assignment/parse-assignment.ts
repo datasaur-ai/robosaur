@@ -12,12 +12,12 @@ export async function parseAssignment(): Promise<{
   reviewers: string[];
   useTeamMemberId?: boolean;
 }> {
-  const { source, bucketName, path } = getConfig()?.assignment ?? { source: false, path: false };
+  const { source, bucketName, path } = getConfig()?.create?.assignment ?? { source: false, path: '', bucketName: '' };
 
   getLogger().info('looking for assignments in project settings');
-  if (getConfig()?.project?.assignments) {
+  if (getConfig()?.create?.assignments) {
     getLogger().info('found assignments');
-    return getConfig().project.assignments || { labelers: [], reviewers: [] };
+    return getConfig().create.assignments || { labelers: [], reviewers: [] };
   }
 
   if (!source) {
