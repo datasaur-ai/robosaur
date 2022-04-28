@@ -22,29 +22,31 @@
       "source": "local",
       "path": "quickstart/token-based/documents"
     },
-    "assignment": {
-      "source": "local",
-      "path": "quickstart/token-based/config/assignment.json"
+    "pcwPayloadSource": {
+      "source": "inline"
     },
-    "projectSettings": {
-      "consensus": 1,
-      "enableEditLabelSet": false,
-      "enableEditSentence": false,
-      "hideLabelerNamesDuringReview": false,
-      "hideRejectedLabelsDuringReview": true,
-      "hideLabelsFromInactiveLabelSetDuringReview": false
-    },
-    "documentSettings": {
-      "kind": "TOKEN_BASED",
-      "customScriptId": null,
+    "pcwAssignmentStrategy": "AUTO",
+    "pcwPayload": {
+      "projectSettings": {
+        "consensus": 1,
+        "enableEditLabelSet": false,
+        "enableEditSentence": false,
+        "hideLabelerNamesDuringReview": false,
+        "hideRejectedLabelsDuringReview": true,
+        "hideLabelsFromInactiveLabelSetDuringReview": false
+      },
+      "documentSettings": {
+        "kind": "TOKEN_BASED",
+        "customScriptId": null,
 
-      "allowCharacterBasedLabeling": false,
-      "allowArcDrawing": true,
-      "allowMultiLabels": true,
-      "allTokensMustBeLabeled": false,
-      "textLabelMaxTokenLength": 999999,
-      "sentenceSeparator": "\n",
-      "tokenizer": "WINK"
+        "allowCharacterBasedLabeling": false,
+        "allowArcDrawing": true,
+        "allowMultiLabels": true,
+        "allTokensMustBeLabeled": false,
+        "textLabelMaxTokenLength": 999999,
+        "sentenceSeparator": "\n",
+        "tokenizer": "WINK"
+      }
     }
   }
 }
