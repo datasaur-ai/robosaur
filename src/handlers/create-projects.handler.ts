@@ -107,6 +107,8 @@ export async function handleCreateProjects(configFile: string, options) {
     while (counterRetry < LIMIT_RETRY) {
       getLogger().info(`creating project ${projectDetails.name}...`);
 
+      console.log(projectDetails.fullPath)
+
       getLogger().info(`retrieving documents from ${source}...`);
       const documents =
         source === StorageSources.LOCAL

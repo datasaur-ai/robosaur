@@ -23,6 +23,13 @@ export function getMinioConfig(): ClientOptions {
   };
 }
 
+export function getAzureBlobConfig() {
+  return {
+    connectionString: getConfig().credentials[StorageSources.AZURE].azureConnectionString,
+    containerName: getConfig().credentials[StorageSources.AZURE].containerName,
+  };
+}
+
 export function normalizeFolderName(folder: string) {
   if (folder.length === 0) return folder;
   if (folder[folder.length - 1] !== '/') folder = folder + '/';

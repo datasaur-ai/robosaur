@@ -9,6 +9,7 @@ export enum StorageSources {
   GOOGLE = 'gcs',
   AMAZONS3 = 's3',
   INLINE = 'inline',
+  AZURE = 'azure',
 }
 
 export enum SplitDocumentStrategy {
@@ -212,6 +213,13 @@ export interface CredentialsConfig {
      */
     gcsCredentialJson: string;
   };
+  [StorageSources.AZURE]: {
+    /**
+     * @description Connection string from Blob Storage Container
+     */
+    azureConnectionString: string;
+    containerName: string;
+  };
 }
 
 export interface StatefileConfig extends WithStorage {
@@ -239,11 +247,11 @@ export interface FilesConfig extends WithStorage {
 }
 
 export interface PCWSource extends WithStorage {
-  source: StorageSources.AMAZONS3 | StorageSources.GOOGLE | StorageSources.LOCAL | StorageSources.INLINE;
+  source: StorageSources.AMAZONS3 | StorageSources.GOOGLE | StorageSources.LOCAL | StorageSources.INLINE | StorageSources.AZURE;
 }
 
 export interface AssignmentConfig extends WithStorage {
-  source: StorageSources.AMAZONS3 | StorageSources.GOOGLE | StorageSources.LOCAL;
+  source: StorageSources.AMAZONS3 | StorageSources.GOOGLE | StorageSources.LOCAL | StorageSources.AZURE;
   /**
    * @description local or remote path to assignment file
    */
