@@ -22,101 +22,174 @@
       "source": "local",
       "path": "quickstart/row-based/document"
     },
-    "assignment": {
-      "source": "local",
-      "path": "quickstart/row-based/config/assignment.json"
+    "pcwPayloadSource": {
+      "source": "inline"
     },
-    "projectSettings": {
-      "consensus": 1,
-      "enableEditLabelSet": false,
-      "enableEditSentence": false,
-      "hideLabelerNamesDuringReview": false,
-      "hideRejectedLabelsDuringReview": true,
-      "hideLabelsFromInactiveLabelSetDuringReview": false
-    },
-    "documentSettings": {
-      "kind": "ROW_BASED",
-      "customScriptId": null,
-      "displayedRows": 10,
-      "mediaDisplayStrategy": "THUMBNAIL",
-      "firstRowAsHeader": true,
-      "viewer": "TABULAR",
-      "viewerConfig": {},
-      "enableTabularMarkdownParsing": false
-    },
-    "questionSetFile": "quickstart/row-based/config/question-set.json",
-    "docFileOptions": {
-      "firstRowAsHeader": true,
-      "customHeaderColumns": [
+    "pcwAssignmentStrategy": "AUTO",
+    "pcwPayload": {
+      "projectSettings": {
+        "consensus": 1,
+        "enableEditLabelSet": false,
+        "enableEditSentence": false,
+        "hideLabelerNamesDuringReview": false,
+        "hideRejectedLabelsDuringReview": true,
+        "hideLabelsFromInactiveLabelSetDuringReview": false
+      },
+      "documentSettings": {
+        "kind": "ROW_BASED",
+        "customScriptId": null,
+        "displayedRows": 10,
+        "mediaDisplayStrategy": "THUMBNAIL",
+        "firstRowAsHeader": true,
+        "viewer": "TABULAR",
+        "viewerConfig": {},
+        "enableTabularMarkdownParsing": false
+      },
+      "documents": [
         {
-          "name": "Shown to all",
-          "displayed": true,
-          "labelerRestricted": false
-        },
-        {
-          "name": "Hidden from Labeler",
-          "displayed": true,
-          "labelerRestricted": true
-        },
-        {
-          "name": "Hidden from all",
-          "displayed": false,
-          "labelerRestricted": true
-        },
-        {
-          "name": "Hidden from all",
-          "displayed": false,
-          "labelerRestricted": false
-        },
-        {
-          "name": "Year",
-          "displayed": true,
-          "labelerRestricted": false
-        },
-        {
-          "name": "City",
-          "displayed": true,
-          "labelerRestricted": false
-        },
-        {
-          "name": "Code",
-          "displayed": false,
-          "labelerRestricted": false
-        },
-        {
-          "name": "Location",
-          "displayed": false,
-          "labelerRestricted": false
-        },
-        {
-          "name": "State",
-          "displayed": false,
-          "labelerRestricted": false
-        },
-        {
-          "name": "Avg Temp",
-          "displayed": true,
-          "labelerRestricted": false
-        },
-        {
-          "name": "Max Temp",
-          "displayed": false,
-          "labelerRestricted": false
-        },
-        {
-          "name": "Min Temp",
-          "displayed": false,
-          "labelerRestricted": false
-        },
-        {
-          "name": "Wind.Direction",
-          "displayed": true,
-          "labelerRestricted": false
-        },
-        {
-          "name": "Wind.Speed",
-          "displayed": true,
-          "labelerRestricted": false
+          "file": {
+            "path": "lorem.txt"
+          },
+          "fileName": "lorem.txt",
+          "name": "lorem.txt",
+          "settings": {
+            "questions": [
+              {
+                "type": "TEXT",
+                "config": {},
+                "name": "Q1",
+                "label": "Bound to Wind.Speed",
+                "bindToColumn": "Wind.Speed",
+                "required": true
+              },
+              {
+                "type": "TEXT",
+                "config": {},
+                "label": "Not bound, will add new column",
+                "name": "with this name",
+                "required": true
+              },
+              {
+                "type": "SLIDER",
+                "config": {
+                  "min": 1,
+                  "max": 10,
+                  "step": 1,
+                  "theme": "GRADIENT"
+                },
+                "name": "Q3",
+                "label": "Slider",
+                "required": false
+              },
+              {
+                "type": "CHECKBOX",
+                "config": {
+                  "hint": "Description, or hint will be displayed here"
+                },
+                "name": "Q4",
+                "label": "This is a checkbox question",
+                "required": false
+              },
+              {
+                "type": "DROPDOWN",
+                "config": {
+                  "multiple": false,
+                  "options": [
+                    {
+                      "id": "1",
+                      "label": "Option 1"
+                    },
+                    {
+                      "id": "2",
+                      "label": "Option 2"
+                    },
+                    {
+                      "id": "3",
+                      "label": "Option 3"
+                    }
+                  ]
+                },
+                "name": "Q5",
+                "label": "Choose one answer from dropdown",
+                "required": false
+              }
+            ]
+          },
+          "docFileOptions": {
+            "firstRowAsHeader": true,
+            "customHeaderColumns": [
+              {
+                "name": "Shown to all",
+                "displayed": true,
+                "labelerRestricted": false
+              },
+              {
+                "name": "Hidden from Labeler",
+                "displayed": true,
+                "labelerRestricted": true
+              },
+              {
+                "name": "Hidden from all",
+                "displayed": false,
+                "labelerRestricted": true
+              },
+              {
+                "name": "Hidden from all",
+                "displayed": false,
+                "labelerRestricted": false
+              },
+              {
+                "name": "Year",
+                "displayed": true,
+                "labelerRestricted": false
+              },
+              {
+                "name": "City",
+                "displayed": true,
+                "labelerRestricted": false
+              },
+              {
+                "name": "Code",
+                "displayed": false,
+                "labelerRestricted": false
+              },
+              {
+                "name": "Location",
+                "displayed": false,
+                "labelerRestricted": false
+              },
+              {
+                "name": "State",
+                "displayed": false,
+                "labelerRestricted": false
+              },
+              {
+                "name": "Avg Temp",
+                "displayed": true,
+                "labelerRestricted": false
+              },
+              {
+                "name": "Max Temp",
+                "displayed": false,
+                "labelerRestricted": false
+              },
+              {
+                "name": "Min Temp",
+                "displayed": false,
+                "labelerRestricted": false
+              },
+              {
+                "name": "Wind.Direction",
+                "displayed": true,
+                "labelerRestricted": false
+              },
+              {
+                "name": "Wind.Speed",
+                "displayed": true,
+                "labelerRestricted": false
+              }
+            ]
+          }
         }
       ]
     }
