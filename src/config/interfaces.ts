@@ -215,9 +215,12 @@ export interface CredentialsConfig {
   };
   [StorageSources.AZURE]: {
     /**
-     * @description Connection string from Blob Storage Container
+     * @description Connection string from Azure Storage Account.
      */
     azureConnectionString: string;
+    /**
+     * @description Name of the container for the projects, scripts, and exported files.
+     */
     containerName: string;
   };
 }

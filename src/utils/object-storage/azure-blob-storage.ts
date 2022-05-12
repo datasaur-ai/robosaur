@@ -35,7 +35,6 @@ export class AzureBlobStorageClient implements ObjectStorageClient {
     for await (const blob of containerClient.listBlobsFlat({ prefix: folderName })) {
       items.push({ name: blob.name, prefix: folderName });
     }
-    console.log(items)
 
     return items;
   }

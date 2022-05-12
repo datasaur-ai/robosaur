@@ -30,7 +30,6 @@ export async function parseAssignment(): Promise<{
     case StorageSources.AZURE:
     case StorageSources.AMAZONS3:
     case StorageSources.GOOGLE:
-      console.log(bucketName, path)
       return JSON.parse(await getStorageClient(source).getStringFileContent(bucketName, path));
     default:
       throw new Error(
