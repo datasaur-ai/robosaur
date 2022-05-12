@@ -247,7 +247,7 @@ In this part we will explain each part of the Robosaur config file. We will use 
 
 ### Storage configuration
 
-There are numerous `"source": "local"` in many places, and we said to keep them as-is. For most use cases, creating and exporting projects to and from local storage is the simplest approach. However, Robosaur also supports project creation from files located in S3 buckets and GCS buckets! All we need to do is set the correct credentials, and change the `source` to `s3` or `gcs`.
+There are numerous `"source": "local"` in many places, and we said to keep them as-is. For most use cases, creating and exporting projects to and from local storage is the simplest approach. However, Robosaur also supports project creation from files located in S3 buckets, GCS buckets, and Azure Blob Storage containers! All we need to do is set the correct credentials, and change the `source` to `s3`, `gcs`, or `azure`.
 
 Here are the examples for credentials and other configs:
 
@@ -315,7 +315,7 @@ Here are the examples for credentials and other configs:
    {
      "credentials": {
        "azure": {
-         "azureConnectionString": "<CONNECTION_STRING_FROM_STORAGE_ACCOUNT>",
+         "azureConnectionString": "my-connection-string",
          "containerName": "my-azure-container"
        }
      },
@@ -385,7 +385,7 @@ Example:
 }
 ```
 
-- `"gcs"` or `"s3"`: store the PCW script in an object cloud storage. `pcwPayloadSource` should contain another value called `bucketName` and `pcwPaylod` should be a `string` containing a url to the file in the object cloud storage. Don't forget to provide credentials to the chosen cloud provider (refer [here](#storage-configuration)).
+- `"gcs"`, `"s3"`, `"azure"`: store the PCW script in an object cloud storage. `pcwPayloadSource` should contain another value called `bucketName` and `pcwPayload` should be a `string` containing a path to the file in the object cloud storage. Don't forget to provide credentials to the chosen cloud provider (refer [here](#storage-configuration)).
 
 Example:
 

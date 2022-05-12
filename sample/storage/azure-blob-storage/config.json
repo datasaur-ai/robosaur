@@ -32,30 +32,10 @@
       "prefix": "projects"
     },
     "pcwPayloadSource": {
-      "source": "inline"
+      "source": "azure",
+      "bucketName": "<CONTAINER_NAME>"
     },
     "pcwAssignmentStrategy": "AUTO",
-    "pcwPayload": {
-      "projectSettings": {
-        "consensus": 1,
-        "enableEditLabelSet": false,
-        "enableEditSentence": false,
-        "hideLabelerNamesDuringReview": false,
-        "hideRejectedLabelsDuringReview": true,
-        "hideLabelsFromInactiveLabelSetDuringReview": false
-      },
-      "documentSettings": {
-        "kind": "TOKEN_BASED",
-        "customScriptId": null,
-
-        "allowCharacterBasedLabeling": false,
-        "allowArcDrawing": true,
-        "allowMultiLabels": true,
-        "allTokensMustBeLabeled": false,
-        "textLabelMaxTokenLength": 999999,
-        "sentenceSeparator": "\n",
-        "tokenizer": "WINK"
-      }
-    }
+    "pcwPayload": "path/to/pcwScript.json"
   }
 }
