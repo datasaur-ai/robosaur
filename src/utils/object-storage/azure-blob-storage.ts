@@ -25,7 +25,6 @@ export class AzureBlobStorageClient implements ObjectStorageClient {
     for await (const blob of containerClient.listBlobsFlat()) {
       if(blob.name.startsWith(rootPrefix)) subfolders.push(blob.name);
     }
-    console.log(subfolders)
     return subfolders;
   }
 
@@ -34,7 +33,6 @@ export class AzureBlobStorageClient implements ObjectStorageClient {
 
     let items: BucketItem[] = [];
     for await (const blob of containerClient.listBlobsFlat({ prefix: folderName })) {
-      // console.log('\t', blob.name);
       items.push({ name: blob.name, prefix: folderName });
     }
     console.log(items)
