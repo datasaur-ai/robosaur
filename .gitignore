@@ -3,4 +3,5 @@
 
 config/*.json
 logs/
-quickstart/*
+quickstart/state
+quickstart/export
