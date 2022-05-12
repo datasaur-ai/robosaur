@@ -309,6 +309,30 @@ Here are the examples for credentials and other configs:
    - s3:PutObjectAcl
    - s3:DeleteObject
 
+3. Azure Blob Storage - `config/azure-blob-storage/config.json`
+
+   ```json
+   {
+     "credentials": {
+       "azure": {
+         "azureConnectionString": "<CONNECTION_STRING_FROM_STORAGE_ACCOUNT>",
+         "containerName": "my-azure-container"
+       }
+     },
+     "projectState": {
+       "source": "azure",
+       "bucketName": "my-azure-container",
+       "path": "path/to/stateFile.json"
+     }
+   }
+   ```
+
+   Both `azureConnectionString` and `containerName` are required.
+
+   You can obtain your `azureConnectionString` by copying one of the connection strings from your Azure Storage Account.
+
+   The `containerName` is where you would upload your projects, inside a `projects` folder. Robosaur would also save the project state and export your projects into this container, in the `state` and `download` folders respectively.
+
 ## Using PCW Payload
 
 Robosaur's config file uses a different format compared to the **View Script** option during Project Creation Wizard (PCW). To use the script generated from PCW use the option `--use-pcw` on `create-projects` command.
