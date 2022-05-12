@@ -31,31 +31,31 @@
       "bucketName": "<CONTAINER_NAME>",
       "prefix": "projects"
     },
-    "assignment": {
-      "source": "azure",
-      "bucketName": "<CONTAINER_NAME>",
-      "path": "path/to/assignment.json"
+    "pcwPayloadSource": {
+      "source": "inline"
     },
-    "projectSettings": {
-      "consensus": 1,
-      "enableEditLabelSet": false,
-      "enableEditSentence": false,
-      "hideLabelerNamesDuringReview": false,
-      "hideRejectedLabelsDuringReview": true,
-      "hideLabelsFromInactiveLabelSetDuringReview": false
-    },
-    "documentSettings": {
-      "kind": "TOKEN_BASED",
-      "customScriptId": "<CUSTOM SCRIPT ID>",
+    "pcwAssignmentStrategy": "AUTO",
+    "pcwPayload": {
+      "projectSettings": {
+        "consensus": 1,
+        "enableEditLabelSet": false,
+        "enableEditSentence": false,
+        "hideLabelerNamesDuringReview": false,
+        "hideRejectedLabelsDuringReview": true,
+        "hideLabelsFromInactiveLabelSetDuringReview": false
+      },
+      "documentSettings": {
+        "kind": "TOKEN_BASED",
+        "customScriptId": null,
 
-      "allowCharacterBasedLabeling": false,
-      "allowArcDrawing": true,
-      "allowMultiLabels": true,
-      "allTokensMustBeLabeled": false,
-      "textLabelMaxTokenLength": 999999,
-      "sentenceSeparator": "\n",
-      "tokenizer": "WINK"
-    },
-    "labelSetDirectory": "sample/__shared__/labelset"
+        "allowCharacterBasedLabeling": false,
+        "allowArcDrawing": true,
+        "allowMultiLabels": true,
+        "allTokensMustBeLabeled": false,
+        "textLabelMaxTokenLength": 999999,
+        "sentenceSeparator": "\n",
+        "tokenizer": "WINK"
+      }
+    }
   }
 }
