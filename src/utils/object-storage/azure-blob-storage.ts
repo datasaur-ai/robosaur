@@ -22,8 +22,8 @@ export class AzureBlobStorageClient implements ObjectStorageClient {
     const containerClient = AzureBlobStorageClient.getContainerClient(bucketName);
 
     let subfolders: string[] = [];
-    for await (const blob of containerClient.listBlobsFlat()) {
-      if(blob.name.startsWith(rootPrefix)) subfolders.push(blob.name);
+    for await (const blob of containerClient.listBlobsByHierarchy("/", { prefix: rootPrefix + "/" })) {
+      subfolders.push(blob.name);
     }
     return subfolders;
   }
