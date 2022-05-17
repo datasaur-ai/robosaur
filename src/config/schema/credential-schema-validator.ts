@@ -31,7 +31,7 @@ const CredentialsSchema: JSONSchemaType<CredentialsConfig> = {
       type: 'object',
       properties: {
         azureConnectionString: { type: 'string' },
-        containerName: {type: 'string'}
+        containerName: { type: 'string' }
       },
       required: ['azureConnectionString', 'containerName'],
     }

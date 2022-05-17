@@ -5,6 +5,7 @@ import { BucketItem, ObjectStorageClient } from './interfaces';
 export class AzureBlobStorageClient implements ObjectStorageClient {
   static client: Client;
   static containerClient;
+
   static getClient(azureConfig = getAzureBlobConfig(), override = false) {
     if (!AzureBlobStorageClient.client || override)
       AzureBlobStorageClient.client = Client.fromConnectionString(azureConfig.connectionString);
@@ -63,5 +64,4 @@ export class AzureBlobStorageClient implements ObjectStorageClient {
   async setFileContent(bucketName: string, objectName: string, content: Buffer): Promise<void> {
     await AzureBlobStorageClient.getContainerClient(bucketName).getBlockBlobClient(objectName).upload(content, content.length);
   }
-
 }

@@ -3,6 +3,13 @@ import { ClientOptions } from 'minio';
 import { getConfig } from '../../config/config';
 import { StorageSources } from '../../config/interfaces';
 
+export function getAzureBlobConfig() {
+  return {
+    connectionString: getConfig().credentials[StorageSources.AZURE].azureConnectionString,
+    containerName: getConfig().credentials[StorageSources.AZURE].containerName,
+  };
+}
+
 export function getGCSConfig(): StorageOptions {
   return {
     keyFilename: getConfig().credentials[StorageSources.GOOGLE].gcsCredentialJson,
@@ -20,13 +27,6 @@ export function getMinioConfig(): ClientOptions {
     // in some cases, Minio will throw S3: Access Denied when region is set to null
     // even when `aws s3 ls <bucket> returns correct results`
     region: s3Credentials.s3Region,
-  };
-}
-
-export function getAzureBlobConfig() {
-  return {
-    connectionString: getConfig().credentials[StorageSources.AZURE].azureConnectionString,
-    containerName: getConfig().credentials[StorageSources.AZURE].containerName,
   };
 }
 

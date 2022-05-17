@@ -4,12 +4,12 @@ import { AssignmentConfig as ParsedAssignment } from '../assignment/interfaces';
 import { TextDocumentType, TokenizationMethod, TranscriptMethod } from '../generated/graphql';
 
 export enum StorageSources {
+  AMAZONS3 = 's3',
+  AZURE = 'azure',
+  GOOGLE = 'gcs',
+  INLINE = 'inline',
   LOCAL = 'local',
   REMOTE = 'remote',
-  GOOGLE = 'gcs',
-  AMAZONS3 = 's3',
-  INLINE = 'inline',
-  AZURE = 'azure',
 }
 
 export enum SplitDocumentStrategy {
