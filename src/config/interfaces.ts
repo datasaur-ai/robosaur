@@ -135,6 +135,14 @@ export interface CreateConfig {
 
     autoScrollWhenLabeling?: boolean;
     sentenceSeparator?: string;
+
+    fileTransformerId?: string;
+
+    enableAnonymization?: boolean;
+
+    anonymizationEntityTypes?: Array<string>;
+    anonymizationMaskingMethod?: string;
+    anonymizationRegExps?: Array<string>;
   };
   type?: TextDocumentType;
   kinds?: string[];
