@@ -135,7 +135,7 @@ export interface CreateConfig {
 
     autoScrollWhenLabeling?: boolean;
     sentenceSeparator?: string;
-
+    
     enableAnonymization?: boolean;
 
     anonymizationEntityTypes?: Array<string>;

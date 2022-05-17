@@ -22,7 +22,7 @@ const getFromLocal = (pcwPayloadSource: PCWSource, pcwPayload: string | (PCWWrap
     throw new WrongPcwPayloadType(pcwPayloadSource?.source, 'NOT string');
   }
   const readResult = readJSONFile(pcwPayload);
-  return readResult?.variables.input || readResult;
+  return readResult?.variables?.input || readResult;
 };
 
 const getFromCloud = async (pcwPayloadSource: PCWSource, pcwPayload: string | (PCWWrapper & PCWPayload)) => {
@@ -38,7 +38,7 @@ const getFromCloud = async (pcwPayloadSource: PCWSource, pcwPayload: string | (P
   const storageClient: ObjectStorageClient = getStorageClient(pcwPayloadSource?.source);
   const payloadString = await storageClient.getStringFileContent(pcwPayloadSource.bucketName, pcwPayload);
   const readResult = JSON.parse(payloadString);
-  return readResult?.variables.input || readResult;
+  return readResult?.variables?.input || readResult;
 };
 
 export const parsePcw = async (pcwPayloadSource: PCWSource, pcwPayload: string | (PCWWrapper & PCWPayload)) => {
