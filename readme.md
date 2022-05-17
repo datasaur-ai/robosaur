@@ -331,7 +331,7 @@ Here are the examples for credentials and other configs:
 
    You can obtain your `azureConnectionString` by copying one of the connection strings from your Azure Storage Account.
 
-   The `containerName` is where you would upload your projects, inside a `projects` folder. Robosaur would also save the project state and export your projects into this container, in the `state` and `download` folders respectively.
+   The `containerName` is where you would upload your projects, inside a `projects` folder.
 
 ## Using PCW Payload
 
@@ -385,7 +385,7 @@ Example:
 }
 ```
 
-- `"gcs"`, `"s3"`, `"azure"`: store the PCW script in an object cloud storage. `pcwPayloadSource` should contain another value called `bucketName` and `pcwPayload` should be a `string` containing a path to the file in the object cloud storage. Don't forget to provide credentials to the chosen cloud provider (refer [here](#storage-configuration)).
+- `"gcs"`, `"s3"`, or `"azure"`: store the PCW script in an object cloud storage. `pcwPayloadSource` should contain another value called `bucketName` and `pcwPayload` should be a `string` containing a path to the file in the object cloud storage. Don't forget to provide credentials to the chosen cloud provider (refer [here](#storage-configuration)).
 
 Example:
 
