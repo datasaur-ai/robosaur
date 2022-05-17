@@ -108,7 +108,7 @@ export interface CreateConfig {
      * @description determine the custom script to be used.
      * The ID can be obtained from the custom script page in this format: https://app.datasaur.ai/teams/{teamId}/custom-scripts/{custom-script-id}
      */
-    customScriptId?: string;
+    fileTransformerId?: string;
 
     // TOKEN_BASED
     allTokensMustBeLabeled?: boolean;
@@ -135,9 +135,7 @@ export interface CreateConfig {
 
     autoScrollWhenLabeling?: boolean;
     sentenceSeparator?: string;
-
-    fileTransformerId?: string;
-
+    
     enableAnonymization?: boolean;
 
     anonymizationEntityTypes?: Array<string>;
