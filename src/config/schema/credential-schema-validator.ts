@@ -27,6 +27,14 @@ const CredentialsSchema: JSONSchemaType<CredentialsConfig> = {
       },
       required: ['gcsCredentialJson'],
     },
+    [StorageSources.AZURE]: {
+      type: 'object',
+      properties: {
+        connectionString: { type: 'string' },
+        containerName: { type: 'string' }
+      },
+      required: ['connectionString', 'containerName'],
+    }
   },
   required: [],
 };

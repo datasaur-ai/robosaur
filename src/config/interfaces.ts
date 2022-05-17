@@ -4,11 +4,12 @@ import { AssignmentConfig as ParsedAssignment } from '../assignment/interfaces';
 import { TextDocumentType, TokenizationMethod, TranscriptMethod } from '../generated/graphql';
 
 export enum StorageSources {
+  AMAZONS3 = 's3',
+  AZURE = 'azure',
+  GOOGLE = 'gcs',
+  INLINE = 'inline',
   LOCAL = 'local',
   REMOTE = 'remote',
-  GOOGLE = 'gcs',
-  AMAZONS3 = 's3',
-  INLINE = 'inline',
 }
 
 export enum SplitDocumentStrategy {
@@ -218,6 +219,16 @@ export interface CredentialsConfig {
      */
     gcsCredentialJson: string;
   };
+  [StorageSources.AZURE]: {
+    /**
+     * @description Connection string from Azure Storage Account.
+     */
+    connectionString: string;
+    /**
+     * @description Name of the container for the projects, scripts, and exported files.
+     */
+    containerName: string;
+  };
 }
 
 export interface StatefileConfig extends WithStorage {
@@ -245,11 +256,11 @@ export interface FilesConfig extends WithStorage {
 }
 
 export interface PCWSource extends WithStorage {
-  source: StorageSources.AMAZONS3 | StorageSources.GOOGLE | StorageSources.LOCAL | StorageSources.INLINE;
+  source: StorageSources.AMAZONS3 | StorageSources.GOOGLE | StorageSources.LOCAL | StorageSources.INLINE | StorageSources.AZURE;
 }
 
 export interface AssignmentConfig extends WithStorage {
-  source: StorageSources.AMAZONS3 | StorageSources.GOOGLE | StorageSources.LOCAL;
+  source: StorageSources.AMAZONS3 | StorageSources.GOOGLE | StorageSources.LOCAL | StorageSources.AZURE;
   /**
    * @description local or remote path to assignment file
    */

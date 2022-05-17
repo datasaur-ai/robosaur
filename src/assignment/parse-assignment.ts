@@ -5,7 +5,7 @@ import { StorageSources } from '../config/interfaces';
 import { getLogger } from '../logger';
 import { getStorageClient } from '../utils/object-storage';
 
-const IMPLEMENTED_SOURCES = [StorageSources.LOCAL, StorageSources.AMAZONS3, StorageSources.GOOGLE];
+const IMPLEMENTED_SOURCES = [StorageSources.LOCAL, StorageSources.AMAZONS3, StorageSources.GOOGLE, StorageSources.AZURE];
 
 export async function parseAssignment(): Promise<{
   labelers: string[];
@@ -27,6 +27,7 @@ export async function parseAssignment(): Promise<{
   switch (source) {
     case StorageSources.LOCAL:
       return JSON.parse(readFileSync(resolve(process.cwd(), path), { encoding: 'utf-8' }));
+    case StorageSources.AZURE:
     case StorageSources.AMAZONS3:
     case StorageSources.GOOGLE:
       return JSON.parse(await getStorageClient(source).getStringFileContent(bucketName, path));

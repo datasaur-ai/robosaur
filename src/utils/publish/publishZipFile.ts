@@ -16,6 +16,7 @@ export async function publishZipFile(url: string, projectName: string) {
   switch (source) {
     case StorageSources.AMAZONS3:
     case StorageSources.GOOGLE:
+    case StorageSources.AZURE:
       getLogger().info(`publishing zip-file to ${source}...`, { data: { bucketName, source, prefix, projectName } });
       await getStorageClient(source).setFileContent(
         bucketName,

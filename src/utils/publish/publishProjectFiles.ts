@@ -23,6 +23,7 @@ export async function publishProjectFiles(url: string, projectName: string) {
       }
       break;
     case StorageSources.AMAZONS3:
+    case StorageSources.AZURE:
     case StorageSources.GOOGLE:
       getLogger().info(`publishing extracted files to ${source}...`, { data: { source, prefix, bucketName } });
       for (const file of files) {

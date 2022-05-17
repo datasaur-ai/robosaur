@@ -19,6 +19,7 @@ export function getDocuments(): Document[] {
     case StorageSources.REMOTE:
       return getRemoteDocuments(resolvedPath);
     case StorageSources.AMAZONS3:
+    case StorageSources.AZURE:
     case StorageSources.GOOGLE:
       throw new Error(`${documents.source} is supported for multiple project creation only.`);
     default:

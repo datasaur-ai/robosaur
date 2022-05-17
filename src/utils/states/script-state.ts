@@ -12,7 +12,7 @@ import { getStorageClient } from '../object-storage';
 import { CreateJobState, ProjectState } from './interfaces';
 import { TeamProjectsState } from './team-projects-state';
 
-const IMPLEMENTED_STATE_SOURCE = [StorageSources.LOCAL, StorageSources.AMAZONS3, StorageSources.GOOGLE];
+const IMPLEMENTED_STATE_SOURCE = [StorageSources.LOCAL, StorageSources.AMAZONS3, StorageSources.GOOGLE, StorageSources.AZURE];
 
 export class ScriptState {
   private teams: TeamProjectsState[];
@@ -53,7 +53,11 @@ export class ScriptState {
         getLogger().info('parsing state finished');
         return new ScriptState(scriptState);
       } catch (error) {
-        getLogger().error('error in parsing state', { error: JSON.stringify(error), message: error.message });
+        if (error.code === "BlobNotFound") {
+          getLogger().info("State blob not found in Azure, proceeding to create one...");
+        } else {
+          getLogger().error('error in parsing state', { error: JSON.stringify(error), message: error.message });
+        }
         throw new Error(`error parsing state file from ${ScriptState.stateConfig.path}`);
       }
     } else {
@@ -194,6 +198,7 @@ export class ScriptState {
   private static async readStateFile() {
     switch (ScriptState.stateConfig.source) {
       case StorageSources.AMAZONS3:
+      case StorageSources.AZURE:
       case StorageSources.GOOGLE:
         return getStorageClient(ScriptState.stateConfig.source).getStringFileContent(
           ScriptState.stateConfig.bucketName,
@@ -215,6 +220,7 @@ export class ScriptState {
   private static async writeStateFile(content: ScriptState) {
     switch (ScriptState.stateConfig.source) {
       case StorageSources.AMAZONS3:
+      case StorageSources.AZURE:
       case StorageSources.GOOGLE:
         await getStorageClient(ScriptState.stateConfig.source).setStringFileContent(
           ScriptState.stateConfig.bucketName,
@@ -236,12 +242,11 @@ export class ScriptState {
   }
 
   toJSON() {
-    const retvalObject = {
+    return {
       version: this.version,
       createdAt: new Date(this.createdAt).toISOString(),
       updatedAt: new Date(this.updatedAt).toISOString(),
       teams: this.teams,
     };
-    return retvalObject;
   }
 }

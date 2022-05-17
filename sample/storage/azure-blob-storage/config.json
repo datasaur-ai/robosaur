@@ -1,0 +1,41 @@
+{
+  "datasaur": {
+    "host": "https://app.datasaur.ai",
+    "clientId": "<DATASAUR_CLIENT_ID> See the guide here https://datasaurai.gitbook.io/datasaur/advanced/datasaur-apis/oauth-2.0#generate-oauth-credentials-menu",
+    "clientSecret": "<DATASAUR_CLIENT_SECRET> See the guide here https://datasaurai.gitbook.io/datasaur/advanced/datasaur-apis/oauth-2.0#generate-oauth-credentials-menu"
+  },
+  "credentials": {
+    "azure": {
+      "connectionString": "<CONNECTION_STRING_FROM_STORAGE_ACCOUNT>",
+      "containerName": "<CONTAINER_NAME>"
+    }
+  },
+  "projectState": {
+    "source": "azure",
+    "bucketName": "<CONTAINER_NAME>",
+    "path": "path/to/stateFile.json"
+  },
+  "export": {
+    "source": "azure",
+    "bucketName": "<CONTAINER_NAME>",
+    "prefix": "download",
+    "teamId": "<TEAM_ID>",
+    "statusFilter": ["COMPLETE"],
+    "format": "CUSTOM",
+    "customScriptId": "<CUSTOM_SCRIPT_ID>"
+  },
+  "create": {
+    "teamId": "<TEAM_ID>",
+    "files": {
+      "source": "azure",
+      "bucketName": "<CONTAINER_NAME>",
+      "prefix": "projects"
+    },
+    "pcwPayloadSource": {
+      "source": "azure",
+      "bucketName": "<CONTAINER_NAME>"
+    },
+    "pcwAssignmentStrategy": "AUTO",
+    "pcwPayload": "path/to/pcwScript.json"
+  }
+}

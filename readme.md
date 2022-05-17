@@ -247,7 +247,7 @@ In this part we will explain each part of the Robosaur config file. We will use 
 
 ### Storage configuration
 
-There are numerous `"source": "local"` in many places, and we said to keep them as-is. For most use cases, creating and exporting projects to and from local storage is the simplest approach. However, Robosaur also supports project creation from files located in S3 buckets and GCS buckets! All we need to do is set the correct credentials, and change the `source` to `s3` or `gcs`.
+There are numerous `"source": "local"` in many places, and we said to keep them as-is. For most use cases, creating and exporting projects to and from local storage is the simplest approach. However, Robosaur also supports project creation from files located in S3 buckets, GCS buckets, and Azure Blob Storage containers! All we need to do is set the correct credentials, and change the `source` to `s3`, `gcs`, or `azure`.
 
 Here are the examples for credentials and other configs:
 
@@ -309,6 +309,30 @@ Here are the examples for credentials and other configs:
    - s3:PutObjectAcl
    - s3:DeleteObject
 
+3. Azure Blob Storage - `config/azure-blob-storage/config.json`
+
+   ```json
+   {
+     "credentials": {
+       "azure": {
+         "connectionString": "my-connection-string",
+         "containerName": "my-azure-container"
+       }
+     },
+     "projectState": {
+       "source": "azure",
+       "bucketName": "my-azure-container",
+       "path": "path/to/stateFile.json"
+     }
+   }
+   ```
+
+   Both `connectionString` and `containerName` are required.
+
+   You can obtain your `connectionString` by copying one of the connection strings from your Azure Storage Account.
+
+   The `containerName` is where you would upload your projects, inside a `projects` folder.
+
 ## Using PCW Payload
 
 Robosaur's config file uses a different format compared to the **View Script** option during Project Creation Wizard (PCW). To use the script generated from PCW use the option `--use-pcw` on `create-projects` command.
@@ -361,7 +385,7 @@ Example:
 }
 ```
 
-- `"gcs"` or `"s3"`: store the PCW script in an object cloud storage. `pcwPayloadSource` should contain another value called `bucketName` and `pcwPaylod` should be a `string` containing a url to the file in the object cloud storage. Don't forget to provide credentials to the chosen cloud provider (refer [here](#storage-configuration)).
+- `"gcs"`, `"s3"`, or `"azure"`: store the PCW script in an object cloud storage. `pcwPayloadSource` should contain another value called `bucketName` and `pcwPayload` should be a `string` containing a path to the file in the object cloud storage. Don't forget to provide credentials to the chosen cloud provider (refer [here](#storage-configuration)).
 
 Example:
 
