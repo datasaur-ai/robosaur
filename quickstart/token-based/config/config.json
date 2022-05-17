@@ -1,8 +1,8 @@
 {
   "datasaur": {
-    "host": "https://app.datasaur.ai",
-    "clientId": "<DATASAUR_CLIENT_ID>",
-    "clientSecret": "<DATASAUR_CLIENT_SECRET>"
+    "host": "http://localhost:8080",
+    "clientId": "e09b9165-0010-49ae-bedb-72f8c1da9bb7",
+    "clientSecret": "ce5603b0-4d05-4d75-96d0-18167601e6f2"
   },
   "projectState": {
     "source": "local",
@@ -11,13 +11,13 @@
   "export": {
     "source": "local",
     "prefix": "quickstart/token-based/export",
-    "teamId": "<TEAM_ID>",
+    "teamId": "1",
     "statusFilter": [],
     "format": "JSON_ADVANCED",
     "customScriptId": null
   },
   "create": {
-    "teamId": "<TEAM_ID>",
+    "teamId": "1",
     "files": {
       "source": "local",
       "path": "quickstart/token-based/documents"
