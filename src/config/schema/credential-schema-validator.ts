@@ -30,10 +30,10 @@ const CredentialsSchema: JSONSchemaType<CredentialsConfig> = {
     [StorageSources.AZURE]: {
       type: 'object',
       properties: {
-        azureConnectionString: { type: 'string' },
+        connectionString: { type: 'string' },
         containerName: { type: 'string' }
       },
-      required: ['azureConnectionString', 'containerName'],
+      required: ['connectionString', 'containerName'],
     }
   },
   required: [],

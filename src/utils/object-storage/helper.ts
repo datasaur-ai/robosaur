@@ -5,7 +5,7 @@ import { StorageSources } from '../../config/interfaces';
 
 export function getAzureBlobConfig() {
   return {
-    connectionString: getConfig().credentials[StorageSources.AZURE].azureConnectionString,
+    connectionString: getConfig().credentials[StorageSources.AZURE].connectionString,
     containerName: getConfig().credentials[StorageSources.AZURE].containerName,
   };
 }

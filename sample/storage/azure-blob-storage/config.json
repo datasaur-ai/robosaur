@@ -6,7 +6,7 @@
   },
   "credentials": {
     "azure": {
-      "azureConnectionString": "<CONNECTION_STRING_FROM_STORAGE_ACCOUNT>",
+      "connectionString": "<CONNECTION_STRING_FROM_STORAGE_ACCOUNT>",
       "containerName": "<CONTAINER_NAME>"
     }
   },

@@ -217,7 +217,7 @@ export interface CredentialsConfig {
     /**
      * @description Connection string from Azure Storage Account.
      */
-    azureConnectionString: string;
+    connectionString: string;
     /**
      * @description Name of the container for the projects, scripts, and exported files.
      */

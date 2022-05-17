@@ -315,7 +315,7 @@ Here are the examples for credentials and other configs:
    {
      "credentials": {
        "azure": {
-         "azureConnectionString": "my-connection-string",
+         "connectionString": "my-connection-string",
          "containerName": "my-azure-container"
        }
      },
@@ -327,9 +327,9 @@ Here are the examples for credentials and other configs:
    }
    ```
 
-   Both `azureConnectionString` and `containerName` are required.
+   Both `connectionString` and `containerName` are required.
 
-   You can obtain your `azureConnectionString` by copying one of the connection strings from your Azure Storage Account.
+   You can obtain your `connectionString` by copying one of the connection strings from your Azure Storage Account.
 
    The `containerName` is where you would upload your projects, inside a `projects` folder.
 
