@@ -29,7 +29,7 @@ export async function createProject(
   const projectDocuments = documents.map((document) => {
     return {
       ...document,
-      customScriptId: settings.documentSettings.customScriptId ?? undefined,
+      fileTransformerId: settings.documentSettings.fileTransformerId ?? undefined,
       docFileOptions: {
         ...settings.docFileOptions,
         firstRowAsHeader: settings?.docFileOptions?.firstRowAsHeader ?? !!settings.documentSettings?.firstRowAsHeader,

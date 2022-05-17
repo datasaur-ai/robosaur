@@ -12,7 +12,7 @@ const getFromInline = (pcwPayload: string | (PCWWrapper & PCWPayload)) => {
     throw new WrongPcwPayloadType('INLINE', 'string');
   }
 
-  return pcwPayload?.variables.input || pcwPayload;
+  return pcwPayload?.variables?.input || pcwPayload;
 };
 
 const getFromLocal = (pcwPayloadSource: PCWSource, pcwPayload: string | (PCWWrapper & PCWPayload)) => {
