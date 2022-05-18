@@ -40,7 +40,10 @@ export async function createProject(
   projectDocuments[0]['settings'] = { questions: settings.questions };
 
   let labelSetIDs: string[] | null = null;
-  if (settings.documentSettings.kind === 'TOKEN_BASED' && settings.labelSets) {
+  if (
+    (settings.documentSettings.kind === 'TOKEN_BASED' || settings.kinds?.includes('TOKEN_BASED')) &&
+    settings.labelSets
+  ) {
     labelSetIDs = await Promise.all(
       settings.labelSets.map(async (labelSet, index) => {
         if (labelSet) {

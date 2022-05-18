@@ -72,29 +72,31 @@ export async function handleCreateProjects(configFile: string, options) {
   getLogger().info(`found ${projectsToCreate.length} projects to create: ${JSON.stringify(projectsToCreate)}`);
 
   const updatedProjectConfig = getConfig().create;
-  const projectKind = updatedProjectConfig.documentSettings.kind;
-  switch (projectKind) {
-    case 'TOKEN_BASED':
-      if (updatedProjectConfig.labelSets) break;
-      updatedProjectConfig.labelSets = getLabelSetsFromDirectory(getConfig());
-      break;
-    case 'DOCUMENT_BASED':
-    case 'ROW_BASED':
-      if (updatedProjectConfig.questions) break;
+
+  if (
+    updatedProjectConfig.documentSettings.kind == 'TOKEN_BASED' ||
+    updatedProjectConfig.kinds?.includes('TOKEN_BASED')
+  ) {
+    if (!updatedProjectConfig.labelSets) updatedProjectConfig.labelSets = getLabelSetsFromDirectory(getConfig());
+  } else if (
+    updatedProjectConfig.documentSettings.kind == 'ROW_BASED' ||
+    updatedProjectConfig.documentSettings.kind == 'DOCUMENT_BASED' ||
+    updatedProjectConfig.kinds?.includes('ROW_BASED') ||
+    updatedProjectConfig.kinds?.includes('DOCUMENT_BASED')
+  ) {
+    if (!updatedProjectConfig.questions) {
       if (updatedProjectConfig.questionSetFile) {
         updatedProjectConfig.questions = getQuestionSetFromFile(getConfig());
-        break;
+      } else {
+        getLogger().warn(`no 'questions' or 'questionSetFile' is configured in ${configFile}`);
+        if (getConfig().create.labelSetDirectory) {
+          getLogger().warn(
+            `Robosaur does not support ROW_BASED project creation using TOKEN_BASED csv labelsets. Please refer to our JSON documentation on how to structure ROW_BASED questions`,
+            { link: 'https://datasaurai.gitbook.io/datasaur/advanced/apis-docs/create-new-project/questions' },
+          );
+        }
       }
-      getLogger().warn(`no 'questions' or 'questionSetFile' is configured in ${configFile}`);
-      if (getConfig().create.labelSetDirectory) {
-        getLogger().warn(
-          `Robosaur does not support ROW_BASED project creation using TOKEN_BASED csv labelsets. Please refer to our JSON documentation on how to structure ROW_BASED questions`,
-          { link: 'https://datasaurai.gitbook.io/datasaur/advanced/apis-docs/create-new-project/questions' },
-        );
-      }
-      break;
-    default:
-      getLogger().warn(`unrecognized project kind: ${projectKind}...`);
+    }
   }
 
   getLogger().info('validating project assignment...');
