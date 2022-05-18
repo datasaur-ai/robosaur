@@ -22,13 +22,21 @@ const populateConfig = (payload: PCWPayload) => {
     getConfig().create.splitDocumentOption = mapSplitDocumentOptions.fromPcw(payload.splitDocumentOption);
   }
 
-  if (getConfig().create.documentSettings.kind === 'TOKEN_BASED' && payload.labelSets && payload.labelSets.length > 0) {
+  getConfig().create.kinds = payload.kinds;
+
+  if (
+    (getConfig().create.documentSettings.kind === 'TOKEN_BASED' || getConfig().create.kinds?.includes('TOKEN_BASED')) &&
+    payload.labelSets &&
+    payload.labelSets.length > 0
+  ) {
     getConfig().create.labelSets = mapLabelSet.fromPcw(payload.labelSets);
   }
 
   if (
     (getConfig().create.documentSettings.kind === 'ROW_BASED' ||
-      getConfig().create.documentSettings.kind === 'DOCUMENT_BASED') &&
+      getConfig().create.documentSettings.kind === 'DOCUMENT_BASED' ||
+      getConfig().create.kinds?.includes('ROW_BASED') ||
+      getConfig().create.kinds?.includes('DOCUMENT_BASED')) &&
     payload.documents &&
     payload.documents.length > 0 &&
     payload.documents[0].settings?.questions &&
