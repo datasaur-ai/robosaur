@@ -46,7 +46,7 @@ function validateConfigCredentials(config: Config) {
 }
 
 function doSourcesNeedCredentials(config: Config) {
-  const sourcesNeedCredentials = [StorageSources.AMAZONS3, StorageSources.GOOGLE];
+  const sourcesNeedCredentials = [StorageSources.AMAZONS3, StorageSources.GOOGLE, StorageSources.AZURE];
   const usedSources = [
     config.create?.assignment?.source,
     config.create?.files?.source,

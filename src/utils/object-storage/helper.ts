@@ -3,6 +3,13 @@ import { ClientOptions } from 'minio';
 import { getConfig } from '../../config/config';
 import { StorageSources } from '../../config/interfaces';
 
+export function getAzureBlobConfig() {
+  return {
+    connectionString: getConfig().credentials[StorageSources.AZURE].connectionString,
+    containerName: getConfig().credentials[StorageSources.AZURE].containerName,
+  };
+}
+
 export function getGCSConfig(): StorageOptions {
   return {
     keyFilename: getConfig().credentials[StorageSources.GOOGLE].gcsCredentialJson,

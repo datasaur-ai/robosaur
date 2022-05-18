@@ -21,7 +21,7 @@ const ExportSchema: JSONSchemaType<ExportConfig> = {
     {
       if: {
         properties: {
-          source: { enum: [StorageSources.AMAZONS3, StorageSources.GOOGLE] },
+          source: { enum: [StorageSources.AMAZONS3, StorageSources.GOOGLE, StorageSources.AZURE] },
         },
       },
       required: ['source'],

@@ -8,7 +8,6 @@ export const mapDocumentSettings = {
   fromPcw: (payload: TextDocumentSettingsInput): ConfigDocumentSettings => {
     return {
       kind: removeNulls(payload.kind),
-      customScriptId: removeNulls(payload.customScriptId),
       allTokensMustBeLabeled: removeNulls(payload.allTokensMustBeLabeled),
       allowArcDrawing: removeNulls(payload.allowArcDrawing),
       textLabelMaxTokenLength: removeNulls(payload.textLabelMaxTokenLength),
@@ -26,6 +25,11 @@ export const mapDocumentSettings = {
       allowMultiLabels: removeNulls(payload.allowMultiLabels),
       autoScrollWhenLabeling: removeNulls(payload.autoScrollWhenLabeling),
       sentenceSeparator: removeNulls(payload.sentenceSeparator),
+      anonymizationEntityTypes: removeNulls(payload.anonymizationEntityTypes),
+      anonymizationMaskingMethod: removeNulls(payload.anonymizationMaskingMethod),
+      anonymizationRegExps: removeNulls(payload.anonymizationRegExps),
+      fileTransformerId: removeNulls(payload.fileTransformerId),
+      enableAnonymization: removeNulls(payload.enableAnonymization),
     };
   },
 };

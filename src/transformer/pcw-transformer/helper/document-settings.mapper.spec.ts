@@ -48,7 +48,7 @@ describe('documentSettingsMapper', () => {
         'US_DRIVER_LICENSE',
         'IBAN_CODE',
       ],
-      customScriptId: '1',
+      fileTransformerId: '1',
     };
 
     const mapped: Config['create']['documentSettings'] = {
@@ -70,7 +70,25 @@ describe('documentSettingsMapper', () => {
       },
       firstRowAsHeader: false,
       enableTabularMarkdownParsing: false,
-      customScriptId: '1',
+      fileTransformerId: '1',
+      anonymizationEntityTypes: [
+        'PERSON',
+        'DATE_TIME',
+        'EMAIL_ADDRESS',
+        'PHONE_NUMBER',
+        'ORGANIZATION',
+        'LOCATION',
+        'DOMAIN_NAME',
+        'IP_ADDRESS',
+        'US_PASSPORT',
+        'CREDIT_CARD',
+        'US_SSN',
+        'US_ITIN',
+        'US_BANK_NUMBER',
+        'US_DRIVER_LICENSE',
+        'IBAN_CODE',
+      ],
+      enableAnonymization: false,
     };
 
     const result = mapDocumentSettings.fromPcw(fromPcw);

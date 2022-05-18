@@ -22,38 +22,111 @@
       "source": "local",
       "path": "quickstart/doc-based/document"
     },
-    "assignment": {
-      "source": "local",
-      "path": "quickstart/doc-based/config/assignment.json"
+    "pcwPayloadSource": {
+      "source": "inline"
     },
-    "projectSettings": {
-      "consensus": 1,
-      "enableEditLabelSet": false,
-      "enableEditSentence": false,
-      "hideLabelerNamesDuringReview": false,
-      "hideRejectedLabelsDuringReview": true,
-      "hideLabelsFromInactiveLabelSetDuringReview": false
-    },
-    "documentSettings": {
-      "kind": "DOCUMENT_BASED",
-      "customScriptId": null,
-      "displayedRows": -1,
-      "mediaDisplayStrategy": "THUMBNAIL",
-      "firstRowAsHeader": false,
-      "viewer": "URL",
-      "viewerConfig": {
-        "urlColumnNames": []
+    "pcwAssignmentStrategy": "AUTO",
+    "pcwPayload": {
+      "projectSettings": {
+        "consensus": 1,
+        "enableEditLabelSet": false,
+        "enableEditSentence": false,
+        "hideLabelerNamesDuringReview": false,
+        "hideRejectedLabelsDuringReview": true,
+        "hideLabelsFromInactiveLabelSetDuringReview": false
       },
-      "enableTabularMarkdownParsing": false
-    },
-    "questionSetFile": "quickstart/doc-based/config/question-set.json",
-    "docFileOptions": {
-      "firstRowAsHeader": false,
-      "customHeaderColumns": [
+      "documentSettings": {
+        "kind": "DOCUMENT_BASED",
+        "customScriptId": null,
+        "displayedRows": -1,
+        "mediaDisplayStrategy": "THUMBNAIL",
+        "firstRowAsHeader": false,
+        "viewer": "URL",
+        "viewerConfig": {
+          "urlColumnNames": []
+        },
+        "enableTabularMarkdownParsing": false
+      },
+      "documents": [
         {
-          "displayed": true,
-          "labelerRestricted": false,
-          "name": "Column 1"
+          "file": {
+            "path": "lorem.txt"
+          },
+          "fileName": "lorem.txt",
+          "name": "lorem.txt",
+          "settings": {
+            "questions": [
+              {
+                "type": "TEXT",
+                "config": {},
+                "name": "Q1",
+                "label": "Bound to Wind.Speed",
+                "bindToColumn": "Wind.Speed",
+                "required": true
+              },
+              {
+                "type": "TEXT",
+                "config": {},
+                "label": "Not bound, will add new column",
+                "name": "with this name",
+                "required": true
+              },
+              {
+                "type": "SLIDER",
+                "config": {
+                  "min": 1,
+                  "max": 10,
+                  "step": 1,
+                  "theme": "GRADIENT"
+                },
+                "name": "Q3",
+                "label": "Slider",
+                "required": false
+              },
+              {
+                "type": "CHECKBOX",
+                "config": {
+                  "hint": "Description, or hint will be displayed here"
+                },
+                "name": "Q4",
+                "label": "This is a checkbox question",
+                "required": false
+              },
+              {
+                "type": "DROPDOWN",
+                "config": {
+                  "multiple": false,
+                  "options": [
+                    {
+                      "id": "1",
+                      "label": "Option 1"
+                    },
+                    {
+                      "id": "2",
+                      "label": "Option 2"
+                    },
+                    {
+                      "id": "3",
+                      "label": "Option 3"
+                    }
+                  ]
+                },
+                "name": "Q5",
+                "label": "Choose one answer from dropdown",
+                "required": false
+              }
+            ]
+          },
+          "docFileOptions": {
+            "firstRowAsHeader": false,
+            "customHeaderColumns": [
+              {
+                "displayed": true,
+                "labelerRestricted": false,
+                "name": "Column 1"
+              }
+            ]
+          }
         }
       ]
     }
