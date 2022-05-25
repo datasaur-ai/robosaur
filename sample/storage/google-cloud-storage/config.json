@@ -19,7 +19,7 @@
     "teamId": "<TEAM_ID>",
     "statusFilter": ["COMPLETE"],
     "format": "CUSTOM",
-    "customScriptId": "<CUSTOM_SCRIPT_ID>"
+    "fileTransformerId": "<FILE_TRANSFORMER_ID>"
   },
   "create": {
     "teamId": "<TEAM_ID>",
@@ -43,7 +43,7 @@
     },
     "documentSettings": {
       "kind": "TOKEN_BASED",
-      "customScriptId": "<CUSTOM SCRIPT ID>",
+      "fileTransformerId": "<FILE TRANSFORMER ID>",
 
       "allowCharacterBasedLabeling": false,
       "allowArcDrawing": true,

@@ -2065,7 +2065,7 @@ export type LaunchTextProjectInput = {
   assignees?: InputMaybe<Array<ProjectAssignmentByNameInput>>;
   /** Optional. Team projects only. Assign specific document to specific team member. */
   documentAssignments?: InputMaybe<Array<DocumentAssignmentInput>>;
-  /** Document related configuration, such as token length and custom script. */
+  /** Document related configuration, such as token length and file transformer. */
   documentSettings: TextDocumentSettingsInput;
   /** Required. The documents associated to the project. Please ensure all the documents uploaded are of the same type. */
   documents?: InputMaybe<Array<CreateTextDocumentInput>>;

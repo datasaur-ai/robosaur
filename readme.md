@@ -197,7 +197,7 @@ Example:
     }
   },
   "format": "JSON_ADVANCED",
-  "customScriptId": null
+  "fileTransformerId": null
 },
 ...
 ```
@@ -235,7 +235,7 @@ In this part we will explain each part of the Robosaur config file. We will use 
    3. `"project"`  
       This is the Datasaur project configuration.  
       More options can be seen by creating a project via the web UI, and then clicking the `View Script` button.  
-      In general, we want to keep these mostly unchanged, except for `project.teamId` and `project.customScriptId`
+      In general, we want to keep these mostly unchanged, except for `project.teamId` and `project.fileTransformerId`
       1. `docFileOptions` - Configuration specific for `ROW_BASED` configs. Refer to [`row-based.md`](row-based.md) for more information.
       2. `splitDocumentOption` - Allows splitting each document to several parts, based on the `strategy` and `number` option. For more information, see <https://datasaurai.gitbook.io/datasaur/basics/workforce-management/split-files>
 
@@ -243,7 +243,7 @@ In this part we will explain each part of the Robosaur config file. We will use 
    1. `"export"`  
       This changes Robosaur's export behavior.  
       `export.prefix` is the folder path where Robosaur will save the export result - make sure Robosaur has write permission to the folder.  
-      `export.format` & `export.customScriptId` affects how Datasaur will export our projects. See this [gitbook link](https://datasaurai.gitbook.io/datasaur/advanced/apis-docs/export-project#export-all-files) for more details.
+      `export.format` & `export.fileTransformerId` affects how Datasaur will export our projects. See this [gitbook link](https://datasaurai.gitbook.io/datasaur/advanced/apis-docs/export-project#export-all-files) for more details.
 
 ### Storage configuration
 

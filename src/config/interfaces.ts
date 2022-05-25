@@ -106,8 +106,8 @@ export interface CreateConfig {
      */
     kind?: string;
     /**
-     * @description determine the custom script to be used.
-     * The ID can be obtained from the custom script page in this format: https://app.datasaur.ai/teams/{teamId}/custom-scripts/{custom-script-id}
+     * @description determine the file transformer to be used.
+     * The ID can be obtained from the file transformer page in this format: https://app.datasaur.ai/teams/{teamId}/file-transformers/{file-transformer-id}
      */
     fileTransformerId?: string;
 
@@ -323,9 +323,9 @@ export interface ExportConfig extends WithStorage {
   /**
    * @description custom export script to use
    * only used when format is CUSTOM
-   * The ID can be obtained from the custom script page in this format: https://app.datasaur.ai/teams/{teamId}/custom-scripts/{custom-script-id}
+   * The ID can be obtained from the file transformer page in this format: https://app.datasaur.ai/teams/{teamId}/file-transformers/{file-transformer-id}
    */
-  customScriptId: string;
+  fileTransformerId: string;
 }
 
 interface WithStorage {

@@ -18,12 +18,12 @@ export async function exportProject(
   projectId: string,
   fileName: string,
   format: ExportFormat,
-  customScriptId?: string,
+  fileTransformerId?: string,
 ): Promise<ExportResult> {
   const variables = {
     input: {
       projectIds: [projectId],
-      customScriptId,
+      fileTransformerId,
       role: 'REVIEWER',
       format: format,
       fileName,

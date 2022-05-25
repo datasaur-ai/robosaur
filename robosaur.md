@@ -153,9 +153,9 @@ Some notable ones are:
    A common example would be to do the export when the project has been marked completed by the labeler. To do this, we would apply the `["REVIEW_READY", "IN_REVIEW"]` filter. If we also want to export reviewed projects, we can add `"COMPLETE"` to the filter.
 2. `format` => what export format to export the project with  
    Please note that not all types of project can be exported to all export format. For more complete details, please refer to Datasaur's GitBook [here](https://datasaurai.gitbook.io/datasaur/advanced/apis-docs/export-project#export-all-files)
-3. `customScriptId` => which custom export script to use
+3. `fileTransformerId` => which custom export script to use
    This field is only used when the `format` field is set to `CUSTOM`.  
-   The ID itself can be obtained from the custom script URL in this format: `https://app.datasaur.ai/teams/{teamId}/custom-scripts/{custom-script-id}`.  
+   The ID itself can be obtained from the file transformer URL in this format: `https://app.datasaur.ai/teams/{teamId}/file-transformers/{file-transformer-id}`.
    For more details in creating and / or using your own custom export script, please refer to Datasaur GitBook [here](https://datasaurai.gitbook.io/datasaur/basics/workforce-management/custom-scripts)
 4. `source`, `prefix` => where the export results should be saved.  
    `source` can be either `local`, `s3` or `gcs`. For `s3` and `gcs`, we will also need to specify `bucketName` and `config.credentials` to give Robosaur access to the bucket.  
@@ -166,7 +166,7 @@ Some notable ones are:
 For the `create-projects` command, Robosaur can behave smarter with the help of a state file.
 
 In case of project creation using `create-projects`, the state file will keep track on what projects have been submitted to Datasaur, and for which teams.
-This allows the script to be used to create projects using the same bucket structure for different teams by only changing the relevant config (for example `teamId`, `assignment` and `customScriptId`)
+This allows the script to be used to create projects using the same bucket structure for different teams by only changing the relevant config (for example `teamId`, `assignment` and `fileTransformerId`)
 
 For project export using `export-projects`, the state file will keep track which projects have been exported from which teams. In subsequent runs, any projects that have been previously exported will only be exported again if there is a change in the project status.
 

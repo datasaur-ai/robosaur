@@ -10,7 +10,7 @@
     "teamId": "<TEAM_ID>",
     "statusFilter": ["COMPLETE"],
     "format": "JSON_ADVANCED",
-    "customScriptId": null
+    "fileTransformerId": null
   },
   "create": {
     "teamId": "<TEAM_ID>",
@@ -32,7 +32,7 @@
     },
     "documentSettings": {
       "kind": "TOKEN_BASED",
-      "customScriptId": null,
+      "fileTransformerId": null,
 
       "allowCharacterBasedLabeling": false,
       "allowArcDrawing": true,
