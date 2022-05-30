@@ -20,7 +20,7 @@ const handleStateless = async (unzip: boolean) => {
     statusFilter,
     teamId,
     format: exportFormat,
-    customScriptId: exportCustomScriptId,
+    fileTransformerId: exportFileTransformerId,
     source,
     projectFilter,
   } = getConfig().export;
@@ -62,12 +62,12 @@ const handleStateless = async (unzip: boolean) => {
         id: project.id,
         name: filename,
         format: exportFormat,
-        customScriptId: exportCustomScriptId,
+        fileTransformerId: exportFileTransformerId,
       },
     });
     let retval: ExportResult | null = null;
     try {
-      retval = await exportProject(project.id, filename, exportFormat, exportCustomScriptId);
+      retval = await exportProject(project.id, filename, exportFormat, exportFileTransformerId);
     } catch (error) {
       retval = {
         exportId: 'dummyexport',
@@ -128,7 +128,7 @@ export async function handleExportProjects(configFile: string, { unzip }: { unzi
     statusFilter,
     teamId,
     format: exportFormat,
-    customScriptId: exportCustomScriptId,
+    fileTransformerId: exportFileTransformerId,
     source,
     projectFilter,
   } = getConfig().export;
@@ -185,12 +185,12 @@ export async function handleExportProjects(configFile: string, { unzip }: { unzi
         id: project.projectId,
         name: project.projectName,
         format: exportFormat,
-        customScriptId: exportCustomScriptId,
+        fileTransformerId: exportFileTransformerId,
       },
     });
     let retval: ExportResult | null = null;
     try {
-      retval = await exportProject(project.projectId as string, name, exportFormat, exportCustomScriptId);
+      retval = await exportProject(project.projectId as string, name, exportFormat, exportFileTransformerId);
     } catch (error) {
       retval = {
         exportId: 'dummyexport',
