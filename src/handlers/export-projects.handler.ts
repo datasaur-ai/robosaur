@@ -252,7 +252,15 @@ export async function handleExportProjects(configFile: string, { unzip }: { unzi
 async function getTagIds(teamId: string, tagsName: string[]) {
   if (tagsName.length === 0) return undefined;
   const tags = await getTeamTags(teamId);
-  const tagIds = tags.filter((tag) => tagsName.includes(tag.name)).map((tag) => tag.id);
+
+  const tagIds = tagsName.map((tagName) => {
+    const tag = tags.find((tag) => tag.name === tagName);
+    if (tag === undefined) {
+      throw new Error(`Tag ${tagName} is not found.`);
+    }
+    return tag.id;
+  });
+
   if (tagIds.length === 0) {
     throw new Error(`${tagsName} is not found.`);
   }
