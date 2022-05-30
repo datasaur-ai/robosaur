@@ -9,7 +9,7 @@
     "start": "ts-node src/index.ts",
     "codegen": "graphql-codegen --config codegen.yml",
     "build": "rimraf dist/ && tsc --project tsconfig.json",
-    "prepare": "npm run build"
+    "postinstall": "npm run build"
   },
   "dependencies": {
     "@azure/storage-blob": "~12.9.0",
