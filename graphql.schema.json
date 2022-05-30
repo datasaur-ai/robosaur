@@ -16531,7 +16531,7 @@
           },
           {
             "name": "documentSettings",
-            "description": "Document related configuration, such as token length and custom script.",
+            "description": "Document related configuration, such as token length and file transformer.",
             "type": {
               "kind": "NON_NULL",
               "name": null,

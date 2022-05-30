@@ -13,7 +13,7 @@ const ExportSchema: JSONSchemaType<ExportConfig> = {
     source: { type: 'string' },
     bucketName: { type: 'string' },
     prefix: { type: 'string' },
-    customScriptId: { type: 'string', nullable: true },
+    fileTransformerId: { type: 'string', nullable: true },
   },
 
   required: ['teamId', 'format', 'statusFilter'],
@@ -43,9 +43,9 @@ const ExportSchema: JSONSchemaType<ExportConfig> = {
   },
   then: {
     properties: {
-      customScriptId: { type: 'string', nullable: false },
+      fileTransformerId: { type: 'string', nullable: false },
     },
-    required: ['customScriptId'],
+    required: ['fileTransformerId'],
   },
 };
 

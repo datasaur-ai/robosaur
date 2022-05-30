@@ -11,10 +11,10 @@
   "export": {
     "source": "local",
     "prefix": "path/to/export/root",
-    "teamId": "<TEAM)ID>",
+    "teamId": "<TEAM_ID>",
     "statusFilter": [],
     "format": "JSON_ADVANCED",
-    "customScriptId": null
+    "fileTransformerId": null
   },
   "files": {
     "source": "local",
