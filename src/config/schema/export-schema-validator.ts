@@ -1,6 +1,6 @@
-import Ajv, { JSONSchemaType, str } from 'ajv';
+import Ajv, { JSONSchemaType } from 'ajv';
 import { ExportFormat } from '../../datasaur/interfaces';
-import { ExportConfig, StorageSources } from '../interfaces';
+import { ExportConfig, StateConfig, StorageSources } from '../interfaces';
 
 const schemaValidator = new Ajv({ allErrors: true });
 
@@ -14,6 +14,8 @@ const ExportSchema: JSONSchemaType<ExportConfig> = {
     bucketName: { type: 'string' },
     prefix: { type: 'string' },
     customScriptId: { type: 'string', nullable: true },
+    executionMode: { type: 'string', enum: [StateConfig.STATEFUL, StateConfig.STATELESS], nullable: true },
+    projectFilter: { type: 'object', nullable: true, required: ['kind'] },
   },
 
   required: ['teamId', 'format', 'statusFilter'],
