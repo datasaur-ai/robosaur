@@ -4,7 +4,7 @@ import { getProjectExportValidators } from '../config/schema/validator';
 import { exportProject } from '../datasaur/export-project';
 import { JobStatus } from '../datasaur/get-jobs';
 import { getProjects } from '../datasaur/get-projects';
-import { getTags } from '../datasaur/get-tags';
+import { getTeamTags } from '../datasaur/get-team-tags';
 import { ExportResult } from '../datasaur/interfaces';
 import { getLogger } from '../logger';
 import { pollJobsUntilCompleted } from '../utils/polling.helper';
@@ -251,7 +251,7 @@ export async function handleExportProjects(configFile: string, { unzip }: { unzi
 
 async function getTagIds(teamId: string, tagsName: string[]) {
   if (tagsName.length === 0) return undefined;
-  const tags = await getTags(teamId);
+  const tags = await getTeamTags(teamId);
   const tagIds = tags.filter((tag) => tagsName.includes(tag.name)).map((tag) => tag.id);
   if (tagIds.length === 0) {
     throw new Error(`${tagsName} is not found.`);
