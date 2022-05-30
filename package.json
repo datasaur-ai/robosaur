@@ -8,7 +8,7 @@
     "test": "jest",
     "start": "ts-node src/index.ts",
     "codegen": "graphql-codegen --config codegen.yml",
-    "build": "rimraf dist/ && tsc --project tsconfig.json",
+    "build": "rimraf dist/ && tsc --project tsconfig.json --outDir ./dist",
     "postinstall": "npm run build"
   },
   "dependencies": {
