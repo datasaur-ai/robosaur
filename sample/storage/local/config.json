@@ -14,7 +14,7 @@
     "teamId": "<TEAM_ID>",
     "statusFilter": ["COMPLETE"],
     "format": "CUSTOM",
-    "fileTransformerId": "<FILE TRANSFORMER ID>"
+    "fileTransformerId": "<FILE_TRANSFORMER_ID>"
   },
   "create": {
     "teamId": "<TEAM_ID>",

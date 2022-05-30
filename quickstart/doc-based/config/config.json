@@ -14,7 +14,7 @@
     "teamId": "<TEAM_ID>",
     "statusFilter": [],
     "format": "CSV",
-    "customScriptId": null
+    "fileTransformerId": null
   },
   "create": {
     "teamId": "<TEAM_ID>",
@@ -37,7 +37,7 @@
       },
       "documentSettings": {
         "kind": "DOCUMENT_BASED",
-        "customScriptId": null,
+        "fileTransformerId": null,
         "displayedRows": -1,
         "mediaDisplayStrategy": "THUMBNAIL",
         "firstRowAsHeader": false,

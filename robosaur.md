@@ -156,7 +156,7 @@ Some notable ones are:
 3. `fileTransformerId` => which custom export script to use
    This field is only used when the `format` field is set to `CUSTOM`.  
    The ID itself can be obtained from the file transformer URL in this format: `https://app.datasaur.ai/teams/{teamId}/file-transformers/{file-transformer-id}`.
-   For more details in creating and / or using your own custom export script, please refer to Datasaur GitBook [here](https://datasaurai.gitbook.io/datasaur/basics/workforce-management/custom-scripts)
+   For more details in creating and / or using your own custom export script, please refer to Datasaur GitBook [here](https://datasaurai.gitbook.io/datasaur/basics/workforce-management/file-transformer)
 4. `source`, `prefix` => where the export results should be saved.  
    `source` can be either `local`, `s3` or `gcs`. For `s3` and `gcs`, we will also need to specify `bucketName` and `config.credentials` to give Robosaur access to the bucket.  
    `prefix` sets the folder that will contain the export results. If we want Robosaur to save in the root directory (for example to the root directory of S3 bucket) we can set `prefix` to an empty string `""`.

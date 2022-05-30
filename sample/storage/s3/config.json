@@ -49,7 +49,7 @@
     },
     "documentSettings": {
       "kind": "TOKEN_BASED",
-      "fileTransformerId": "<FILE TRANSFORMER ID>",
+      "fileTransformerId": "<FILE_TRANSFORMER_ID>",
 
       "allowCharacterBasedLabeling": false,
       "allowArcDrawing": true,
