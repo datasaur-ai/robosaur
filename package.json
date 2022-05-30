@@ -33,6 +33,7 @@
     "@types/adm-zip": "0.4.34",
     "@types/graphql": "^14.5.0",
     "@types/jest": "27.4.0",
+    "@types/lodash": "^4.14.182",
     "@types/minio": "7.0.11",
     "@types/node": "16.11.21",
     "@types/papaparse": "5.3.1",
