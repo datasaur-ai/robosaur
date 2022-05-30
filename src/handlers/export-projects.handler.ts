@@ -260,10 +260,6 @@ async function getTagIds(teamId: string, tagsName: string[]) {
     }
     return tag.id;
   });
-
-  if (tagIds.length === 0) {
-    throw new Error(`${tagsName} is not found.`);
-  }
   return tagIds;
 }
 
