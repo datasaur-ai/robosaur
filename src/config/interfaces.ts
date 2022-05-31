@@ -54,7 +54,7 @@ export interface Config {
   exportProjectList: ExportProjectListConfig;
 
   // revert project status
-  revert?: RevertConfig;
+  revert: RevertConfig;
 }
 
 export interface CreateConfig {

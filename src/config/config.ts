@@ -48,8 +48,8 @@ export function getActiveTeamId() {
 function setActiveTeamId(context: ScriptAction) {
   switch (context) {
     case ScriptAction.REVERT_PROJECT_STATUS:
-      getLogger().info(`action ${context} does not use activeTeamId`);
-      return;
+      activeTeamId = getConfig().revert.teamId;
+      break;
     case ScriptAction.PROJECT_CREATION:
       activeTeamId =
         getConfig().create.teamId ||
