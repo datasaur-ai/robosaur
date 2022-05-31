@@ -46,8 +46,8 @@
     "prettier": "2.2.1",
     "ts-jest": "26.5.6",
     "ts-loader": "5.4.5",
-    "ts-node": "10.4.0",
-    "typescript": "3.9.10"
+    "ts-node": "10.8.0",
+    "typescript": "4.7.2"
   },
   "author": "Datasaur.ai (https://github.com/datasaur-ai)",
   "license": "MIT",
