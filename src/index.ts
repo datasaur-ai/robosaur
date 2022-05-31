@@ -4,6 +4,7 @@ import { handleCreateProject } from './handlers/create-project.handler';
 import { handleCreateProjects } from './handlers/create-projects.handler';
 import { handleExportProjectList } from './handlers/export-projects-list.handler';
 import { handleExportProjects } from './handlers/export-projects.handler';
+import { handleRevertCompletedProjectsToInReview } from './handlers/revert-completed-projects.handler';
 import { getLogger } from './logger';
 
 const program = new Command();
@@ -33,6 +34,11 @@ program
   .command(`export-project-list <configFile>`)
   .description('Export project list as a csv based on the given config file')
   .action(handleExportProjectList);
+
+program
+  .command('revert-completed-projects-to-in-review <configFile> <projectListTxt> <teamId>')
+  .description('Reverts all project status from COMPLETED to IN_REVIEW. Will use the supplied teamId')
+  .action(handleRevertCompletedProjectsToInReview);
 
 program.parseAsync(process.argv);
 

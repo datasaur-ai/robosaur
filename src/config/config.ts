@@ -47,6 +47,9 @@ export function getActiveTeamId() {
 
 function setActiveTeamId(context: ScriptAction) {
   switch (context) {
+    case ScriptAction.REVERT_PROJECT_STATUS:
+      getLogger().info(`action ${context} does not use activeTeamId`);
+      return;
     case ScriptAction.PROJECT_CREATION:
       activeTeamId =
         getConfig().create.teamId ||
@@ -60,6 +63,7 @@ function setActiveTeamId(context: ScriptAction) {
       activeTeamId = getConfig().exportProjectList.teamId;
       break;
     case ScriptAction.NONE:
+    default:
       getLogger().warn('unspecified script context, attempt to set teamId automatically');
       const projectCreationTeam =
         getConfig().create.teamId ||
@@ -69,4 +73,6 @@ function setActiveTeamId(context: ScriptAction) {
       activeTeamId = projectCreationTeam ?? projectExportTeam;
       break;
   }
+
+  getLogger().info(`activeTeamId ${activeTeamId}`);
 }
