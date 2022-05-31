@@ -52,6 +52,9 @@ export interface Config {
 
   // project-list export
   exportProjectList: ExportProjectListConfig;
+
+  // revert project status
+  revert?: RevertConfig;
 }
 
 export interface CreateConfig {
@@ -336,6 +339,18 @@ export interface ExportConfig extends WithStorage {
   fileTransformerId: string;
 }
 
+export interface RevertConfig extends WithStorage {
+  /**
+   * @description full-path to a TXT file containing projectIds
+   * For `local` source, can be a relative path to the file
+   */
+  path: string;
+
+  /**
+   * @description teamId where the projects are located
+   */
+  teamId: string;
+}
 interface WithStorage {
   source: StorageSources;
   /**
