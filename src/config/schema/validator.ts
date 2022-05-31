@@ -13,6 +13,10 @@ export function getProjectExportValidators() {
   return [validateConfigCredentials, validateConfigExport];
 }
 
+export function getProjectOverviewExportValidators() {
+  return [validateConfigCredentials, validateConfigProjectOverview];
+}
+
 function validateConfigDocuments(config: Config) {
   if (!documentsSchemaValidator(config.create?.files)) {
     getLogger().error(`config.documents has some errors`, { errors: documentsSchemaValidator.errors });
@@ -27,6 +31,14 @@ function validateConfigAssignment(config: Config) {
       throw new Error(`config.assignment has some errors: ${JSON.stringify(assignmentSchemaValidator.errors)}`);
     }
   }
+}
+
+function validateConfigProjectOverview(config: Config) {
+  //AJV Schema Validator
+  // if (!exportSchemaValidator(config.export)) {
+  //   getLogger().error(`config.export has some errors`, { errors: exportSchemaValidator.errors });
+  //   throw new Error(`config.export has some errors ${JSON.stringify({ errors: exportSchemaValidator.errors })}`);
+  // }
 }
 
 function validateConfigExport(config: Config) {

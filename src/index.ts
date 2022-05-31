@@ -2,6 +2,7 @@ import { Command } from 'commander';
 import packageJson from '../package.json';
 import { handleCreateProject } from './handlers/create-project.handler';
 import { handleCreateProjects } from './handlers/create-projects.handler';
+import { handleExportProjectOverview } from './handlers/export-projects-overview.handler';
 import { handleExportProjects } from './handlers/export-projects.handler';
 import { getLogger } from './logger';
 
@@ -27,6 +28,11 @@ program
   .option('-u --unzip', 'Unzips the exported projects, only storing the final version accepted by reviewers')
   .description('Export all projects based on the given config file')
   .action(handleExportProjects);
+
+program
+  .command(`export-project-overview <configFile>`)
+  .description('Export project overview as a csv based on the given config file')
+  .action(handleExportProjectOverview);
 
 program.parseAsync(process.argv);
 
