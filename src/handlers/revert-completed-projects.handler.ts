@@ -12,6 +12,7 @@ import { sleep } from '../utils/sleep';
 import { ScriptAction } from './constants';
 
 const TOGGLE_STATUS_POLLING_MS = 1500;
+const CHUNK_LENGTH = 10;
 
 export const handleRevertCompletedProjectsToInReview = async (configFile: string) => {
   setConfigByJSONFile(configFile, getRevertProjectStatusValidator(), ScriptAction.REVERT_PROJECT_STATUS);
@@ -30,7 +31,7 @@ export const handleRevertCompletedProjectsToInReview = async (configFile: string
     getLogger().warn(`Robosaur will only process projects with COMPLETE status`);
   }
 
-  const chunkedProjectIds = chunk(validProjectIds, 5);
+  const chunkedProjectIds = chunk(validProjectIds, CHUNK_LENGTH);
 
   const results: Array<{ projectId: string; status: string }> = [];
   for (const [idx, batch] of chunkedProjectIds.entries()) {

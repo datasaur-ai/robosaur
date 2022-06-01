@@ -38,7 +38,7 @@ program
 program
   .command('revert-completed-projects-to-in-review <configFile> <projectListTxt> <teamId>')
   .command('revert-completed-projects-to-in-review <configFile>')
-  .description('Reverts all project status from COMPLETED to IN_REVIEW. Will use the supplied teamId')
+  .description("Reverts the specified projects' status from COMPLETED to IN_REVIEW")
   .action(handleRevertCompletedProjectsToInReview);
 
 program.parseAsync(process.argv);
