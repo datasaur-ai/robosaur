@@ -44,12 +44,17 @@ For more in-depth breakdown, please refer to [row-based.md](row-based.md)
   - [Usage](#usage)
     - [`create-projects`](#create-projects)
     - [`export-projects`](#export-projects)
-  - [Stateful execution](#stateful-execution)
+    - [`export-project-overview`](#export-project-overview)
+  - [Execution Modes](#execution-modes)
+    - [Stateful Project Creation & Export](#stateful-project-creation--export)
+    - [Stateless project export](#stateless-project-export)
   - [Configuration](#configuration)
     - [Script-wide configuration](#script-wide-configuration)
     - [Per-command configuration](#per-command-configuration)
     - [Storage configuration](#storage-configuration)
-    - [Using Script from PCW](#using-script-from-pcw)
+  - [Using PCW Payload](#using-pcw-payload)
+    - [Providing Documents](#providing-documents)
+    - [Providing Labeler and Reviewer Assigments through PCW Payload](#providing-labeler-and-reviewer-assigments-through-pcw-payload)
 
 ## Requirements
 
@@ -138,6 +143,39 @@ This can be set in the `export.statusFilter` inside the config JSON. In `quickst
 {
   "export": {
     "statusFilter": ["COMPLETE"]
+  }
+}
+```
+
+### `export-project-overview`
+
+```console
+$ npm run start -- export-project-overview -h
+Usage: robosaur export-project-overview <configFile>
+
+Export project overview based on the given config file
+
+Options:
+  -h, --help  display help for command
+```
+
+Robosaur will try to export a csv that contain the project overview: id, name, status, tag, createdDate, completedDate.
+
+Robosaur supports filtering which project to export by the project status, tags, and date. This can be set in the `exportProjectOverview.projectFilter` inside the config JSON. For example, in `config.json`, this is set to be `quickstart/export-project-overview` like so:
+
+```json
+{
+  "exportProjectOverview.projectFilter": {
+    "teamId": "1",
+    "filename": "quickstart/export-project-overview/result.csv",
+    "projectFilter": {
+      "statuses": ["COMPLETED"],
+      "date": {
+        "newestDate": "2022-03-11",
+        "oldestDate": "2022-03-07"
+      }
+    },
+    "tags": ["PASS"]
   }
 }
 ```
