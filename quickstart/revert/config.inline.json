@@ -1,0 +1,12 @@
+{
+  "datasaur": {
+    "host": "https://app.datasaur.ai",
+    "clientId": "<DATASAUR_CLIENT_ID>",
+    "clientSecret": "<DATASAUR_CLIENT_SECRET>"
+  },
+  "revert": {
+    "source": "inline",
+    "payload": ["sample12345", "projectId67", "UPPERCASE89", "lowercase01", "numeric2345"],
+    "teamId": "<TEAM_ID>"
+  }
+}

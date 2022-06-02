@@ -67,12 +67,25 @@ export const handleRevertCompletedProjectsToInReview = async (configFile: string
 
 async function getProjectIds(revertConfig: RevertConfig) {
   let content = '';
-  if (revertConfig.source === StorageSources.LOCAL) {
-    content = readFileSync(revertConfig.path, { encoding: 'utf8' });
-  } else {
-    content = await getStorageClient().getStringFileContent(revertConfig.bucketName, revertConfig.path);
+  let projectIds: Array<string>;
+  switch (revertConfig.source) {
+    case StorageSources.LOCAL:
+      content = readFileSync(revertConfig.path, { encoding: 'utf8' });
+      projectIds = content.split('\n').map((id) => id.trim());
+      break;
+    case StorageSources.AMAZONS3:
+    case StorageSources.AZURE:
+    case StorageSources.GOOGLE:
+      content = await getStorageClient().getStringFileContent(revertConfig.bucketName, revertConfig.path);
+      projectIds = content.split('\n').map((id) => id.trim());
+      break;
+    case StorageSources.INLINE:
+      projectIds = revertConfig.payload;
+      break;
+    default:
+      throw new Error('Unsupported StorageSources');
   }
-  const projectIds = content.split('\n').map((id) => id.trim());
+
   getLogger().info(`Found ${projectIds.length} projectIds in ${revertConfig.path}`);
   return projectIds;
 }

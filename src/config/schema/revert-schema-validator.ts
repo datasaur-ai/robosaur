@@ -12,12 +12,19 @@ const RevertSchema: JSONSchemaType<RevertConfig> = {
     path: { type: 'string' },
     source: {
       type: 'string',
-      enum: [StorageSources.LOCAL, StorageSources.AMAZONS3, StorageSources.AZURE, StorageSources.GOOGLE],
+      enum: [
+        StorageSources.LOCAL,
+        StorageSources.AMAZONS3,
+        StorageSources.AZURE,
+        StorageSources.GOOGLE,
+        StorageSources.INLINE,
+      ],
     },
     teamId: { type: 'string' },
+    payload: { type: 'array', items: { type: 'string' }, nullable: true },
   },
 
-  required: ['source', 'path', 'teamId'],
+  required: ['source', 'teamId'],
   oneOf: [
     {
       if: {
@@ -27,7 +34,17 @@ const RevertSchema: JSONSchemaType<RevertConfig> = {
       },
       then: { required: ['source', 'path', 'teamId', 'bucketName'] },
       else: {
-        required: ['source', 'path', 'teamId'],
+        if: {
+          properties: {
+            source: { const: StorageSources.INLINE },
+          },
+        },
+        then: {
+          required: ['source', 'payload', 'teamId'],
+        },
+        else: {
+          required: ['source', 'path', 'teamId'],
+        },
       },
     },
   ],

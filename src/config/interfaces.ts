@@ -350,6 +350,15 @@ export interface RevertConfig extends WithStorage {
    * @description teamId where the projects are located
    */
   teamId: string;
+
+  source:
+    | StorageSources.AMAZONS3
+    | StorageSources.AZURE
+    | StorageSources.GOOGLE
+    | StorageSources.LOCAL
+    | StorageSources.INLINE;
+
+  payload: Array<string>;
 }
 interface WithStorage {
   source: StorageSources;
