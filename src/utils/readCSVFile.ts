@@ -1,4 +1,4 @@
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs';
+import { readFileSync } from 'fs';
 import * as Papa from 'papaparse';
 
 export const defaultCSVConfig: Papa.ParseConfig = {
@@ -23,20 +23,4 @@ export const defaultCSVConfig: Papa.ParseConfig = {
 export function readCSVFile(filepath: string, encoding: BufferEncoding = 'utf-8', config = defaultCSVConfig) {
   const content = readFileSync(filepath, { encoding });
   return Papa.parse(content, config);
-}
-
-export function writeCSVFile(content: any[], filename: string, encoding: BufferEncoding = 'utf-8') {
-  const csv = Papa.unparse(content);
-  createDirIfNotExist(filename);
-  return writeFileSync(filename, csv, { encoding });
-}
-
-function createDirIfNotExist(filename: string) {
-  const indexFilename = filename.lastIndexOf('/');
-  if (indexFilename > -1) {
-    const dir = filename.slice(0, indexFilename);
-    if (!existsSync(dir)) {
-      mkdirSync(dir, { recursive: true });
-    }
-  }
 }
