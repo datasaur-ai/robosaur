@@ -23,7 +23,7 @@ export const handleRevertCompletedProjectsToInReview = async (configFile: string
   const validProject = projects.filter((p) => projectIds.includes(p.id));
   const validProjectIds = validProject.map((p) => p.id);
 
-  const invalidProjectIds = difference([projectIds, validProjectIds]);
+  const invalidProjectIds = difference(projectIds, validProjectIds);
 
   getLogger().info(`Project with COMPLETED status: ${validProjectIds}`, {
     count: validProjectIds.length,
