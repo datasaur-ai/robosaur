@@ -1,0 +1,12 @@
+{
+  "datasaur": {
+    "host": "https://app.datasaur.ai",
+    "clientId": "<DATASAUR_CLIENT_ID>",
+    "clientSecret": "<DATASAUR_CLIENT_SECRET>"
+  },
+  "revert": {
+    "source": "local",
+    "path": "quickstart/revert/data.txt",
+    "teamId": "<TEAM_ID>"
+  }
+}

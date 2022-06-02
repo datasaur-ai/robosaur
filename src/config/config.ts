@@ -73,6 +73,4 @@ function setActiveTeamId(context: ScriptAction) {
       activeTeamId = projectCreationTeam ?? projectExportTeam;
       break;
   }
-
-  getLogger().info(`activeTeamId ${activeTeamId}`);
 }

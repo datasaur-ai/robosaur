@@ -1,0 +1,5 @@
+sample12345
+projectId67
+UPPERCASE89
+lowercase01
+numeric2345

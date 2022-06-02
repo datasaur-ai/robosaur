@@ -25,9 +25,15 @@ export const handleRevertCompletedProjectsToInReview = async (configFile: string
 
   const invalidProjectIds = difference([projectIds, validProjectIds]);
 
-  getLogger().info(`Project with COMPLETED status: ${validProjectIds}`);
+  getLogger().info(`Project with COMPLETED status: ${validProjectIds}`, {
+    count: validProjectIds.length,
+    projects: validProjectIds,
+  });
   if (invalidProjectIds.length > 0) {
-    getLogger().warn(`Project with other status: ${invalidProjectIds}`);
+    getLogger().warn(`Project with other status: ${invalidProjectIds}`, {
+      count: invalidProjectIds.length,
+      projects: invalidProjectIds,
+    });
     getLogger().warn(`Robosaur will only process projects with COMPLETE status`);
   }
 
@@ -60,11 +66,13 @@ export const handleRevertCompletedProjectsToInReview = async (configFile: string
 };
 
 async function getProjectIds(revertConfig: RevertConfig) {
+  let content = '';
   if (revertConfig.source === StorageSources.LOCAL) {
-    const content = readFileSync(revertConfig.path, { encoding: 'utf8' });
-    return content.split('\n').map((id) => id.trim());
+    content = readFileSync(revertConfig.path, { encoding: 'utf8' });
   } else {
-    const content = await getStorageClient().getStringFileContent(revertConfig.bucketName, revertConfig.path);
-    return content.split('\n').map((id) => id.trim());
+    content = await getStorageClient().getStringFileContent(revertConfig.bucketName, revertConfig.path);
   }
+  const projectIds = content.split('\n').map((id) => id.trim());
+  getLogger().info(`Found ${projectIds.length} projectIds in ${revertConfig.path}`);
+  return projectIds;
 }
