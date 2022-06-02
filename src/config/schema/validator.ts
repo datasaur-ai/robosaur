@@ -15,7 +15,7 @@ export function getProjectExportValidators() {
 }
 
 export function getProjectOverviewExportValidators() {
-  return [validateConfigCredentials, validateConfigProjectOverview];
+  return [validateConfigProjectOverview];
 }
 
 function validateConfigDocuments(config: Config) {
@@ -36,9 +36,13 @@ function validateConfigAssignment(config: Config) {
 
 function validateConfigProjectOverview(config: Config) {
   if (!exportProjectOverviewSchemaValidator(config.exportProjectOverview)) {
-    getLogger().error(`config.exportProjectOverview has some errors`, { errors: exportSchemaValidator.errors });
+    getLogger().error(`config.exportProjectOverview has some errors`, {
+      errors: exportProjectOverviewSchemaValidator.errors,
+    });
     throw new Error(
-      `config.exportProjectOverview has some errors ${JSON.stringify({ errors: exportSchemaValidator.errors })}`,
+      `config.exportProjectOverview has some errors ${JSON.stringify({
+        errors: exportProjectOverviewSchemaValidator.errors,
+      })}`,
     );
   }
 }
