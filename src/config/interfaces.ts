@@ -50,8 +50,8 @@ export interface Config {
   // project creation
   create: CreateConfig;
 
-  // project export
-  exportProjectOverview: ProjectOverviewExportConfig;
+  // project-overview export
+  exportProjectOverview: ExportProjectOverviewConfig;
 }
 
 export interface CreateConfig {
@@ -345,7 +345,7 @@ interface WithStorage {
   bucketName: string;
 }
 
-interface ProjectOverviewExportConfig {
+export interface ExportProjectOverviewConfig {
   /**
    * @description id of the team.
    * The ID can be obtained from your team workspace page in this format: https://app.datasaur.ai/teams/{teamId}
@@ -359,8 +359,7 @@ interface ProjectOverviewExportConfig {
   filename: string;
 
   /**
-   * @description Required if executionMode is 'stateless'
-   * A filter on which projects to export
+   * @description A filter on which projects to export
    */
   projectFilter?: {
     statuses?: ProjectStatus[];

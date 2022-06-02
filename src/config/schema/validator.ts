@@ -3,6 +3,7 @@ import { Config, StorageSources } from '../interfaces';
 import { assignmentSchemaValidator } from './assignment-schema-validator';
 import { credentialsSchemaValidator } from './credential-schema-validator';
 import { documentsSchemaValidator } from './documents-schema-validator';
+import { exportProjectOverviewSchemaValidator } from './export-project-overview-schema.validator';
 import { exportSchemaValidator } from './export-schema-validator';
 
 export function getProjectCreationValidators() {
@@ -34,11 +35,12 @@ function validateConfigAssignment(config: Config) {
 }
 
 function validateConfigProjectOverview(config: Config) {
-  //AJV Schema Validator
-  // if (!exportSchemaValidator(config.export)) {
-  //   getLogger().error(`config.export has some errors`, { errors: exportSchemaValidator.errors });
-  //   throw new Error(`config.export has some errors ${JSON.stringify({ errors: exportSchemaValidator.errors })}`);
-  // }
+  if (!exportProjectOverviewSchemaValidator(config.exportProjectOverview)) {
+    getLogger().error(`config.exportProjectOverview has some errors`, { errors: exportSchemaValidator.errors });
+    throw new Error(
+      `config.exportProjectOverview has some errors ${JSON.stringify({ errors: exportSchemaValidator.errors })}`,
+    );
+  }
 }
 
 function validateConfigExport(config: Config) {
