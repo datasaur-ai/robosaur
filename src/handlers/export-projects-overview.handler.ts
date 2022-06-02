@@ -1,9 +1,9 @@
 import { getConfig, setConfigByJSONFile } from '../config/config';
 import { getProjectExportValidators } from '../config/schema/validator';
 import { getProjects } from '../datasaur/get-projects';
-import { getTeamTags } from '../datasaur/get-team-tags';
 import { getLogger } from '../logger';
-import { writeCSVFile } from '../utils/readCSVFile';
+import { convertTagNamesToIds } from '../utils/tags/convertTagNamesToIds';
+import { writeCSVFile } from '../utils/writeCSVFile';
 import { ScriptAction } from './constants';
 
 export async function handleExportProjectOverview(configFile: string) {
@@ -13,7 +13,7 @@ export async function handleExportProjectOverview(configFile: string) {
 
   // retrieves projects from Datasaur matching the filters
   getLogger().info('retrieving projects with filters', { filter: projectFilter });
-  const tagIds = projectFilter?.tags ? await getTagIds(teamId, projectFilter.tags) : undefined;
+  const tagIds = projectFilter?.tags ? await convertTagNamesToIds(teamId, projectFilter.tags) : undefined;
   const projects = await getProjects({
     statuses: projectFilter?.statuses,
     teamId,
@@ -44,21 +44,8 @@ export async function handleExportProjectOverview(configFile: string) {
     };
   });
 
+  getLogger().info(`exporting csv to ${filename}`);
   await writeCSVFile(projectToExport, filename);
 
   getLogger().info('exiting script...');
-}
-
-async function getTagIds(teamId: string, tagsName: string[]) {
-  if (tagsName.length === 0) return;
-
-  const tags = await getTeamTags(teamId);
-
-  return tagsName.map((tagName) => {
-    const tag = tags.find((tag) => tag.name === tagName);
-    if (tag === undefined) {
-      throw new Error(`Tag ${tagName} is not found.`);
-    }
-    return tag.id;
-  });
 }
