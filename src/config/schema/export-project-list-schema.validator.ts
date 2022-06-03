@@ -7,7 +7,9 @@ const ExportProjectListSchema: JSONSchemaType<ExportProjectListConfig> = {
   type: 'object',
   properties: {
     teamId: { type: 'string' },
-    filename: { type: 'string' },
+    source: { type: 'string' },
+    bucketName: { type: 'string' },
+    path: { type: 'string' },
     projectFilter: {
       type: 'object',
       nullable: true,
@@ -19,7 +21,7 @@ const ExportProjectListSchema: JSONSchemaType<ExportProjectListConfig> = {
     },
   },
 
-  required: ['teamId', 'filename'],
+  required: ['teamId', 'path'],
 };
 
 export const exportProjectListSchemaValidator = schemaValidator.compile(ExportProjectListSchema);

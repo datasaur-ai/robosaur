@@ -345,7 +345,7 @@ interface WithStorage {
   bucketName: string;
 }
 
-export interface ExportProjectListConfig {
+export interface ExportProjectListConfig extends WithStorage {
   /**
    * @description id of the team.
    * The ID can be obtained from your team workspace page in this format: https://app.datasaur.ai/teams/{teamId}
@@ -353,10 +353,10 @@ export interface ExportProjectListConfig {
   teamId: string;
 
   /**
-   * @description filename to save the generated csv
-   * Including path to the folder containing sub-folders, without leading slash (/)
+   * @description Path to save the generated csv
+   * Path to the folder containing sub-folders, without leading slash (/)
    */
-  filename: string;
+  path: string;
 
   /**
    * @description A filter on which projects to export

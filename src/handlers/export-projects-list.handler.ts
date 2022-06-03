@@ -1,15 +1,17 @@
+import { mkdirSync, writeFileSync } from 'fs';
+import Papa from 'papaparse';
 import { getConfig, setConfigByJSONFile } from '../config/config';
+import { StorageSources } from '../config/interfaces';
 import { getProjectListExportValidators } from '../config/schema/validator';
 import { getProjects } from '../datasaur/get-projects';
 import { getLogger } from '../logger';
 import { convertTagNamesToIds } from '../utils/tags/convertTagNamesToIds';
-import { writeCSVFile } from '../utils/writeCSVFile';
 import { ScriptAction } from './constants';
 
 export async function handleExportProjectList(configFile: string) {
   setConfigByJSONFile(configFile, getProjectListExportValidators(), ScriptAction.PROJECT_LIST_EXPORT);
 
-  const { teamId, filename, projectFilter } = getConfig().exportProjectList;
+  const { teamId, source, path, projectFilter } = getConfig().exportProjectList;
 
   // retrieves projects from Datasaur matching the filters
   getLogger().info('retrieving projects with filters', { filter: projectFilter });
@@ -44,8 +46,15 @@ export async function handleExportProjectList(configFile: string) {
     };
   });
 
-  getLogger().info(`exporting csv to ${filename}`);
-  await writeCSVFile(projectToExport, filename);
+  if (source === StorageSources.LOCAL) {
+    getLogger().info(`exporting csv to ${path}`);
+    mkdirSync(path, { recursive: true });
+    const csv = Papa.unparse(projectToExport);
+    await writeFileSync(`${path}/project-list.csv`, csv, { encoding: 'utf-8' });
+  } else {
+    getLogger().error(`currently we only support export to local file, exiting script...`);
+    return;
+  }
 
   getLogger().info('exiting script...');
 }
