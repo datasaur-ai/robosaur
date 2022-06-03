@@ -14,7 +14,15 @@
     "teamId": "<TEAM_ID>",
     "statusFilter": [],
     "format": "JSON_ADVANCED",
-    "fileTransformerId": null
+    "fileTransformerId": null,
+    "projectFilter": {
+      "kind": "TOKEN_BASED",
+      "date": {
+        "newestDate": "2022-02-01",
+        "oldestDate": "2022-01-01"
+      },
+      "tags": []
+    }
   },
   "create": {
     "teamId": "<TEAM_ID>",
