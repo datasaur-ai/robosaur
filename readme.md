@@ -161,7 +161,7 @@ Options:
 
 Robosaur will try to export a list of project as csv file: id, name, status, tag, createdDate, completedDate.
 
-Robosaur supports filtering which project to export by the project status, tags, and date. This can be set in the `exportProjectList.projectFilter` inside the config JSON. For example, in `config.json`, this is set to be `quickstart/export-project-list` like so:
+Robosaur supports filtering which project to export by the project status, tags, and date. This can be set in the `exportProjectList.projectFilter` inside the config JSON. For example, in `config.json`, this is set to be `sample/export-project-list` like so:
 
 ```json
 {
