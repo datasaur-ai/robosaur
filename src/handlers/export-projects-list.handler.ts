@@ -1,5 +1,6 @@
 import { mkdirSync, writeFileSync } from 'fs';
 import Papa from 'papaparse';
+import Path from 'path';
 import { getConfig, setConfigByJSONFile } from '../config/config';
 import { StorageSources } from '../config/interfaces';
 import { getProjectListExportValidators } from '../config/schema/validator';
@@ -48,7 +49,7 @@ export async function handleExportProjectList(configFile: string) {
 
   if (source === StorageSources.LOCAL) {
     getLogger().info(`exporting csv to ${path}`);
-    const dir = path.slice(0, path.lastIndexOf('/'));
+    const dir = Path.dirname(path);
     mkdirSync(dir, { recursive: true });
     const csv = Papa.unparse(projectToExport);
     await writeFileSync(`${path}`, csv, { encoding: 'utf-8' });
