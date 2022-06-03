@@ -56,6 +56,9 @@ function setActiveTeamId(context: ScriptAction) {
     case ScriptAction.PROJECT_EXPORT:
       activeTeamId = getConfig().export.teamId;
       break;
+    case ScriptAction.APPLY_TAGS:
+      activeTeamId = getConfig().applyTags.teamId;
+      break;
     case ScriptAction.NONE:
       getLogger().warn('unspecified script context, attempt to set teamId automatically');
       const projectCreationTeam =
@@ -63,7 +66,8 @@ function setActiveTeamId(context: ScriptAction) {
         (getConfig().create.pcwPayload as PCWPayload).teamId ||
         (getConfig().create.pcwPayload as PCWWrapper).variables.input.teamId;
       const projectExportTeam = getConfig().export?.teamId;
-      activeTeamId = projectCreationTeam ?? projectExportTeam;
+      const projectApplyTagsTeam = getConfig().applyTags?.teamId;
+      activeTeamId = projectCreationTeam ?? projectExportTeam ?? projectApplyTagsTeam;
       break;
   }
 }
