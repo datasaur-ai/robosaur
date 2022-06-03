@@ -56,7 +56,7 @@ function setActiveTeamId(context: ScriptAction) {
     case ScriptAction.PROJECT_EXPORT:
       activeTeamId = getConfig().export.teamId;
       break;
-    case ScriptAction.PROJECT_OVERVIEW_LIST:
+    case ScriptAction.PROJECT_LIST_EXPORT:
       activeTeamId = getConfig().exportProjectList.teamId;
       break;
     case ScriptAction.NONE:
