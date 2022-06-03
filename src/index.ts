@@ -2,7 +2,7 @@ import { Command } from 'commander';
 import packageJson from '../package.json';
 import { handleCreateProject } from './handlers/create-project.handler';
 import { handleCreateProjects } from './handlers/create-projects.handler';
-import { handleExportProjectOverview } from './handlers/export-projects-overview.handler';
+import { handleExportProjectList } from './handlers/export-projects-list.handler';
 import { handleExportProjects } from './handlers/export-projects.handler';
 import { getLogger } from './logger';
 
@@ -30,9 +30,9 @@ program
   .action(handleExportProjects);
 
 program
-  .command(`export-project-overview <configFile>`)
-  .description('Export project overview as a csv based on the given config file')
-  .action(handleExportProjectOverview);
+  .command(`export-project-list <configFile>`)
+  .description('Export project list as a csv based on the given config file')
+  .action(handleExportProjectList);
 
 program.parseAsync(process.argv);
 

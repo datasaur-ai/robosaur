@@ -4,8 +4,8 @@
     "clientId": "<DATASAUR_CLIENT_ID>",
     "clientSecret": "<DATASAUR_CLIENT_SECRET>"
   },
-  "exportProjectOverview": {
+  "exportProjectList": {
     "teamId": "<TEAM_ID>",
-    "filename": "quickstart/export-project-overview/result.csv"
+    "filename": "quickstart/export-project-list/result.csv"
   }
 }

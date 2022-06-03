@@ -3,7 +3,7 @@ import { Config, StorageSources } from '../interfaces';
 import { assignmentSchemaValidator } from './assignment-schema-validator';
 import { credentialsSchemaValidator } from './credential-schema-validator';
 import { documentsSchemaValidator } from './documents-schema-validator';
-import { exportProjectOverviewSchemaValidator } from './export-project-overview-schema.validator';
+import { exportProjectListSchemaValidator } from './export-project-list-schema.validator';
 import { exportSchemaValidator } from './export-schema-validator';
 
 export function getProjectCreationValidators() {
@@ -14,8 +14,8 @@ export function getProjectExportValidators() {
   return [validateConfigCredentials, validateConfigExport];
 }
 
-export function getProjectOverviewExportValidators() {
-  return [validateConfigProjectOverview];
+export function getProjectListExportValidators() {
+  return [validateConfigProjectList];
 }
 
 function validateConfigDocuments(config: Config) {
@@ -34,14 +34,14 @@ function validateConfigAssignment(config: Config) {
   }
 }
 
-function validateConfigProjectOverview(config: Config) {
-  if (!exportProjectOverviewSchemaValidator(config.exportProjectOverview)) {
-    getLogger().error(`config.exportProjectOverview has some errors`, {
-      errors: exportProjectOverviewSchemaValidator.errors,
+function validateConfigProjectList(config: Config) {
+  if (!exportProjectListSchemaValidator(config.exportProjectList)) {
+    getLogger().error(`config.exportProjectList has some errors`, {
+      errors: exportProjectListSchemaValidator.errors,
     });
     throw new Error(
-      `config.exportProjectOverview has some errors ${JSON.stringify({
-        errors: exportProjectOverviewSchemaValidator.errors,
+      `config.exportProjectList has some errors ${JSON.stringify({
+        errors: exportProjectListSchemaValidator.errors,
       })}`,
     );
   }

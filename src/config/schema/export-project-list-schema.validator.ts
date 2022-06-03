@@ -1,10 +1,9 @@
-import Ajv, { JSONSchemaType, str } from 'ajv';
-import { ExportFormat } from '../../datasaur/interfaces';
-import { ExportProjectOverviewConfig, StorageSources } from '../interfaces';
+import Ajv, { JSONSchemaType } from 'ajv';
+import { ExportProjectListConfig } from '../interfaces';
 
 const schemaValidator = new Ajv({ allErrors: true });
 
-const ExportProjectOverviewSchema: JSONSchemaType<ExportProjectOverviewConfig> = {
+const ExportProjectListSchema: JSONSchemaType<ExportProjectListConfig> = {
   type: 'object',
   properties: {
     teamId: { type: 'string' },
@@ -23,4 +22,4 @@ const ExportProjectOverviewSchema: JSONSchemaType<ExportProjectOverviewConfig> =
   required: ['teamId', 'filename'],
 };
 
-export const exportProjectOverviewSchemaValidator = schemaValidator.compile(ExportProjectOverviewSchema);
+export const exportProjectListSchemaValidator = schemaValidator.compile(ExportProjectListSchema);

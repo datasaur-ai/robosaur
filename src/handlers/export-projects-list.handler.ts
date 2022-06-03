@@ -1,15 +1,15 @@
 import { getConfig, setConfigByJSONFile } from '../config/config';
-import { getProjectOverviewExportValidators } from '../config/schema/validator';
+import { getProjectListExportValidators } from '../config/schema/validator';
 import { getProjects } from '../datasaur/get-projects';
 import { getLogger } from '../logger';
 import { convertTagNamesToIds } from '../utils/tags/convertTagNamesToIds';
 import { writeCSVFile } from '../utils/writeCSVFile';
 import { ScriptAction } from './constants';
 
-export async function handleExportProjectOverview(configFile: string) {
-  setConfigByJSONFile(configFile, getProjectOverviewExportValidators(), ScriptAction.PROJECT_OVERVIEW_EXPORT);
+export async function handleExportProjectList(configFile: string) {
+  setConfigByJSONFile(configFile, getProjectListExportValidators(), ScriptAction.PROJECT_LIST_EXPORT);
 
-  const { teamId, filename, projectFilter } = getConfig().exportProjectOverview;
+  const { teamId, filename, projectFilter } = getConfig().exportProjectList;
 
   // retrieves projects from Datasaur matching the filters
   getLogger().info('retrieving projects with filters', { filter: projectFilter });
