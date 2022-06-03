@@ -165,17 +165,18 @@ Robosaur supports filtering which project to export by the project status, tags,
 
 ```json
 {
-  "exportProjectList.projectFilter": {
+  "exportProjectList": {
     "teamId": "1",
-    "filename": "quickstart/export-project-list/result.csv",
+    "source": "local",
+    "path": "quickstart/export-project-list",
     "projectFilter": {
       "statuses": ["COMPLETE"],
       "date": {
         "newestDate": "2022-03-11",
         "oldestDate": "2022-03-07"
-      }
-    },
-    "tags": ["PASS"]
+      },
+      "tags": ["PASS"]
+    }
   }
 }
 ```
