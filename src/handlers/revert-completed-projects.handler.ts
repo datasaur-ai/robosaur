@@ -1,4 +1,3 @@
-import { readFileSync } from 'fs';
 import { chunk, difference } from 'lodash';
 import { getActiveTeamId, getConfig, setConfigByJSONFile } from '../config/config';
 import { RevertConfig, StorageSources } from '../config/interfaces';
@@ -8,6 +7,7 @@ import { ProjectStatus } from '../datasaur/interfaces';
 import { toggleCabinetStatus } from '../datasaur/toggle-cabinet-status';
 import { getLogger } from '../logger';
 import { getStorageClient } from '../utils/object-storage';
+import { readJSONFile } from '../utils/readJSONFile';
 import { sleep } from '../utils/sleep';
 import { ScriptAction } from './constants';
 
@@ -66,18 +66,19 @@ export const handleRevertCompletedProjectsToInReview = async (configFile: string
 };
 
 async function getProjectIds(revertConfig: RevertConfig) {
-  let content = '';
   let projectIds: Array<string>;
   switch (revertConfig.source) {
     case StorageSources.LOCAL:
-      content = readFileSync(revertConfig.path, { encoding: 'utf8' });
-      projectIds = content.split('\n').map((id) => id.trim());
+      projectIds = readJSONFile(revertConfig.path);
       break;
     case StorageSources.AMAZONS3:
     case StorageSources.AZURE:
     case StorageSources.GOOGLE:
-      content = await getStorageClient().getStringFileContent(revertConfig.bucketName, revertConfig.path);
-      projectIds = content.split('\n').map((id) => id.trim());
+      let content = await getStorageClient(revertConfig.source).getStringFileContent(
+        revertConfig.bucketName,
+        revertConfig.path,
+      );
+      projectIds = JSON.parse(content);
       break;
     case StorageSources.INLINE:
       projectIds = revertConfig.payload;

@@ -6,7 +6,7 @@
   },
   "revert": {
     "source": "local",
-    "path": "sample/revert/data.txt",
+    "path": "sample/revert/data.json",
     "teamId": "<TEAM_ID>"
   }
 }
