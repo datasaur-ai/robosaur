@@ -7,43 +7,44 @@ import { getProject } from "../datasaur/get-project"
 import { readCSVFile } from "../utils/readCSVFile";
 import { ScriptAction } from "./constants";
 import { updateProjectTag } from "../datasaur/update-project-tag";
+import { getLogger } from "../logger";
 
 export async function handleApplyTags(configFile: string) {
   setConfigByJSONFile(configFile, getApplyTagValidators(), ScriptAction.APPLY_TAGS)
 
   const config = getConfig().applyTags;
   const applyTagPayload: ProjectTags[] = getApplyTagPayload(config)
-  console.log(applyTagPayload);
-
   const tagsToApplyList = getTagsList(applyTagPayload)
-  console.log(tagsToApplyList)
+  getLogger().info("Reading apply-tag payload...");
 
   const teamTagsList = await getTeamTags(config.teamId)
   const teamTagsNames = teamTagsList.map((tag) => {
     return tag.name;
   })
+  getLogger().info("Retrieving existing tags...");
 
-  await createNonexistingTags(tagsToApplyList,teamTagsNames,config)
+  createNonexistingTags(tagsToApplyList,teamTagsNames,config)
 
   const projects: Promise<{ projectId: any; tags: any; }>[] = applyTagPayload.map(async payload => {
     const project = await getProject(payload.projectId)
-    // console.log(project)
+    getLogger().info(`Applying tags to project ${payload.projectId}`);
 
     const projectTag = payload.tags
+    const tagList = await getTeamTags(config.teamId)
     projectTag?.forEach(tag => {
-      project.tags.push(teamTagsList.find((tagItem)=>tagItem.name === tag))
+      project.tags.push(tagList.find((tagItem)=>tagItem.name === tag))
     });
 
-    const tagIds = project.tags.map((tag)=>{
+    const tagIds = await project.tags.map((tag)=>{
       return tag.id
     })
 
-    console.log({projectId:project.id, tags: [...new Set(tagIds)]})
     return {projectId:project.id, tags: [...new Set(tagIds)]}
   });
 
   projects.forEach(async (project)=>{
     updateProjectTag((await project).projectId, (await project).tags)
+    getLogger().info("Tagging success!");
   })
 }
 
@@ -94,11 +95,10 @@ function getTagsList(configPayload) {
   return tags
 }
 
-async function createNonexistingTags(tagTargets, tagList, config){
-   tagTargets.forEach(async tag => {
+function createNonexistingTags(tagTargets, tagList, config){
+  tagTargets.forEach(async tag => {
     if (!tagList.includes(tag)){
-      //create tag
-      console.log("creating tag", tag)
+      getLogger().info(`Tag ${tag} not found! Creating tag in project...`);
       await createTags(config.teamId, tag);
     }
   })
