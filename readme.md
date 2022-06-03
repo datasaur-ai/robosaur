@@ -210,7 +210,7 @@ The file `data.txt` should be a newline-separated file containing one projectId 
 
 `app.datasaur.ai/teams/<TEAM_ID>/projects/<PROJECT_ID>/<DOCUMENT>`
 
-We have provided a minimal config example for this command under [quickstart/revert/config.json](quickstart/revert/config.json) and a sample [data.txt](quickstart/revert/data.txt) file in the same folder. Please keep in mind that the projectIds inside that file are not actual projectIds. For quick testing purposes, we also support `inline` source where we provide the list of projectIds directly in the [config](quickstart/revert/config.inline.json) file.
+We have provided a minimal config example for this command under [sample/revert/config.json](sample/revert/config.json) and a sample [data.txt](sample/revert/data.txt) file in the same folder. Please keep in mind that the projectIds inside that file are not actual projectIds. For quick testing purposes, we also support `inline` source where we provide the list of projectIds directly in the [config](sample/revert/config.inline.json) file.
 
 ## Execution Modes
 
