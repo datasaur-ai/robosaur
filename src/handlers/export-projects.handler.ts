@@ -253,14 +253,13 @@ async function getTagIds(teamId: string, tagsName: string[]) {
   if (tagsName.length === 0) return undefined;
   const tags = await getTeamTags(teamId);
 
-  const tagIds = tagsName.map((tagName) => {
+  return tagsName.map((tagName) => {
     const tag = tags.find((tag) => tag.name === tagName);
     if (tag === undefined) {
       throw new Error(`Tag ${tagName} is not found.`);
     }
     return tag.id;
   });
-  return tagIds;
 }
 
 function shouldExport(state: ProjectState) {
