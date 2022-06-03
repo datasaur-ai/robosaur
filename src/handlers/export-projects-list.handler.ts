@@ -48,9 +48,10 @@ export async function handleExportProjectList(configFile: string) {
 
   if (source === StorageSources.LOCAL) {
     getLogger().info(`exporting csv to ${path}`);
-    mkdirSync(path, { recursive: true });
+    const dir = path.slice(0, path.lastIndexOf('/'));
+    mkdirSync(dir, { recursive: true });
     const csv = Papa.unparse(projectToExport);
-    await writeFileSync(`${path}/project-list.csv`, csv, { encoding: 'utf-8' });
+    await writeFileSync(`${path}`, csv, { encoding: 'utf-8' });
   } else {
     getLogger().error(`currently we only support export to local file, exiting script...`);
     return;

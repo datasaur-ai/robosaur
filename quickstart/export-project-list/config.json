@@ -7,6 +7,6 @@
   "exportProjectList": {
     "teamId": "<TEAM_ID>",
     "source": "local",
-    "path": "quickstart/export-project-list"
+    "path": "quickstart/export-project-list/project-list.csv"
   }
 }
