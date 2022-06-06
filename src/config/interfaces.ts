@@ -49,6 +49,9 @@ export interface Config {
 
   // project creation
   create: CreateConfig;
+
+  // project-list export
+  exportProjectList: ExportProjectListConfig;
 }
 
 export interface CreateConfig {
@@ -136,7 +139,7 @@ export interface CreateConfig {
 
     autoScrollWhenLabeling?: boolean;
     sentenceSeparator?: string;
-    
+
     enableAnonymization?: boolean;
 
     anonymizationEntityTypes?: Array<string>;
@@ -256,7 +259,12 @@ export interface FilesConfig extends WithStorage {
 }
 
 export interface PCWSource extends WithStorage {
-  source: StorageSources.AMAZONS3 | StorageSources.GOOGLE | StorageSources.LOCAL | StorageSources.INLINE | StorageSources.AZURE;
+  source:
+    | StorageSources.AMAZONS3
+    | StorageSources.GOOGLE
+    | StorageSources.LOCAL
+    | StorageSources.INLINE
+    | StorageSources.AZURE;
 }
 
 export interface AssignmentConfig extends WithStorage {
@@ -335,4 +343,30 @@ interface WithStorage {
    * the GCS or S3 bucket name, without gs:// or s3:// prefix
    */
   bucketName: string;
+}
+
+export interface ExportProjectListConfig extends WithStorage {
+  /**
+   * @description id of the team.
+   * The ID can be obtained from your team workspace page in this format: https://app.datasaur.ai/teams/{teamId}
+   */
+  teamId: string;
+
+  /**
+   * @description Path to save the generated csv
+   * Path to the folder containing sub-folders, without leading slash (/)
+   */
+  path: string;
+
+  /**
+   * @description A filter on which projects to export
+   */
+  projectFilter?: {
+    statuses?: ProjectStatus[];
+    tags?: string[];
+    date?: {
+      newestDate: Date;
+      oldestDate?: Date;
+    };
+  };
 }

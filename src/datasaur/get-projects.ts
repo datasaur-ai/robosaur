@@ -14,6 +14,8 @@ const GET_PROJECTS_QUERY = gql`
         }
         __typename
         status
+        createdDate
+        completedDate
       }
       pageInfo {
         nextCursor

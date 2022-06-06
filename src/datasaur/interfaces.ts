@@ -3,6 +3,8 @@ export interface Project {
   name: string;
   tags: Tag[];
   status: ProjectStatus;
+  createdDate: string;
+  completedDate?: string;
 }
 
 export interface Tag {
