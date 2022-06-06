@@ -19,6 +19,9 @@ export async function getTeamTags(teamId) {
   const variables = {
     input: {
       teamId,
+      filter: {
+        includeGlobalTag: true,
+      },
     },
   };
   const data = await query(GET_TEAM_TAGS, variables);
