@@ -1,9 +1,9 @@
-import { validateAdditionalItems } from 'ajv/dist/vocabularies/applicator/additionalItems';
+import { chunk } from 'lodash';
 import { getActiveTeamId, getConfig, setConfigByJSONFile } from '../config/config';
 import { RevertConfig, StorageSources } from '../config/interfaces';
 import { getRevertProjectStatusValidator } from '../config/schema/revert-schema-validator';
 import { getPaginatedProjects } from '../datasaur/get-projects';
-import { ProjectStatus } from '../datasaur/interfaces';
+import { Project, ProjectStatus } from '../datasaur/interfaces';
 import { toggleCabinetStatus } from '../datasaur/toggle-cabinet-status';
 import { getLogger } from '../logger';
 import { getStorageClient } from '../utils/object-storage';
@@ -12,7 +12,8 @@ import { sleep } from '../utils/sleep';
 import { ScriptAction } from './constants';
 
 const SLEEP_INTERVAL = 1500;
-const TAKE_PER_PAGE = 100;
+const TAKE_PER_PAGE = 2;
+const CHUNK_LENGTH = 1;
 
 export const handleRevertCompletedProjectsToInReview = async (configFile: string) => {
   setConfigByJSONFile(configFile, getRevertProjectStatusValidator(), ScriptAction.REVERT_PROJECT_STATUS);
@@ -21,51 +22,62 @@ export const handleRevertCompletedProjectsToInReview = async (configFile: string
   let skip = 0;
 
   let remainingProjectIds = [...inputProjectIds];
-  const results = [] as Array<{ projectId: string; status: ProjectStatus }>;
   let continueLooping = true;
-
+  const validProjects = [] as Project[];
   while (continueLooping) {
-    const paginatedResult = await getPaginatedProjects({ teamId: getActiveTeamId() }, skip, TAKE_PER_PAGE);
+    const paginatedResult = await getPaginatedProjects(
+      { teamId: getActiveTeamId(), statuses: [ProjectStatus.COMPLETE] },
+      skip,
+      TAKE_PER_PAGE,
+    );
 
     if (paginatedResult.totalCount === 0) {
       getLogger().info('No projects with COMPLETE status was found');
       break;
     }
 
-    getLogger().info(`Checking ${skip + paginatedResult.nodes.length} / ${paginatedResult.totalCount} projects...`);
+    getLogger().info(
+      `Checking ${skip + paginatedResult.nodes.length} / ${paginatedResult.totalCount} COMPLETE projects...`,
+    );
 
     const projects = paginatedResult.nodes;
-    const validProjects = projects.filter((p) => inputProjectIds.includes(p.id) && p.status === ProjectStatus.COMPLETE);
+    const newValidProjects = projects.filter(
+      (p) => inputProjectIds.includes(p.id) && p.status === ProjectStatus.COMPLETE,
+    );
 
-    getLogger().info(`Project with COMPLETED status: ${validProjects}`, {
-      count: validProjects.length,
-      projects: validProjects,
-    });
+    if (newValidProjects.length > 0) {
+      getLogger().info(`valid projects found: ${newValidProjects.map((p) => p.id)}`, {
+        count: newValidProjects.length,
+        projects: newValidProjects,
+      });
+      validProjects.push(...newValidProjects);
+    }
 
-    const currentResults = await Promise.all(
-      validProjects.map(async (project) => {
-        const retval = { projectId: project.id } as { projectId: string; status: ProjectStatus };
+    continueLooping = Boolean(paginatedResult.pageInfo.nextCursor && remainingProjectIds.length > 0);
+    if (continueLooping) {
+      skip += TAKE_PER_PAGE;
+      sleep(1000);
+    }
+  }
 
+  const results = [] as Array<{ projectId: string; status: ProjectStatus }>;
+  const chunkedProjects = chunk(validProjects, CHUNK_LENGTH);
+  for (const batch of chunkedProjects) {
+    const bacthResult = await Promise.all(
+      batch.map(async (project) => {
+        getLogger().info(`sending request to revert project ${project.id} status...`);
         try {
           const updatedStatus = await toggleCabinetStatus(project.id);
-          retval.status = updatedStatus.status;
+          return { projectId: project.id, status: updatedStatus.status };
         } catch (error) {
-          getLogger().error(`Fail to toggle project status for ${project.id}`, { error: error });
-          retval.status = project.status;
+          getLogger().error(`Error on updating ${project.id}`, { error: error });
+          return { projectId: project.id, status: project.status };
         }
-
-        // remove project.id from input list
-        remainingProjectIds = remainingProjectIds.filter((projectId) => project.id !== projectId);
-        return retval;
       }),
     );
 
-    results.push(...currentResults);
-
+    results.push(...bacthResult);
     await sleep(SLEEP_INTERVAL);
-    skip += TAKE_PER_PAGE;
-
-    continueLooping = Boolean(paginatedResult.pageInfo.nextCursor && remainingProjectIds.length > 0);
   }
 
   if (results.length === 0) {
