@@ -1,5 +1,5 @@
-import { gql } from "graphql-request";
-import { query } from "./query";
+import { gql } from 'graphql-request';
+import { query } from './query';
 
 const CREATE_TAG = gql`
   mutation CreateTagMutation($input: CreateTagInput!) {
@@ -11,14 +11,14 @@ const CREATE_TAG = gql`
     id
     name
   }
-`
+`;
 
-export async function createTags(teamId, name){
+export async function createTags(teamId, name) {
   const variables = {
     input: {
       teamId,
-      name
-    }
+      name,
+    },
   };
 
   const data = await query(CREATE_TAG, variables);

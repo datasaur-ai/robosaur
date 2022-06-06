@@ -1,6 +1,6 @@
 import { getLogger } from '../../logger';
 import { Config, StorageSources } from '../interfaces';
-import { applyTagsSchemaValidator } from "./apply-tags-schema-validator";
+import { applyTagsSchemaValidator } from './apply-tags-schema-validator';
 import { assignmentSchemaValidator } from './assignment-schema-validator';
 import { credentialsSchemaValidator } from './credential-schema-validator';
 import { documentsSchemaValidator } from './documents-schema-validator';
@@ -14,7 +14,7 @@ export function getProjectExportValidators() {
   return [validateConfigCredentials, validateConfigExport];
 }
 
-export function getApplyTagValidators(){
+export function getApplyTagValidators() {
   return [validateConfigCredentials, validateConfigApplyTags];
 }
 
@@ -51,7 +51,7 @@ function validateConfigCredentials(config: Config) {
 }
 
 function validateConfigApplyTags(config: Config) {
-  if(!applyTagsSchemaValidator(config.applyTags)) {
+  if (!applyTagsSchemaValidator(config.applyTags)) {
     getLogger().error(`config.applyTags has some errors`, { errors: applyTagsSchemaValidator.errors });
     throw new Error(`config.applyTags has some errors ${JSON.stringify(applyTagsSchemaValidator)}`);
   }
