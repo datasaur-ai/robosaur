@@ -1,0 +1,26 @@
+{
+  "datasaur": {
+    "host": "https://app.datasaur.ai",
+    "clientId": "<CLIENT_ID>",
+    "clientSecret": "<CLIENT_SECRET>"
+  },
+  "projectState": {
+    "source": "local",
+    "path": "sample/apply-tags/state/projectState.json"
+  },
+  "applyTags": {
+    "teamId": "<TEAM_ID>",
+    "source": "local",
+    "path": "sample/apply-tags/tags.csv",
+    "payload": [
+      {
+        "projectId": "<PROJECT_ID_1>",
+        "tags": ["<TAG_1>", "<TAG_2>"]
+      },
+      {
+        "projectId": "<PROJECT_ID_2>",
+        "tags": ["<TAG_3>"]
+      }
+    ]
+  }
+}
