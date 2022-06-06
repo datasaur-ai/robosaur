@@ -1,8 +1,8 @@
-import { chunk, difference } from 'lodash';
+import { validateAdditionalItems } from 'ajv/dist/vocabularies/applicator/additionalItems';
 import { getActiveTeamId, getConfig, setConfigByJSONFile } from '../config/config';
 import { RevertConfig, StorageSources } from '../config/interfaces';
 import { getRevertProjectStatusValidator } from '../config/schema/revert-schema-validator';
-import { getProjects } from '../datasaur/get-projects';
+import { getPaginatedProjects } from '../datasaur/get-projects';
 import { ProjectStatus } from '../datasaur/interfaces';
 import { toggleCabinetStatus } from '../datasaur/toggle-cabinet-status';
 import { getLogger } from '../logger';
@@ -11,58 +11,72 @@ import { readJSONFile } from '../utils/readJSONFile';
 import { sleep } from '../utils/sleep';
 import { ScriptAction } from './constants';
 
-const TOGGLE_STATUS_POLLING_MS = 1500;
-const CHUNK_LENGTH = 10;
+const SLEEP_INTERVAL = 1500;
+const TAKE_PER_PAGE = 100;
 
 export const handleRevertCompletedProjectsToInReview = async (configFile: string) => {
   setConfigByJSONFile(configFile, getRevertProjectStatusValidator(), ScriptAction.REVERT_PROJECT_STATUS);
-  const projectIds = await getProjectIds(getConfig().revert);
-  const projects = await getProjects({ teamId: getActiveTeamId(), statuses: [ProjectStatus.COMPLETE] });
 
-  // separate valid (project with COMPLETED status) and invalid project
-  const validProject = projects.filter((p) => projectIds.includes(p.id));
-  const validProjectIds = validProject.map((p) => p.id);
+  const inputProjectIds = await getProjectIds(getConfig().revert);
+  let skip = 0;
 
-  const invalidProjectIds = difference(projectIds, validProjectIds);
+  let remainingProjectIds = [...inputProjectIds];
+  const results = [] as Array<{ projectId: string; status: ProjectStatus }>;
+  let continueLooping = true;
 
-  getLogger().info(`Project with COMPLETED status: ${validProjectIds}`, {
-    count: validProjectIds.length,
-    projects: validProjectIds,
-  });
-  if (invalidProjectIds.length > 0) {
-    getLogger().warn(`Project with other status: ${invalidProjectIds}`, {
-      count: invalidProjectIds.length,
-      projects: invalidProjectIds,
+  while (continueLooping) {
+    const paginatedResult = await getPaginatedProjects({ teamId: getActiveTeamId() }, skip, TAKE_PER_PAGE);
+
+    if (paginatedResult.totalCount === 0) {
+      getLogger().info('No projects with COMPLETE status was found');
+      break;
+    }
+
+    getLogger().info(`Checking ${skip + paginatedResult.nodes.length} / ${paginatedResult.totalCount} projects...`);
+
+    const projects = paginatedResult.nodes;
+    const validProjects = projects.filter((p) => inputProjectIds.includes(p.id) && p.status === ProjectStatus.COMPLETE);
+
+    getLogger().info(`Project with COMPLETED status: ${validProjects}`, {
+      count: validProjects.length,
+      projects: validProjects,
     });
-    getLogger().warn(`Robosaur will only process projects with COMPLETE status`);
-  }
 
-  const chunkedProjectIds = chunk(validProjectIds, CHUNK_LENGTH);
+    const currentResults = await Promise.all(
+      validProjects.map(async (project) => {
+        const retval = { projectId: project.id } as { projectId: string; status: ProjectStatus };
 
-  const results: Array<{ projectId: string; status: string }> = [];
-  for (const [idx, batch] of chunkedProjectIds.entries()) {
-    const batchResult = await Promise.all(
-      batch.map(async (projectId) => ({ projectId, cabinetStatus: await toggleCabinetStatus(projectId) })),
+        try {
+          const updatedStatus = await toggleCabinetStatus(project.id);
+          retval.status = updatedStatus.status;
+        } catch (error) {
+          getLogger().error(`Fail to toggle project status for ${project.id}`, { error: error });
+          retval.status = project.status;
+        }
+
+        // remove project.id from input list
+        remainingProjectIds = remainingProjectIds.filter((projectId) => project.id !== projectId);
+        return retval;
+      }),
     );
 
-    results.push(
-      ...batchResult.map((result) => ({ projectId: result.projectId, status: result.cabinetStatus.status })),
-    );
+    results.push(...currentResults);
 
-    if (idx !== chunkedProjectIds.length - 1) {
-      sleep(TOGGLE_STATUS_POLLING_MS);
-    }
+    await sleep(SLEEP_INTERVAL);
+    skip += TAKE_PER_PAGE;
+
+    continueLooping = Boolean(paginatedResult.pageInfo.nextCursor && remainingProjectIds.length > 0);
   }
 
-  if (results.length === 0 && validProject.length === 0) {
-    // no results -> all projects provided are not COMPLETE yet
-    getLogger().info('No valid projects are found.');
-  } else {
-    if (results.some((res) => res.status !== ProjectStatus.IN_PROGRESS)) {
-      getLogger().error(`Some projects failed to be reverted back to ${ProjectStatus.IN_PROGRESS}`);
-    }
-    getLogger().info('Execution results', { data: results });
+  if (results.length === 0) {
+    getLogger().info('No valid projects are found');
+    return;
   }
+
+  if (results.some((val) => val.status !== ProjectStatus.IN_PROGRESS)) {
+    getLogger().warn('There are some failures during command execution');
+  }
+  getLogger().info('Execution results: ', { data: results });
 };
 
 async function getProjectIds(revertConfig: RevertConfig) {
@@ -87,6 +101,6 @@ async function getProjectIds(revertConfig: RevertConfig) {
       throw new Error('Unsupported StorageSources');
   }
 
-  getLogger().info(`Found ${projectIds.length} projectIds in ${revertConfig.path}`);
+  getLogger().info(`Found ${projectIds.length} projectIds in ${revertConfig.path ?? 'inline payload'}`);
   return projectIds;
 }
