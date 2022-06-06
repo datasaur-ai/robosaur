@@ -5,18 +5,18 @@ import { ScriptAction } from './constants';
 import { createTags } from '../datasaur/create-tag';
 import { getProject } from '../datasaur/get-project';
 import { getTeamTags } from '../datasaur/get-team-tags';
+import { Project } from '../datasaur/interfaces';
 import { updateProjectTag } from '../datasaur/update-project-tag';
 import { getLogger } from '../logger';
 import { getStorageClient } from '../utils/object-storage';
 import { defaultCSVConfig, readCSVFile } from '../utils/readCSVFile';
 import * as Papa from 'papaparse';
-import { Project } from '../datasaur/interfaces';
 
 export async function handleApplyTags(configFile: string) {
   setConfigByJSONFile(configFile, getApplyTagValidators(), ScriptAction.APPLY_TAGS);
 
   const config = getConfig().applyTags;
-  const applyTagPayload: ProjectTags[] = await getApplyTagPayload(config);
+  const applyTagPayload = await getApplyTagPayload(config);
   const tagsToApplyList = getTagsList(applyTagPayload);
   getLogger().info('Reading apply-tag payload...');
 
@@ -39,9 +39,14 @@ export async function handleApplyTags(configFile: string) {
     getLogger().info(`Applying tags to project ${payload.projectId}`);
 
     const projectTag = payload.tags;
-    projectTag?.forEach((tag) => {
-      project?.tags.push(tagList.find((tagItem) => tagItem.name === tag));
-    });
+    if (projectTag.includes(',')) {
+      const splitTags = projectTag.split(',');
+      splitTags.forEach((tag) => {
+        project?.tags.push(tagList.find((tagItem) => tagItem.name === tag));
+      });
+    } else {
+      project?.tags.push(tagList.find((tagItem) => tagItem.name === projectTag));
+    }
 
     const tagIds = project?.tags.map((tag) => {
       return tag.id;
@@ -67,16 +72,21 @@ async function getApplyTagPayload(config: ApplyTagsConfig) {
 
   switch (config.source) {
     case StorageSources.INLINE:
-      return config.payload;
+      return config.payload.map((project) => {
+        return {
+          projectId: project.projectId,
+          tags: project.tags.toString(),
+        };
+      });
     case StorageSources.LOCAL:
-      const csvData = readCSVFile(config.path, 'utf-8').data.slice(1);
-      return readPayloadCsv(csvData);
+      return readCSVFile(config.path, 'utf-8', {
+        header: true,
+      }).data;
     case StorageSources.AMAZONS3:
     case StorageSources.AZURE:
     case StorageSources.GOOGLE:
       const csvFromCloud = await getStorageClient(config.source).getStringFileContent(config.bucketName, config.path);
-      const parsedCsvFromCloud = Papa.parse(csvFromCloud, defaultCSVConfig).data.slice(1);
-      return readPayloadCsv(parsedCsvFromCloud);
+      return Papa.parse(csvFromCloud, { ...defaultCSVConfig, header: true }).data;
     default:
       throw new Error(
         `${config.source} is not implemented for this command. Please use one of ${JSON.stringify(
@@ -86,39 +96,19 @@ async function getApplyTagPayload(config: ApplyTagsConfig) {
   }
 }
 
-function readPayloadCsv(path) {
-  let payloadFromCsv: ProjectTags[] = [];
-
-  path.forEach((data: string[]) => {
-    if (payloadFromCsv.filter((payload) => payload.projectId === data[1]).length === 0) {
-      const properFormat: ProjectTags = {
-        projectId: data[1],
-        tags: [data[0]],
-      };
-      payloadFromCsv.push(properFormat);
-    } else {
-      payloadFromCsv = payloadFromCsv.map((payload) => {
-        if (payload.projectId === data[1]) {
-          payload.tags = [...payload.tags, data[0]];
-        }
-
-        return payload;
+function getTagsList(configPayload) {
+  let tagsList: string[] = [];
+  configPayload.forEach((project) => {
+    if (project.tags.includes(',')) {
+      const splitTags = project.tags.split(',');
+      splitTags.forEach((tag: string) => {
+        if (!tagsList.includes(tag)) tagsList.push(tag);
       });
+    } else {
+      if (!tagsList.includes(project.tags)) tagsList.push(project.tags);
     }
   });
-
-  return payloadFromCsv;
-}
-
-function getTagsList(configPayload) {
-  let tags: string[] = [];
-  configPayload.forEach((project) => {
-    project.tags.forEach((tag: string) => {
-      if (!tags.includes(tag)) tags.push(tag);
-    });
-  });
-
-  return tags;
+  return tagsList;
 }
 
 async function createNonExistingTags(tagTargets, tagList, config) {
