@@ -167,17 +167,31 @@ Robosaur supports filtering which project to export by the project status, tags,
     "teamId": "1",
     "source": "local",
     "path": "quickstart/export-project-list/project-list.csv",
-    // Optional filter fields
     "projectFilter": {
+      // Optional filter fields
       "statuses": ["COMPLETE"],
       "date": {
-        "newestDate": "2022-03-11",
-        "oldestDate": "2022-03-07"
+        "newestDate": "2022-03-11T00:00:00.000Z",
+        "oldestDate": "2022-03-07T00:00:00.000Z"
       },
       "tags": ["PASS"]
     }
   }
 }
+```
+
+The `date.newestDate` and `date.oldestDate` fields accept a valid `Date` string. If unspecified, Datasaur's GraphQL API will use the UTC timezone by default.
+To use our local time, please use a full [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) date string for precise results. One way to generate current date string using nodeJS would be to call `new Date()` in the REPL.
+
+```console
+❯ TZ=Singapore date
+Mon 06 Jun 2022 05:34:18  +08
+❯ node
+Welcome to Node.js v16.13.2.
+Type ".help" for more information.
+> new Date()
+2022-06-06T09:34:23.053Z
+> .exit
 ```
 
 ### `revert-completed-projects-to-in-progress`
