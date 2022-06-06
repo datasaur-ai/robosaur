@@ -183,7 +183,7 @@ Example csv format:
 
 ```csv
 tags,projectId
-<TAG_1>,<PROJECT_ID_1>
+"<TAG_1>,<TAG_4>",<PROJECT_ID_1>
 <TAG_2>,<PROJECT_ID_1>
 <TAG_3>,<PROJECT_ID_2>
 ```

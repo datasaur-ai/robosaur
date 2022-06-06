@@ -38,15 +38,10 @@ export async function handleApplyTags(configFile: string) {
     const project = projectsList.find((item) => item.id === payload.projectId);
     getLogger().info(`Applying tags to project ${payload.projectId}`);
 
-    const projectTag = payload.tags;
-    if (projectTag.includes(',')) {
-      const splitTags = projectTag.split(',');
-      splitTags.forEach((tag) => {
-        project?.tags.push(tagList.find((tagItem) => tagItem.name === tag));
-      });
-    } else {
-      project?.tags.push(tagList.find((tagItem) => tagItem.name === projectTag));
-    }
+    const projectTag = payload.tags.split(',');
+    projectTag.forEach((tag) => {
+      project?.tags.push(tagList.find((tagItem) => tagItem.name === tag));
+    });
 
     const tagIds = project?.tags.map((tag) => {
       return tag.id;
