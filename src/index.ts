@@ -36,7 +36,6 @@ program
   .action(handleExportProjectList);
 
 program
-  .command('revert-completed-projects-to-in-review <configFile> <projectListTxt> <teamId>')
   .command('revert-completed-projects-to-in-review <configFile>')
   .description("Reverts the specified projects' status from COMPLETED to IN_REVIEW")
   .action(handleRevertCompletedProjectsToInReview);
