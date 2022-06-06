@@ -44,12 +44,16 @@ For more in-depth breakdown, please refer to [row-based.md](row-based.md)
   - [Usage](#usage)
     - [`create-projects`](#create-projects)
     - [`export-projects`](#export-projects)
-  - [Stateful execution](#stateful-execution)
+  - [Execution Modes](#execution-modes)
+    - [Stateful Project Creation & Export](#stateful-project-creation--export)
+    - [Stateless project export](#stateless-project-export)
   - [Configuration](#configuration)
     - [Script-wide configuration](#script-wide-configuration)
     - [Per-command configuration](#per-command-configuration)
     - [Storage configuration](#storage-configuration)
-    - [Using Script from PCW](#using-script-from-pcw)
+  - [Using PCW Payload](#using-pcw-payload)
+    - [Providing Documents](#providing-documents)
+    - [Providing Labeler and Reviewer Assigments through PCW Payload](#providing-labeler-and-reviewer-assigments-through-pcw-payload)
 
 ## Requirements
 
@@ -179,6 +183,10 @@ Robosaur now supports exporting project not created by Robosaur (stateless). To 
 
        Ignores all projects created before this date.
 
+   - `"tags"`
+
+     Filter projects by its tag names.
+
 Example:
 
 ```json
@@ -194,7 +202,8 @@ Example:
     "date": {
       "newestDate": "2022-03-11",
       "oldestDate": "2022-03-07"
-    }
+    },
+    "tags": ["OCR"]
   },
   "format": "JSON_ADVANCED",
   "fileTransformerId": null

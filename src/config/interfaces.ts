@@ -136,7 +136,7 @@ export interface CreateConfig {
 
     autoScrollWhenLabeling?: boolean;
     sentenceSeparator?: string;
-    
+
     enableAnonymization?: boolean;
 
     anonymizationEntityTypes?: Array<string>;
@@ -256,7 +256,12 @@ export interface FilesConfig extends WithStorage {
 }
 
 export interface PCWSource extends WithStorage {
-  source: StorageSources.AMAZONS3 | StorageSources.GOOGLE | StorageSources.LOCAL | StorageSources.INLINE | StorageSources.AZURE;
+  source:
+    | StorageSources.AMAZONS3
+    | StorageSources.GOOGLE
+    | StorageSources.LOCAL
+    | StorageSources.INLINE
+    | StorageSources.AZURE;
 }
 
 export interface AssignmentConfig extends WithStorage {
@@ -298,6 +303,7 @@ export interface ExportConfig extends WithStorage {
       newestDate: Date;
       oldestDate?: Date;
     };
+    tags?: string[];
   };
 
   /**

@@ -14,7 +14,15 @@
     "teamId": "<TEAM_ID>",
     "statusFilter": [],
     "format": "CSV",
-    "fileTransformerId": null
+    "fileTransformerId": null,
+    "projectFilter": {
+      "kind": "ROW_BASED",
+      "date": {
+        "newestDate": "2022-02-01",
+        "oldestDate": "2022-01-01"
+      },
+      "tags": []
+    }
   },
   "create": {
     "teamId": "<TEAM_ID>",

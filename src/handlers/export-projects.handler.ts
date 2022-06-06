@@ -4,6 +4,7 @@ import { getProjectExportValidators } from '../config/schema/validator';
 import { exportProject } from '../datasaur/export-project';
 import { JobStatus } from '../datasaur/get-jobs';
 import { getProjects } from '../datasaur/get-projects';
+import { getTeamTags } from '../datasaur/get-team-tags';
 import { ExportResult } from '../datasaur/interfaces';
 import { getLogger } from '../logger';
 import { pollJobsUntilCompleted } from '../utils/polling.helper';
@@ -25,6 +26,7 @@ const handleStateless = async (unzip: boolean) => {
   } = getConfig().export;
 
   getLogger().info('retrieving projects with filters', { filter: statusFilter });
+  const filterTagIds = projectFilter && projectFilter.tags ? await getTagIds(teamId, projectFilter.tags) : undefined;
   const projectToExports = await getProjects({
     statuses: statusFilter,
     teamId,
@@ -35,6 +37,7 @@ const handleStateless = async (unzip: boolean) => {
           oldestDate: projectFilter.date?.oldestDate,
         }
       : undefined,
+    tags: filterTagIds,
   });
 
   getLogger().info(`found ${projectToExports.length} projects to export`);
@@ -133,6 +136,7 @@ export async function handleExportProjects(configFile: string, { unzip }: { unzi
   // retrieves projects from Datasaur matching the status filters
   // add or update the projects in script state
   getLogger().info('retrieving projects with filters', { filter: statusFilter });
+  const filterTagIds = projectFilter && projectFilter.tags ? await getTagIds(teamId, projectFilter.tags) : undefined;
   const validProjectsFromDatasaur = await getProjects({
     statuses: statusFilter,
     teamId,
@@ -143,6 +147,7 @@ export async function handleExportProjects(configFile: string, { unzip }: { unzi
           oldestDate: projectFilter.date?.oldestDate,
         }
       : undefined,
+    tags: filterTagIds,
   });
   scriptState.addProjectsToExport(validProjectsFromDatasaur);
 
@@ -242,6 +247,19 @@ export async function handleExportProjects(configFile: string, { unzip }: { unzi
   );
   await scriptState.save();
   getLogger().info('exiting script...');
+}
+
+async function getTagIds(teamId: string, tagsName: string[]) {
+  if (tagsName.length === 0) return undefined;
+  const tags = await getTeamTags(teamId);
+
+  return tagsName.map((tagName) => {
+    const tag = tags.find((tag) => tag.name === tagName);
+    if (tag === undefined) {
+      throw new Error(`Tag ${tagName} is not found.`);
+    }
+    return tag.id;
+  });
 }
 
 function shouldExport(state: ProjectState) {
