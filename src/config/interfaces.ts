@@ -49,6 +49,9 @@ export interface Config {
 
   // project creation
   create: CreateConfig;
+
+  // apply tags to project
+  applyTags: ApplyTagsConfig;
 }
 
 export interface CreateConfig {
@@ -332,6 +335,24 @@ export interface ExportConfig extends WithStorage {
    * The ID can be obtained from the file transformer page in this format: https://app.datasaur.ai/teams/{teamId}/file-transformers/{file-transformer-id}
    */
   fileTransformerId: string;
+}
+
+export interface ApplyTagsConfig extends WithStorage {
+  teamId: string;
+  source:
+    | StorageSources.AMAZONS3
+    | StorageSources.GOOGLE
+    | StorageSources.LOCAL
+    | StorageSources.INLINE
+    | StorageSources.AZURE;
+  prefix: string;
+  path: string;
+  payload: ProjectTags[];
+}
+
+export interface ProjectTags {
+  projectId: string;
+  tags: Array<string>;
 }
 
 interface WithStorage {

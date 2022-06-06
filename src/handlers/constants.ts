@@ -21,5 +21,6 @@ export const PROJECT_CREATION_CONFIG = {
 export const enum ScriptAction {
   PROJECT_CREATION = 'CREATION',
   PROJECT_EXPORT = 'EXPORT',
+  APPLY_TAGS = 'APPLY_TAGS',
   NONE = 'NONE',
 }

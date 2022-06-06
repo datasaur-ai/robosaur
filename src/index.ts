@@ -1,5 +1,6 @@
 import { Command } from 'commander';
 import packageJson from '../package.json';
+import { handleApplyTags } from "./handlers/apply-tags.handler";
 import { handleCreateProject } from './handlers/create-project.handler';
 import { handleCreateProjects } from './handlers/create-projects.handler';
 import { handleExportProjects } from './handlers/export-projects.handler';
@@ -27,6 +28,11 @@ program
   .option('-u --unzip', 'Unzips the exported projects, only storing the final version accepted by reviewers')
   .description('Export all projects based on the given config file')
   .action(handleExportProjects);
+
+program
+  .command(`apply-tags <configFile>`)
+  .description('Applies tags to projects based on the given config file')
+  .action(handleApplyTags);
 
 program.parseAsync(process.argv);
 

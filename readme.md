@@ -146,6 +146,52 @@ This can be set in the `export.statusFilter` inside the config JSON. In `quickst
 }
 ```
 
+### `apply-tags`
+
+```console
+$ npm run start -- apply-tags -h
+Usage: robosaur apply-tags [options] <configFile>
+
+Applies tags to projects based on the given config file
+
+Options:
+  -h, --help  display help for command
+```
+
+Robosaur will try to apply tags to projects specified in the config file's payload, or from a separate csv file. The csv file can be from local or one of our supported Cloud Services.
+
+If the tag in the config file is not present in the team, Robosaur will create the tag and apply it to the project automatically.
+
+Example config format:
+
+```json
+{
+  "applyTags": {
+    "teamId": "<TEAM_ID>",
+    "source": "inline",
+    "payload": [
+      {
+        "projectId": "<PROJECT_ID_1>",
+        "tags": ["<TAG_1>", "<TAG_2>"]
+      },
+      {
+        "projectId": "<PROJECT_ID_2>",
+        "tags": ["<TAG_3>"]
+      }
+    ]
+  }
+}
+```
+
+Example csv format:
+
+```csv
+tags,projectId
+"<TAG_1>,<TAG_4>",<PROJECT_ID_1>
+<TAG_2>,<PROJECT_ID_1>
+<TAG_3>,<PROJECT_ID_2>
+```
+
 ## Execution Modes
 
 ### Stateful Project Creation & Export
