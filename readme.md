@@ -45,6 +45,7 @@ For more in-depth breakdown, please refer to [row-based.md](row-based.md)
     - [`create-projects`](#create-projects)
     - [`export-projects`](#export-projects)
     - [`export-project-list`](#export-project-list)
+    - [`revert-completed-projects-to-in-progress`](#revert-completed-projects-to-in-progress)
   - [Execution Modes](#execution-modes)
     - [Stateful Project Creation & Export](#stateful-project-creation--export)
     - [Stateless project export](#stateless-project-export)
@@ -154,9 +155,6 @@ $ npm run start -- export-project-list -h
 Usage: robosaur export-project-list <configFile>
 
 Export project list based on the given config file
-
-Options:
-  -h, --help  display help for command
 ```
 
 Robosaur will try to export a list of project as csv file: id, name, status, tag, createdDate, completedDate.
@@ -170,16 +168,64 @@ Robosaur supports filtering which project to export by the project status, tags,
     "source": "local",
     "path": "quickstart/export-project-list/project-list.csv",
     "projectFilter": {
+      // Optional filter fields
       "statuses": ["COMPLETE"],
       "date": {
-        "newestDate": "2022-03-11",
-        "oldestDate": "2022-03-07"
+        "newestDate": "2022-03-11T00:00:00.000Z",
+        "oldestDate": "2022-03-07T00:00:00.000Z"
       },
       "tags": ["PASS"]
     }
   }
 }
 ```
+
+The `date.newestDate` and `date.oldestDate` fields accept a valid `Date` string. If unspecified, Datasaur's GraphQL API will use the UTC timezone by default.
+To use our local time, please use a full [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) date string for precise results. One way to generate current date string using nodeJS would be to call `new Date()` in the REPL.
+
+```console
+$ LC_TIME=en_US.UTF-8 TZ=Singapore date
+Mon 06 Jun 2022 05:52:39 PM +08
+$ node
+Welcome to Node.js v16.13.2.
+Type ".help" for more information.
+> new Date()
+2022-06-06T09:52:50.466Z
+> .exit
+```
+
+### `revert-completed-projects-to-in-progress`
+
+```console
+$ npm run start -- revert-completed-projects-to-in-progress -h
+Usage: robosaur revert-completed-projects-to-in-progress [options] <configFile>
+
+Reverts the specified projects' status from COMPLETED to IN_PROGRESS
+
+Options:
+  -h, --help  display help for command
+```
+
+This command allows Robosaur to read a list of projectIds from a file, and send a request to Datasaur's API to revert their statuses from `COMPLETE` back to `IN_PROGRESS`.
+
+The relevant config for this command is under the `revert` key, and the file containing projectIds can be a local file, or a file in a supported object storage, namely S3, Azure Blob Storage or Google Cloud Storage. If the file is read from an object storage, be sure to set the correct [credentials](#storage-configuration) and specify the bucketName inside the `revert` key.
+
+```json
+{
+  "revert": {
+    "source": "gcs",
+    "bucketName": "my-bucket",
+    "path": "full/path/to/data.json",
+    "teamId": "<TEAM_ID>"
+  }
+}
+```
+
+The file `data.json` should contain a single JSON array, where each element of the array is a string. The projectIds can be found in the URL when we open a project in the Datasaur web app, specifically this part of the URL:
+
+`app.datasaur.ai/teams/<TEAM_ID>/projects/<PROJECT_ID>/<DOCUMENT>`
+
+There is a minimal config example for this command under [sample/revert/config.json](sample/revert/config.json) and a sample [data.json](sample/revert/data.json) file in the same folder. Please keep in mind that the projectIds inside that file are not actual projectIds. For quick testing purposes, we also support `inline` source where we provide the list of projectIds directly in the [config](sample/revert/config.inline.json) file.
 
 ## Execution Modes
 
@@ -189,7 +235,7 @@ For both commands, Robosaur can behave a bit smarter with the help of a JSON sta
 
 In multiple project creation using the `create-projects` command, the statefile can help keeping track which projects have been created previously, and Robosaur will not create the project again if it had been successfully created before.
 
-In project export using `export-projects`, the JSON statefile is treated as source of truth. Only projects found in the statefile will be checked against the `statusFilter` and exported.  
+In project export using `export-projects`, the JSON statefile is treated as source of truth. Only projects found in the statefile will be checked against the `statusFilter` and exported.
 Robosaur will also record the project state when it was last exported, and subsequent runs will only export the project if there had been a forward change in the project status
 
 ### Stateless project export
@@ -247,19 +293,19 @@ In this part we will explain each part of the Robosaur config file. We will use 
 
 ### Script-wide configuration
 
-1. `"datasaur"`  
+1. `"datasaur"`
    Contains our OAuth `clientId` and `clientSecret`. These credentials are only enabled for Growth and Enterprise plans. For more information, please reach out to [Datasaur](https://datasaur.ai)
-2. `"projectState"`  
+2. `"projectState"`
    Where we want our statefile to be saved. `projectState.path` can be a full or a relative path to a JSON file. For now, keep `source` as `local` for all `source`s.
 
 ### Per-command configuration
 
 1. Project creation (`create-projects`)
 
-   1. `"files"`  
+   1. `"files"`
       Where our project folders are located. A bit different from `projectState.path`, `create.files.path` should be a folder path - relative or full.
-   2. `"assignment"`  
-      Where our assignment file is located. `create.assignment.path` is similar to `projectState.path`, it should be a full or relative path pointing to a JSON file.  
+   2. `"assignment"`
+      Where our assignment file is located. `create.assignment.path` is similar to `projectState.path`, it should be a full or relative path pointing to a JSON file.
       `assignment.strategy` accepts one of two options: `"ALL"` or `"AUTO"`
 
       - `"ALL"`: each labeler will receive a copy of all documents
@@ -268,20 +314,20 @@ In this part we will explain each part of the Robosaur config file. We will use 
       For example, if we have a project with 3 different documents - `#1`, `#2`, `#3` - and 2 labeler, `Alice` and `Bob`, using
 
       1. `"ALL"` means both `Alice` and `Bob` will get those 3 documents.
-      2. `"AUTO"` means `Alice` will get #1, `Bob` will get #2, and we then loop-back to `Alice` who will get #3  
+      2. `"AUTO"` means `Alice` will get #1, `Bob` will get #2, and we then loop-back to `Alice` who will get #3
          So, with `"AUTO"` -> `Alice` gets 2 documents, and `Bob` gets 1 document
 
-   3. `"project"`  
-      This is the Datasaur project configuration.  
-      More options can be seen by creating a project via the web UI, and then clicking the `View Script` button.  
+   3. `"project"`
+      This is the Datasaur project configuration.
+      More options can be seen by creating a project via the web UI, and then clicking the `View Script` button.
       In general, we want to keep these mostly unchanged, except for `project.teamId` and `project.fileTransformerId`
       1. `docFileOptions` - Configuration specific for `ROW_BASED` configs. Refer to [`row-based.md`](row-based.md) for more information.
       2. `splitDocumentOption` - Allows splitting each document to several parts, based on the `strategy` and `number` option. For more information, see <https://datasaurai.gitbook.io/datasaur/basics/workforce-management/split-files>
 
 2. Project export (`export-projects`)
-   1. `"export"`  
-      This changes Robosaur's export behavior.  
-      `export.prefix` is the folder path where Robosaur will save the export result - make sure Robosaur has write permission to the folder.  
+   1. `"export"`
+      This changes Robosaur's export behavior.
+      `export.prefix` is the folder path where Robosaur will save the export result - make sure Robosaur has write permission to the folder.
       `export.format` & `export.fileTransformerId` affects how Datasaur will export our projects. See this [gitbook link](https://datasaurai.gitbook.io/datasaur/advanced/apis-docs/export-project#export-all-files) for more details.
 
 ### Storage configuration
@@ -305,7 +351,7 @@ Here are the examples for credentials and other configs:
    }
    ```
 
-   To fully use Robosaur with a GCS bucket, we can use the `Storage Object Admin` role.  
+   To fully use Robosaur with a GCS bucket, we can use the `Storage Object Admin` role.
    The specific IAM permissions required are as follows:
 
    - storage.objects.list
@@ -335,9 +381,9 @@ Here are the examples for credentials and other configs:
    }
    ```
 
-   `s3Region` is an optional parameter, indicating where your S3 bucket is located.  
-   However, we have encountered some cases where we got `S3: Access Denied` error when it is not defined.  
-   We recommend setting this property whenever possible.  
+   `s3Region` is an optional parameter, indicating where your S3 bucket is located.
+   However, we have encountered some cases where we got `S3: Access Denied` error when it is not defined.
+   We recommend setting this property whenever possible.
    Usually, these are identified by access keys starting with `ASIA...`
 
    To fully use Robosaur with S3 buckets, these are the IAM Roles required:
@@ -498,3 +544,7 @@ Robosaur **does not** support providing documents through PCW payload. The `docu
 ```
 
 Robosaur supports using PCW's labeler and reviewer assignment settings, but note that `assignment` option **should not** be provided. Also, `documents` option used for assigning specific documents for each labelers will be ignored. Instead, use `pcwAssignmentStrategy` option to specify `AUTO` or `ALL` assignment method.
+
+```
+
+```

@@ -1,5 +1,3 @@
-import internal from 'stream';
-
 export interface ObjectStorageClient {
   listItemsInBucket(bucketName: string, prefix: string): Promise<BucketItem[]>;
   listSubfoldersOfPrefix(bucketname: string, rootPrefix?: string): Promise<string[]>;

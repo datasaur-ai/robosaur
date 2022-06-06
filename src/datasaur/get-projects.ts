@@ -22,6 +22,7 @@ const GET_PROJECTS_QUERY = gql`
         prevCursor
         __typename
       }
+      totalCount
     }
   }
 `;

@@ -1,4 +1,4 @@
-import Ajv, { JSONSchemaType, str } from 'ajv';
+import Ajv, { JSONSchemaType } from 'ajv';
 import { ExportFormat } from '../../datasaur/interfaces';
 import { ExportConfig, StorageSources } from '../interfaces';
 
