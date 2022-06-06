@@ -44,6 +44,7 @@ For more in-depth breakdown, please refer to [row-based.md](row-based.md)
   - [Usage](#usage)
     - [`create-projects`](#create-projects)
     - [`export-projects`](#export-projects)
+    - [`apply-tags`](#apply-tags)
     - [`export-project-list`](#export-project-list)
     - [`revert-completed-projects-to-in-progress`](#revert-completed-projects-to-in-progress)
   - [Execution Modes](#execution-modes)
@@ -148,6 +149,52 @@ This can be set in the `export.statusFilter` inside the config JSON. In `quickst
 }
 ```
 
+### `apply-tags`
+
+```console
+$ npm run start -- apply-tags -h
+Usage: robosaur apply-tags [options] <configFile>
+
+Applies tags to projects based on the given config file
+
+Options:
+  -h, --help  display help for command
+```
+
+Robosaur will try to apply tags to projects specified in the config file's payload, or from a separate csv file. The csv file can be from local or one of our supported Cloud Services.
+
+If the tag in the config file is not present in the team, Robosaur will create the tag and apply it to the project automatically.
+
+Example config format:
+
+```json
+{
+  "applyTags": {
+    "teamId": "<TEAM_ID>",
+    "source": "inline",
+    "payload": [
+      {
+        "projectId": "<PROJECT_ID_1>",
+        "tags": ["<TAG_1>", "<TAG_2>"]
+      },
+      {
+        "projectId": "<PROJECT_ID_2>",
+        "tags": ["<TAG_3>"]
+      }
+    ]
+  }
+}
+```
+
+Example csv format:
+
+```csv
+tags,projectId
+"<TAG_1>,<TAG_4>",<PROJECT_ID_1>
+<TAG_2>,<PROJECT_ID_1>
+<TAG_3>,<PROJECT_ID_2>
+```
+
 ### `export-project-list`
 
 ```console
@@ -181,7 +228,7 @@ Robosaur supports filtering which project to export by the project status, tags,
 ```
 
 The `date.newestDate` and `date.oldestDate` fields accept a valid `Date` string. If unspecified, Datasaur's GraphQL API will use the UTC timezone by default.
-To use our local time, please use a full [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) date string for precise results. One way to generate current date string using nodeJS would be to call `new Date()` in the REPL.
+To use a specific local timezone, please use a full [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) date string for precise results. One way to generate current date string using nodeJS would be to call `new Date()` in the REPL.
 
 ```console
 $ LC_TIME=en_US.UTF-8 TZ=Singapore date
@@ -201,14 +248,11 @@ $ npm run start -- revert-completed-projects-to-in-progress -h
 Usage: robosaur revert-completed-projects-to-in-progress [options] <configFile>
 
 Reverts the specified projects' status from COMPLETED to IN_PROGRESS
-
-Options:
-  -h, --help  display help for command
 ```
 
-This command allows Robosaur to read a list of projectIds from a file, and send a request to Datasaur's API to revert their statuses from `COMPLETE` back to `IN_PROGRESS`.
+This command allows Robosaur to read a list of projectIds from a file, and send requests to Datasaur's API to revert their statuses from `COMPLETE` back to `IN_PROGRESS`.
 
-The relevant config for this command is under the `revert` key, and the file containing projectIds can be a local file, or a file in a supported object storage, namely S3, Azure Blob Storage or Google Cloud Storage. If the file is read from an object storage, be sure to set the correct [credentials](#storage-configuration) and specify the bucketName inside the `revert` key.
+The relevant config for this command is under the `revert` key, and the file containing projectIds can be a local file, or a file in a supported object storage. If the file is read from an object storage, be sure to set the correct [credentials](#storage-configuration) and specify the bucketName inside the `revert` key.
 
 ```json
 {
@@ -264,6 +308,10 @@ Robosaur now supports exporting project not created by Robosaur (stateless). To 
 
        Ignores all projects created before this date.
 
+   - `"tags"`
+
+     Filter projects by its tag names.
+
 Example:
 
 ```json
@@ -279,7 +327,8 @@ Example:
     "date": {
       "newestDate": "2022-03-11",
       "oldestDate": "2022-03-07"
-    }
+    },
+    "tags": ["OCR"]
   },
   "format": "JSON_ADVANCED",
   "fileTransformerId": null

@@ -55,6 +55,9 @@ export interface Config {
 
   // revert project status
   revert: RevertConfig;
+
+  // apply tags to project
+  applyTags: ApplyTagsConfig;
 }
 
 export interface CreateConfig {
@@ -309,6 +312,7 @@ export interface ExportConfig extends WithStorage {
       newestDate: Date;
       oldestDate?: Date;
     };
+    tags?: string[];
   };
 
   /**
@@ -360,6 +364,25 @@ export interface RevertConfig extends WithStorage {
 
   payload: Array<string>;
 }
+
+export interface ApplyTagsConfig extends WithStorage {
+  teamId: string;
+  source:
+    | StorageSources.AMAZONS3
+    | StorageSources.GOOGLE
+    | StorageSources.LOCAL
+    | StorageSources.INLINE
+    | StorageSources.AZURE;
+  prefix: string;
+  path: string;
+  payload: ProjectTags[];
+}
+
+export interface ProjectTags {
+  projectId: string;
+  tags: Array<string>;
+}
+
 interface WithStorage {
   source: StorageSources;
   /**

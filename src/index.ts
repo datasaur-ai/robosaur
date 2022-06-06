@@ -1,5 +1,6 @@
 import { Command } from 'commander';
 import packageJson from '../package.json';
+import { handleApplyTags } from './handlers/apply-tags.handler';
 import { handleCreateProject } from './handlers/create-project.handler';
 import { handleCreateProjects } from './handlers/create-projects.handler';
 import { handleExportProjectList } from './handlers/export-projects-list.handler';
@@ -39,6 +40,11 @@ program
   .command('revert-completed-projects-to-in-progress <configFile>')
   .description("Reverts the specified projects' status from COMPLETED to IN_PROGRESS")
   .action(handleRevertCompletedProjectsToInProgress);
+
+program
+  .command(`apply-tags <configFile>`)
+  .description('Applies tags to projects based on the given config file')
+  .action(handleApplyTags);
 
 program.parseAsync(process.argv);
 

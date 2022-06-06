@@ -1,5 +1,6 @@
 import { getLogger } from '../../logger';
 import { Config, StorageSources } from '../interfaces';
+import { applyTagsSchemaValidator } from './apply-tags-schema-validator';
 import { assignmentSchemaValidator } from './assignment-schema-validator';
 import { credentialsSchemaValidator } from './credential-schema-validator';
 import { documentsSchemaValidator } from './documents-schema-validator';
@@ -16,6 +17,10 @@ export function getProjectExportValidators() {
 
 export function getProjectListExportValidators() {
   return [validateConfigProjectList];
+}
+
+export function getApplyTagValidators() {
+  return [validateConfigCredentials, validateConfigApplyTags];
 }
 
 function validateConfigDocuments(config: Config) {
@@ -63,6 +68,13 @@ function validateConfigCredentials(config: Config) {
   }
 }
 
+function validateConfigApplyTags(config: Config) {
+  if (!applyTagsSchemaValidator(config.applyTags)) {
+    getLogger().error(`config.applyTags has some errors`, { errors: applyTagsSchemaValidator.errors });
+    throw new Error(`config.applyTags has some errors ${JSON.stringify(applyTagsSchemaValidator)}`);
+  }
+}
+
 function doSourcesNeedCredentials(config: Config) {
   const sourcesNeedCredentials = [StorageSources.AMAZONS3, StorageSources.GOOGLE, StorageSources.AZURE];
   const usedSources = [
@@ -70,6 +82,7 @@ function doSourcesNeedCredentials(config: Config) {
     config.create?.files?.source,
     config.projectState?.source,
     config.export?.source,
+    config.applyTags?.source,
   ];
 
   return usedSources.some((source) => (source ? sourcesNeedCredentials.includes(source) : false));

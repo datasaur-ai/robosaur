@@ -47,9 +47,6 @@ export function getActiveTeamId() {
 
 function setActiveTeamId(context: ScriptAction) {
   switch (context) {
-    case ScriptAction.REVERT_PROJECT_STATUS:
-      activeTeamId = getConfig().revert.teamId;
-      break;
     case ScriptAction.PROJECT_CREATION:
       activeTeamId =
         getConfig().create.teamId ||
@@ -59,8 +56,14 @@ function setActiveTeamId(context: ScriptAction) {
     case ScriptAction.PROJECT_EXPORT:
       activeTeamId = getConfig().export.teamId;
       break;
+    case ScriptAction.APPLY_TAGS:
+      activeTeamId = getConfig().applyTags.teamId;
+      break;
     case ScriptAction.PROJECT_LIST_EXPORT:
       activeTeamId = getConfig().exportProjectList.teamId;
+      break;
+    case ScriptAction.REVERT_PROJECT_STATUS:
+      activeTeamId = getConfig().revert.teamId;
       break;
     case ScriptAction.NONE:
     default:
@@ -70,7 +73,8 @@ function setActiveTeamId(context: ScriptAction) {
         (getConfig().create.pcwPayload as PCWPayload).teamId ||
         (getConfig().create.pcwPayload as PCWWrapper).variables.input.teamId;
       const projectExportTeam = getConfig().export?.teamId;
-      activeTeamId = projectCreationTeam ?? projectExportTeam;
+      const projectApplyTagsTeam = getConfig().applyTags?.teamId;
+      activeTeamId = projectCreationTeam ?? projectExportTeam ?? projectApplyTagsTeam;
       break;
   }
 }
