@@ -4,7 +4,7 @@ import { handleCreateProject } from './handlers/create-project.handler';
 import { handleCreateProjects } from './handlers/create-projects.handler';
 import { handleExportProjectList } from './handlers/export-projects-list.handler';
 import { handleExportProjects } from './handlers/export-projects.handler';
-import { handleRevertCompletedProjectsToInReview } from './handlers/revert-completed-projects.handler';
+import { handleRevertCompletedProjectsToInProgress } from './handlers/revert-completed-projects.handler';
 import { getLogger } from './logger';
 
 const program = new Command();
@@ -36,9 +36,9 @@ program
   .action(handleExportProjectList);
 
 program
-  .command('revert-completed-projects-to-in-review <configFile>')
-  .description("Reverts the specified projects' status from COMPLETED to IN_REVIEW")
-  .action(handleRevertCompletedProjectsToInReview);
+  .command('revert-completed-projects-to-in-progress <configFile>')
+  .description("Reverts the specified projects' status from COMPLETED to IN_PROGRESS")
+  .action(handleRevertCompletedProjectsToInProgress);
 
 program.parseAsync(process.argv);
 

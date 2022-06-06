@@ -12,7 +12,7 @@ import { ScriptAction } from './constants';
 
 const SLEEP_INTERVAL = 2500;
 
-export const handleRevertCompletedProjectsToInReview = async (configFile: string) => {
+export const handleRevertCompletedProjectsToInProgress = async (configFile: string) => {
   setConfigByJSONFile(configFile, getRevertProjectStatusValidator(), ScriptAction.REVERT_PROJECT_STATUS);
 
   const inputProjectIds = await getProjectIds(getConfig().revert);

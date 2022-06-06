@@ -7,6 +7,14 @@
   "exportProjectList": {
     "teamId": "<TEAM_ID>",
     "source": "local",
-    "path": "quickstart/export-project-list/project-list.csv"
+    "path": "quickstart/export-project-list/project-list.csv",
+    "projectFilter": {
+      "statuses": ["COMPLETE"],
+      "date": {
+        "newestDate": "2022-03-11",
+        "oldestDate": "2022-03-07"
+      },
+      "tags": ["PASS"]
+    }
   }
 }

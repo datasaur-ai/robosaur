@@ -45,7 +45,7 @@ For more in-depth breakdown, please refer to [row-based.md](row-based.md)
     - [`create-projects`](#create-projects)
     - [`export-projects`](#export-projects)
     - [`export-project-list`](#export-project-list)
-    - [`revert-completed-projects-to-in-review`](#revert-completed-projects-to-in-review)
+    - [`revert-completed-projects-to-in-progress`](#revert-completed-projects-to-in-progress)
   - [Execution Modes](#execution-modes)
     - [Stateful Project Creation & Export](#stateful-project-creation--export)
     - [Stateless project export](#stateless-project-export)
@@ -167,6 +167,7 @@ Robosaur supports filtering which project to export by the project status, tags,
     "teamId": "1",
     "source": "local",
     "path": "quickstart/export-project-list/project-list.csv",
+    // Optional filter fields
     "projectFilter": {
       "statuses": ["COMPLETE"],
       "date": {
@@ -179,19 +180,19 @@ Robosaur supports filtering which project to export by the project status, tags,
 }
 ```
 
-### `revert-completed-projects-to-in-review`
+### `revert-completed-projects-to-in-progress`
 
 ```console
-$ npm run start -- revert-completed-projects-to-in-review -h
-Usage: robosaur revert-completed-projects-to-in-review [options] <configFile>
+$ npm run start -- revert-completed-projects-to-in-progress -h
+Usage: robosaur revert-completed-projects-to-in-progress [options] <configFile>
 
-Reverts the specified projects' status from COMPLETED to IN_REVIEW
+Reverts the specified projects' status from COMPLETED to IN_PROGRESS
 
 Options:
   -h, --help  display help for command
 ```
 
-This command allows Robosaur to read a list of projectIds from a file, and send a request to Datasaur's API to revert their statuses from `COMPLETE` back to `IN_REVIEW`.
+This command allows Robosaur to read a list of projectIds from a file, and send a request to Datasaur's API to revert their statuses from `COMPLETE` back to `IN_PROGRESS`.
 
 The relevant config for this command is under the `revert` key, and the file containing projectIds can be a local file, or a file in a supported object storage, namely S3, Azure Blob Storage or Google Cloud Storage. If the file is read from an object storage, be sure to set the correct [credentials](#storage-configuration) and specify the bucketName inside the `revert` key.
 
