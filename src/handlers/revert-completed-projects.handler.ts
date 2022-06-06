@@ -11,7 +11,7 @@ import { readJSONFile } from '../utils/readJSONFile';
 import { sleep } from '../utils/sleep';
 import { ScriptAction } from './constants';
 
-const SLEEP_INTERVAL = 1500;
+const SLEEP_INTERVAL = 2500;
 const TAKE_PER_PAGE = 2;
 const CHUNK_LENGTH = 1;
 
@@ -56,7 +56,7 @@ export const handleRevertCompletedProjectsToInReview = async (configFile: string
     continueLooping = Boolean(paginatedResult.pageInfo.nextCursor && remainingProjectIds.length > 0);
     if (continueLooping) {
       skip += TAKE_PER_PAGE;
-      sleep(1000);
+      sleep(SLEEP_INTERVAL);
     }
   }
 
