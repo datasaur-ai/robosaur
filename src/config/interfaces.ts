@@ -273,6 +273,7 @@ export interface AssignmentConfig extends WithStorage {
    * @description local or remote path to assignment file
    */
   path: string;
+  by: 'PROJECT' | 'DOCUMENT';
 
   /**
    * @description document assignment strategy.
