@@ -551,15 +551,15 @@ Robosaur **does not** support providing documents through PCW payload. The `docu
 ```json
 {
   ...
-  // "assignment": {
-  //    DO NOT provide this option
-  // }
+  "assignment": { // use this only if you want to distribute by projects
+    ...
+  },
   "project": {
     ...
     "pcwPayloadSource": {
       "source": "inline",
     },
-    "pcwAssignmentStrategy": "AUTO",
+    "pcwAssignmentStrategy": "AUTO", // remove this if you want to distribute by projects
     "pcwPayload": {
       ...
       "documentAssignments": [

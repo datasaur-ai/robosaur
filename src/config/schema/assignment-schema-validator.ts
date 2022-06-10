@@ -10,6 +10,7 @@ const AssignmentSchema: JSONSchemaType<AssignmentConfig> = {
   properties: {
     source: { type: 'string' },
     path: { type: 'string' },
+    by: { enum: ['PROJECT', 'DOCUMENT'], default: 'DOCUMENT', type: 'string' },
     strategy: { enum: ['ALL', 'AUTO'], default: 'ALL', type: 'string' },
     bucketName: { type: 'string', nullable: true }, // nullable when local
   },
