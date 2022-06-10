@@ -44,12 +44,16 @@ For more in-depth breakdown, please refer to [row-based.md](row-based.md)
   - [Usage](#usage)
     - [`create-projects`](#create-projects)
     - [`export-projects`](#export-projects)
-  - [Stateful execution](#stateful-execution)
+  - [Execution Modes](#execution-modes)
+    - [Stateful Project Creation & Export](#stateful-project-creation--export)
+    - [Stateless project export](#stateless-project-export)
   - [Configuration](#configuration)
     - [Script-wide configuration](#script-wide-configuration)
     - [Per-command configuration](#per-command-configuration)
     - [Storage configuration](#storage-configuration)
-    - [Using Script from PCW](#using-script-from-pcw)
+  - [Using PCW Payload](#using-pcw-payload)
+    - [Providing Documents](#providing-documents)
+    - [Providing Labeler and Reviewer Assigments through PCW Payload](#providing-labeler-and-reviewer-assigments-through-pcw-payload)
 
 ## Requirements
 
@@ -142,6 +146,52 @@ This can be set in the `export.statusFilter` inside the config JSON. In `quickst
 }
 ```
 
+### `apply-tags`
+
+```console
+$ npm run start -- apply-tags -h
+Usage: robosaur apply-tags [options] <configFile>
+
+Applies tags to projects based on the given config file
+
+Options:
+  -h, --help  display help for command
+```
+
+Robosaur will try to apply tags to projects specified in the config file's payload, or from a separate csv file. The csv file can be from local or one of our supported Cloud Services.
+
+If the tag in the config file is not present in the team, Robosaur will create the tag and apply it to the project automatically.
+
+Example config format:
+
+```json
+{
+  "applyTags": {
+    "teamId": "<TEAM_ID>",
+    "source": "inline",
+    "payload": [
+      {
+        "projectId": "<PROJECT_ID_1>",
+        "tags": ["<TAG_1>", "<TAG_2>"]
+      },
+      {
+        "projectId": "<PROJECT_ID_2>",
+        "tags": ["<TAG_3>"]
+      }
+    ]
+  }
+}
+```
+
+Example csv format:
+
+```csv
+tags,projectId
+"<TAG_1>,<TAG_4>",<PROJECT_ID_1>
+<TAG_2>,<PROJECT_ID_1>
+<TAG_3>,<PROJECT_ID_2>
+```
+
 ## Execution Modes
 
 ### Stateful Project Creation & Export
@@ -179,6 +229,10 @@ Robosaur now supports exporting project not created by Robosaur (stateless). To 
 
        Ignores all projects created before this date.
 
+   - `"tags"`
+
+     Filter projects by its tag names.
+
 Example:
 
 ```json
@@ -194,10 +248,11 @@ Example:
     "date": {
       "newestDate": "2022-03-11",
       "oldestDate": "2022-03-07"
-    }
+    },
+    "tags": ["OCR"]
   },
   "format": "JSON_ADVANCED",
-  "customScriptId": null
+  "fileTransformerId": null
 },
 ...
 ```
@@ -235,7 +290,7 @@ In this part we will explain each part of the Robosaur config file. We will use 
    3. `"project"`  
       This is the Datasaur project configuration.  
       More options can be seen by creating a project via the web UI, and then clicking the `View Script` button.  
-      In general, we want to keep these mostly unchanged, except for `project.teamId` and `project.customScriptId`
+      In general, we want to keep these mostly unchanged, except for `project.teamId` and `project.fileTransformerId`
       1. `docFileOptions` - Configuration specific for `ROW_BASED` configs. Refer to [`row-based.md`](row-based.md) for more information.
       2. `splitDocumentOption` - Allows splitting each document to several parts, based on the `strategy` and `number` option. For more information, see <https://datasaurai.gitbook.io/datasaur/basics/workforce-management/split-files>
 
@@ -243,7 +298,7 @@ In this part we will explain each part of the Robosaur config file. We will use 
    1. `"export"`  
       This changes Robosaur's export behavior.  
       `export.prefix` is the folder path where Robosaur will save the export result - make sure Robosaur has write permission to the folder.  
-      `export.format` & `export.customScriptId` affects how Datasaur will export our projects. See this [gitbook link](https://datasaurai.gitbook.io/datasaur/advanced/apis-docs/export-project#export-all-files) for more details.
+      `export.format` & `export.fileTransformerId` affects how Datasaur will export our projects. See this [gitbook link](https://datasaurai.gitbook.io/datasaur/advanced/apis-docs/export-project#export-all-files) for more details.
 
 ### Storage configuration
 
@@ -417,15 +472,15 @@ Robosaur **does not** support providing documents through PCW payload. The `docu
 ```json
 {
   ...
-  // "assignment": {
-  //    DO NOT provide this option
-  // }
+  "assignment": { // use this only if you want to distribute by projects
+    ...
+  },
   "project": {
     ...
     "pcwPayloadSource": {
       "source": "inline",
     },
-    "pcwAssignmentStrategy": "AUTO",
+    "pcwAssignmentStrategy": "AUTO", // remove this if you want to distribute by projects
     "pcwPayload": {
       ...
       "documentAssignments": [

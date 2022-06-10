@@ -49,6 +49,9 @@ export interface Config {
 
   // project creation
   create: CreateConfig;
+
+  // apply tags to project
+  applyTags: ApplyTagsConfig;
 }
 
 export interface CreateConfig {
@@ -106,8 +109,8 @@ export interface CreateConfig {
      */
     kind?: string;
     /**
-     * @description determine the custom script to be used.
-     * The ID can be obtained from the custom script page in this format: https://app.datasaur.ai/teams/{teamId}/custom-scripts/{custom-script-id}
+     * @description determine the file transformer to be used.
+     * The ID can be obtained from the file transformer page in this format: https://app.datasaur.ai/teams/{teamId}/file-transformers/{file-transformer-id}
      */
     fileTransformerId?: string;
 
@@ -136,7 +139,7 @@ export interface CreateConfig {
 
     autoScrollWhenLabeling?: boolean;
     sentenceSeparator?: string;
-    
+
     enableAnonymization?: boolean;
 
     anonymizationEntityTypes?: Array<string>;
@@ -256,7 +259,12 @@ export interface FilesConfig extends WithStorage {
 }
 
 export interface PCWSource extends WithStorage {
-  source: StorageSources.AMAZONS3 | StorageSources.GOOGLE | StorageSources.LOCAL | StorageSources.INLINE | StorageSources.AZURE;
+  source:
+    | StorageSources.AMAZONS3
+    | StorageSources.GOOGLE
+    | StorageSources.LOCAL
+    | StorageSources.INLINE
+    | StorageSources.AZURE;
 }
 
 export interface AssignmentConfig extends WithStorage {
@@ -265,6 +273,7 @@ export interface AssignmentConfig extends WithStorage {
    * @description local or remote path to assignment file
    */
   path: string;
+  by: 'PROJECT' | 'DOCUMENT';
 
   /**
    * @description document assignment strategy.
@@ -298,6 +307,7 @@ export interface ExportConfig extends WithStorage {
       newestDate: Date;
       oldestDate?: Date;
     };
+    tags?: string[];
   };
 
   /**
@@ -323,9 +333,27 @@ export interface ExportConfig extends WithStorage {
   /**
    * @description custom export script to use
    * only used when format is CUSTOM
-   * The ID can be obtained from the custom script page in this format: https://app.datasaur.ai/teams/{teamId}/custom-scripts/{custom-script-id}
+   * The ID can be obtained from the file transformer page in this format: https://app.datasaur.ai/teams/{teamId}/file-transformers/{file-transformer-id}
    */
-  customScriptId: string;
+  fileTransformerId: string;
+}
+
+export interface ApplyTagsConfig extends WithStorage {
+  teamId: string;
+  source:
+    | StorageSources.AMAZONS3
+    | StorageSources.GOOGLE
+    | StorageSources.LOCAL
+    | StorageSources.INLINE
+    | StorageSources.AZURE;
+  prefix: string;
+  path: string;
+  payload: ProjectTags[];
+}
+
+export interface ProjectTags {
+  projectId: string;
+  tags: Array<string>;
 }
 
 interface WithStorage {

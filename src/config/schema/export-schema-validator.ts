@@ -1,6 +1,7 @@
-import Ajv, { JSONSchemaType, str } from 'ajv';
+import Ajv, { JSONSchemaType } from 'ajv';
 import { ExportFormat } from '../../datasaur/interfaces';
-import { ExportConfig, StorageSources } from '../interfaces';
+import { TextDocumentKind } from '../../generated/graphql';
+import { ExportConfig, StateConfig, StorageSources } from '../interfaces';
 
 const schemaValidator = new Ajv({ allErrors: true });
 
@@ -13,7 +14,21 @@ const ExportSchema: JSONSchemaType<ExportConfig> = {
     source: { type: 'string' },
     bucketName: { type: 'string' },
     prefix: { type: 'string' },
-    customScriptId: { type: 'string', nullable: true },
+    fileTransformerId: { type: 'string', nullable: true },
+    executionMode: { type: 'string', enum: [StateConfig.STATEFUL, StateConfig.STATELESS], nullable: true },
+    projectFilter: {
+      type: 'object',
+      nullable: true,
+      required: ['kind'],
+      properties: {
+        kind: {
+          type: 'string',
+          enum: [TextDocumentKind.TokenBased, TextDocumentKind.RowBased, TextDocumentKind.DocumentBased],
+        },
+        date: { type: 'object', nullable: true, required: ['newestDate'] },
+        tags: { type: 'array', nullable: true, items: { type: 'string' } },
+      },
+    },
   },
 
   required: ['teamId', 'format', 'statusFilter'],
@@ -43,9 +58,9 @@ const ExportSchema: JSONSchemaType<ExportConfig> = {
   },
   then: {
     properties: {
-      customScriptId: { type: 'string', nullable: false },
+      fileTransformerId: { type: 'string', nullable: false },
     },
-    required: ['customScriptId'],
+    required: ['fileTransformerId'],
   },
 };
 

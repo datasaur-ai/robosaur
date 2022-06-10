@@ -2,9 +2,10 @@ import { writeFileSync } from 'fs';
 import { resolve } from 'path';
 import { getAssignmentConfig } from '../assignment/get-assignment-config';
 import { getDocumentAssignment } from '../assignment/get-document-assignment';
+import { getProjectAssignment } from '../assignment/get-project-assignment';
 import { DocumentAssignment } from '../assignment/interfaces';
 import { getConfig, setConfigByJSONFile } from '../config/config';
-import { StorageSources } from '../config/interfaces';
+import { CreateConfig, FilesConfig, StorageSources } from '../config/interfaces';
 import { getProjectCreationValidators } from '../config/schema/validator';
 import { JobStatus } from '../datasaur/get-jobs';
 import { getLocalDocuments } from '../documents/get-local-documents';
@@ -15,15 +16,24 @@ import { setConfigFromPcw } from '../transformer/pcw-transformer/setConfigFromPc
 import { getLabelSetsFromDirectory } from '../utils/labelset';
 import { pollJobsUntilCompleted } from '../utils/polling.helper';
 import { getQuestionSetFromFile } from '../utils/questionset';
+import { readJSONFile } from '../utils/readJSONFile';
 import { getState } from '../utils/states/getStates';
+import { ScriptState } from '../utils/states/script-state';
 import { ScriptAction } from './constants';
 import { handleCreateProject } from './create-project.handler';
 import { doCreateProjectAndUpdateState, getProjectNamesFromFolderNames } from './creation/helper';
+
+interface ProjectCreationOption {
+  dryRun: boolean;
+  usePcw: boolean;
+  withoutPcw: boolean;
+}
 
 interface ProjectConfiguration {
   projectName: string;
   documents: Array<RemoteDocument | LocalDocument>;
   documentAssignments: Array<DocumentAssignment>;
+  job?: { id: string };
 
   /**
    * @description taken from getConfig().project
@@ -34,15 +44,36 @@ interface ProjectConfiguration {
 const LIMIT_RETRY = 3;
 const PROJECT_BEFORE_SAVE = 5;
 
-export async function handleCreateProjects(configFile: string, options) {
+export async function handleCreateProjects(configFile: string, options: ProjectCreationOption) {
   const { dryRun, withoutPcw, usePcw } = options;
   const cwd = process.cwd();
+
+  await setProjectCreationConfig(cwd, configFile, usePcw, withoutPcw);
+
+  const scriptState = await getState();
+  await scriptState.updateInProgressProjectCreationStates();
+
+  const createConfig = getConfig().create;
+
+  const projectsToBeCreated = await getProjectsToBeCreated(createConfig.files, scriptState, dryRun);
+
+  await setLabelSetsOrQuestions(createConfig);
+
+  const results = await submitProjectCreationJob(createConfig, projectsToBeCreated, scriptState, dryRun);
+  await checkProjectCreationJob(results, scriptState, cwd, dryRun);
+}
+
+async function setProjectCreationConfig(cwd: string, configFile: string, usePcw: boolean, withoutPcw: boolean) {
   setConfigByJSONFile(resolve(cwd, configFile), getProjectCreationValidators(), ScriptAction.PROJECT_CREATION);
 
   if (withoutPcw) {
     getLogger().info('withoutPcw is set to true, parsing config...');
   } else if (usePcw) {
     await setConfigFromPcw(getConfig());
+    if (getConfig().create.assignment?.path && !getConfig().create.pcwAssignmentStrategy) {
+      const rawConfig = readJSONFile(resolve(cwd, getConfig().create.assignment!.path));
+      getConfig().create.assignments = rawConfig;
+    }
   }
 
   const documentSource = getConfig().create.files.source;
@@ -53,70 +84,88 @@ export async function handleCreateProjects(configFile: string, options) {
       );
       return handleCreateProject('New Robosaur Project', configFile);
   }
-  const { bucketName, prefix: storagePrefix, source, path } = getConfig().create.files;
+}
 
-  const scriptState = await getState();
-  await scriptState.updateInProgressProjectCreationStates();
-
-  let projectsToCreate: { name: string; fullPath: string }[];
-  projectsToCreate = await getProjectNamesFromFolderNames(source, { bucketName, prefix: storagePrefix, path });
+async function getProjectsToBeCreated(
+  filesConfig: FilesConfig,
+  scriptState: ScriptState,
+  dryRun: boolean,
+): Promise<{ name: string; fullPath: string }[]> {
+  const { source, bucketName, prefix, path } = filesConfig;
 
   // potential improvement: checks documents / file inside each bucket folder
-  projectsToCreate = projectsToCreate.filter((project) => !scriptState.projectNameHasBeenUsed(project.name));
+  const projectsToBeCreated: { name: string; fullPath: string }[] = (
+    await getProjectNamesFromFolderNames(source, { bucketName, prefix, path })
+  ).filter((project) => !scriptState.projectNameHasBeenUsed(project.name));
 
-  if (projectsToCreate.length === 0) {
+  if (projectsToBeCreated.length === 0) {
     getLogger().info('no projects left to create, exiting...');
     if (!dryRun) await scriptState.save();
-    return;
+    return [];
   }
-  getLogger().info(`found ${projectsToCreate.length} projects to create: ${JSON.stringify(projectsToCreate)}`);
+  getLogger().info(`found ${projectsToBeCreated.length} projects to create: ${JSON.stringify(projectsToBeCreated)}`);
+  return projectsToBeCreated;
+}
 
-  const updatedProjectConfig = getConfig().create;
-  const projectKind = updatedProjectConfig.documentSettings.kind;
-  switch (projectKind) {
-    case 'TOKEN_BASED':
-      if (updatedProjectConfig.labelSets) break;
-      updatedProjectConfig.labelSets = getLabelSetsFromDirectory(getConfig());
-      break;
-    case 'DOCUMENT_BASED':
-    case 'ROW_BASED':
-      if (updatedProjectConfig.questions) break;
-      if (updatedProjectConfig.questionSetFile) {
-        updatedProjectConfig.questions = getQuestionSetFromFile(getConfig());
-        break;
+async function setLabelSetsOrQuestions(createConfig: CreateConfig) {
+  if (createConfig.documentSettings.kind == 'TOKEN_BASED' || createConfig.kinds?.includes('TOKEN_BASED')) {
+    if (!createConfig.labelSets) createConfig.labelSets = getLabelSetsFromDirectory(getConfig());
+  } else if (
+    createConfig.documentSettings.kind == 'ROW_BASED' ||
+    createConfig.documentSettings.kind == 'DOCUMENT_BASED' ||
+    createConfig.kinds?.includes('ROW_BASED') ||
+    createConfig.kinds?.includes('DOCUMENT_BASED')
+  ) {
+    if (!createConfig.questions) {
+      if (createConfig.questionSetFile) {
+        createConfig.questions = getQuestionSetFromFile(getConfig());
+      } else {
+        getLogger().warn(`no 'questions' or 'questionSetFile' is configured in the config file`);
+        if (getConfig().create.labelSetDirectory) {
+          getLogger().warn(
+            `Robosaur does not support ROW_BASED project creation using TOKEN_BASED csv labelsets. Please refer to our JSON documentation on how to structure ROW_BASED questions`,
+            { link: 'https://datasaurai.gitbook.io/datasaur/advanced/apis-docs/create-new-project/questions' },
+          );
+        }
       }
-      getLogger().warn(`no 'questions' or 'questionSetFile' is configured in ${configFile}`);
-      if (getConfig().create.labelSetDirectory) {
-        getLogger().warn(
-          `Robosaur does not support ROW_BASED project creation using TOKEN_BASED csv labelsets. Please refer to our JSON documentation on how to structure ROW_BASED questions`,
-          { link: 'https://datasaurai.gitbook.io/datasaur/advanced/apis-docs/create-new-project/questions' },
-        );
-      }
-      break;
-    default:
-      getLogger().warn(`unrecognized project kind: ${projectKind}...`);
+    }
   }
+}
 
-  getLogger().info('validating project assignment...');
+async function submitProjectCreationJob(
+  createConfig: CreateConfig,
+  projectsToBeCreated: { name: string; fullPath: string }[],
+  scriptState: ScriptState,
+  dryRun: boolean,
+): Promise<ProjectConfiguration[]> {
   const assignees = await getAssignmentConfig();
 
   let results: any[] = [];
   let projectCounter = 0;
-  for (const projectDetails of projectsToCreate) {
+  const labelers = getConfig().create.assignments?.labelers || [];
+  let currentLabelerIndex = 0;
+  for (const projectDetails of projectsToBeCreated) {
     let counterRetry = 0;
     while (counterRetry < LIMIT_RETRY) {
       getLogger().info(`creating project ${projectDetails.name}...`);
-      getLogger().info(`retrieving documents from ${source}...`);
+      getLogger().info(`retrieving documents from ${createConfig.files.source}...`);
       const documents =
-        source === StorageSources.LOCAL
+        createConfig.files.source === StorageSources.LOCAL
           ? getLocalDocuments(projectDetails.fullPath)
-          : await getObjectStorageDocuments(bucketName, projectDetails.fullPath);
+          : await getObjectStorageDocuments(createConfig.files.bucketName, projectDetails.fullPath);
 
       const newProjectConfiguration: ProjectConfiguration = {
         projectName: projectDetails.name,
         documents,
-        documentAssignments: getDocumentAssignment(assignees, documents),
-        projectConfig: updatedProjectConfig,
+        documentAssignments:
+          createConfig.assignment && createConfig.assignment?.by === 'PROJECT'
+            ? getProjectAssignment(
+                assignees,
+                documents,
+                getConfig().create.assignment?.strategy === 'AUTO' ? [labelers[currentLabelerIndex]] : labelers,
+              )
+            : getDocumentAssignment(assignees, documents),
+        projectConfig: createConfig,
       };
 
       if (dryRun) {
@@ -150,8 +199,18 @@ export async function handleCreateProjects(configFile: string, options) {
 
     projectCounter += 1;
     if (projectCounter % PROJECT_BEFORE_SAVE === 0) await scriptState.save();
+    currentLabelerIndex = (currentLabelerIndex + 1) % labelers.length;
   }
 
+  return results;
+}
+
+async function checkProjectCreationJob(
+  results: ProjectConfiguration[],
+  scriptState: ScriptState,
+  cwd: string,
+  dryRun: boolean,
+) {
   if (dryRun) {
     let filepath = resolve(cwd, `dry-run-output-${Date.now()}.json`);
     writeFileSync(filepath, JSON.stringify(results, null, 2));
@@ -160,7 +219,7 @@ export async function handleCreateProjects(configFile: string, options) {
     await scriptState.save();
     getLogger().info(`sending query for ProjectLaunchJob status...`);
 
-    const jobs = await pollJobsUntilCompleted(results.map((r) => r.job.id));
+    const jobs = await pollJobsUntilCompleted(results.map((r) => r.job?.id || ''));
 
     const createFail = jobs.filter((j) => j.status === JobStatus.FAILED);
     const createOK = jobs.filter((j) => j.status === JobStatus.DELIVERED).map((j) => j.id);

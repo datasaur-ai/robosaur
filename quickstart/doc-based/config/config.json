@@ -14,7 +14,15 @@
     "teamId": "<TEAM_ID>",
     "statusFilter": [],
     "format": "CSV",
-    "customScriptId": null
+    "fileTransformerId": null,
+    "projectFilter": {
+      "kind": "DOCUMENT_BASED",
+      "date": {
+        "newestDate": "2022-02-01",
+        "oldestDate": "2022-01-01"
+      },
+      "tags": []
+    }
   },
   "create": {
     "teamId": "<TEAM_ID>",
@@ -37,7 +45,7 @@
       },
       "documentSettings": {
         "kind": "DOCUMENT_BASED",
-        "customScriptId": null,
+        "fileTransformerId": null,
         "displayedRows": -1,
         "mediaDisplayStrategy": "THUMBNAIL",
         "firstRowAsHeader": false,
