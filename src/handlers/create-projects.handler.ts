@@ -143,7 +143,9 @@ async function submitProjectCreationJob(
   let results: any[] = [];
   let projectCounter = 0;
   const labelers = getConfig().create.assignments?.labelers || [];
+  const reviewers = getConfig().create.assignments?.reviewers || [];
   let currentLabelerIndex = 0;
+  let currentReviewerIndex = 0;
   for (const projectDetails of projectsToBeCreated) {
     let counterRetry = 0;
     while (counterRetry < LIMIT_RETRY) {
@@ -163,6 +165,7 @@ async function submitProjectCreationJob(
                 assignees,
                 documents,
                 getConfig().create.assignment?.strategy === 'AUTO' ? [labelers[currentLabelerIndex]] : labelers,
+                getConfig().create.assignment?.strategy === 'AUTO' ? [reviewers[currentReviewerIndex]] : reviewers,
               )
             : getDocumentAssignment(assignees, documents),
         projectConfig: createConfig,
@@ -200,6 +203,7 @@ async function submitProjectCreationJob(
     projectCounter += 1;
     if (projectCounter % PROJECT_BEFORE_SAVE === 0) await scriptState.save();
     currentLabelerIndex = (currentLabelerIndex + 1) % labelers.length;
+    currentReviewerIndex = (currentReviewerIndex + 1) % reviewers.length;
   }
 
   return results;
