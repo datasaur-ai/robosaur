@@ -10,10 +10,10 @@ import { updateProjectTag } from '../datasaur/update-project-tag';
 import { getLogger } from '../logger';
 import { getStorageClient } from '../utils/object-storage';
 import { defaultCSVConfig, readCSVFile } from '../utils/readCSVFile';
-import * as Papa from 'papaparse';
 import { sleep } from '../utils/sleep';
+import * as Papa from 'papaparse';
 
-const BATCH_COUNT = 20;
+const BATCH_COUNT = 10;
 
 export async function handleApplyTags(configFile: string) {
   setConfigByJSONFile(configFile, getApplyTagValidators(), ScriptAction.APPLY_TAGS);
@@ -38,7 +38,7 @@ export async function handleApplyTags(configFile: string) {
     projectsList.push(await getProject(project.projectId));
     if (request_count > BATCH_COUNT) {
       getLogger().info(`Resolving requests...`);
-      await sleep(3000);
+      await sleep(1000);
       request_count = 0;
     } else {
       request_count += 1;
@@ -63,7 +63,7 @@ export async function handleApplyTags(configFile: string) {
     getLogger().info('Tagging success!');
     if (request_count > BATCH_COUNT) {
       getLogger().info(`Resolving requests...`);
-      await sleep(3000);
+      await sleep(1000);
       request_count = 0;
     } else {
       request_count += 1;
