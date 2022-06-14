@@ -8,10 +8,11 @@ import { createTags } from '../datasaur/create-tag';
 import { getProject } from '../datasaur/get-project';
 import { getTeamTags } from '../datasaur/get-team-tags';
 import { updateProjectTag } from '../datasaur/update-project-tag';
+import { Project, Tag } from '../generated/graphql';
 import { getLogger } from '../logger';
 import { getStorageClient } from '../utils/object-storage';
 import { defaultCSVConfig, readCSVFile } from '../utils/readCSVFile';
-import { Project, Tag } from '../generated/graphql';
+import { sleep } from '../utils/sleep';
 
 interface ApplyTagsOption {
   method: 'PUT' | 'PATCH';
@@ -36,9 +37,11 @@ export async function handleApplyTags(configFile: string, option: ApplyTagsOptio
     return result;
   }, new Map<string, Tag>());
 
+  let requestCount = 0;
   const projectMap = new Map<string, Project>();
   for (const project of applyTagPayload) {
     projectMap.set(project.projectId, await getProject(project.projectId));
+    requestCount = await rest(requestCount);
   }
 
   const projects = applyTagPayload.map((payload) => {
@@ -63,6 +66,7 @@ export async function handleApplyTags(configFile: string, option: ApplyTagsOptio
   for (const project of projects) {
     await updateProjectTag(project.projectId, project.tags);
     getLogger().info(`Successfully tag project ${project.projectId}`);
+    requestCount = await rest(requestCount);
   }
 }
 
@@ -103,7 +107,7 @@ async function getApplyTagPayload(config: ApplyTagsConfig) {
 
 function getTagsList(configPayload) {
   let tagsList: string[] = [];
-  configPayload.forEach((project) => {
+  configPayload.forEach((project: { tags: string }) => {
     if (project.tags.includes(',')) {
       const splitTags = project.tags.split(',');
       splitTags.forEach((tag: string) => {
@@ -117,10 +121,22 @@ function getTagsList(configPayload) {
 }
 
 async function createNonExistingTags(tagTargets, tagList, config) {
+  let requestCount = 0;
   for (const tag of tagTargets) {
     if (!tagList.includes(tag)) {
       getLogger().info(`Tag ${tag} not found! Creating tag in project...`);
       await createTags(config.teamId, tag);
+      requestCount = await rest(requestCount);
     }
   }
+}
+
+async function rest(requestCount: number): Promise<number> {
+  const BATCH_COUNT = 10;
+  if (requestCount > BATCH_COUNT) {
+    getLogger().info(`Resolving requests...`);
+    await sleep(1000);
+    return 0;
+  }
+  return requestCount + 1;
 }
