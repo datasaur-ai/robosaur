@@ -13,6 +13,8 @@ import { defaultCSVConfig, readCSVFile } from '../utils/readCSVFile';
 import * as Papa from 'papaparse';
 import { sleep } from '../utils/sleep';
 
+const BATCH_COUNT = 20;
+
 export async function handleApplyTags(configFile: string) {
   setConfigByJSONFile(configFile, getApplyTagValidators(), ScriptAction.APPLY_TAGS);
 
@@ -30,16 +32,16 @@ export async function handleApplyTags(configFile: string) {
   await createNonExistingTags(tagsToApplyList, teamTagsNames, config);
 
   let projectsList: Project[] = [];
-  let batch_count = 0;
+  let request_count = 0;
   for (const project of applyTagPayload) {
     getLogger().info(`Retrieving project ${project.projectId}...`);
     projectsList.push(await getProject(project.projectId));
-    if (batch_count > 20) {
+    if (request_count > BATCH_COUNT) {
       getLogger().info(`Resolving requests...`);
       await sleep(3000);
-      batch_count = 0;
+      request_count = 0;
     } else {
-      batch_count += 1;
+      request_count += 1;
     }
   }
 
@@ -59,12 +61,12 @@ export async function handleApplyTags(configFile: string) {
 
     updateProjectTag(project?.id, [...new Set(tagIds)]);
     getLogger().info('Tagging success!');
-    if (batch_count > 20) {
+    if (request_count > BATCH_COUNT) {
       getLogger().info(`Resolving requests...`);
       await sleep(3000);
-      batch_count = 0;
+      request_count = 0;
     } else {
-      batch_count += 1;
+      request_count += 1;
     }
   }
 }
