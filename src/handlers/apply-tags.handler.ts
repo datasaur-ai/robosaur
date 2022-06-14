@@ -59,7 +59,7 @@ export async function handleApplyTags(configFile: string) {
       return tag.id;
     });
 
-    updateProjectTag(project?.id, [...new Set(tagIds)]);
+    await updateProjectTag(project?.id, [...new Set(tagIds)]);
     getLogger().info('Tagging success!');
     if (request_count > BATCH_COUNT) {
       getLogger().info(`Resolving requests...`);
