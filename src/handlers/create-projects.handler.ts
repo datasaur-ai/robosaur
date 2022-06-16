@@ -16,7 +16,6 @@ import { setConfigFromPcw } from '../transformer/pcw-transformer/setConfigFromPc
 import { getLabelSetsFromDirectory } from '../utils/labelset';
 import { pollJobsUntilCompleted } from '../utils/polling.helper';
 import { getQuestionSetFromFile } from '../utils/questionset';
-import { readJSONFile } from '../utils/readJSONFile';
 import { getState } from '../utils/states/getStates';
 import { ScriptState } from '../utils/states/script-state';
 import { ScriptAction } from './constants';
@@ -70,10 +69,6 @@ async function setProjectCreationConfig(cwd: string, configFile: string, usePcw:
     getLogger().info('withoutPcw is set to true, parsing config...');
   } else if (usePcw) {
     await setConfigFromPcw(getConfig());
-    if (getConfig().create.assignment?.path && !getConfig().create.pcwAssignmentStrategy) {
-      const rawConfig = readJSONFile(resolve(cwd, getConfig().create.assignment!.path));
-      getConfig().create.assignments = rawConfig;
-    }
   }
 
   const documentSource = getConfig().create.files.source;
