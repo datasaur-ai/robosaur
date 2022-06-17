@@ -9,6 +9,7 @@ const GET_PROJECT_QUERY = gql`
       tags {
         id
         name
+        globalTag
       }
       status
     }

@@ -1,3 +1,5 @@
+import * as Papa from 'papaparse';
+
 import { getConfig, setConfigByJSONFile } from '../config/config';
 import { ApplyTagsConfig, StorageSources } from '../config/interfaces';
 import { getApplyTagValidators } from '../config/schema/validator';
@@ -5,17 +7,18 @@ import { ScriptAction } from './constants';
 import { createTags } from '../datasaur/create-tag';
 import { getProject } from '../datasaur/get-project';
 import { getTeamTags } from '../datasaur/get-team-tags';
-import { Project } from '../datasaur/interfaces';
 import { updateProjectTag } from '../datasaur/update-project-tag';
+import { Tag } from '../generated/graphql';
 import { getLogger } from '../logger';
 import { getStorageClient } from '../utils/object-storage';
 import { defaultCSVConfig, readCSVFile } from '../utils/readCSVFile';
 import { sleep } from '../utils/sleep';
-import * as Papa from 'papaparse';
 
-const BATCH_COUNT = 10;
+interface ApplyTagsOption {
+  method: 'PUT' | 'PATCH';
+}
 
-export async function handleApplyTags(configFile: string) {
+export async function handleApplyTags(configFile: string, option: ApplyTagsOption) {
   setConfigByJSONFile(configFile, getApplyTagValidators(), ScriptAction.APPLY_TAGS);
 
   const config = getConfig().applyTags;
@@ -23,51 +26,36 @@ export async function handleApplyTags(configFile: string) {
   const tagsToApplyList = getTagsList(applyTagPayload);
   getLogger().info('Reading apply-tag payload...');
 
-  const teamTagsList = await getTeamTags(config.teamId);
-  const teamTagsNames = teamTagsList.map((tag) => {
-    return tag.name;
-  });
+  const teamTagNames = (await getTeamTags(config.teamId)).map((tag) => tag.name);
   getLogger().info('Retrieving existing tags...');
 
-  await createNonExistingTags(tagsToApplyList, teamTagsNames, config);
+  await createNonExistingTags(tagsToApplyList, teamTagNames, config);
+  const tagMap = (await getTeamTags(config.teamId)).reduce((result, tag) => {
+    result.set(tag.name, tag);
+    return result;
+  }, new Map<string, Tag>());
 
-  let projectsList: Project[] = [];
-  let request_count = 0;
-  for (const project of applyTagPayload) {
-    getLogger().info(`Retrieving project ${project.projectId}...`);
-    projectsList.push(await getProject(project.projectId));
-    if (request_count > BATCH_COUNT) {
-      getLogger().info(`Resolving requests...`);
-      await sleep(1000);
-      request_count = 0;
-    } else {
-      request_count += 1;
-    }
-  }
-
-  const tagList = await getTeamTags(config.teamId);
+  let requestCount = 0;
   for (const payload of applyTagPayload) {
-    const project = projectsList.find((item) => item.id === payload.projectId);
-    getLogger().info(`Applying tags to project ${payload.projectId}`);
+    const project = await getProject(payload.projectId);
+    requestCount = await rest(requestCount);
 
+    const tagIds =
+      option.method === 'PUT'
+        ? project?.tags?.filter((tag) => tag.globalTag).map((tag) => tag.id)
+        : project?.tags?.map((tag) => tag.id);
     const projectTag = payload.tags.split(',');
     projectTag.forEach((tag) => {
-      project?.tags.push(tagList.find((tagItem) => tagItem.name === tag));
+      // skip empty string
+      if (tag) {
+        tagIds?.push(tagMap.get(tag)!.id);
+      }
     });
 
-    const tagIds = project?.tags.map((tag) => {
-      return tag.id;
-    });
-
-    await updateProjectTag(project?.id, [...new Set(tagIds)]);
-    getLogger().info('Tagging success!');
-    if (request_count > BATCH_COUNT) {
-      getLogger().info(`Resolving requests...`);
-      await sleep(1000);
-      request_count = 0;
-    } else {
-      request_count += 1;
-    }
+    getLogger().info(`Applying tags to project ${payload.projectId}`);
+    await updateProjectTag(payload.projectId, tagIds);
+    getLogger().info(`Successfully tag project ${payload.projectId}`);
+    requestCount = await rest(requestCount);
   }
 }
 
@@ -122,10 +110,22 @@ function getTagsList(configPayload) {
 }
 
 async function createNonExistingTags(tagTargets, tagList, config) {
+  let requestCount = 0;
   for (const tag of tagTargets) {
     if (!tagList.includes(tag)) {
       getLogger().info(`Tag ${tag} not found! Creating tag in project...`);
       await createTags(config.teamId, tag);
+      requestCount = await rest(requestCount);
     }
   }
+}
+
+async function rest(requestCount: number): Promise<number> {
+  const BATCH_COUNT = 10;
+  if (requestCount > BATCH_COUNT) {
+    getLogger().info(`Resolving requests...`);
+    await sleep(1000);
+    return 0;
+  }
+  return requestCount + 1;
 }
