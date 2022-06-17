@@ -24,10 +24,9 @@ const handleStateless = async (unzip: boolean) => {
     source,
     projectFilter,
   } = getConfig().export;
-
-  getLogger().info('retrieving projects with filters', { filter: statusFilter });
   const filterTagIds = projectFilter && projectFilter.tags ? await getTagIds(teamId, projectFilter.tags) : undefined;
-  const projectToExports = await getProjects({
+
+  const filter = {
     statuses: statusFilter,
     teamId,
     kinds: projectFilter?.kind ? [projectFilter?.kind] : [],
@@ -38,7 +37,9 @@ const handleStateless = async (unzip: boolean) => {
         }
       : undefined,
     tags: filterTagIds,
-  });
+  };
+  getLogger().info('retrieving projects with filters', { filter });
+  const projectToExports = await getProjects(filter);
 
   getLogger().info(`found ${projectToExports.length} projects to export`);
 
@@ -132,12 +133,11 @@ export async function handleExportProjects(configFile: string, { unzip }: { unzi
     source,
     projectFilter,
   } = getConfig().export;
+  const filterTagIds = projectFilter && projectFilter.tags ? await getTagIds(teamId, projectFilter.tags) : undefined;
 
   // retrieves projects from Datasaur matching the status filters
   // add or update the projects in script state
-  getLogger().info('retrieving projects with filters', { filter: statusFilter });
-  const filterTagIds = projectFilter && projectFilter.tags ? await getTagIds(teamId, projectFilter.tags) : undefined;
-  const validProjectsFromDatasaur = await getProjects({
+  const filter = {
     statuses: statusFilter,
     teamId,
     kinds: projectFilter?.kind ? [projectFilter?.kind] : [],
@@ -148,13 +148,19 @@ export async function handleExportProjects(configFile: string, { unzip }: { unzi
         }
       : undefined,
     tags: filterTagIds,
-  });
+  };
+  getLogger().info('retrieving projects with filters', { filter });
+  const validProjectsFromDatasaur = await getProjects(filter);
   scriptState.addProjectsToExport(validProjectsFromDatasaur);
 
   // from script state, retrieves all projects that are eligible for export
+  const validProjectNamesFromDatasaur = validProjectsFromDatasaur.map((p) => p.name);
   const projectToExports = Array.from(scriptState.getTeamProjectsState().getProjects()).filter(
     ([_name, projectState]) => {
-      if (statusFilter.includes(projectState.projectStatus)) {
+      if (
+        statusFilter.includes(projectState.projectStatus) &&
+        validProjectNamesFromDatasaur.includes(projectState.projectName)
+      ) {
         return shouldExport(projectState);
       }
       // special case: if export.statusFilter set to [],
@@ -166,6 +172,7 @@ export async function handleExportProjects(configFile: string, { unzip }: { unzi
       return false;
     },
   );
+
   if (projectToExports.length === 0) {
     getLogger().info(`no projects left to export, exiting script...`);
     return;
