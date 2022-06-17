@@ -1,6 +1,6 @@
-import { Command } from 'commander';
+import { Command, InvalidOptionArgumentError } from 'commander';
 import packageJson from '../package.json';
-import { handleApplyTags } from "./handlers/apply-tags.handler";
+import { handleApplyTags } from './handlers/apply-tags.handler';
 import { handleCreateProject } from './handlers/create-project.handler';
 import { handleCreateProjects } from './handlers/create-projects.handler';
 import { handleExportProjects } from './handlers/export-projects.handler';
@@ -31,6 +31,17 @@ program
 
 program
   .command(`apply-tags <configFile>`)
+  .option(
+    '--method <method>',
+    'Update method between PUT and PATCH',
+    (value) => {
+      if (value !== 'PUT' && value !== 'PATCH') {
+        throw new InvalidOptionArgumentError('The supported method is either PUT or PATCH');
+      }
+      return value;
+    },
+    'PUT',
+  )
   .description('Applies tags to projects based on the given config file')
   .action(handleApplyTags);
 

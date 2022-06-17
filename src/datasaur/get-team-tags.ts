@@ -1,4 +1,5 @@
 import { gql } from 'graphql-request';
+import { Tag } from '../generated/graphql';
 import { query } from './query';
 
 const GET_TEAM_TAGS = gql`
@@ -11,11 +12,12 @@ const GET_TEAM_TAGS = gql`
   fragment TagFragment on Tag {
     id
     name
+    globalTag
     __typename
   }
 `;
 
-export async function getTeamTags(teamId) {
+export async function getTeamTags(teamId): Promise<Tag[]> {
   const variables = {
     input: {
       teamId,

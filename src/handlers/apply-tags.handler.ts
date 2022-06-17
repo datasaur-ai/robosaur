@@ -1,18 +1,23 @@
+import * as Papa from 'papaparse';
+
 import { getConfig, setConfigByJSONFile } from '../config/config';
-import { ApplyTagsConfig, ProjectTags, StorageSources } from '../config/interfaces';
+import { ApplyTagsConfig, StorageSources } from '../config/interfaces';
 import { getApplyTagValidators } from '../config/schema/validator';
 import { ScriptAction } from './constants';
 import { createTags } from '../datasaur/create-tag';
 import { getProject } from '../datasaur/get-project';
 import { getTeamTags } from '../datasaur/get-team-tags';
-import { Project } from '../datasaur/interfaces';
 import { updateProjectTag } from '../datasaur/update-project-tag';
 import { getLogger } from '../logger';
 import { getStorageClient } from '../utils/object-storage';
 import { defaultCSVConfig, readCSVFile } from '../utils/readCSVFile';
-import * as Papa from 'papaparse';
+import { Project, Tag } from '../generated/graphql';
 
-export async function handleApplyTags(configFile: string) {
+interface ApplyTagsOption {
+  method: 'PUT' | 'PATCH';
+}
+
+export async function handleApplyTags(configFile: string, option: ApplyTagsOption) {
   setConfigByJSONFile(configFile, getApplyTagValidators(), ScriptAction.APPLY_TAGS);
 
   const config = getConfig().applyTags;
@@ -21,39 +26,44 @@ export async function handleApplyTags(configFile: string) {
   getLogger().info('Reading apply-tag payload...');
 
   const teamTagsList = await getTeamTags(config.teamId);
-  const teamTagsNames = teamTagsList.map((tag) => {
-    return tag.name;
-  });
+
+  const teamTagNames = teamTagsList.map((tag) => tag.name);
   getLogger().info('Retrieving existing tags...');
 
-  await createNonExistingTags(tagsToApplyList, teamTagsNames, config);
-  const tagList = await getTeamTags(config.teamId);
+  await createNonExistingTags(tagsToApplyList, teamTagNames, config);
+  const tagMap = (await getTeamTags(config.teamId)).reduce((result, tag) => {
+    result.set(tag.name, tag);
+    return result;
+  }, new Map<string, Tag>());
 
-  let projectsList: Project[] = [];
+  const projectMap = new Map<string, Project>();
   for (const project of applyTagPayload) {
-    projectsList.push(await getProject(project.projectId));
+    projectMap.set(project.projectId, await getProject(project.projectId));
   }
 
   const projects = applyTagPayload.map((payload) => {
-    const project = projectsList.find((item) => item.id === payload.projectId);
+    const project = projectMap.get(payload.projectId);
+    const tagIds =
+      option.method === 'PUT'
+        ? project?.tags?.filter((tag) => tag.globalTag).map((tag) => tag.id)
+        : project?.tags?.map((tag) => tag.id);
     getLogger().info(`Applying tags to project ${payload.projectId}`);
 
     const projectTag = payload.tags.split(',');
     projectTag.forEach((tag) => {
-      project?.tags.push(tagList.find((tagItem) => tagItem.name === tag));
-    });
-
-    const tagIds = project?.tags.map((tag) => {
-      return tag.id;
+      // skip empty string
+      if (tag) {
+        tagIds?.push(tagMap.get(tag)!.id);
+      }
     });
 
     return { projectId: project?.id, tags: [...new Set(tagIds)] };
   });
 
-  projects.forEach((project) => {
-    updateProjectTag(project.projectId, project.tags);
-    getLogger().info('Tagging success!');
-  });
+  for (const project of projects) {
+    await updateProjectTag(project.projectId, project.tags);
+    getLogger().info(`Successfully tag project ${project.projectId}`);
+  }
 }
 
 async function getApplyTagPayload(config: ApplyTagsConfig) {
