@@ -166,10 +166,7 @@ export async function handleExportProjects(configFile: string, { unzip }: { unzi
       // special case: if export.statusFilter set to [],
       // match datasaur.ai getProjects behavior
       // return all projects
-      if (statusFilter.length === 0) {
-        return true;
-      }
-      return false;
+      return statusFilter.length === 0;
     },
   );
 

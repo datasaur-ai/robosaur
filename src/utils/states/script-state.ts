@@ -12,7 +12,12 @@ import { getStorageClient } from '../object-storage';
 import { CreateJobState, ProjectState } from './interfaces';
 import { TeamProjectsState } from './team-projects-state';
 
-const IMPLEMENTED_STATE_SOURCE = [StorageSources.LOCAL, StorageSources.AMAZONS3, StorageSources.GOOGLE, StorageSources.AZURE];
+const IMPLEMENTED_STATE_SOURCE = [
+  StorageSources.LOCAL,
+  StorageSources.AMAZONS3,
+  StorageSources.GOOGLE,
+  StorageSources.AZURE,
+];
 
 export class ScriptState {
   private teams: TeamProjectsState[];
@@ -53,8 +58,8 @@ export class ScriptState {
         getLogger().info('parsing state finished');
         return new ScriptState(scriptState);
       } catch (error) {
-        if (error.code === "BlobNotFound") {
-          getLogger().info("State blob not found in Azure, proceeding to create one...");
+        if (error.code === 'BlobNotFound') {
+          getLogger().info('State blob not found in Azure, proceeding to create one...');
         } else {
           getLogger().error('error in parsing state', { error: JSON.stringify(error), message: error.message });
         }
@@ -80,6 +85,12 @@ export class ScriptState {
         updatedAt: Date.now(),
         projectStatus: project.status,
       });
+    }
+  }
+
+  removeProjectsFromExport(projectNames: string[]) {
+    for (const projectName of projectNames) {
+      this.getTeamProjectsState().removeExport(projectName);
     }
   }
 

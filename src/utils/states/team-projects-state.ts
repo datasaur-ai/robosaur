@@ -44,6 +44,13 @@ export class TeamProjectsState {
     });
   }
 
+  removeExport(projectName: string) {
+    const project = this.projects.get(projectName);
+    if (project && project.export) {
+      this.projects.set(projectName, { ...project, export: undefined });
+    }
+  }
+
   updateByCreateJobId(jobid: string, newProjectState: DeepPartial<ProjectState>) {
     let identifier = '';
     for (const [key, project] of this.projects) {
