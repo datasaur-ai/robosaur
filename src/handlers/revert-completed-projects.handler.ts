@@ -8,6 +8,7 @@ import { getLogger } from '../logger';
 import { getStorageClient } from '../utils/object-storage';
 import { readJSONFile } from '../utils/readJSONFile';
 import { sleep } from '../utils/sleep';
+import { getState } from '../utils/states/getStates';
 import { ScriptAction } from './constants';
 
 const SLEEP_INTERVAL = 2500;
@@ -16,7 +17,7 @@ export const handleRevertCompletedProjectsToInProgress = async (configFile: stri
   setConfigByJSONFile(configFile, getRevertProjectStatusValidator(), ScriptAction.REVERT_PROJECT_STATUS);
 
   const inputProjectIds = await getProjectIds(getConfig().revert);
-  const results = [] as Array<{ id: string; status: ProjectStatus | null }>;
+  const results = [] as Array<{ id: string; name: string; status: ProjectStatus | null }>;
 
   // use regular while for granular index control
   let i = 0;
@@ -26,7 +27,7 @@ export const handleRevertCompletedProjectsToInProgress = async (configFile: stri
       getLogger().info(`Retrieving details for ${projectId}`);
       const project: Project = await getProject(projectId);
 
-      let result = { id: projectId } as { id: string; status: ProjectStatus | null };
+      let result = { id: projectId, name: project.name } as { id: string; name: string; status: ProjectStatus | null };
       if (project.status === ProjectStatus.COMPLETE) {
         getLogger().info(`Sending revert status request for ${projectId}`);
         const updateResult = await toggleCabinetStatus(projectId);
@@ -45,7 +46,7 @@ export const handleRevertCompletedProjectsToInProgress = async (configFile: stri
         await sleep(SLEEP_INTERVAL * 2);
       } else {
         i += 1;
-        results.push({ id: projectId, status: null });
+        results.push({ id: projectId, name: '', status: null });
       }
     }
 
@@ -54,6 +55,19 @@ export const handleRevertCompletedProjectsToInProgress = async (configFile: stri
 
   if (results.length === 0) {
     getLogger().error('No valid projects were found');
+  }
+
+  const revertedProjectNames = results.reduce((result, currentValue) => {
+    if (currentValue.status === ProjectStatus.IN_PROGRESS) {
+      result.push(currentValue.name);
+    }
+    return result;
+  }, [] as string[]);
+  if (revertedProjectNames.length > 0) {
+    // so that later these projects can be exported again
+    const state = await getState();
+    state.removeProjectsFromExport(revertedProjectNames);
+    await state.save();
   }
 
   if (results.some((res) => res.status !== ProjectStatus.IN_PROGRESS)) {
