@@ -1,3 +1,4 @@
+import { parseAssignment } from '../../assignment/parse-assignment';
 import { getConfig } from '../../config/config';
 import { Config } from '../../config/interfaces';
 import { getLogger } from '../../logger';
@@ -67,4 +68,8 @@ export const setConfigFromPcw = async (input: Config) => {
   populateConfig(payload);
 
   getLogger().info('finished transforming payload, continue to creating projects...');
+
+  if (getConfig().create.assignment?.path && !getConfig().create.pcwAssignmentStrategy) {
+    getConfig().create.assignments = await parseAssignment();
+  }
 };

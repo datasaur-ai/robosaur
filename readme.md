@@ -155,10 +155,17 @@ Usage: robosaur apply-tags [options] <configFile>
 Applies tags to projects based on the given config file
 
 Options:
-  -h, --help  display help for command
+  --method <method>   Update method between PUT and PATCH (default: "PUT")
+  -h, --help          display help for command
 ```
 
 Robosaur will try to apply tags to projects specified in the config file's payload, or from a separate csv file. The csv file can be from local or one of our supported Cloud Services.
+
+With the default method, apply tags will replace all of the project tags with the input, just like PUT method on REST API. The same goes for PATCH, whereas it will only add new tags to a project. See the example below.
+
+- Project A has Tag1.
+- PUT ["Tag2"]: Project A will have only Tag2.
+- PATCH ["Tag2"]: Project A will have Tag1 and Tag2.
 
 If the tag in the config file is not present in the team, Robosaur will create the tag and apply it to the project automatically.
 
