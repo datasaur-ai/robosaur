@@ -37,6 +37,7 @@
     "pcwPayload": {
       "projectSettings": {
         "consensus": 1,
+        "conflictResolution": "PEER_REVIEW",
         "enableEditLabelSet": false,
         "enableEditSentence": false,
         "hideLabelerNamesDuringReview": false,
