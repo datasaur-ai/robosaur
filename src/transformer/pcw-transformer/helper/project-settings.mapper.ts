@@ -6,8 +6,10 @@ export type ConfigProjectSettings = Config['create']['projectSettings'];
 
 export const mapProjectSettings = {
   fromPcw: (payload: ProjectSettingsInput): ConfigProjectSettings => ({
-    consensus: removeNulls(payload.consensus),
-    conflictResolution: removeNulls(payload.conflictResolution),
+    conflictResolution: {
+      mode: removeNulls(payload.conflictResolution?.mode),
+      consensus: removeNulls(payload.conflictResolution?.consensus),
+    },
     enableEditLabelSet: removeNulls(payload.enableEditLabelSet),
     enableEditSentence: removeNulls(payload.enableEditSentence),
     hideLabelerNamesDuringReview: removeNulls(payload.hideLabelerNamesDuringReview),

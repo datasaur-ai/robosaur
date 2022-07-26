@@ -1,7 +1,7 @@
 import { ExportFormat, ProjectStatus } from '../datasaur/interfaces';
 import { PCWPayload, PCWWrapper } from '../transformer/pcw-transformer/interfaces';
 import { AssignmentConfig as ParsedAssignment } from '../assignment/interfaces';
-import { TextDocumentType, TokenizationMethod, TranscriptMethod } from '../generated/graphql';
+import { ConflictResolutionMode, TextDocumentType, TokenizationMethod, TranscriptMethod } from '../generated/graphql';
 
 export enum StorageSources {
   AMAZONS3 = 's3',
@@ -93,7 +93,14 @@ export interface CreateConfig {
    * Configuration from the 4th and 5th step of the Creation Wizard UI.
    */
   projectSettings: {
-    consensus: number;
+    /**
+     * @deprecated Moved to conflictResolution.consensus
+     */
+    consensus?: number;
+    conflictResolution: {
+      consensus: number;
+      mode: ConflictResolutionMode;
+    };
     enableEditLabelSet: boolean;
     enableEditSentence: boolean;
     hideLabelerNamesDuringReview: boolean;

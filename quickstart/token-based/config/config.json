@@ -36,8 +36,10 @@
     "pcwAssignmentStrategy": "AUTO",
     "pcwPayload": {
       "projectSettings": {
-        "consensus": 1,
-        "conflictResolution": "PEER_REVIEW",
+        "conflictResolution": {
+          "mode": "PEER_REVIEW",
+          "consensus": 1
+        },
         "enableEditLabelSet": false,
         "enableEditSentence": false,
         "hideLabelerNamesDuringReview": false,
