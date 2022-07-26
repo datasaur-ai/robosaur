@@ -1,5 +1,5 @@
 import { Config } from '../../../config/interfaces';
-import { ProjectSettingsInput } from '../../../generated/graphql';
+import { ConflictResolutionMode, ProjectSettingsInput } from '../../../generated/graphql';
 import { mapProjectSettings } from './project-settings.mapper';
 
 describe('projectSettingsMapper', () => {
@@ -11,7 +11,7 @@ describe('projectSettingsMapper', () => {
       hideLabelsFromInactiveLabelSetDuringReview: false,
       hideOriginalSentencesDuringReview: true,
       hideRejectedLabelsDuringReview: true,
-      consensus: 1,
+      conflictResolution: { consensus: 1, mode: ConflictResolutionMode.Manual },
     };
 
     const mapped: Config['create']['projectSettings'] = {
@@ -20,7 +20,7 @@ describe('projectSettingsMapper', () => {
       hideLabelerNamesDuringReview: false,
       hideLabelsFromInactiveLabelSetDuringReview: false,
       hideRejectedLabelsDuringReview: true,
-      consensus: 1,
+      conflictResolution: { consensus: 1, mode: ConflictResolutionMode.Manual },
     };
 
     const result = mapProjectSettings.fromPcw(fromPcw);
