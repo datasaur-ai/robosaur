@@ -79,12 +79,13 @@ async function getApplyTagPayload(config: ApplyTagsConfig) {
     case StorageSources.LOCAL:
       return readCSVFile(config.path, 'utf-8', {
         header: true,
+        skipEmptyLines: true,
       }).data;
     case StorageSources.AMAZONS3:
     case StorageSources.AZURE:
     case StorageSources.GOOGLE:
       const csvFromCloud = await getStorageClient(config.source).getStringFileContent(config.bucketName, config.path);
-      return Papa.parse(csvFromCloud, { ...defaultCSVConfig, header: true }).data;
+      return Papa.parse(csvFromCloud, { ...defaultCSVConfig, header: true, skipEmptyLines: true }).data;
     default:
       throw new Error(
         `${config.source} is not implemented for this command. Please use one of ${JSON.stringify(
