@@ -1,11 +1,11 @@
 import { GraphQLClient } from 'graphql-request';
-import { RequestDocument } from 'graphql-request/dist/types';
+import { ClientError, RequestDocument } from 'graphql-request/dist/types';
 import packageJson from '../../package.json';
 import { getConfig } from '../config/config';
 import { getLogger } from '../logger';
 import { getAccessToken } from './get-access-token';
 
-let client: GraphQLClient;
+let currentClient: GraphQLClient | undefined;
 let endpointUrl: string;
 
 export async function query<T = any, V = any>(
@@ -13,14 +13,26 @@ export async function query<T = any, V = any>(
   variables?: V,
   requestHeaders?: HeadersInit,
 ): Promise<T> {
-  const client = await getClient();
+  let client = await getClient();
   client.setHeader('user-agent', `Robosaur/${packageJson.version}+${process.platform}+${process.version}`);
   client.setEndpoint(appendGQLTitleAsQuery(endpointUrl, document));
+  try {
+    return await client.request<T, V>(document, variables, requestHeaders);
+  } catch (error) {
+    if (error instanceof ClientError) {
+      const firstError = error.response?.errors?.[0];
+      if (firstError?.message === 'Unauthorized' && firstError?.extensions?.type === 'AuthenticationError') {
+        // most likely because the access token is expired so try to re-generate a new access token
+        currentClient = undefined;
+        client = await getClient();
+      }
+    }
+  }
   return client.request<T, V>(document, variables, requestHeaders);
 }
 
-async function getClient() {
-  if (!client) {
+async function getClient(): Promise<GraphQLClient> {
+  if (!currentClient) {
     getLogger().info('generating access token...');
     const config = getConfig().datasaur;
     endpointUrl = `${config.host}/graphql`;
@@ -28,10 +40,8 @@ async function getClient() {
       const accessToken = await getAccessToken(config.host, config.clientId, config.clientSecret);
       getLogger().info('finished generating access token...');
 
-      client = new GraphQLClient(endpointUrl, {
-        headers: {
-          authorization: `Bearer ${accessToken}`,
-        },
+      currentClient = new GraphQLClient(endpointUrl, {
+        headers: { authorization: `Bearer ${accessToken}` },
       });
     } catch (error) {
       getLogger().error(`fails to get access token`, {
@@ -42,7 +52,7 @@ async function getClient() {
       throw new Error('fails to get access token');
     }
   }
-  return client;
+  return currentClient;
 }
 
 function appendGQLTitleAsQuery(url: string, document: RequestDocument) {
