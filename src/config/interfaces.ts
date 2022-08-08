@@ -97,7 +97,7 @@ export interface CreateConfig {
      * @deprecated Moved to conflictResolution.consensus
      */
     consensus?: number;
-    conflictResolution: {
+    conflictResolution?: {
       consensus: number;
       mode: ConflictResolutionMode;
     };

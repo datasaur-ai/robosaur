@@ -596,7 +596,6 @@ export type CreateExternalObjectStorageInput = {
   bucketName: Scalars['String'];
   cloudService: ObjectStorageClientName;
   credentials: ExternalObjectStorageCredentialsInput;
-  prefix?: InputMaybe<Scalars['String']>;
   teamId: Scalars['ID'];
 };
 
@@ -682,6 +681,10 @@ export type CreateTextDocumentInput = {
   /** Only used in Row Based Labeling and Document Based Labeling. */
   docFileOptions?: InputMaybe<DocFileOptionsInput>;
   externalImportableUrl?: InputMaybe<Scalars['String']>;
+  /** Specify this if you want to select a pre-labeled file directly from your own object storage */
+  externalObjectStorageAnswerFileKey?: InputMaybe<Scalars['String']>;
+  /** Specify this if you want to select a file directly from your own object storage */
+  externalObjectStorageFileKey?: InputMaybe<Scalars['String']>;
   extraFiles?: InputMaybe<Array<Scalars['Upload']>>;
   /** Specify `file` if you want to upload file. Datasaur only process one between `file` and `fileUrl`s. */
   file?: InputMaybe<Scalars['Upload']>;
@@ -747,8 +750,12 @@ export type CustomReportBuilderInput = {
 export enum CustomReportClientSegment {
   Date = 'DATE',
   Document = 'DOCUMENT',
+  DocumentCreatedAt = 'DOCUMENT_CREATED_AT',
+  DocumentOrigin = 'DOCUMENT_ORIGIN',
+  DocumentUpdatedAt = 'DOCUMENT_UPDATED_AT',
   Label = 'LABEL',
   LabelType = 'LABEL_TYPE',
+  OwnerUser = 'OWNER_USER',
   Project = 'PROJECT',
   ProjectRole = 'PROJECT_ROLE',
   User = 'USER'
@@ -762,11 +769,17 @@ export type CustomReportFilter = {
 
 export enum CustomReportFilterColumn {
   Date = 'DATE',
+  DocumentCreatedAt = 'DOCUMENT_CREATED_AT',
   DocumentName = 'DOCUMENT_NAME',
+  DocumentOriginName = 'DOCUMENT_ORIGIN_NAME',
+  DocumentUpdatedAt = 'DOCUMENT_UPDATED_AT',
   Label = 'LABEL',
   LabeledByUserDisplayName = 'LABELED_BY_USER_DISPLAY_NAME',
+  LabelType = 'LABEL_TYPE',
+  OwnerUserName = 'OWNER_USER_NAME',
   ProjectName = 'PROJECT_NAME',
-  ProjectRole = 'PROJECT_ROLE'
+  ProjectRole = 'PROJECT_ROLE',
+  UserName = 'USER_NAME'
 }
 
 export enum CustomReportFilterStrategy {
@@ -778,6 +791,7 @@ export enum CustomReportFilterStrategy {
 }
 
 export enum CustomReportMetric {
+  ActiveDuration = 'ACTIVE_DURATION',
   LabelsAccuracy = 'LABELS_ACCURACY',
   TotalConflicts = 'TOTAL_CONFLICTS',
   TotalConflictsResolved = 'TOTAL_CONFLICTS_RESOLVED',
@@ -1138,7 +1152,9 @@ export type EditSentenceInput = {
 
 export type EditSentenceResult = {
   __typename?: 'EditSentenceResult';
+  addedBoundingBoxLabels: Array<BoundingBoxLabel>;
   addedLabels: Array<GqlConflictable>;
+  deletedBoundingBoxLabels: Array<BoundingBoxLabel>;
   deletedLabels: Array<GqlConflictable>;
   document: TextDocument;
   previousSentences: Array<TextSentence>;
@@ -1350,7 +1366,6 @@ export type ExternalObjectStorage = {
   createdAt: Scalars['DateTime'];
   credentials: ExternalObjectStorageCredentials;
   id: Scalars['ID'];
-  prefix?: Maybe<Scalars['String']>;
   projects?: Maybe<Array<Maybe<Project>>>;
   team: Team;
   updatedAt: Scalars['DateTime'];
@@ -2340,6 +2355,12 @@ export type LabelingStatusStatistic = {
   totalTimeSpent: Scalars['Int'];
 };
 
+export type LabelingTracker = {
+  __typename?: 'LabelingTracker';
+  lastLabeledLine?: Maybe<Scalars['Int']>;
+  textDocumentId: Scalars['ID'];
+};
+
 export type LastUsedProject = {
   __typename?: 'LastUsedProject';
   name: Scalars['String'];
@@ -2693,8 +2714,6 @@ export type Mutation = {
   updateFileTransformer: FileTransformer;
   /** Updates a labelset details. */
   updateLabelSet: LabelSet;
-  /** Updates a labelset item's details in a labelset. */
-  updateLabelSetTagItem?: Maybe<TagItem>;
   /** Updates the specified labelset template. */
   updateLabelSetTemplate?: Maybe<LabelSetTemplate>;
   updateLabelingFunction: LabelingFunction;
@@ -3342,11 +3361,6 @@ export type MutationUpdateLabelSetArgs = {
 };
 
 
-export type MutationUpdateLabelSetTagItemArgs = {
-  input: UpdateLabelSetTagItemInput;
-};
-
-
 export type MutationUpdateLabelSetTemplateArgs = {
   input: UpdateLabelSetTemplateInput;
 };
@@ -3550,6 +3564,13 @@ export enum OcrProvider {
   GoogleCloudVision = 'GOOGLE_CLOUD_VISION',
   Konvergen = 'KONVERGEN'
 }
+
+export type ObjectMeta = {
+  __typename?: 'ObjectMeta';
+  createdAt?: Maybe<Scalars['String']>;
+  key: Scalars['String'];
+  sizeInBytes: Scalars['Int'];
+};
 
 export enum ObjectStorageClientName {
   AwsS3 = 'AWS_S3',
@@ -3945,6 +3966,7 @@ export type Query = {
   getExportable: Scalars['ExportableJSON'];
   getExtensions?: Maybe<Array<Extension>>;
   getExternalFilesByApi: Array<ExternalFile>;
+  getExternalObjectMeta: Array<ObjectMeta>;
   getExternalObjectStorages?: Maybe<Array<ExternalObjectStorage>>;
   getFileTransformer: FileTransformer;
   getFileTransformers: Array<FileTransformer>;
@@ -3953,6 +3975,8 @@ export type Query = {
   getGrammarMistakes: Array<GrammarMistake>;
   getGuidelines: Array<Guideline>;
   getInvalidAnswerInfos: Array<InvalidAnswerInfo>;
+  getInvalidDocumentAnswerInfos: Array<InvalidAnswerInfo>;
+  getInvalidRowAnswerInfos: Array<InvalidAnswerInfo>;
   /**
    * Get a specific Job by its ID.
    * Can be used to check the status of a `ProjectLaunchJob`.
@@ -4295,6 +4319,12 @@ export type QueryGetExternalFilesByApiArgs = {
 };
 
 
+export type QueryGetExternalObjectMetaArgs = {
+  externalObjectStorageId: Scalars['ID'];
+  objectKeys: Array<Scalars['String']>;
+};
+
+
 export type QueryGetExternalObjectStoragesArgs = {
   teamId: Scalars['ID'];
 };
@@ -4327,6 +4357,16 @@ export type QueryGetGuidelinesArgs = {
 
 
 export type QueryGetInvalidAnswerInfosArgs = {
+  cabinetId: Scalars['ID'];
+};
+
+
+export type QueryGetInvalidDocumentAnswerInfosArgs = {
+  cabinetId: Scalars['ID'];
+};
+
+
+export type QueryGetInvalidRowAnswerInfosArgs = {
   cabinetId: Scalars['ID'];
 };
 
@@ -5287,6 +5327,7 @@ export type TextDocument = {
   fileName: Scalars['String'];
   id: Scalars['ID'];
   isCompleted: Scalars['Boolean'];
+  lastLabeledLine?: Maybe<Scalars['Int']>;
   lastSavedAt: Scalars['String'];
   mimeType: Scalars['String'];
   name: Scalars['String'];
@@ -5705,15 +5746,6 @@ export type UpdateLabelSetSettingsInput = {
   index: Scalars['Int'];
 };
 
-export type UpdateLabelSetTagItemInput = {
-  /** Required. The labelset where the labelset item is owned. */
-  labelSetId: Scalars['ID'];
-  /** Optional. The labelset signature. */
-  labelSetSignature?: InputMaybe<Scalars['String']>;
-  /** Required. The labelset item to be updated. */
-  tagItem: TagItemInput;
-};
-
 export type UpdateLabelSetTemplateInput = {
   id: Scalars['ID'];
   name?: InputMaybe<Scalars['String']>;
@@ -5852,7 +5884,9 @@ export type UpdateSentenceDocLabelsResult = {
 
 export type UpdateSentenceResult = {
   __typename?: 'UpdateSentenceResult';
+  addedBoundingBoxLabels: Array<BoundingBoxLabel>;
   addedLabels: Array<GqlConflictable>;
+  deletedBoundingBoxLabels: Array<BoundingBoxLabel>;
   deletedLabels: Array<GqlConflictable>;
   document: TextDocument;
   /** @deprecated Use `addedLabels` and `deletedLabels` */

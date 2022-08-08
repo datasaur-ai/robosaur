@@ -12,6 +12,7 @@ import { getLocalDocuments } from '../documents/get-local-documents';
 import { getObjectStorageDocuments } from '../documents/get-object-storage-documents';
 import { LocalDocument, RemoteDocument } from '../documents/interfaces';
 import { getLogger } from '../logger';
+import { getDatasaurVersion } from '../transformer/pcw-transformer/helper/getDatasaurVersion';
 import { setConfigFromPcw } from '../transformer/pcw-transformer/setConfigFromPcw';
 import { getLabelSetsFromDirectory } from '../utils/labelset';
 import { pollJobsUntilCompleted } from '../utils/polling.helper';

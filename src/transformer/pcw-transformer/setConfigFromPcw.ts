@@ -2,9 +2,12 @@ import { parseAssignment } from '../../assignment/parse-assignment';
 import { getConfig } from '../../config/config';
 import { Config } from '../../config/interfaces';
 import { getLogger } from '../../logger';
+import { PROJECT_SETTINGS_BREAKING_VERSION } from './constants';
+import { isVersionGreaterThanOrEqual } from './helper/compareVersion';
 import { mapDocFileOptions } from './helper/doc-file-options.mapper';
 import { mapDocumentAssignments } from './helper/document-assignments.mapper';
 import { mapDocumentSettings } from './helper/document-settings.mapper';
+import { getDatasaurVersion } from './helper/getDatasaurVersion';
 import { mapLabelSet } from './helper/label-set.mapper';
 import { parsePcw } from './helper/parsePcw';
 import { mapProjectSettings } from './helper/project-settings.mapper';
@@ -12,9 +15,18 @@ import { mapSplitDocumentOptions } from './helper/split-document-options.mapper'
 import { validatePcw } from './helper/validatePcw';
 import { PCWPayload } from './interfaces';
 
-const populateConfig = (payload: PCWPayload) => {
+const populateConfig = async (payload: PCWPayload) => {
   getConfig().create.documentSettings = mapDocumentSettings.fromPcw(payload.documentSettings);
-  getConfig().create.projectSettings = mapProjectSettings.fromPcw(payload.projectSettings);
+
+  const datasaurVersion = await getDatasaurVersion();
+  if (isVersionGreaterThanOrEqual(datasaurVersion, PROJECT_SETTINGS_BREAKING_VERSION)) {
+    getConfig().create.projectSettings = mapProjectSettings.fromPcw(payload.projectSettings);
+    console.log(getConfig().create.projectSettings);
+  } else {
+    getConfig().create.projectSettings = mapProjectSettings.fromPcwOld(payload.projectSettings);
+    console.log(getConfig().create.projectSettings);
+  }
+
   if (payload.documents && payload.documents.length > 0) {
     getConfig().create.docFileOptions = mapDocFileOptions.fromPcw(payload.documents[0].docFileOptions!);
   }
@@ -65,7 +77,7 @@ export const setConfigFromPcw = async (input: Config) => {
   }
 
   getLogger().info(`transforming payload to robosaur format...`);
-  populateConfig(payload);
+  await populateConfig(payload);
 
   getLogger().info('finished transforming payload, continue to creating projects...');
 
