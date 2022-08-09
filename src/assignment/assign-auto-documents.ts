@@ -16,7 +16,10 @@ export function assignAutoDocuments(assignmentPool: AssignmentConfig, documents:
     members[reviewer] = { isLabeler: false || members[reviewer]?.isLabeler, isReviewer: true };
   });
 
-  const consensus = getConfig()?.create?.projectSettings?.consensus ?? 1;
+  const consensus =
+    getConfig()?.create?.projectSettings?.conflictResolution?.consensus ??
+    getConfig()?.create?.projectSettings?.consensus ??
+    1;
 
   const labelerAssignmentMap = new Map<string, Array<{ fileName: string; part: number }>>();
   const labelerIdentifiers: string[] = [];
@@ -38,9 +41,7 @@ export function assignAutoDocuments(assignmentPool: AssignmentConfig, documents:
   }
 
   let labelerIndex = 0;
-  for (let index = 0; index < allDocuments.length; index++) {
-    const document = allDocuments[index];
-
+  for (const document of allDocuments) {
     let numberOfAssignments = 0;
     while (numberOfAssignments < consensus) {
       const currentLabeler = labelerIdentifiers[labelerIndex];
