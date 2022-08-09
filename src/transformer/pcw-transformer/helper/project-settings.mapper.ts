@@ -1,15 +1,16 @@
 import { Config } from '../../../config/interfaces';
-import { ProjectSettingsInput } from '../../../generated/graphql';
-import { ProjectSettingsInputWithConsensus } from '../interfaces';
+import { ConflictResolutionMode } from '../../../generated/graphql';
+import { DatasaurVersion } from '../constants';
+import { ProjectSettingsInputWithConsensus, PCWPayload } from '../interfaces';
 import { removeNulls } from './removeNull';
 
 export type ConfigProjectSettings = Config['create']['projectSettings'];
 
 export const mapProjectSettings = {
-  fromPcw: (payload: ProjectSettingsInput): ConfigProjectSettings => ({
+  fromPcw: (payload: ProjectSettingsInputWithConsensus): ConfigProjectSettings => ({
     conflictResolution: {
-      mode: removeNulls(payload.conflictResolution?.mode),
-      consensus: removeNulls(payload.conflictResolution?.consensus),
+      mode: removeNulls(payload.conflictResolution?.mode ?? ConflictResolutionMode.PeerReview),
+      consensus: removeNulls(payload.conflictResolution?.consensus ?? payload.consensus ?? 1),
     },
     enableEditLabelSet: removeNulls(payload.enableEditLabelSet),
     enableEditSentence: removeNulls(payload.enableEditSentence),
@@ -18,7 +19,7 @@ export const mapProjectSettings = {
     hideLabelsFromInactiveLabelSetDuringReview: removeNulls(payload.hideLabelsFromInactiveLabelSetDuringReview),
   }),
   fromPcwWithConsensus: (payload: ProjectSettingsInputWithConsensus): ConfigProjectSettings => ({
-    consensus: removeNulls(payload.consensus),
+    consensus: removeNulls(payload.consensus ?? payload.conflictResolution?.consensus ?? 1),
     enableEditLabelSet: removeNulls(payload.enableEditLabelSet),
     enableEditSentence: removeNulls(payload.enableEditSentence),
     hideLabelerNamesDuringReview: removeNulls(payload.hideLabelerNamesDuringReview),
@@ -26,3 +27,13 @@ export const mapProjectSettings = {
     hideLabelsFromInactiveLabelSetDuringReview: removeNulls(payload.hideLabelsFromInactiveLabelSetDuringReview),
   }),
 };
+
+export const DatasaurVersionMapper = new Map<DatasaurVersion, (payload: PCWPayload) => ConfigProjectSettings>();
+DatasaurVersionMapper.set(DatasaurVersion.DEFAULT, (payload) => {
+  const projectSettingsPayload = payload.projectSettings;
+  return mapProjectSettings.fromPcw(projectSettingsPayload);
+});
+DatasaurVersionMapper.set(DatasaurVersion.v5_38_0, (payload) => {
+  const projectSettingsPayload = payload.projectSettings;
+  return mapProjectSettings.fromPcwWithConsensus(projectSettingsPayload);
+});

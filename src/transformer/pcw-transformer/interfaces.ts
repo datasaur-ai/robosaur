@@ -3,13 +3,10 @@ import {
   CreateTextDocumentInput,
   DocumentAssignmentInput,
   ExtensionId,
-  InputMaybe,
   LabelSetTextProjectInput,
   ProjectAssignmentByNameInput,
-  ProjectDynamicReviewMethod,
   ProjectPurpose,
   ProjectSettingsInput,
-  Scalars,
   SplitDocumentOptionInput,
   TextDocumentKind,
   TextDocumentSettingsInput,
@@ -55,16 +52,6 @@ export interface PCWPayload {
   teamId: string;
 }
 
-export type ProjectSettingsInputWithConsensus = {
-  consensus?: InputMaybe<Scalars['Int']>;
-  dynamicReviewMemberId?: InputMaybe<Scalars['ID']>;
-  dynamicReviewMethod?: InputMaybe<ProjectDynamicReviewMethod>;
-  enableDeleteSentence?: InputMaybe<Scalars['Boolean']>;
-  enableEditLabelSet?: InputMaybe<Scalars['Boolean']>;
-  enableEditSentence?: InputMaybe<Scalars['Boolean']>;
-  enableInsertSentence?: InputMaybe<Scalars['Boolean']>;
-  hideLabelerNamesDuringReview?: InputMaybe<Scalars['Boolean']>;
-  hideLabelsFromInactiveLabelSetDuringReview?: InputMaybe<Scalars['Boolean']>;
-  hideOriginalSentencesDuringReview?: InputMaybe<Scalars['Boolean']>;
-  hideRejectedLabelsDuringReview?: InputMaybe<Scalars['Boolean']>;
-};
+export interface ProjectSettingsInputWithConsensus extends ProjectSettingsInput {
+  consensus?: number;
+}
