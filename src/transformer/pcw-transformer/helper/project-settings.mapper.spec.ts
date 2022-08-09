@@ -53,4 +53,39 @@ describe('projectSettingsMapper', () => {
 
     expect(result).toEqual(mapped);
   });
+
+  it('should fill out missing consensus fields with default values', () => {
+    const missingConsensus: ProjectSettingsInputWithConsensus = {
+      enableEditLabelSet: true,
+      enableEditSentence: true,
+      hideLabelerNamesDuringReview: false,
+      hideLabelsFromInactiveLabelSetDuringReview: false,
+      hideOriginalSentencesDuringReview: true,
+      hideRejectedLabelsDuringReview: true,
+    };
+
+    const withConsensus: Config['create']['projectSettings'] = {
+      enableEditLabelSet: true,
+      enableEditSentence: true,
+      hideLabelerNamesDuringReview: false,
+      hideLabelsFromInactiveLabelSetDuringReview: false,
+      hideRejectedLabelsDuringReview: true,
+      consensus: 1,
+    };
+
+    const withConflictResolution: Config['create']['projectSettings'] = {
+      enableEditLabelSet: true,
+      enableEditSentence: true,
+      hideLabelerNamesDuringReview: false,
+      hideLabelsFromInactiveLabelSetDuringReview: false,
+      hideRejectedLabelsDuringReview: true,
+      conflictResolution: { consensus: 1, mode: ConflictResolutionMode.PeerReview },
+    };
+
+    const resultWithConsensus = mapProjectSettings.fromPcwWithConsensus(missingConsensus);
+    const resultWithConflictResolution = mapProjectSettings.fromPcw(missingConsensus);
+
+    expect(resultWithConsensus).toEqual(withConsensus);
+    expect(resultWithConflictResolution).toEqual(withConflictResolution);
+  });
 });
