@@ -1,6 +1,6 @@
 import { Config } from '../../../config/interfaces';
 import { ProjectSettingsInput } from '../../../generated/graphql';
-import { ProjectSettingsInputOld } from '../interfaces';
+import { ProjectSettingsInputWithConsensus } from '../interfaces';
 import { removeNulls } from './removeNull';
 
 export type ConfigProjectSettings = Config['create']['projectSettings'];
@@ -17,7 +17,7 @@ export const mapProjectSettings = {
     hideRejectedLabelsDuringReview: removeNulls(payload.hideRejectedLabelsDuringReview),
     hideLabelsFromInactiveLabelSetDuringReview: removeNulls(payload.hideLabelsFromInactiveLabelSetDuringReview),
   }),
-  fromPcwOld: (payload: ProjectSettingsInputOld): ConfigProjectSettings => ({
+  fromPcwWithConsensus: (payload: ProjectSettingsInputWithConsensus): ConfigProjectSettings => ({
     consensus: removeNulls(payload.consensus),
     enableEditLabelSet: removeNulls(payload.enableEditLabelSet),
     enableEditSentence: removeNulls(payload.enableEditSentence),

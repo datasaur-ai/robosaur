@@ -19,13 +19,9 @@ const populateConfig = async (payload: PCWPayload) => {
   getConfig().create.documentSettings = mapDocumentSettings.fromPcw(payload.documentSettings);
 
   const datasaurVersion = await getDatasaurVersion();
-  if (isVersionGreaterThanOrEqual(datasaurVersion, PROJECT_SETTINGS_BREAKING_VERSION)) {
-    getConfig().create.projectSettings = mapProjectSettings.fromPcw(payload.projectSettings);
-    console.log(getConfig().create.projectSettings);
-  } else {
-    getConfig().create.projectSettings = mapProjectSettings.fromPcwOld(payload.projectSettings);
-    console.log(getConfig().create.projectSettings);
-  }
+  getConfig().create.projectSettings = isVersionGreaterThanOrEqual(datasaurVersion, PROJECT_SETTINGS_BREAKING_VERSION)
+    ? mapProjectSettings.fromPcw(payload.projectSettings)
+    : mapProjectSettings.fromPcwWithConsensus(payload.projectSettings);
 
   if (payload.documents && payload.documents.length > 0) {
     getConfig().create.docFileOptions = mapDocFileOptions.fromPcw(payload.documents[0].docFileOptions!);
