@@ -1,5 +1,6 @@
 import { Config } from '../../../config/interfaces';
 import { ConflictResolutionMode, ProjectSettingsInput } from '../../../generated/graphql';
+import { ProjectSettingsInputWithConsensus } from '../interfaces';
 import { mapProjectSettings } from './project-settings.mapper';
 
 describe('projectSettingsMapper', () => {
@@ -24,6 +25,31 @@ describe('projectSettingsMapper', () => {
     };
 
     const result = mapProjectSettings.fromPcw(fromPcw);
+
+    expect(result).toEqual(mapped);
+  });
+
+  it('should use previous version projectSettings for older version of Datasaur', () => {
+    const fromPreviousVersionOfPcw: ProjectSettingsInputWithConsensus = {
+      enableEditLabelSet: true,
+      enableEditSentence: true,
+      hideLabelerNamesDuringReview: false,
+      hideLabelsFromInactiveLabelSetDuringReview: false,
+      hideOriginalSentencesDuringReview: true,
+      hideRejectedLabelsDuringReview: true,
+      consensus: 3,
+    };
+
+    const mapped: Config['create']['projectSettings'] = {
+      enableEditLabelSet: true,
+      enableEditSentence: true,
+      hideLabelerNamesDuringReview: false,
+      hideLabelsFromInactiveLabelSetDuringReview: false,
+      hideRejectedLabelsDuringReview: true,
+      consensus: 3,
+    };
+
+    const result = mapProjectSettings.fromPcwWithConsensus(fromPreviousVersionOfPcw);
 
     expect(result).toEqual(mapped);
   });
