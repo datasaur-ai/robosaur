@@ -17,8 +17,8 @@ const populateConfig = async (payload: PCWPayload) => {
   getConfig().create.documentSettings = mapDocumentSettings.fromPcw(payload.documentSettings);
 
   const datasaurVersion = await getDatasaurVersion();
-  const projectSettingsMapper = DatasaurVersionMapper.get(datasaurVersion)!;
-  getConfig().create.projectSettings = projectSettingsMapper(payload);
+  const getProjectSettings = DatasaurVersionMapper.get(datasaurVersion)!;
+  getConfig().create.projectSettings = getProjectSettings(payload);
 
   if (payload.documents && payload.documents.length > 0) {
     getConfig().create.docFileOptions = mapDocFileOptions.fromPcw(payload.documents[0].docFileOptions!);
