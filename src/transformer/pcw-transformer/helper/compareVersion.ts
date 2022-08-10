@@ -7,11 +7,11 @@ export function parseVersion(version) {
       return value;
     }
   }
-  return DatasaurVersion.DEFAULT;
+  return DatasaurVersion.LATEST;
 }
 
 export function getVersionValues() {
   return Object.values(DatasaurVersion).filter((value) => {
-    return value != DatasaurVersion.DEFAULT;
+    return value != DatasaurVersion.LATEST;
   });
 }

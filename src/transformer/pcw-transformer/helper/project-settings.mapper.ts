@@ -29,7 +29,7 @@ export const mapProjectSettings = {
 };
 
 export const DatasaurVersionMapper = new Map<DatasaurVersion, (payload: PCWPayload) => ConfigProjectSettings>();
-DatasaurVersionMapper.set(DatasaurVersion.DEFAULT, (payload) => {
+DatasaurVersionMapper.set(DatasaurVersion.LATEST, (payload) => {
   const projectSettingsPayload = payload.projectSettings;
   return mapProjectSettings.fromPcw(projectSettingsPayload);
 });
