@@ -33,7 +33,7 @@ DatasaurVersionMapper.set(DatasaurVersion.DEFAULT, (payload) => {
   const projectSettingsPayload = payload.projectSettings;
   return mapProjectSettings.fromPcw(projectSettingsPayload);
 });
-DatasaurVersionMapper.set(DatasaurVersion.v5_38_0, (payload) => {
+DatasaurVersionMapper.set(DatasaurVersion.v5_37_0, (payload) => {
   const projectSettingsPayload = payload.projectSettings;
   return mapProjectSettings.fromPcwWithConsensus(projectSettingsPayload);
 });

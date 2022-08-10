@@ -1,4 +1,4 @@
 export enum DatasaurVersion {
   DEFAULT = 'LATEST',
-  v5_38_0 = '5.38.0', // Has consensus breaking change
+  v5_37_0 = '5.37.0', // Last version before consensus breaking change
 }
