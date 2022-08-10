@@ -41,7 +41,7 @@ export interface PCWPayload {
   labelSetId?: string;
   guidelineId?: string;
   projectCreationId?: string;
-  projectSettings: ProjectSettingsInput;
+  projectSettings: ProjectSettingsInput | ProjectSettingsInputWithConsensus;
   documentSettings: TextDocumentSettingsInput;
   documents?: CreateTextDocumentInput[];
   tagNames?: string[];
@@ -50,4 +50,8 @@ export interface PCWPayload {
   reviewerExtensions?: ExtensionId[];
   splitDocumentOption?: SplitDocumentOptionInput;
   teamId: string;
+}
+
+export interface ProjectSettingsInputWithConsensus extends ProjectSettingsInput {
+  consensus?: number;
 }

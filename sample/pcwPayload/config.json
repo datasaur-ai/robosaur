@@ -110,7 +110,10 @@
             "hideLabelsFromInactiveLabelSetDuringReview": false,
             "hideOriginalSentencesDuringReview": true,
             "hideRejectedLabelsDuringReview": true,
-            "consensus": 1
+            "conflictResolution": {
+              "mode": "PEER_REVIEW",
+              "consensus": 1
+            }
           },
           "teamId": "<TEAM_ID>",
           "documents": [
