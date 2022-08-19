@@ -1,0 +1,18 @@
+{
+  "datasaur": {
+    "host": "https://app.datasaur.ai",
+    "clientId": "<CLIENT_ID>",
+    "clientSecret": "<CLIENT_SECRET>"
+  },
+  "projectState": {
+    "source": "local",
+    "path": "sample/apply-tags/state/projectState.json"
+  },
+  "splitDocument": {
+    "path": "sample/split-document/_doc-data-100.csv",
+    "header": true,
+    "linesPerFile": 5,
+    "filesPerFolder": 5,
+    "resultFolder": "sample/split-document/result"
+  }
+}

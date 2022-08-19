@@ -5,6 +5,7 @@ import { assignmentSchemaValidator } from './assignment-schema-validator';
 import { credentialsSchemaValidator } from './credential-schema-validator';
 import { documentsSchemaValidator } from './documents-schema-validator';
 import { exportSchemaValidator } from './export-schema-validator';
+import { splitDocumentSchemaValidator } from './split-document-schema-validator';
 
 export function getProjectCreationValidators() {
   return [validateConfigCredentials, validateConfigAssignment, validateConfigDocuments];
@@ -16,6 +17,17 @@ export function getProjectExportValidators() {
 
 export function getApplyTagValidators() {
   return [validateConfigCredentials, validateConfigApplyTags];
+}
+
+export function getSplitDocumentValidators() {
+  return [validateConfigSplitDocument];
+}
+
+function validateConfigSplitDocument(config: Config) {
+  if (!splitDocumentSchemaValidator(config.splitDocument)) {
+    getLogger().error(`config.splitDocument has some errors`, { errors: splitDocumentSchemaValidator.errors });
+    throw new Error(`config.splitDocument has some errors: ${JSON.stringify(splitDocumentSchemaValidator.errors)}`);
+  }
 }
 
 function validateConfigDocuments(config: Config) {
