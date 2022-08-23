@@ -9,7 +9,7 @@
     "path": "sample/apply-tags/state/projectState.json"
   },
   "splitDocument": {
-    "path": "sample/split-document/_doc-data-100.csv",
+    "path": "sample/split-document/sample.csv",
     "header": true,
     "linesPerFile": 5,
     "filesPerFolder": 5,
