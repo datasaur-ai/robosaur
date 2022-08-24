@@ -10,8 +10,8 @@ const SplitDocumentSchema: JSONSchemaType<SplitDocumentConfig> = {
   properties: {
     path: { type: 'string' },
     header: { type: 'boolean' },
-    linesPerFile: { type: 'number' },
-    filesPerFolder: { type: 'number' },
+    linesPerFile: { type: 'number', minimum: 1 },
+    filesPerFolder: { type: 'number', minimum: 1 },
     resultFolder: { type: 'string' },
   },
   required: ['path', 'header', 'linesPerFile', 'filesPerFolder', 'resultFolder'],
