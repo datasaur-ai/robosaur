@@ -52,6 +52,9 @@ export interface Config {
 
   // apply tags to project
   applyTags: ApplyTagsConfig;
+
+  // split document
+  splitDocument: SplitDocumentConfig;
 }
 
 export interface CreateConfig {
@@ -370,4 +373,12 @@ interface WithStorage {
    * the GCS or S3 bucket name, without gs:// or s3:// prefix
    */
   bucketName: string;
+}
+
+export interface SplitDocumentConfig {
+  path: string;
+  header: boolean;
+  linesPerFile: number;
+  filesPerFolder: number;
+  resultFolder: string;
 }
