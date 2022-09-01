@@ -56,6 +56,7 @@ const populateConfig = async (payload: PCWPayload) => {
   }
   getConfig().create.type = payload.type;
   getConfig().create.kinds = payload.kinds || [];
+  getConfig().create.tagNames = payload.tagNames;
 };
 
 export const setConfigFromPcw = async (input: Config) => {
