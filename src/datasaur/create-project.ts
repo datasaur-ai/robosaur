@@ -24,7 +24,6 @@ export async function createProject(
   documents: Document[],
   documentAssignments: DocumentAssignment[],
   settings: Config['create'],
-  tagNames: string[] = [],
 ) {
   const projectDocuments = documents.map((document) => {
     return {
@@ -65,7 +64,7 @@ export async function createProject(
       kinds: settings.kinds,
       projectSettings: settings.projectSettings,
       documentAssignments,
-      tagNames,
+      tagNames: settings.tagNames,
       documents: projectDocuments,
       labelerExtensions: settings.kinds
         ? getExtensions(settings.kinds || []).LABELER

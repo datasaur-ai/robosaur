@@ -215,6 +215,11 @@ export interface CreateConfig {
     strategy: SplitDocumentStrategy;
     number: number;
   };
+
+  /**
+   * @description Optional. Tags to be applied to created projects
+   */
+  tagNames?: string[];
 }
 
 export interface CredentialsConfig {

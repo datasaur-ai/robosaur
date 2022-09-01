@@ -13,7 +13,7 @@ import { ProjectConfiguration } from '../constants';
 
 export async function doCreateProjectAndUpdateState(projectConfiguration: ProjectConfiguration, state: ScriptState) {
   const { projectName, documents, documentAssignments, projectConfig } = projectConfiguration;
-  const result = await createProject(projectName, documents, documentAssignments, projectConfig, undefined);
+  const result = await createProject(projectName, documents, documentAssignments, projectConfig);
   getLogger().info(`ProjectLaunchJob for ${projectName} submitted: Job ID: ${result.job.id}`);
   state.addProject({
     projectName: projectName,
