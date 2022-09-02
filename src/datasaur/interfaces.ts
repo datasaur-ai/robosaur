@@ -3,6 +3,17 @@ export interface Project {
   name: string;
   tags: Tag[];
   status: ProjectStatus;
+  reviewCabinet?: Cabinet;
+}
+
+export interface Cabinet {
+  id: string;
+}
+
+export interface CabinetLabelSet {
+  id: string;
+  index: number;
+  name: string;
 }
 
 export interface Tag {
@@ -57,8 +68,18 @@ export interface ExportResult {
 
 export interface JSONAdvancedFormat {
   labels?: SpanLabel[];
-  labelSets: LabelSet[] | undefined;
+  labelSets: JSONAdvancedFormatLabelSet[] | undefined;
   sentences: JSONAdvancedSentenceFormat[];
+}
+
+export interface JSONAdvancedFormatLabelSet {
+  index: number;
+  labelItems: JSONAdvancedFormatLabelSetItem[];
+}
+
+export interface JSONAdvancedFormatLabelSetItem {
+  id: string;
+  labelName: string;
 }
 
 export interface JSONAdvancedSentenceFormat {

@@ -12,6 +12,9 @@ const GET_PROJECTS_QUERY = gql`
           id
           name
         }
+        reviewCabinet {
+          id
+        }
         __typename
         status
       }
