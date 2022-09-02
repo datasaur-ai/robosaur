@@ -4,6 +4,7 @@ import { applyTagsSchemaValidator } from './apply-tags-schema-validator';
 import { assignmentSchemaValidator } from './assignment-schema-validator';
 import { credentialsSchemaValidator } from './credential-schema-validator';
 import { documentsSchemaValidator } from './documents-schema-validator';
+import { exportAnnotatedDataSchemaValidator } from './export-annotated-data-schema-validator';
 import { exportSchemaValidator } from './export-schema-validator';
 import { splitDocumentSchemaValidator } from './split-document-schema-validator';
 
@@ -13,6 +14,10 @@ export function getProjectCreationValidators() {
 
 export function getProjectExportValidators() {
   return [validateConfigCredentials, validateConfigExport];
+}
+
+export function getExportAnnotatedDataValidators() {
+  return [validateConfigCredentials, validateConfigExportAnnotatedData];
 }
 
 export function getApplyTagValidators() {
@@ -53,6 +58,19 @@ function validateConfigExport(config: Config) {
   }
 }
 
+function validateConfigExportAnnotatedData(config: Config) {
+  if (!exportAnnotatedDataSchemaValidator(config.exportAnnotatedData)) {
+    getLogger().error(`config.exportAnnotatedData has some errors`, {
+      errors: exportAnnotatedDataSchemaValidator.errors,
+    });
+    throw new Error(
+      `config.exportAnnotatedData has some errors ${JSON.stringify({
+        errors: exportAnnotatedDataSchemaValidator.errors,
+      })}`,
+    );
+  }
+}
+
 function validateConfigCredentials(config: Config) {
   if (config.credentials || doSourcesNeedCredentials(config)) {
     if (!credentialsSchemaValidator(config.credentials)) {
@@ -76,6 +94,7 @@ function doSourcesNeedCredentials(config: Config) {
     config.create?.files?.source,
     config.projectState?.source,
     config.export?.source,
+    config.exportAnnotatedData?.source,
     config.applyTags?.source,
   ];
 

@@ -47,6 +47,9 @@ export interface Config {
   // project export
   export: ExportConfig;
 
+  // export annotated data
+  exportAnnotatedData: ExportAnnotatedDataConfig;
+
   // project creation
   create: CreateConfig;
 
@@ -346,6 +349,42 @@ export interface ExportConfig extends WithStorage {
    * The ID can be obtained from the file transformer page in this format: https://app.datasaur.ai/teams/{teamId}/file-transformers/{file-transformer-id}
    */
   fileTransformerId: string;
+}
+
+export interface ExportAnnotatedDataConfig extends WithStorage {
+  /**
+   * @description Projects' status to filter.
+   * Only projects matching the specified statuses will be exported by Robosaur.
+   * The possible statuses, in order are:
+   * CREATED, IN_PROGRESS, REVIEW_READY, IN_REVIEW, COMPLETE
+   */
+  statusFilter: Array<ProjectStatus>;
+
+  /**
+   * @description A filter on which projects to export
+   */
+  projectFilter?: {
+    date?: {
+      newestDate: Date;
+      oldestDate?: Date;
+    };
+    tags?: string[];
+    keyword?: string;
+  };
+
+  /**
+   * @description Required for 'gcs' and 's3' sources.
+   * Path to the folder containing sub-folders, without leading slash (/)
+   * Each exported project will be uploaded into a separate subfolder, with its' projectName as the folder name
+   * If the subfolders are located in root, set prefix to empty string ''
+   */
+  prefix: string;
+
+  /**
+   * @description id of the team.
+   * The ID can be obtained from your team workspace page in this format: https://app.datasaur.ai/teams/{teamId}
+   */
+  teamId: string;
 }
 
 export interface ApplyTagsConfig extends WithStorage {

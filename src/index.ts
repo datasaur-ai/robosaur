@@ -3,6 +3,7 @@ import packageJson from '../package.json';
 import { handleApplyTags } from './handlers/apply-tags.handler';
 import { handleCreateProject } from './handlers/create-project.handler';
 import { handleCreateProjects } from './handlers/create-projects.handler';
+import { handleExportAnnotatedData } from './handlers/export-annotated-data';
 import { handleExportProjects } from './handlers/export-projects.handler';
 import { handleSplitDocument } from './handlers/split-document.handler';
 import { getLogger } from './logger';
@@ -29,6 +30,11 @@ program
   .option('-u --unzip', 'Unzips the exported projects, only storing the final version accepted by reviewers')
   .description('Export all projects based on the given config file')
   .action(handleExportProjects);
+
+program
+  .command(`export-annotated-data <configFile>`)
+  .description('Export Annotated Data')
+  .action(handleExportAnnotatedData);
 
 program
   .command(`split-document <configFile>`)

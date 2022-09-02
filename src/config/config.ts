@@ -56,6 +56,9 @@ function setActiveTeamId(context: ScriptAction) {
     case ScriptAction.PROJECT_EXPORT:
       activeTeamId = getConfig().export.teamId;
       break;
+    case ScriptAction.EXPORT_ANNOTATED_DATA:
+      activeTeamId = getConfig().exportAnnotatedData.teamId;
+      break;
     case ScriptAction.APPLY_TAGS:
       activeTeamId = getConfig().applyTags.teamId;
       break;
