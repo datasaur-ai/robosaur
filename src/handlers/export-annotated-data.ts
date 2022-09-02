@@ -17,11 +17,9 @@ import {
 import { getLogger } from '../logger';
 import { pollJobsUntilCompleted } from '../utils/polling.helper';
 import { downloadFromPreSignedUrl } from '../utils/publish/helper';
-import { publishZipFile } from '../utils/publish/publishZipFile';
 import { streamToBuffer } from '../utils/stream/streamToBuffer';
 import { ScriptAction } from './constants';
 import Zip from 'adm-zip';
-import { readFile } from 'fs/promises';
 import * as Papa from 'papaparse';
 import { publishAnnotatedDataFile } from '../utils/publish/publishAnnotatedDataFile';
 import path from 'path';
@@ -113,24 +111,29 @@ const handleStateless = async () => {
       },
     });
     let retval: ExportResult | null = null;
-    // try {
-    //   retval = await exportProject(project.id, filename, exportFormat);
-    // } catch (error) {
-    //   retval = {
-    //     exportId: 'dummyexport',
-    //     fileUrl: 'dummyfile',
-    //   } as ExportResult;
-    //   getLogger().error(`fail in exportProject query`, { error: JSON.stringify(error), message: error.message });
-    // }
-    // result.exportId = retval.exportId;
-    // result.jobStatus = retval.queued ? JobStatus.QUEUED : JobStatus.IN_PROGRESS;
+    try {
+      retval = await exportProject(project.id, filename, exportFormat);
+    } catch (error) {
+      retval = {
+        exportId: 'dummyexport',
+        fileUrl: 'dummyfile',
+      } as ExportResult;
+      getLogger().error(`fail in exportProject query`, { error: JSON.stringify(error), message: error.message });
+    }
+    result.exportId = retval.exportId;
+    result.jobStatus = retval.queued ? JobStatus.QUEUED : JobStatus.IN_PROGRESS;
 
-    // const jobResult = (await pollJobsUntilCompleted([retval.exportId]))[0];
-    // getLogger().info(`export job finished`, { ...jobResult });
-    // result.jobStatus = jobResult?.status;
+    const jobResult = (await pollJobsUntilCompleted([retval.exportId]))[0];
+    getLogger().info(`export job finished`, { ...jobResult });
+    result.jobStatus = jobResult?.status;
 
     try {
-      const annotatedDataCsv = await getAnnotatedData(project.name, teamMembersMap, cabinetLabelSetsMapByIndex);
+      const annotatedDataCsv = await getAnnotatedData(
+        retval.fileUrl,
+        project.name,
+        teamMembersMap,
+        cabinetLabelSetsMapByIndex,
+      );
       await publishAnnotatedDataFile(filename, annotatedDataCsv);
       result.jobStatus = 'PUBLISHED';
     } catch (error) {
@@ -155,12 +158,13 @@ const handleStateless = async () => {
 };
 
 async function getAnnotatedData(
+  url: string,
   projectName: string,
   teamMembersMap: { [id: string]: TeamMember },
   cabinetLabelSetsMapByIndex: { [id: number]: CabinetLabelSet },
 ): Promise<string> {
-  const zipFile = await readFile('quickstart/annotated-data/export/_Uniphore_ Datasaur Dataset_FRYWjo0dORv.zip');
-  const zip = new Zip(zipFile);
+  const zipStream = await downloadFromPreSignedUrl(url);
+  const zip = new Zip(await streamToBuffer(zipStream.data));
   let annotatedDataRows: AnnotatedDataRow[] = [];
 
   for (const entry of zip.getEntries()) {
