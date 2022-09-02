@@ -239,6 +239,7 @@ function getAnnotatedDataRows(
       const label = line.labelsMap.get(positionHashCode);
       if (label) {
         if (spanLabel.type == LabelEntityType.SPAN) {
+          label.layer = spanLabel.layer;
           label.labelSetItemId = spanLabel.labelSetItemId;
           label.acceptedByUserId = spanLabel.acceptedByUserId;
           label.rejectedByUserId = spanLabel.rejectedByUserId;
