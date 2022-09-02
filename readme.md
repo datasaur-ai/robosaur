@@ -44,6 +44,8 @@ For more in-depth breakdown, please refer to [row-based.md](row-based.md)
   - [Usage](#usage)
     - [`create-projects`](#create-projects)
     - [`export-projects`](#export-projects)
+    - [`export-annotated-data`](#export-annotated-data)
+    - [`apply-tags`](#apply-tags)
   - [Execution Modes](#execution-modes)
     - [Stateful Project Creation & Export](#stateful-project-creation--export)
     - [Stateless project export](#stateless-project-export)
@@ -144,6 +146,18 @@ This can be set in the `export.statusFilter` inside the config JSON. In `quickst
     "statusFilter": ["COMPLETE"]
   }
 }
+```
+
+### `export-annotated-data`
+
+```console
+$ npm run start -- export-annotated-data -h
+Usage: robosaur export-annotated-data [options] <configFile>
+
+Export all annotated-data based on the given config file
+
+Options:
+  -h, --help  display help for command
 ```
 
 ### `apply-tags`

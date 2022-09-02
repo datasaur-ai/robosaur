@@ -1,8 +1,8 @@
 {
   "datasaur": {
     "host": "https://app.datasaur.ai",
-    "clientId": "689c6e13-6d83-40f1-b140-77f2c86b44b0",
-    "clientSecret": "403afccd-1c0b-4c80-9216-0498c643d6d6"
+    "clientId": "<DATASAUR_CLIENT_ID>",
+    "clientSecret": "<DATASAUR_CLIENT_SECRET>"
   },
   "projectState": {
     "source": "local",
@@ -11,11 +11,11 @@
   "exportAnnotatedData": {
     "source": "local",
     "prefix": "quickstart/annotated-data/export",
-    "teamId": "57",
+    "teamId": "<TEAM_ID>",
     "statusFilter": [],
     "projectFilter": {
       "tags": [],
-      "keyword": "[Uniphore] Datasaur Dataset"
+      "keyword": "Project Name"
     }
   }
 }
