@@ -1,4 +1,4 @@
-import { getConfig, setConfigByJSONFile } from '../config/config';
+import { getActiveTeamId, getConfig, setConfigByJSONFile } from '../config/config';
 import { getExportAnnotatedDataValidators } from '../config/schema/validator';
 import { exportProject } from '../datasaur/export-project';
 import { JobStatus } from '../datasaur/get-jobs';
@@ -23,6 +23,8 @@ import { readFile } from 'fs/promises';
 import * as Papa from 'papaparse';
 import { publishAnnotatedDataFile } from '../utils/publish/publishAnnotatedDataFile';
 import path from 'path';
+import { getTeamMembers, TeamMember } from '../datasaur/get-team-members';
+import { keyBy } from 'lodash';
 
 interface AnnotatedDataRow {
   Project: string;
@@ -58,6 +60,8 @@ const handleStateless = async () => {
   const exportFormat = ExportFormat.JSON_ADVANCED;
   const { statusFilter, teamId, source, projectFilter } = getConfig().exportAnnotatedData;
   const filterTagIds = projectFilter && projectFilter.tags ? await getTagIds(teamId, projectFilter.tags) : undefined;
+  const teamMembers = await getTeamMembers(getActiveTeamId());
+  const temMembersMap = keyBy(teamMembers, (member: TeamMember) => member.user?.id);
 
   const filter = {
     statuses: statusFilter,
@@ -117,7 +121,7 @@ const handleStateless = async () => {
     // result.jobStatus = jobResult?.status;
 
     try {
-      const annotatedDataCsv = await getAnnotatedData(project.name);
+      const annotatedDataCsv = await getAnnotatedData(project.name, temMembersMap);
       await publishAnnotatedDataFile(filename, annotatedDataCsv);
       result.jobStatus = 'PUBLISHED';
     } catch (error) {
@@ -141,7 +145,7 @@ const handleStateless = async () => {
   getLogger().info('exiting script...');
 };
 
-async function getAnnotatedData(projectName: string): Promise<string> {
+async function getAnnotatedData(projectName: string, temMembersMap: {}): Promise<string> {
   const zipFile = await readFile('quickstart/annotated-data/export/_Uniphore_ Datasaur Dataset_FRYWjo0dORv.zip');
   const zip = new Zip(zipFile);
   let annotatedDataRows: AnnotatedDataRow[] = [];
@@ -151,7 +155,7 @@ async function getAnnotatedData(projectName: string): Promise<string> {
       if (entry.entryName.includes('/DOCUMENT-')) {
         const filename = path.parse(entry.entryName).name;
         const jsonAdvanced: JSONAdvancedFormat = JSON.parse(zip.readAsText(entry));
-        const rows = getAnnotatedDataRows(jsonAdvanced, projectName, filename);
+        const rows = getAnnotatedDataRows(jsonAdvanced, projectName, filename, temMembersMap);
         annotatedDataRows = annotatedDataRows.concat(rows);
       }
     }
@@ -164,6 +168,7 @@ function getAnnotatedDataRows(
   jsonAdvanced: JSONAdvancedFormat,
   projectName: string,
   filename: string,
+  temMembersMap: {},
 ): AnnotatedDataRow[] {
   if (!jsonAdvanced.labels || jsonAdvanced.labels.length == 0) {
     return [];
@@ -215,7 +220,7 @@ function getAnnotatedDataRows(
     }
   }
 
-  return linesMapToAnnotatedDataRows(linesMap, projectName, filename);
+  return linesMapToAnnotatedDataRows(linesMap, projectName, filename, temMembersMap);
 }
 
 function isStartTimestampofTurn(label: SpanLabel): boolean {
@@ -241,6 +246,7 @@ function linesMapToAnnotatedDataRows(
   linesMap: Map<number, Line>,
   projectName: string,
   filename: string,
+  temMembersMap: {},
 ): AnnotatedDataRow[] {
   const annotatedDataRows: AnnotatedDataRow[] = [];
 
@@ -255,14 +261,14 @@ function linesMapToAnnotatedDataRows(
         'Label Category': '',
         'Label Name': '',
         'Turn ID': String(label.startCellLine + 1),
-        'Start Timestamp of Turn': String(line.startTimestampOfTurn),
-        'End Timestamp of Turn': String(line.endTimestampOfTurn),
-        'Start TimeLabel': String(label.startTimestampMillis),
-        'End TimeLabel': String(label.endTimestampMillis),
+        'Start Timestamp of Turn': timestampMilisToTime(line.startTimestampOfTurn),
+        'End Timestamp of Turn': timestampMilisToTime(line.endTimestampOfTurn),
+        'Start TimeLabel': timestampMilisToTime(label.startTimestampMillis),
+        'End TimeLabel': timestampMilisToTime(label.endTimestampMillis),
         'Labeled Phrases': getLabeledPhrases(label, line.tokens),
         'Speaker Channel': line.speaker,
-        Labeler: String(label.labeledByUserId),
-        Reviewer: getReviewer(label),
+        Labeler: getUserEmail(temMembersMap, label.labeledByUserId),
+        Reviewer: getReviewer(label, temMembersMap),
         Status: label.status,
         'Date of Labeling': label.createdAt,
         'Date of Reviewing': label.updatedAt,
@@ -276,14 +282,22 @@ function linesMapToAnnotatedDataRows(
   return annotatedDataRows;
 }
 
-function getReviewer(label: SpanLabel): string {
+function timestampMilisToTime(timestampMilis?: number): string {
+  return timestampMilis ? new Date(timestampMilis).toISOString().slice(11, -1) : 'NA';
+}
+
+function getReviewer(label: SpanLabel, temMembersMap: {}): string {
   if (label.acceptedByUserId) {
-    return String(label.acceptedByUserId);
+    return getUserEmail(temMembersMap, label.acceptedByUserId);
   } else if (label.rejectedByUserId) {
-    return String(label.rejectedByUserId);
+    return getUserEmail(temMembersMap, label.rejectedByUserId);
   } else {
     return 'Consensus';
   }
+}
+
+function getUserEmail(temMembersMap: {}, userId?: number): string {
+  return userId && temMembersMap[String(userId)] ? temMembersMap[String(userId)].user?.email : '';
 }
 
 function getLabeledPhrases(label: SpanLabel, tokens: string[]) {
@@ -303,7 +317,7 @@ function getPositionHashCode(hashCode: string): string {
 export async function handleExportAnnotatedData(configFile: string) {
   setConfigByJSONFile(configFile, getExportAnnotatedDataValidators(), ScriptAction.EXPORT_ANNOTATED_DATA);
 
-  getLogger().info('executing stateless export using filter from config');
+  getLogger().info('executing export annotated data using filter from config');
   return handleStateless();
 }
 

@@ -7,6 +7,7 @@ const TEAM_MEMBER_QUERY = gql`
       nodes {
         id
         user {
+          id
           email
         }
         invitationStatus
@@ -25,6 +26,7 @@ const TEAM_MEMBER_QUERY = gql`
 export interface TeamMember {
   id: string | number;
   user: {
+    id: string;
     email: string;
   } | null;
   invitationStatus: string;
