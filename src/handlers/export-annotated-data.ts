@@ -12,6 +12,7 @@ import {
   JSONAdvancedFormat,
   LabelEntityType,
   LabelItem,
+  LabelStatus,
   SpanLabel,
 } from '../datasaur/interfaces';
 import { getLogger } from '../logger';
@@ -204,7 +205,6 @@ function getAnnotatedDataRows(
   }
 
   const linesMap = new Map<number, Line>();
-
   const labelSetsMap = new Map<number, { [id: number]: LabelItem }>();
 
   for (const labelSet of jsonAdvanced.labelSets) {
@@ -235,7 +235,7 @@ function getAnnotatedDataRows(
         }
       }
 
-      const positionHashCode = getPositionHashCode(spanLabel.hashCode);
+      const positionHashCode = getPositionHashCode(spanLabel);
       const label = line.labelsMap.get(positionHashCode);
       if (label) {
         if (spanLabel.type == LabelEntityType.SPAN) {
@@ -253,6 +253,7 @@ function getAnnotatedDataRows(
       } else {
         line.labelsMap.set(positionHashCode, spanLabel);
       }
+      linesMap.set(spanLabel.startCellLine, line);
     }
   }
 
@@ -300,27 +301,33 @@ function linesMapToAnnotatedDataRows(
     for (const key of line.labelsMap.keys()) {
       const label = line.labelsMap.get(key)!;
 
-      const annotatedDataRow: AnnotatedDataRow = {
-        Project: projectName,
-        'Audio File ID': filename,
-        'Label Category': getLabelCategory(cabinetLabelSetsMapByIndex, label.layer),
-        'Label Name': getLabelName(labelSetsMap, label),
-        'Turn ID': String(label.startCellLine + 1),
-        'Start Timestamp of Turn': timestampMilisToTime(line.startTimestampOfTurn),
-        'End Timestamp of Turn': timestampMilisToTime(line.endTimestampOfTurn),
-        'Start TimeLabel': timestampMilisToTime(label.startTimestampMillis),
-        'End TimeLabel': timestampMilisToTime(label.endTimestampMillis),
-        'Labeled Phrases': getLabeledPhrases(label, line.tokens),
-        'Speaker Channel': line.speaker,
-        Labeler: getUserEmail(teamMembersMap, label.labeledByUserId),
-        Reviewer: getReviewer(label, teamMembersMap),
-        Status: label.status,
-        'Date of Labeling': label.createdAt,
-        'Date of Reviewing': label.updatedAt,
-        'Date of Assignment': '',
-      };
+      if (
+        label.labelSetItemId &&
+        label.endTimestampMillis &&
+        (label.status === LabelStatus.ACCEPTED || label.status === LabelStatus.REJECTED)
+      ) {
+        const annotatedDataRow: AnnotatedDataRow = {
+          Project: projectName,
+          'Audio File ID': filename,
+          'Label Category': getLabelCategory(cabinetLabelSetsMapByIndex, label.layer),
+          'Label Name': getLabelName(labelSetsMap, label),
+          'Turn ID': String(label.startCellLine + 1),
+          'Start Timestamp of Turn': timestampMilisToTime(line.startTimestampOfTurn),
+          'End Timestamp of Turn': timestampMilisToTime(line.endTimestampOfTurn),
+          'Start TimeLabel': timestampMilisToTime(label.startTimestampMillis),
+          'End TimeLabel': timestampMilisToTime(label.endTimestampMillis),
+          'Labeled Phrases': getLabeledPhrases(label, line.tokens),
+          'Speaker Channel': line.speaker,
+          Labeler: getUserEmail(teamMembersMap, label.labeledByUserId),
+          Reviewer: getReviewer(label, teamMembersMap),
+          Status: label.status,
+          'Date of Labeling': label.createdAt,
+          'Date of Reviewing': label.updatedAt,
+          'Date of Assignment': '',
+        };
 
-      annotatedDataRows.push(annotatedDataRow);
+        annotatedDataRows.push(annotatedDataRow);
+      }
     }
   }
 
@@ -379,8 +386,15 @@ function getLabeledPhrases(label: SpanLabel, tokens: string[]) {
   return labeledPhrases.join(' ');
 }
 
-function getPositionHashCode(hashCode: string): string {
-  return hashCode.split(':').slice(2, -2).join(':');
+function getPositionHashCode(label: SpanLabel): string {
+  return [
+    label.startCellLine,
+    label.startTokenIndex,
+    label.startCharIndex,
+    label.endCellLine,
+    label.endTokenIndex,
+    label.endCharIndex,
+  ].join(':');
 }
 
 export async function handleExportAnnotatedData(configFile: string) {
