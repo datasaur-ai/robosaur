@@ -13,6 +13,7 @@ import {
   LabelEntityType,
   LabelItem,
   LabelStatus,
+  ProjectAssignment,
   SpanLabel,
 } from '../datasaur/interfaces';
 import { getLogger } from '../logger';
@@ -58,6 +59,13 @@ interface Line {
   endTimestampOfTurn?: number;
 }
 
+export async function handleExportAnnotatedData(configFile: string) {
+  setConfigByJSONFile(configFile, getExportAnnotatedDataValidators(), ScriptAction.EXPORT_ANNOTATED_DATA);
+
+  getLogger().info('executing export annotated data using filter from config');
+  return handleStateless();
+}
+
 const handleStateless = async () => {
   const exportFormat = ExportFormat.JSON_ADVANCED;
   const { statusFilter, teamId, source, projectFilter } = getConfig().exportAnnotatedData;
@@ -92,6 +100,7 @@ const handleStateless = async () => {
       : [];
     const cabinetLabelSetsMapByIndex: { [id: number]: CabinetLabelSet } = keyBy(labelSets, 'index');
     getLogger().info(cabinetLabelSetsMapByIndex);
+    const projectAssignmentMap = getProjectAssignmentMap(project.assignees);
 
     const filename = `${project.name}_${project.id}`;
     const result: {
@@ -134,6 +143,7 @@ const handleStateless = async () => {
         project.name,
         teamMembersMap,
         cabinetLabelSetsMapByIndex,
+        projectAssignmentMap,
       );
       await publishAnnotatedDataFile(filename, annotatedDataCsv);
       result.jobStatus = 'PUBLISHED';
@@ -163,6 +173,7 @@ async function getAnnotatedData(
   projectName: string,
   teamMembersMap: { [id: string]: TeamMember },
   cabinetLabelSetsMapByIndex: { [id: number]: CabinetLabelSet },
+  projectAssignmentMap: { [id: number]: ProjectAssignment },
 ): Promise<string> {
   const zipStream = await downloadFromPreSignedUrl(url);
   const zip = new Zip(await streamToBuffer(zipStream.data));
@@ -179,6 +190,7 @@ async function getAnnotatedData(
           filename,
           teamMembersMap,
           cabinetLabelSetsMapByIndex,
+          projectAssignmentMap,
         );
         annotatedDataRows = annotatedDataRows.concat(rows);
       }
@@ -194,6 +206,7 @@ function getAnnotatedDataRows(
   filename: string,
   teamMembersMap: { [id: string]: TeamMember },
   cabinetLabelSetsMapByIndex: { [id: number]: CabinetLabelSet },
+  projectAssignmentMap: { [id: number]: ProjectAssignment },
 ): AnnotatedDataRow[] {
   if (
     !jsonAdvanced.labels ||
@@ -265,6 +278,7 @@ function getAnnotatedDataRows(
     teamMembersMap,
     labelSetsMap,
     cabinetLabelSetsMapByIndex,
+    projectAssignmentMap,
   );
 }
 
@@ -294,6 +308,7 @@ function linesMapToAnnotatedDataRows(
   teamMembersMap: { [id: string]: TeamMember },
   labelSetsMap: Map<number, { [id: number]: LabelItem }>,
   cabinetLabelSetsMapByIndex: { [id: number]: CabinetLabelSet },
+  projectAssignmentMap: { [id: number]: ProjectAssignment },
 ): AnnotatedDataRow[] {
   const annotatedDataRows: AnnotatedDataRow[] = [];
 
@@ -324,7 +339,7 @@ function linesMapToAnnotatedDataRows(
           Status: label.status,
           'Date of Labeling': label.createdAt,
           'Date of Reviewing': label.updatedAt,
-          'Date of Assignment': '',
+          'Date of Assignment': getDateOfAssignment(projectAssignmentMap, label.labeledByUserId),
         };
 
         annotatedDataRows.push(annotatedDataRow);
@@ -333,6 +348,10 @@ function linesMapToAnnotatedDataRows(
   }
 
   return annotatedDataRows;
+}
+
+function getProjectAssignmentMap(assignments?: ProjectAssignment[]): { [id: number]: ProjectAssignment } {
+  return keyBy(assignments, (assignment: ProjectAssignment) => assignment.teamMember?.user?.id);
 }
 
 function getLabelCategory(cabinetLabelSetsMapByIndex: { [id: number]: CabinetLabelSet }, index: number): string {
@@ -349,6 +368,14 @@ function getLabelName(labelSetsMap: Map<number, { [id: number]: LabelItem }>, la
     }
   }
 
+  return '';
+}
+
+function getDateOfAssignment(projectAssignmentMap: { [id: number]: ProjectAssignment }, userId?: number): string {
+  const assignment: ProjectAssignment | undefined = projectAssignmentMap[String(userId)];
+  if (assignment) {
+    return assignment.createdAt;
+  }
   return '';
 }
 
@@ -396,13 +423,6 @@ function getPositionHashCode(label: SpanLabel): string {
     label.endTokenIndex,
     label.endCharIndex,
   ].join(':');
-}
-
-export async function handleExportAnnotatedData(configFile: string) {
-  setConfigByJSONFile(configFile, getExportAnnotatedDataValidators(), ScriptAction.EXPORT_ANNOTATED_DATA);
-
-  getLogger().info('executing export annotated data using filter from config');
-  return handleStateless();
 }
 
 async function getTagIds(teamId: string, tagsName: string[]) {

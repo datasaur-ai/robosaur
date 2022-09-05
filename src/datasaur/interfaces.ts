@@ -1,9 +1,17 @@
+import { TeamMember } from './get-team-members';
+
 export interface Project {
   id: string;
   name: string;
   tags: Tag[];
   status: ProjectStatus;
   reviewCabinet?: Cabinet;
+  assignees?: ProjectAssignment[];
+}
+
+export interface ProjectAssignment {
+  teamMember: TeamMember;
+  createdAt: string;
 }
 
 export interface Cabinet {
