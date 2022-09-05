@@ -21,7 +21,7 @@ import { ScriptAction } from './constants';
 import Zip from 'adm-zip';
 import { readFile } from 'fs/promises';
 import * as Papa from 'papaparse';
-import { publishAnnotatedDataFile } from '../utils/publish/publishAnnotatedDataFile';
+import { publishFile } from '../utils/publish/publishFile';
 import path from 'path';
 import { getTeamMembers, TeamMember } from '../datasaur/get-team-members';
 import { keyBy } from 'lodash';
@@ -121,8 +121,9 @@ const handleStateless = async () => {
     // result.jobStatus = jobResult?.status;
 
     try {
+      const options = getConfig().exportAnnotatedData;
       const annotatedDataCsv = await getAnnotatedData(project.name, temMembersMap);
-      await publishAnnotatedDataFile(filename, annotatedDataCsv);
+      await publishFile(filename, annotatedDataCsv, options);
       result.jobStatus = 'PUBLISHED';
     } catch (error) {
       getLogger().error(`fail to publish exported project to ${source}`, {

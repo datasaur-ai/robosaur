@@ -1,0 +1,12 @@
+{
+  "datasaur": {
+    "host": "https://app.datasaur.ai",
+    "clientId": "<YOUR CLIENT ID>",
+    "clientSecret": "<YOUR CLIENT SECRET>"
+  },
+  "exportTranscription" : {
+    "source": "local",
+    "prefix": "quickstart/transcription/export",
+    "teamId" : "<TEAM ID>"
+  }
+}
