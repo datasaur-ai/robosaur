@@ -5,26 +5,29 @@ import { JobStatus } from '../datasaur/get-jobs';
 import { getProjects } from '../datasaur/get-projects';
 import { getTeamTags } from '../datasaur/get-team-tags';
 import {
+  CabinetLabelSet,
   CellMetadata,
   ExportFormat,
   ExportResult,
   JSONAdvancedFormat,
   LabelEntityType,
+  LabelItem,
+  LabelStatus,
+  ProjectAssignment,
   SpanLabel,
 } from '../datasaur/interfaces';
 import { getLogger } from '../logger';
 import { pollJobsUntilCompleted } from '../utils/polling.helper';
 import { downloadFromPreSignedUrl } from '../utils/publish/helper';
-import { publishZipFile } from '../utils/publish/publishZipFile';
 import { streamToBuffer } from '../utils/stream/streamToBuffer';
 import { ScriptAction } from './constants';
 import Zip from 'adm-zip';
-import { readFile } from 'fs/promises';
 import * as Papa from 'papaparse';
 import { publishFile } from '../utils/publish/publishFile';
 import path from 'path';
 import { getTeamMembers, TeamMember } from '../datasaur/get-team-members';
 import { keyBy } from 'lodash';
+import { getCabinetLabelSetsById } from '../datasaur/get-cabinet-label-sets';
 
 interface AnnotatedDataRow {
   Project: string;
@@ -56,12 +59,19 @@ interface Line {
   endTimestampOfTurn?: number;
 }
 
+export async function handleExportAnnotatedData(configFile: string) {
+  setConfigByJSONFile(configFile, getExportAnnotatedDataValidators(), ScriptAction.EXPORT_ANNOTATED_DATA);
+
+  getLogger().info('executing export annotated data using filter from config');
+  return handleStateless();
+}
+
 const handleStateless = async () => {
   const exportFormat = ExportFormat.JSON_ADVANCED;
   const { statusFilter, teamId, source, projectFilter } = getConfig().exportAnnotatedData;
   const filterTagIds = projectFilter && projectFilter.tags ? await getTagIds(teamId, projectFilter.tags) : undefined;
   const teamMembers = await getTeamMembers(getActiveTeamId());
-  const temMembersMap = keyBy(teamMembers, (member: TeamMember) => member.user?.id);
+  const teamMembersMap = keyBy(teamMembers, (member: TeamMember) => member.user?.id);
 
   const filter = {
     statuses: statusFilter,
@@ -85,6 +95,13 @@ const handleStateless = async () => {
 
   const results: Array<{ projectName: string; exportId: string; jobStatus: JobStatus | 'PUBLISHED' }> = [];
   for (const project of projectToExports) {
+    const labelSets: CabinetLabelSet[] = project.reviewCabinet
+      ? await getCabinetLabelSetsById(project.reviewCabinet?.id)
+      : [];
+    const cabinetLabelSetsMapByIndex: { [id: number]: CabinetLabelSet } = keyBy(labelSets, 'index');
+    getLogger().info(cabinetLabelSetsMapByIndex);
+    const projectAssignmentMap = getProjectAssignmentMap(project.assignees);
+
     const filename = `${project.name}_${project.id}`;
     const result: {
       projectName: string;
@@ -104,25 +121,31 @@ const handleStateless = async () => {
       },
     });
     let retval: ExportResult | null = null;
-    // try {
-    //   retval = await exportProject(project.id, filename, exportFormat);
-    // } catch (error) {
-    //   retval = {
-    //     exportId: 'dummyexport',
-    //     fileUrl: 'dummyfile',
-    //   } as ExportResult;
-    //   getLogger().error(`fail in exportProject query`, { error: JSON.stringify(error), message: error.message });
-    // }
-    // result.exportId = retval.exportId;
-    // result.jobStatus = retval.queued ? JobStatus.QUEUED : JobStatus.IN_PROGRESS;
+    try {
+      retval = await exportProject(project.id, filename, exportFormat);
+    } catch (error) {
+      retval = {
+        exportId: 'dummyexport',
+        fileUrl: 'dummyfile',
+      } as ExportResult;
+      getLogger().error(`fail in exportProject query`, { error: JSON.stringify(error), message: error.message });
+    }
+    result.exportId = retval.exportId;
+    result.jobStatus = retval.queued ? JobStatus.QUEUED : JobStatus.IN_PROGRESS;
 
-    // const jobResult = (await pollJobsUntilCompleted([retval.exportId]))[0];
-    // getLogger().info(`export job finished`, { ...jobResult });
-    // result.jobStatus = jobResult?.status;
+    const jobResult = (await pollJobsUntilCompleted([retval.exportId]))[0];
+    getLogger().info(`export job finished`, { ...jobResult });
+    result.jobStatus = jobResult?.status;
 
     try {
       const options = getConfig().exportAnnotatedData;
-      const annotatedDataCsv = await getAnnotatedData(project.name, temMembersMap);
+      const annotatedDataCsv = await getAnnotatedData(
+        retval.fileUrl,
+        project.name,
+        teamMembersMap,
+        cabinetLabelSetsMapByIndex,
+        projectAssignmentMap,
+      );
       await publishFile(filename, annotatedDataCsv, options);
       result.jobStatus = 'PUBLISHED';
     } catch (error) {
@@ -146,9 +169,15 @@ const handleStateless = async () => {
   getLogger().info('exiting script...');
 };
 
-async function getAnnotatedData(projectName: string, temMembersMap: {}): Promise<string> {
-  const zipFile = await readFile('quickstart/annotated-data/export/_Uniphore_ Datasaur Dataset_FRYWjo0dORv.zip');
-  const zip = new Zip(zipFile);
+async function getAnnotatedData(
+  url: string,
+  projectName: string,
+  teamMembersMap: { [id: string]: TeamMember },
+  cabinetLabelSetsMapByIndex: { [id: number]: CabinetLabelSet },
+  projectAssignmentMap: { [id: number]: ProjectAssignment },
+): Promise<string> {
+  const zipStream = await downloadFromPreSignedUrl(url);
+  const zip = new Zip(await streamToBuffer(zipStream.data));
   let annotatedDataRows: AnnotatedDataRow[] = [];
 
   for (const entry of zip.getEntries()) {
@@ -156,7 +185,14 @@ async function getAnnotatedData(projectName: string, temMembersMap: {}): Promise
       if (entry.entryName.includes('/DOCUMENT-')) {
         const filename = path.parse(entry.entryName).name;
         const jsonAdvanced: JSONAdvancedFormat = JSON.parse(zip.readAsText(entry));
-        const rows = getAnnotatedDataRows(jsonAdvanced, projectName, filename, temMembersMap);
+        const rows = getAnnotatedDataRows(
+          jsonAdvanced,
+          projectName,
+          filename,
+          teamMembersMap,
+          cabinetLabelSetsMapByIndex,
+          projectAssignmentMap,
+        );
         annotatedDataRows = annotatedDataRows.concat(rows);
       }
     }
@@ -169,13 +205,26 @@ function getAnnotatedDataRows(
   jsonAdvanced: JSONAdvancedFormat,
   projectName: string,
   filename: string,
-  temMembersMap: {},
+  teamMembersMap: { [id: string]: TeamMember },
+  cabinetLabelSetsMapByIndex: { [id: number]: CabinetLabelSet },
+  projectAssignmentMap: { [id: number]: ProjectAssignment },
 ): AnnotatedDataRow[] {
-  if (!jsonAdvanced.labels || jsonAdvanced.labels.length == 0) {
+  if (
+    !jsonAdvanced.labels ||
+    jsonAdvanced.labels.length == 0 ||
+    !jsonAdvanced.labelSets ||
+    jsonAdvanced.labelSets.length == 0
+  ) {
     return [];
   }
 
   const linesMap = new Map<number, Line>();
+  const labelSetsMap = new Map<number, { [id: number]: LabelItem }>();
+
+  for (const labelSet of jsonAdvanced.labelSets) {
+    const labelItemMap = keyBy(labelSet.labelItems, 'id');
+    labelSetsMap.set(labelSet.index, labelItemMap);
+  }
 
   for (const sentence of jsonAdvanced.sentences) {
     const line = {
@@ -200,10 +249,11 @@ function getAnnotatedDataRows(
         }
       }
 
-      const positionHashCode = getPositionHashCode(spanLabel.hashCode);
+      const positionHashCode = getPositionHashCode(spanLabel);
       const label = line.labelsMap.get(positionHashCode);
       if (label) {
         if (spanLabel.type == LabelEntityType.SPAN) {
+          label.layer = spanLabel.layer;
           label.labelSetItemId = spanLabel.labelSetItemId;
           label.acceptedByUserId = spanLabel.acceptedByUserId;
           label.rejectedByUserId = spanLabel.rejectedByUserId;
@@ -218,10 +268,19 @@ function getAnnotatedDataRows(
       } else {
         line.labelsMap.set(positionHashCode, spanLabel);
       }
+      linesMap.set(spanLabel.startCellLine, line);
     }
   }
 
-  return linesMapToAnnotatedDataRows(linesMap, projectName, filename, temMembersMap);
+  return linesMapToAnnotatedDataRows(
+    linesMap,
+    projectName,
+    filename,
+    teamMembersMap,
+    labelSetsMap,
+    cabinetLabelSetsMapByIndex,
+    projectAssignmentMap,
+  );
 }
 
 function isStartTimestampofTurn(label: SpanLabel): boolean {
@@ -247,7 +306,10 @@ function linesMapToAnnotatedDataRows(
   linesMap: Map<number, Line>,
   projectName: string,
   filename: string,
-  temMembersMap: {},
+  teamMembersMap: { [id: string]: TeamMember },
+  labelSetsMap: Map<number, { [id: number]: LabelItem }>,
+  cabinetLabelSetsMapByIndex: { [id: number]: CabinetLabelSet },
+  projectAssignmentMap: { [id: number]: ProjectAssignment },
 ): AnnotatedDataRow[] {
   const annotatedDataRows: AnnotatedDataRow[] = [];
 
@@ -256,49 +318,91 @@ function linesMapToAnnotatedDataRows(
     for (const key of line.labelsMap.keys()) {
       const label = line.labelsMap.get(key)!;
 
-      const annotatedDataRow: AnnotatedDataRow = {
-        Project: projectName,
-        'Audio File ID': filename,
-        'Label Category': '',
-        'Label Name': '',
-        'Turn ID': String(label.startCellLine + 1),
-        'Start Timestamp of Turn': timestampMilisToTime(line.startTimestampOfTurn),
-        'End Timestamp of Turn': timestampMilisToTime(line.endTimestampOfTurn),
-        'Start TimeLabel': timestampMilisToTime(label.startTimestampMillis),
-        'End TimeLabel': timestampMilisToTime(label.endTimestampMillis),
-        'Labeled Phrases': getLabeledPhrases(label, line.tokens),
-        'Speaker Channel': line.speaker,
-        Labeler: getUserEmail(temMembersMap, label.labeledByUserId),
-        Reviewer: getReviewer(label, temMembersMap),
-        Status: label.status,
-        'Date of Labeling': label.createdAt,
-        'Date of Reviewing': label.updatedAt,
-        'Date of Assignment': '',
-      };
+      if (
+        label.labelSetItemId &&
+        label.endTimestampMillis &&
+        (label.status === LabelStatus.ACCEPTED || label.status === LabelStatus.REJECTED)
+      ) {
+        const annotatedDataRow: AnnotatedDataRow = {
+          Project: projectName,
+          'Audio File ID': filename,
+          'Label Category': getLabelCategory(cabinetLabelSetsMapByIndex, label.layer),
+          'Label Name': getLabelName(labelSetsMap, label),
+          'Turn ID': String(label.startCellLine + 1),
+          'Start Timestamp of Turn': timestampMilisToTime(line.startTimestampOfTurn),
+          'End Timestamp of Turn': timestampMilisToTime(line.endTimestampOfTurn),
+          'Start TimeLabel': timestampMilisToTime(label.startTimestampMillis),
+          'End TimeLabel': timestampMilisToTime(label.endTimestampMillis),
+          'Labeled Phrases': getLabeledPhrases(label, line.tokens),
+          'Speaker Channel': line.speaker,
+          Labeler: getUserEmail(teamMembersMap, label.labeledByUserId),
+          Reviewer: getReviewer(label, teamMembersMap),
+          Status: label.status,
+          'Date of Labeling': label.createdAt,
+          'Date of Reviewing': label.updatedAt,
+          'Date of Assignment': getDateOfAssignment(projectAssignmentMap, label.labeledByUserId),
+        };
 
-      annotatedDataRows.push(annotatedDataRow);
+        annotatedDataRows.push(annotatedDataRow);
+      }
     }
   }
 
   return annotatedDataRows;
 }
 
+function getProjectAssignmentMap(assignments?: ProjectAssignment[]): { [id: number]: ProjectAssignment } {
+  return keyBy(assignments, (assignment: ProjectAssignment) => assignment.teamMember?.user?.id);
+}
+
+function getLabelCategory(cabinetLabelSetsMapByIndex: { [id: number]: CabinetLabelSet }, index: number): string {
+  return cabinetLabelSetsMapByIndex[index] ? cabinetLabelSetsMapByIndex[index].name : '';
+}
+
+function getLabelName(labelSetsMap: Map<number, { [id: number]: LabelItem }>, label: SpanLabel): string {
+  const labelSet = labelSetsMap.get(label.layer);
+
+  if (labelSet) {
+    const labelSetItem = labelSet[label.labelSetItemId];
+    if (labelSetItem) {
+      return labelSetItem.labelName;
+    }
+  }
+
+  return '';
+}
+
+function getDateOfAssignment(projectAssignmentMap: { [id: number]: ProjectAssignment }, userId?: number): string {
+  const assignment: ProjectAssignment | undefined = projectAssignmentMap[String(userId)];
+  if (assignment) {
+    return assignment.createdAt;
+  }
+  return '';
+}
+
 function timestampMilisToTime(timestampMilis?: number): string {
   return timestampMilis ? new Date(timestampMilis).toISOString().slice(11, -1) : 'NA';
 }
 
-function getReviewer(label: SpanLabel, temMembersMap: {}): string {
+function getReviewer(label: SpanLabel, teamMembersMap: { [id: string]: TeamMember }): string {
   if (label.acceptedByUserId) {
-    return getUserEmail(temMembersMap, label.acceptedByUserId);
+    return getUserEmail(teamMembersMap, label.acceptedByUserId);
   } else if (label.rejectedByUserId) {
-    return getUserEmail(temMembersMap, label.rejectedByUserId);
+    return getUserEmail(teamMembersMap, label.rejectedByUserId);
   } else {
     return 'Consensus';
   }
 }
 
-function getUserEmail(temMembersMap: {}, userId?: number): string {
-  return userId && temMembersMap[String(userId)] ? temMembersMap[String(userId)].user?.email : '';
+function getUserEmail(teamMembersMap: { [id: string]: TeamMember }, userId?: number): string {
+  if (userId) {
+    const teamMember = teamMembersMap[String(userId)];
+    if (teamMember) {
+      return teamMember.user ? teamMember.user.email : '';
+    }
+  }
+
+  return '';
 }
 
 function getLabeledPhrases(label: SpanLabel, tokens: string[]) {
@@ -311,15 +415,15 @@ function getLabeledPhrases(label: SpanLabel, tokens: string[]) {
   return labeledPhrases.join(' ');
 }
 
-function getPositionHashCode(hashCode: string): string {
-  return hashCode.split(':').slice(2, -2).join(':');
-}
-
-export async function handleExportAnnotatedData(configFile: string) {
-  setConfigByJSONFile(configFile, getExportAnnotatedDataValidators(), ScriptAction.EXPORT_ANNOTATED_DATA);
-
-  getLogger().info('executing export annotated data using filter from config');
-  return handleStateless();
+function getPositionHashCode(label: SpanLabel): string {
+  return [
+    label.startCellLine,
+    label.startTokenIndex,
+    label.startCharIndex,
+    label.endCellLine,
+    label.endTokenIndex,
+    label.endCharIndex,
+  ].join(':');
 }
 
 async function getTagIds(teamId: string, tagsName: string[]) {

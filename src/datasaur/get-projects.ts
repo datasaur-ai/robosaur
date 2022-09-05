@@ -12,6 +12,18 @@ const GET_PROJECTS_QUERY = gql`
           id
           name
         }
+        reviewCabinet {
+          id
+        }
+        assignees {
+          teamMember {
+            id
+            user {
+              id
+            }
+          }
+          createdAt
+        }
         __typename
         status
       }
