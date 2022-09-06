@@ -7,8 +7,8 @@ import { normalizeFolderName, safeDirectoryName } from '../object-storage/helper
 import { IMPLEMENTED_EXPORT_STORAGE_SOURCES } from './constants';
 import { saveFileToLocalFileSystem } from './helper';
 
-export async function publishFile<T extends WithStorageExternalSupport>(filename: string, content: string, options: T) {
-  const { source, prefix, bucketName }: T = options;
+export async function publishFile<T extends WithStorageExternalSupport>(filename: string, content: string, config: T) {
+  const { source, prefix, bucketName }: T = config;
   switch (source) {
     case StorageSources.LOCAL:
       getLogger().info(`publishing extracted files to ${source}...`, { data: { source, prefix } });
