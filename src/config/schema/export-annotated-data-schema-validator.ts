@@ -11,6 +11,7 @@ const ExportAnnotatedDataSchema: JSONSchemaType<ExportAnnotatedDataConfig> = {
     source: { type: 'string' },
     bucketName: { type: 'string' },
     prefix: { type: 'string' },
+    exportedTag: { type: 'string', nullable: true },
     projectFilter: {
       type: 'object',
       nullable: true,
