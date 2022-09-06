@@ -1,15 +1,14 @@
 import { mkdirSync } from 'fs';
 import { resolve } from 'path';
-import { getConfig } from '../../config/config';
-import { StorageSources } from '../../config/interfaces';
+import { StorageSources, WithStorageExternalSupport } from '../../config/interfaces';
 import { getLogger } from '../../logger';
 import { getStorageClient } from '../object-storage';
 import { normalizeFolderName, safeDirectoryName } from '../object-storage/helper';
 import { IMPLEMENTED_EXPORT_STORAGE_SOURCES } from './constants';
 import { saveFileToLocalFileSystem } from './helper';
 
-export async function publishAnnotatedDataFile(filename: string, content: string) {
-  const { source, prefix, bucketName } = getConfig().exportAnnotatedData;
+export async function publishFile<T extends WithStorageExternalSupport>(filename: string, content: string, config: T) {
+  const { source, prefix, bucketName }: T = config;
   switch (source) {
     case StorageSources.LOCAL:
       getLogger().info(`publishing extracted files to ${source}...`, { data: { source, prefix } });

@@ -1,10 +1,12 @@
 import { Command, InvalidOptionArgumentError } from 'commander';
 import packageJson from '../package.json';
 import { handleApplyTags } from './handlers/apply-tags.handler';
+import { handleCombineCsv } from './handlers/combine-csv';
 import { handleCreateProject } from './handlers/create-project.handler';
 import { handleCreateProjects } from './handlers/create-projects.handler';
 import { handleExportAnnotatedData } from './handlers/export-annotated-data';
 import { handleExportProjects } from './handlers/export-projects.handler';
+import { handleExportTranscription } from './handlers/export-transcription';
 import { handleSplitDocument } from './handlers/split-document.handler';
 import { getLogger } from './logger';
 
@@ -35,6 +37,21 @@ program
   .command(`export-annotated-data <configFile>`)
   .description('Export Annotated Data')
   .action(handleExportAnnotatedData);
+
+program
+  .command(`export-transcription <configFile>`)
+  .description('Export Transcription')
+  .action(handleExportTranscription);
+
+program
+  .command(`combine-csv`)
+  .arguments('<inputPath> <ouputPath>')
+  .description('Combine all CSV files from input directory into a single file', {
+    inputPath: 'The path of the input directory',
+    ouputPath: 'The path of the output file',
+  })
+  .option('-n, --no-headers', 'If this option in enabled, the program will assume all files have no headers')
+  .action(handleCombineCsv);
 
 program
   .command(`split-document <configFile>`)

@@ -6,6 +6,7 @@ import { credentialsSchemaValidator } from './credential-schema-validator';
 import { documentsSchemaValidator } from './documents-schema-validator';
 import { exportAnnotatedDataSchemaValidator } from './export-annotated-data-schema-validator';
 import { exportSchemaValidator } from './export-schema-validator';
+import { exportTranscriptionSchemaValidator } from './export-transcription-schema-validator';
 import { splitDocumentSchemaValidator } from './split-document-schema-validator';
 
 export function getProjectCreationValidators() {
@@ -18,6 +19,14 @@ export function getProjectExportValidators() {
 
 export function getExportAnnotatedDataValidators() {
   return [validateConfigCredentials, validateConfigExportAnnotatedData];
+}
+
+export function getExportTranscriptionValidators() {
+  return [validateConfigCredentials, validateConfigExportTranscription];
+}
+
+export function getCombineCsvValidators() {
+  return [];
 }
 
 export function getApplyTagValidators() {
@@ -66,6 +75,19 @@ function validateConfigExportAnnotatedData(config: Config) {
     throw new Error(
       `config.exportAnnotatedData has some errors ${JSON.stringify({
         errors: exportAnnotatedDataSchemaValidator.errors,
+      })}`,
+    );
+  }
+}
+
+function validateConfigExportTranscription(config: Config) {
+  if (!exportTranscriptionSchemaValidator(config.exportTranscription)) {
+    getLogger().error(`config.exportTranscription has some errors`, {
+      errors: exportTranscriptionSchemaValidator.errors,
+    });
+    throw new Error(
+      `config.exportTranscription has some errors ${JSON.stringify({
+        errors: exportTranscriptionSchemaValidator.errors,
       })}`,
     );
   }
