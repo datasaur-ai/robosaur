@@ -10,6 +10,7 @@ import { getLogger } from '../logger';
 import { ScriptAction } from './constants';
 import * as Papa from 'papaparse';
 import { publishFile } from '../utils/publish/publishFile';
+import { applyExportedTag, getExportedTagId, getProjectsToExport, getTagIds } from './helpers';
 
 export interface ResultRow {
   'Audio Call Id': string;
@@ -46,19 +47,27 @@ async function getAllCellsFromDocuments(documentIds: string[]) {
 
 async function handleStateless() {
   const config = getConfig().exportTranscription;
-  const { teamId, projectId } = config;
+  const { teamId, projectId, exportedTag, projectFilter, statusFilter } = config;
+  const filterTagIds = projectFilter && projectFilter.tags ? await getTagIds(teamId, projectFilter.tags) : undefined;
   const filter = {
+    statuses: statusFilter,
     teamId,
-    labelerTeamMemberIds: [],
-    reviewerTeamMemberIds: [],
-    statuses: [],
-    tags: [],
     kinds: [TextDocumentKind.TokenBased],
-    isArchived: false,
+    daysCreatedRange: projectFilter?.date
+      ? {
+          newestDate: projectFilter.date.newestDate,
+          oldestDate: projectFilter.date?.oldestDate,
+        }
+      : undefined,
+    tags: filterTagIds,
+    keyword: projectFilter?.keyword,
   };
+  const exportedTagId = await getExportedTagId(teamId, exportedTag);
 
   getLogger().info('retrieving projects with filters', { filter });
-  const projects = projectId ? [await getProject(projectId)] : await getProjects(filter);
+  const projects = projectId
+    ? [await getProject(projectId)]
+    : getProjectsToExport(await getProjects(filter), exportedTagId);
 
   getLogger().info('retrieving all cabinets');
   const allCabinetsByProjectId = await getAllReviewerCabinets(projects);
@@ -105,6 +114,10 @@ async function handleStateless() {
     if (!firstData) continue;
     const csvData = Papa.unparse(resultRow);
     await publishFile(firstData['Audio Call Id'], csvData, config);
+  }
+
+  for (const project of projects) {
+    await applyExportedTag(project, exportedTagId);
   }
 }
 

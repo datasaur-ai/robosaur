@@ -11,6 +11,17 @@ const ExportTranscriptionSchema: JSONSchemaType<ExportTranscriptionConfig> = {
     prefix: { type: 'string' },
     teamId: { type: 'string' },
     projectId: { nullable: true, type: 'string' },
+    exportedTag: { type: 'string', nullable: true },
+    statusFilter: { type: 'array', items: { type: 'string' } },
+    projectFilter: {
+      type: 'object',
+      nullable: true,
+      properties: {
+        date: { type: 'object', nullable: true, required: ['newestDate'] },
+        tags: { type: 'array', nullable: true, items: { type: 'string' } },
+        keyword: { type: 'string', nullable: true },
+      },
+    },
   },
 
   required: ['teamId'],

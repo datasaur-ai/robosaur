@@ -1,9 +1,14 @@
+import Zip from 'adm-zip';
+import { keyBy } from 'lodash';
+import * as Papa from 'papaparse';
+import path from 'path';
 import { getActiveTeamId, getConfig, setConfigByJSONFile } from '../config/config';
 import { getExportAnnotatedDataValidators } from '../config/schema/validator';
 import { exportProject } from '../datasaur/export-project';
+import { getCabinetLabelSetsById } from '../datasaur/get-cabinet-label-sets';
 import { JobStatus } from '../datasaur/get-jobs';
 import { getProjects } from '../datasaur/get-projects';
-import { getTeamTags } from '../datasaur/get-team-tags';
+import { getTeamMembers, TeamMember } from '../datasaur/get-team-members';
 import {
   CabinetLabelSet,
   CellMetadata,
@@ -13,24 +18,16 @@ import {
   LabelEntityType,
   LabelItem,
   LabelStatus,
-  Project,
   ProjectAssignment,
   SpanLabel,
 } from '../datasaur/interfaces';
 import { getLogger } from '../logger';
 import { pollJobsUntilCompleted } from '../utils/polling.helper';
 import { downloadFromPreSignedUrl } from '../utils/publish/helper';
+import { publishFile } from '../utils/publish/publishFile';
 import { streamToBuffer } from '../utils/stream/streamToBuffer';
 import { ScriptAction } from './constants';
-import Zip from 'adm-zip';
-import * as Papa from 'papaparse';
-import { publishFile } from '../utils/publish/publishFile';
-import path from 'path';
-import { getTeamMembers, TeamMember } from '../datasaur/get-team-members';
-import { keyBy } from 'lodash';
-import { getCabinetLabelSetsById } from '../datasaur/get-cabinet-label-sets';
-import { createTags } from '../datasaur/create-tag';
-import { updateProjectTag } from '../datasaur/update-project-tag';
+import { applyExportedTag, getExportedTagId, getProjectsToExport, getTagIds } from './helpers';
 
 interface AnnotatedDataRow {
   Project: string;
@@ -143,7 +140,7 @@ const handleStateless = async () => {
     result.jobStatus = jobResult?.status;
 
     try {
-      const options = getConfig().exportAnnotatedData;
+      const config = getConfig().exportAnnotatedData;
       const annotatedDataCsv = await getAnnotatedData(
         retval.fileUrl,
         project.name,
@@ -151,7 +148,7 @@ const handleStateless = async () => {
         cabinetLabelSetsMapByIndex,
         projectAssignmentMap,
       );
-      await publishFile(filename, annotatedDataCsv, options);
+      await publishFile(filename, annotatedDataCsv, config);
       await applyExportedTag(project, exportedTagId);
       result.jobStatus = 'PUBLISHED';
     } catch (error) {
@@ -174,36 +171,6 @@ const handleStateless = async () => {
   );
   getLogger().info('exiting script...');
 };
-
-async function applyExportedTag(project: Project, tagId?: string) {
-  if (tagId) {
-    const tagIds = new Set(project.tags.map((tag) => tag.id));
-    tagIds.add(tagId);
-    await updateProjectTag(project.id, Array.from(tagIds));
-  }
-}
-
-async function getExportedTagId(teamId, exportedTag?: string): Promise<string | undefined> {
-  if (!exportedTag) {
-    return undefined;
-  }
-  const tags = await getTeamTags(teamId);
-  const tag = tags.find((t) => t.name === exportedTag);
-  if (tag) {
-    return tag.id;
-  } else {
-    const createdTag = await createTags(teamId, exportedTag);
-    return createdTag.id;
-  }
-}
-
-function getProjectsToExport(projects: Project[], exportedTag?: string): Project[] {
-  if (exportedTag) {
-    return projects.filter((project) => !project.tags.some((tag) => tag.name === exportedTag));
-  } else {
-    return projects;
-  }
-}
 
 async function getAnnotatedData(
   url: string,
@@ -460,17 +427,4 @@ function getPositionHashCode(label: SpanLabel): string {
     label.endTokenIndex,
     label.endCharIndex,
   ].join(':');
-}
-
-async function getTagIds(teamId: string, tagsName: string[]) {
-  if (tagsName.length === 0) return undefined;
-  const tags = await getTeamTags(teamId);
-
-  return tagsName.map((tagName) => {
-    const tag = tags.find((tagItem) => tagItem.name === tagName);
-    if (tag === undefined) {
-      throw new Error(`Tag ${tagName} is not found.`);
-    }
-    return tag.id;
-  });
 }
