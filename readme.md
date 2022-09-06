@@ -45,6 +45,8 @@ For more in-depth breakdown, please refer to [row-based.md](row-based.md)
     - [`create-projects`](#create-projects)
     - [`export-projects`](#export-projects)
     - [`export-annotated-data`](#export-annotated-data)
+    - [`export-transcription`](#export-transcription)
+    - [`combine-csv`](#combine-csv)
     - [`apply-tags`](#apply-tags)
   - [Execution Modes](#execution-modes)
     - [Stateful Project Creation & Export](#stateful-project-creation--export)
@@ -158,6 +160,34 @@ Export all annotated-data based on the given config file
 
 Options:
   -h, --help  display help for command
+```
+
+### `export-transcription`
+
+```console
+$ npm run start -- export-transcription -h
+Usage: robosaur export-transcription [options] <configFile>
+
+Export Transcription
+
+Options:
+  -h, --help  display help for command
+```
+
+### `combine-csv`
+
+```console
+Usage: robosaur combine-csv [options] <inputPath> <ouputPath>
+
+Combine all CSV files from input directory into a single file
+
+Arguments:
+  inputPath         The path of the input directory
+  ouputPath         The path of the output file
+
+Options:
+  -n, --no-headers  If this option is enabled, the program will assume all files have no headers
+  -h, --help        display help for command
 ```
 
 ### `apply-tags`
