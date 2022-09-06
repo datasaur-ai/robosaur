@@ -67,56 +67,56 @@ async function handleStateless() {
   getLogger().info('retrieving projects with filters', { filter });
   const projects = projectId
     ? [await getProject(projectId)]
-    : getProjectsToExport(await getProjects(filter), exportedTagId);
-
-  getLogger().info('retrieving all cabinets');
-  const allCabinetsByProjectId = await getAllReviewerCabinets(projects);
-
-  const allDocumentIds: string[] = [];
-  const filenameByDocumentId = new Map<string, string>();
-
-  for (const cabinet of allCabinetsByProjectId.values()) {
-    for (const document of cabinet.documents) {
-      allDocumentIds.push(document.id);
-      filenameByDocumentId.set(document.id, document.fileName);
-    }
-  }
-
-  const allCells = await getAllCellsFromDocuments(allDocumentIds);
-
-  const resultPerDocument = new Map<string, ResultRow[]>();
-  for (const documentId of allDocumentIds) {
-    const cells = allCells.get(documentId);
-    const fileName = filenameByDocumentId.get(documentId)!;
-    const [audioCallId] = fileName.split('.');
-
-    const documentResult: ResultRow[] = cells!.map((cell) => {
-      const speakerChannel = getSpeaker(cell);
-      const reviewedTranscript = cell.content;
-      const originalTranscript = cell.originCell?.content ?? '';
-      return {
-        'Audio Call Id': audioCallId,
-        'Speaker Channel': speakerChannel,
-        'Original Transcription': originalTranscript,
-        'Reviewed Transcription': reviewedTranscript,
-      };
-    });
-
-    resultPerDocument.set(documentId, documentResult);
-  }
-
-  getLogger().info(`generating ${resultPerDocument.size} csv files`);
-
-  // write result
-  for (const resultRow of resultPerDocument.values()) {
-    // write result to file
-    const [firstData] = resultRow;
-    if (!firstData) continue;
-    const csvData = Papa.unparse(resultRow);
-    await publishFile(firstData['Audio Call Id'], csvData, config);
-  }
+    : getProjectsToExport(await getProjects(filter), exportedTag);
 
   for (const project of projects) {
+    getLogger().info('retrieving all cabinets');
+    const allCabinetsByProjectId = await getAllReviewerCabinets([project]);
+
+    const allDocumentIds: string[] = [];
+    const filenameByDocumentId = new Map<string, string>();
+
+    for (const cabinet of allCabinetsByProjectId.values()) {
+      for (const document of cabinet.documents) {
+        allDocumentIds.push(document.id);
+        filenameByDocumentId.set(document.id, document.fileName);
+      }
+    }
+
+    const allCells = await getAllCellsFromDocuments(allDocumentIds);
+
+    const resultPerDocument = new Map<string, ResultRow[]>();
+    for (const documentId of allDocumentIds) {
+      const cells = allCells.get(documentId);
+      const fileName = filenameByDocumentId.get(documentId)!;
+      const [audioCallId] = fileName.split('.');
+
+      const documentResult: ResultRow[] = cells!.map((cell) => {
+        const speakerChannel = getSpeaker(cell);
+        const reviewedTranscript = cell.content;
+        const originalTranscript = cell.originCell?.content ?? '';
+        return {
+          'Audio Call Id': audioCallId,
+          'Speaker Channel': speakerChannel,
+          'Original Transcription': originalTranscript,
+          'Reviewed Transcription': reviewedTranscript,
+        };
+      });
+
+      resultPerDocument.set(documentId, documentResult);
+    }
+
+    getLogger().info(`generating ${resultPerDocument.size} csv files`);
+
+    // write result
+    for (const resultRow of resultPerDocument.values()) {
+      // write result to file
+      const [firstData] = resultRow;
+      if (!firstData) continue;
+      const csvData = Papa.unparse(resultRow);
+      await publishFile(firstData['Audio Call Id'], csvData, config);
+    }
+
     await applyExportedTag(project, exportedTagId);
   }
 }
