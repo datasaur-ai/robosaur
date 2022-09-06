@@ -14,8 +14,11 @@
     "teamId": "<TEAM_ID>",
     "statusFilter": [],
     "projectFilter": {
-      "tags": [],
-      "keyword": "Project Name"
-    }
+      "tags": [
+        "Export Annotated Data"
+      ],
+      "keyword": ""
+    },
+    "exportedTag": "Annotated Data Exported"
   }
 }

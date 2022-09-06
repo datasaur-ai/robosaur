@@ -3,7 +3,7 @@ import { query } from './query';
 
 const CREATE_TAG = gql`
   mutation CreateTagMutation($input: CreateTagInput!) {
-    createTag(input: $input) {
+    result: createTag(input: $input) {
       ...TagFragment
     }
   }

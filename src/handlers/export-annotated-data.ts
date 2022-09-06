@@ -13,6 +13,7 @@ import {
   LabelEntityType,
   LabelItem,
   LabelStatus,
+  Project,
   ProjectAssignment,
   SpanLabel,
 } from '../datasaur/interfaces';
@@ -28,6 +29,8 @@ import path from 'path';
 import { getTeamMembers, TeamMember } from '../datasaur/get-team-members';
 import { keyBy } from 'lodash';
 import { getCabinetLabelSetsById } from '../datasaur/get-cabinet-label-sets';
+import { createTags } from '../datasaur/create-tag';
+import { updateProjectTag } from '../datasaur/update-project-tag';
 
 interface AnnotatedDataRow {
   Project: string;
@@ -68,10 +71,11 @@ export async function handleExportAnnotatedData(configFile: string) {
 
 const handleStateless = async () => {
   const exportFormat = ExportFormat.JSON_ADVANCED;
-  const { statusFilter, teamId, source, projectFilter } = getConfig().exportAnnotatedData;
+  const { statusFilter, teamId, source, projectFilter, exportedTag } = getConfig().exportAnnotatedData;
   const filterTagIds = projectFilter && projectFilter.tags ? await getTagIds(teamId, projectFilter.tags) : undefined;
   const teamMembers = await getTeamMembers(getActiveTeamId());
   const teamMembersMap = keyBy(teamMembers, (member: TeamMember) => member.user?.id);
+  const exportedTagId = await getExportedTagId(teamId, exportedTag);
 
   const filter = {
     statuses: statusFilter,
@@ -87,14 +91,15 @@ const handleStateless = async () => {
     keyword: projectFilter?.keyword,
   };
   getLogger().info('retrieving projects with filters', { filter });
-  const projectToExports = await getProjects(filter);
+  const projects = await getProjects(filter);
+  const projectsToExport = getProjectsToExport(projects, exportedTag);
 
-  getLogger().info(`found ${projectToExports.length} projects to export`);
+  getLogger().info(`found ${projectsToExport.length} projects to export`);
 
-  getLogger().info(projectToExports.map((project) => project.name + '_' + project.id));
+  getLogger().info(projectsToExport.map((project) => project.name + '_' + project.id));
 
   const results: Array<{ projectName: string; exportId: string; jobStatus: JobStatus | 'PUBLISHED' }> = [];
-  for (const project of projectToExports) {
+  for (const project of projectsToExport) {
     const labelSets: CabinetLabelSet[] = project.reviewCabinet
       ? await getCabinetLabelSetsById(project.reviewCabinet?.id)
       : [];
@@ -147,6 +152,7 @@ const handleStateless = async () => {
         projectAssignmentMap,
       );
       await publishFile(filename, annotatedDataCsv, options);
+      await applyExportedTag(project, exportedTagId);
       result.jobStatus = 'PUBLISHED';
     } catch (error) {
       getLogger().error(`fail to publish exported project to ${source}`, {
@@ -168,6 +174,36 @@ const handleStateless = async () => {
   );
   getLogger().info('exiting script...');
 };
+
+async function applyExportedTag(project: Project, tagId?: string) {
+  if (tagId) {
+    const tagIds = new Set(project.tags.map((tag) => tag.id));
+    tagIds.add(tagId);
+    await updateProjectTag(project.id, Array.from(tagIds));
+  }
+}
+
+async function getExportedTagId(teamId, exportedTag?: string): Promise<string | undefined> {
+  if (!exportedTag) {
+    return undefined;
+  }
+  const tags = await getTeamTags(teamId);
+  const tag = tags.find((t) => t.name === exportedTag);
+  if (tag) {
+    return tag.id;
+  } else {
+    const createdTag = await createTags(teamId, exportedTag);
+    return createdTag.id;
+  }
+}
+
+function getProjectsToExport(projects: Project[], exportedTag?: string): Project[] {
+  if (exportedTag) {
+    return projects.filter((project) => !project.tags.some((tag) => tag.name === exportedTag));
+  } else {
+    return projects;
+  }
+}
 
 async function getAnnotatedData(
   url: string,

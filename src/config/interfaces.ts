@@ -394,6 +394,12 @@ export interface ExportAnnotatedDataConfig extends WithStorageExternalSupport {
 
 export interface ExportTranscriptionConfig extends WithStorageExternalSupport {
   /**
+   * @description Tag to apply to the project after the annotated data got exported.
+   * Projects that already tagged with the exportedTag won't get exported.
+   */
+  exportedTag?: string;
+
+  /**
    * @description id of the team.
    * The ID can be obtained from your team workspace page in this format: https://app.datasaur.ai/teams/{teamId}
    */
