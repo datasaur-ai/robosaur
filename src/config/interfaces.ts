@@ -55,6 +55,9 @@ export interface Config {
 
   // split document
   splitDocument: SplitDocumentConfig;
+
+  // auto label
+  autoLabel: AutoLabelConfig;
 }
 
 export interface CreateConfig {
@@ -386,4 +389,14 @@ export interface SplitDocumentConfig {
   linesPerFile: number;
   filesPerFolder: number;
   resultFolder: string;
+}
+
+export interface AutoLabelConfig {
+  enableAutoLabel: boolean;
+  projectId: string;
+  labelerEmail: string;
+  targetApiEndpoint: string;
+  targetApiSecretKey: string;
+  serviceProvider: string;
+  numberOfFilesPerRequest: number;
 }

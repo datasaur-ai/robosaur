@@ -7,6 +7,7 @@ import { DocumentAssignment } from '../assignment/interfaces';
 import { getConfig, setConfigByJSONFile } from '../config/config';
 import { CreateConfig, FilesConfig, StorageSources } from '../config/interfaces';
 import { getProjectCreationValidators } from '../config/schema/validator';
+import { autoLabelTokenProject } from '../datasaur/auto-label';
 import { JobStatus } from '../datasaur/get-jobs';
 import { getLocalDocuments } from '../documents/get-local-documents';
 import { getObjectStorageDocuments } from '../documents/get-object-storage-documents';
@@ -60,6 +61,13 @@ export async function handleCreateProjects(configFile: string, options: ProjectC
 
   const results = await submitProjectCreationJob(createConfig, projectsToBeCreated, scriptState, dryRun);
   await checkProjectCreationJob(results, scriptState, cwd, dryRun);
+
+  if (getConfig().autoLabel.enableAutoLabel) {
+    const projects = scriptState.getTeamProjectsState().getProjects();
+    projects.forEach(async (project) => {
+      await submitAutoLabelJob(project.projectId ?? '');
+    });
+  }
 }
 
 async function setProjectCreationConfig(cwd: string, configFile: string, usePcw: boolean, withoutPcw: boolean) {
@@ -227,4 +235,18 @@ async function checkProjectCreationJob(
     scriptState.updateStatesFromProjectCreationJobs(jobs);
     await scriptState.save();
   }
+}
+
+async function submitAutoLabelJob(projectId: string) {
+  const autoLabelConfig = getConfig().autoLabel;
+  const targetApiInput = {
+    endpoint: autoLabelConfig.targetApiEndpoint,
+    secretKey: autoLabelConfig.targetApiSecretKey,
+  };
+  const options = {
+    serviceProvider: autoLabelConfig.serviceProvider,
+    numberOfFilesPerRequest: autoLabelConfig.numberOfFilesPerRequest,
+  };
+  // TODO: change the query and its inputs to new version
+  await autoLabelTokenProject(projectId, autoLabelConfig.labelerEmail, targetApiInput, options);
 }
