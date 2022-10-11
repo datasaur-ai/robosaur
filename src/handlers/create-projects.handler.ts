@@ -62,7 +62,7 @@ export async function handleCreateProjects(configFile: string, options: ProjectC
   const results = await submitProjectCreationJob(createConfig, projectsToBeCreated, scriptState, dryRun);
   await checkProjectCreationJob(results, scriptState, cwd, dryRun);
 
-  if (getConfig().autoLabel.enableAutoLabel) {
+  if (getConfig().create.autoLabel.enableAutoLabel) {
     const projects = scriptState.getTeamProjectsState().getProjects();
     projects.forEach(async (project) => {
       await submitAutoLabelJob(project.projectId ?? '');
@@ -238,7 +238,7 @@ async function checkProjectCreationJob(
 }
 
 async function submitAutoLabelJob(projectId: string) {
-  const autoLabelConfig = getConfig().autoLabel;
+  const autoLabelConfig = getConfig().create.autoLabel;
   const targetApiInput = {
     endpoint: autoLabelConfig.targetApiEndpoint,
     secretKey: autoLabelConfig.targetApiSecretKey,

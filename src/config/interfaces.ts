@@ -55,9 +55,6 @@ export interface Config {
 
   // split document
   splitDocument: SplitDocumentConfig;
-
-  // auto label
-  autoLabel: AutoLabelConfig;
 }
 
 export interface CreateConfig {
@@ -223,6 +220,8 @@ export interface CreateConfig {
    * @description Optional. Tags to be applied to created projects
    */
   tagNames?: string[];
+
+  autoLabel: AutoLabelConfig;
 }
 
 export interface CredentialsConfig {
