@@ -24,4 +24,5 @@ export const enum ScriptAction {
   APPLY_TAGS = 'APPLY_TAGS',
   SPLIT_DOCUMENT = 'SPLIT_DOCUMENT',
   NONE = 'NONE',
+  EXPORT_FINAL_REPORT = 'EXPORT_FINAL_REPORT',
 }

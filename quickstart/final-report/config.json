@@ -1,0 +1,28 @@
+{
+  "datasaur": {
+    "host": "https://app.datasaur.ai",
+    "clientId": "ae73da96-0f7c-41b6-8eaf-83175645ade7",
+    "clientSecret": "74bcac03-7aa5-45db-b1db-92897abcbc0f"
+  },
+  "projectState": {
+    "source": "local",
+    "path": "quickstart/state/projectState.json"
+  },
+  "export": {
+    "source": "local",
+    "prefix": "quickstart/final-report/export",
+    "teamId": "181",
+    "statusFilter": [],
+    "format": "CSV",
+    "fileTransformerId": null,
+    "executionMode": "stateless",
+    "projectFilter": {
+      "kind": "ROW_BASED",
+      "date": {
+        "newestDate": "2022-10-31",
+        "oldestDate": "2022-01-01"
+      },
+      "tags": []
+    }
+  }
+}

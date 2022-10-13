@@ -4,6 +4,7 @@ import { handleApplyTags } from './handlers/apply-tags.handler';
 import { handleCreateProject } from './handlers/create-project.handler';
 import { handleCreateProjects } from './handlers/create-projects.handler';
 import { handleExportProjects } from './handlers/export-projects.handler';
+import { handleExportFinalReport } from './handlers/final-report/export-final-report.handler'
 import { handleSplitDocument } from './handlers/split-document.handler';
 import { getLogger } from './logger';
 
@@ -29,6 +30,11 @@ program
   .option('-u --unzip', 'Unzips the exported projects, only storing the final version accepted by reviewers')
   .description('Export all projects based on the given config file')
   .action(handleExportProjects);
+
+program
+  .command(`export-final-report <configFile>`)
+  .description('Export final report based on the given config file')
+  .action(handleExportFinalReport);
 
 program
   .command(`split-document <configFile>`)

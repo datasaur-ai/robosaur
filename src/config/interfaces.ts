@@ -298,7 +298,17 @@ export interface AssignmentConfig extends WithStorage {
   strategy: 'ALL' | 'AUTO';
 }
 
-export interface ExportConfig extends WithStorage {
+export interface WithStorageExternalSupport extends WithStorage {
+  /**
+   * @description Required for 'gcs' and 's3' sources.
+   * Path to the folder containing sub-folders, without leading slash (/)
+   * Each exported project will be uploaded into a separate subfolder, with its' projectName as the folder name
+   * If the subfolders are located in root, set prefix to empty string ''
+   */
+  prefix: string;
+}
+
+export interface ExportConfig extends WithStorageExternalSupport {
   /**
    * @description Projects' status to filter.
    * Only projects matching the specified statuses will be exported by Robosaur.
@@ -324,14 +334,6 @@ export interface ExportConfig extends WithStorage {
     };
     tags?: string[];
   };
-
-  /**
-   * @description Required for 'gcs' and 's3' sources.
-   * Path to the folder containing sub-folders, without leading slash (/)
-   * Each exported project will be uploaded into a separate subfolder, with its' projectName as the folder name
-   * If the subfolders are located in root, set prefix to empty string ''
-   */
-  prefix: string;
 
   /**
    * @description id of the team.

@@ -245,6 +245,15 @@ export type AutoLabelTokenBasedProjectOutput = {
   result: Scalars['Boolean'];
 };
 
+export enum AutomationActivityDetailStatus {
+  Failure = 'FAILURE',
+  Success = 'SUCCESS'
+}
+
+export enum AutomationType {
+  ProjectCreation = 'PROJECT_CREATION'
+}
+
 export type AwsMarketplaceSubscriptionInput = {
   action: Scalars['String'];
   customerId: Scalars['ID'];
@@ -791,12 +800,15 @@ export enum CustomReportFilterStrategy {
 }
 
 export enum CustomReportMetric {
-  ActiveDuration = 'ACTIVE_DURATION',
   LabelsAccuracy = 'LABELS_ACCURACY',
+  TimeSpent = 'TIME_SPENT',
+  TimeSpentPerLabel = 'TIME_SPENT_PER_LABEL',
   TotalConflicts = 'TOTAL_CONFLICTS',
   TotalConflictsResolved = 'TOTAL_CONFLICTS_RESOLVED',
   TotalLabelsAccepted = 'TOTAL_LABELS_ACCEPTED',
   TotalLabelsApplied = 'TOTAL_LABELS_APPLIED',
+  TotalLabelsAppliedByLabeler = 'TOTAL_LABELS_APPLIED_BY_LABELER',
+  TotalLabelsAppliedByReviewer = 'TOTAL_LABELS_APPLIED_BY_REVIEWER',
   TotalLabelsRejected = 'TOTAL_LABELS_REJECTED'
 }
 
@@ -822,8 +834,13 @@ export type DataProgramming = {
 
 export type DataProgrammingLabel = {
   __typename?: 'DataProgrammingLabel';
-  id: Scalars['Int'];
-  label: Scalars['String'];
+  labelId: Scalars['Int'];
+  labelName: Scalars['String'];
+};
+
+export type DataProgrammingLibraries = {
+  __typename?: 'DataProgrammingLibraries';
+  libraries: Array<Scalars['String']>;
 };
 
 export type Dataset = {
@@ -1075,6 +1092,21 @@ export type DocumentFileNameWithPart = {
    * Set this to `0` and `SplitDocumentOptionInput` to `null` to skip splitting the document.
    */
   part: Scalars['Int'];
+};
+
+export type DocumentFinalReport = {
+  __typename?: 'DocumentFinalReport';
+  cabinet: Cabinet;
+  document: TextDocument;
+  finalReport: FinalReport;
+  rowFinalReports?: Maybe<Array<RowFinalReport>>;
+  teamMember: TeamMember;
+};
+
+export type DocumentForPredictionInput = {
+  documentId: Scalars['String'];
+  lineIndexEnd: Scalars['Int'];
+  lineIndexStart: Scalars['Int'];
 };
 
 export type DocumentMeta = {
@@ -1333,6 +1365,7 @@ export enum ExtensionId {
   AutoLabelRowExtensionId = 'AUTO_LABEL_ROW_EXTENSION_ID',
   AutoLabelTokenExtensionId = 'AUTO_LABEL_TOKEN_EXTENSION_ID',
   DashboardExtensionId = 'DASHBOARD_EXTENSION_ID',
+  DataProgrammingExtensionId = 'DATA_PROGRAMMING_EXTENSION_ID',
   DictionaryExtensionId = 'DICTIONARY_EXTENSION_ID',
   DocumentLabelingExtensionId = 'DOCUMENT_LABELING_EXTENSION_ID',
   FileCollectionExtensionId = 'FILE_COLLECTION_EXTENSION_ID',
@@ -1409,6 +1442,15 @@ export enum FileTransformerPurpose {
   Export = 'EXPORT',
   Import = 'IMPORT'
 }
+
+export type FinalReport = {
+  __typename?: 'FinalReport';
+  precision: Scalars['Float'];
+  recall: Scalars['Float'];
+  totalAcceptedLabels: Scalars['Int'];
+  totalAppliedLabels: Scalars['Int'];
+  totalRejectedLabels: Scalars['Int'];
+};
 
 export enum FontSize {
   ExtraLarge = 'EXTRA_LARGE',
@@ -1539,6 +1581,12 @@ export type GetCurrentUserTeamMemberInput = {
 export type GetDataProgrammingInput = {
   labels: Array<Scalars['String']>;
   projectId: Scalars['ID'];
+};
+
+export type GetDataProgrammingPredictionsInput = {
+  dataProgrammingId: Scalars['ID'];
+  documents: Array<DocumentForPredictionInput>;
+  labelingFunctionIds?: InputMaybe<Array<Scalars['ID']>>;
 };
 
 export type GetDatasetFilterInput = {
@@ -2063,6 +2111,7 @@ export type InviteTeamMembersInput = {
 
 export type Job = {
   __typename?: 'Job';
+  additionalData?: Maybe<JobAdditionalData>;
   createdAt: Scalars['String'];
   errors: Array<JobError>;
   id: Scalars['String'];
@@ -2071,6 +2120,11 @@ export type Job = {
   resultId?: Maybe<Scalars['String']>;
   status: JobStatus;
   updatedAt: Scalars['String'];
+};
+
+export type JobAdditionalData = {
+  __typename?: 'JobAdditionalData';
+  automationActivityId?: Maybe<Scalars['ID']>;
 };
 
 export type JobError = {
@@ -2603,7 +2657,7 @@ export type Mutation = {
   editSentence: EditSentenceResult;
   enableProjectExtensionElements?: Maybe<ProjectExtension>;
   importTextDocument: TextDocument;
-  insertSentence: Scalars['Int'];
+  insertSentence: Cell;
   inviteTeamMembers: Array<TeamMember>;
   /**
    * Deprecated. Please use `launchTextProjectAsync`.
@@ -2683,8 +2737,10 @@ export type Mutation = {
   replaceProjectAssignees: Project;
   replyComment: Comment;
   requestDemo: RequestDemo;
+  requestResetPasswordByScript?: Maybe<Scalars['String']>;
   requestResetPasswordLink?: Maybe<Scalars['String']>;
   resetPassword?: Maybe<LoginSuccess>;
+  runAutomation: Job;
   runDataIngestion?: Maybe<Scalars['Boolean']>;
   saveDataset: Dataset;
   saveGeneralWorkspaceSettings: GeneralWorkspaceSettings;
@@ -3201,6 +3257,11 @@ export type MutationRequestDemoArgs = {
 };
 
 
+export type MutationRequestResetPasswordByScriptArgs = {
+  input: RequestResetPasswordInput;
+};
+
+
 export type MutationRequestResetPasswordLinkArgs = {
   input: RequestResetPasswordInput;
 };
@@ -3208,6 +3269,12 @@ export type MutationRequestResetPasswordLinkArgs = {
 
 export type MutationResetPasswordArgs = {
   resetPasswordInput: ResetPasswordInput;
+};
+
+
+export type MutationRunAutomationArgs = {
+  automationId: Scalars['ID'];
+  type: AutomationType;
 };
 
 
@@ -3685,10 +3752,12 @@ export type Project = {
 
 export type ProjectAssignment = {
   __typename?: 'ProjectAssignment';
+  createdAt: Scalars['DateTime'];
   documentIds?: Maybe<Array<Scalars['String']>>;
   documents?: Maybe<Array<TextDocument>>;
   role: ProjectAssignmentRole;
   teamMember: TeamMember;
+  updatedAt: Scalars['DateTime'];
 };
 
 /** Deprecated. See `LaunchTextProjectInput` and use field `documentAssignments` of type `DocumentAssignmentInput` instead. */
@@ -3744,6 +3813,12 @@ export type ProjectExtension = {
   width: Scalars['Int'];
 };
 
+export type ProjectFinalReport = {
+  __typename?: 'ProjectFinalReport';
+  documentFinalReports: Array<DocumentFinalReport>;
+  project: Project;
+};
+
 export type ProjectLaunchJob = {
   __typename?: 'ProjectLaunchJob';
   job: Job;
@@ -3794,6 +3869,7 @@ export type ProjectSample = {
 
 export type ProjectSettings = {
   __typename?: 'ProjectSettings';
+  autoMarkDocumentAsComplete: Scalars['Boolean'];
   conflictResolution: ConflictResolution;
   /** @deprecated Moved under `conflictResolution.consensus` */
   consensus?: Maybe<Scalars['Int']>;
@@ -3810,6 +3886,8 @@ export type ProjectSettings = {
 };
 
 export type ProjectSettingsInput = {
+  /** Enables automated mark document as complete. */
+  autoMarkDocumentAsComplete?: InputMaybe<Scalars['Boolean']>;
   conflictResolution?: InputMaybe<ConflictResolutionInput>;
   dynamicReviewMemberId?: InputMaybe<Scalars['ID']>;
   dynamicReviewMethod?: InputMaybe<ProjectDynamicReviewMethod>;
@@ -3851,6 +3929,7 @@ export type ProjectTemplate = {
 
 export type ProjectTemplateProjectSetting = {
   __typename?: 'ProjectTemplateProjectSetting';
+  autoMarkDocumentAsComplete: Scalars['Boolean'];
   enableEditLabelSet: Scalars['Boolean'];
   enableEditSentence: Scalars['Boolean'];
   hideLabelerNamesDuringReview: Scalars['Boolean'];
@@ -3949,6 +4028,8 @@ export type Query = {
   /** Returns custom report metrics group tables. */
   getCustomReportMetricsGroupTables: Array<CustomReportMetricsGroupTable>;
   getDataProgramming?: Maybe<DataProgramming>;
+  getDataProgrammingLibraries: DataProgrammingLibraries;
+  getDataProgrammingPredictions: Job;
   getDataset?: Maybe<Dataset>;
   getDatasets: DatasetPaginatedResponse;
   getDocumentAnswerConflicts: Array<ConflictAnswer>;
@@ -4022,6 +4103,7 @@ export type Query = {
   getProjectTemplates: Array<ProjectTemplate>;
   /** Returns a paginated list of projects. */
   getProjects: ProjectPaginatedResponse;
+  getProjectsFinalReport: Array<ProjectFinalReport>;
   getQuestionSet: QuestionSet;
   getQuestionSetTemplate: QuestionSetTemplate;
   getQuestionSetTemplates: Array<QuestionSetTemplate>;
@@ -4251,6 +4333,11 @@ export type QueryGetCustomApIsArgs = {
 
 export type QueryGetDataProgrammingArgs = {
   input?: InputMaybe<GetDataProgrammingInput>;
+};
+
+
+export type QueryGetDataProgrammingPredictionsArgs = {
+  input: GetDataProgrammingPredictionsInput;
 };
 
 
@@ -4518,6 +4605,11 @@ export type QueryGetProjectTemplatesArgs = {
 
 export type QueryGetProjectsArgs = {
   input: GetProjectsPaginatedInput;
+};
+
+
+export type QueryGetProjectsFinalReportArgs = {
+  projectIds: Array<Scalars['ID']>;
 };
 
 
@@ -5079,6 +5171,12 @@ export type RowAnswersInput = {
   line: Scalars['Int'];
 };
 
+export type RowFinalReport = {
+  __typename?: 'RowFinalReport';
+  finalReport: FinalReport;
+  line: Scalars['Int'];
+};
+
 export type SaveGeneralWorkspaceSettingsInput = {
   projectId: Scalars['ID'];
   settings: GeneralWorkspaceSettingsInput;
@@ -5285,6 +5383,7 @@ export type TeamSetting = {
   defaultExternalObjectStorageId?: Maybe<Scalars['ID']>;
   enableArdisAutoLabel: Scalars['Boolean'];
   enableAssistedLabeling: Scalars['Boolean'];
+  enableDataProgramming: Scalars['Boolean'];
   enableExportTeamOverview: Scalars['Boolean'];
   enableWipeData: Scalars['Boolean'];
 };
@@ -5828,6 +5927,7 @@ export type UpdateProjectLabelSetInput = {
 };
 
 export type UpdateProjectSettingsInput = {
+  autoMarkDocumentAsComplete?: InputMaybe<Scalars['Boolean']>;
   conflictResolution?: InputMaybe<ConflictResolutionInput>;
   dynamicReviewMemberId?: InputMaybe<Scalars['ID']>;
   dynamicReviewMethod?: InputMaybe<ProjectDynamicReviewMethod>;
@@ -5868,7 +5968,9 @@ export type UpdateRowAnswersResult = {
 
 export type UpdateSentenceConflictResult = {
   __typename?: 'UpdateSentenceConflictResult';
+  addedLabels: Array<GqlConflictable>;
   cell: Cell;
+  deletedLabels: Array<GqlConflictable>;
   labels: Array<TextLabel>;
 };
 
@@ -5920,6 +6022,7 @@ export type UpdateTeamSettingInput = {
   allowedReviewerExportMethods?: InputMaybe<Array<GqlExportMethod>>;
   defaultExternalObjectStorageId?: InputMaybe<Scalars['ID']>;
   enableAssistedLabeling?: InputMaybe<Scalars['Boolean']>;
+  enableDataProgramming?: InputMaybe<Scalars['Boolean']>;
   enableWipeData?: InputMaybe<Scalars['Boolean']>;
   teamId: Scalars['ID'];
 };

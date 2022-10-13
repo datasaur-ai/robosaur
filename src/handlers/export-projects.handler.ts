@@ -256,7 +256,7 @@ export async function handleExportProjects(configFile: string, { unzip }: { unzi
   getLogger().info('exiting script...');
 }
 
-async function getTagIds(teamId: string, tagsName: string[]) {
+export async function getTagIds(teamId: string, tagsName: string[]) {
   if (tagsName.length === 0) return undefined;
   const tags = await getTeamTags(teamId);
 
