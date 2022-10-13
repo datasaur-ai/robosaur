@@ -44,16 +44,16 @@ export const EXTENSIONS = {
   TOKEN_BASED: {
     LABELER: [
       ExtensionID.LABELS_EXTENSION_ID,
+      ExtensionID.AUTO_LABEL_TOKEN_EXTENSION_ID,
       ExtensionID.SEARCH_EXTENSION_ID,
       ExtensionID.FILE_COLLECTION_EXTENSION_ID,
-      ExtensionID.AUTO_LABEL_TOKEN_EXTENSION_ID,
     ],
     REVIEWER: [
       ExtensionID.REVIEW_EXTENSION_ID,
       ExtensionID.LABELS_EXTENSION_ID,
+      ExtensionID.AUTO_LABEL_TOKEN_EXTENSION_ID,
       ExtensionID.SEARCH_EXTENSION_ID,
       ExtensionID.FILE_COLLECTION_EXTENSION_ID,
-      ExtensionID.AUTO_LABEL_TOKEN_EXTENSION_ID,
     ],
   },
 };

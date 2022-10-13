@@ -396,6 +396,5 @@ export interface AutoLabelConfig {
   labelerEmail: string;
   targetApiEndpoint: string;
   targetApiSecretKey: string;
-  serviceProvider: string;
   numberOfFilesPerRequest: number;
 }
