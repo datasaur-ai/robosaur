@@ -29,6 +29,7 @@ export async function createProject(
     return {
       ...document,
       fileTransformerId: settings.documentSettings.fileTransformerId ?? undefined,
+      customTextExtractionAPIId: settings.documentSettings.customTextExtractionAPIId,
       docFileOptions: {
         ...settings.docFileOptions,
         firstRowAsHeader: settings?.docFileOptions?.firstRowAsHeader ?? !!settings.documentSettings?.firstRowAsHeader,

@@ -155,6 +155,7 @@ export interface CreateConfig {
     anonymizationEntityTypes?: Array<string>;
     anonymizationMaskingMethod?: string;
     anonymizationRegExps?: Array<string>;
+    customTextExtractionAPIId?: string;
   };
   type?: TextDocumentType;
   kinds?: string[];
