@@ -44,6 +44,7 @@ For more in-depth breakdown, please refer to [row-based.md](row-based.md)
   - [Usage](#usage)
     - [`create-projects`](#create-projects)
     - [`export-projects`](#export-projects)
+    - [`export-final-report`](#export-final-report)
   - [Execution Modes](#execution-modes)
     - [Stateful Project Creation & Export](#stateful-project-creation--export)
     - [Stateless project export](#stateless-project-export)
@@ -144,6 +145,18 @@ This can be set in the `export.statusFilter` inside the config JSON. In `quickst
     "statusFilter": ["COMPLETE"]
   }
 }
+```
+
+### `export-final-report`
+
+```console
+$ npm run start -- export-final-report -h
+Usage: robosaur export-final-report [options] <configFile>
+
+Export all final report based on the given config file
+
+Options:
+  -h, --help  display help for command
 ```
 
 ### `apply-tags`
