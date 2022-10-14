@@ -115,7 +115,9 @@ function generateContent(project, document, line, teamMember, cabinet, finalRepo
     cabinet.role === 'REVIEWER' ? 'N/A' : finalReport.recall,
     cabinet.role === 'REVIEWER' ? 'N/A' : (finalReport.totalRejectedLabels === 0 ? 1 : 0),
     cabinet.role === 'REVIEWER' ? 'N/A' : (finalReport.totalRejectedLabels > 0 ? 1 : 0),
-    cabinet.role === 'REVIEWER' ? 'N/A' : ((finalReport.totalAcceptedLabels / finalReport.totalAcceptedLabels * 100) + '%'),
+    cabinet.role === 'REVIEWER' ? 'N/A' : finalReport.totalAcceptedLabels > 0 && finalReport.totalAppliedLabels > 0
+      ? (finalReport.totalAcceptedLabels / finalReport.totalAppliedLabels * 100) + '%'
+      : 'N/A',
     cabinet.role === 'REVIEWER' ? 'N/A' : (finalReport.totalRejectedLabels === 0 ? '100%' : '0%'),
   ]
 }
