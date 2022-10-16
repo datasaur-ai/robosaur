@@ -37,7 +37,7 @@ const handleStateless = async () => {
   const projects = await getProjects(filter);
   getLogger().info(`found ${projects.length} projects to export`);
 
-  const chunkOfProjects: Project[][]= chunk(projects, 10);
+  const chunkOfProjects: Project[][]= chunk(projects, 20);
   getLogger().info(`divided into ${chunkOfProjects.length} chunk of projects`);
 
   const header = [
