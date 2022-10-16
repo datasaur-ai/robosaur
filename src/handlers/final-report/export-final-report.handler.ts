@@ -4,7 +4,7 @@ import { getConfig, setConfigByJSONFile } from '../../config/config';
 import { StateConfig } from '../../config/interfaces';
 import { getProjectExportValidators } from '../../config/schema/validator';
 import { getProjects } from '../../datasaur/get-projects';
-import { Project, ProjectFinalReport, RowFinalReport } from '../../generated/graphql';
+import { Cabinet, FinalReport, Maybe, Project, ProjectFinalReport, RowFinalReport, TeamMember, TextDocument } from '../../generated/graphql';
 import { getLogger } from '../../logger';
 import { publishFile } from '../../utils/publish/publishFile';
 import { ScriptAction } from '../constants';
@@ -37,7 +37,7 @@ const handleStateless = async () => {
   const projects = await getProjects(filter);
   getLogger().info(`found ${projects.length} projects to export`);
 
-  const chunkOfProjects: Project[][]= chunk(projects, 100);
+  const chunkOfProjects: Project[][]= chunk(projects, 10);
 
   const header = [
     'Project Name',
@@ -56,64 +56,71 @@ const handleStateless = async () => {
     'DPU'
   ];
 
-  chunkOfProjects.forEach(async (projectsToExport, index) => {
+  for (let index = 0; index < chunkOfProjects.length; index++) {
+    const projectsToExport = chunkOfProjects[index];
     getLogger().info(`[START] export projects... ${(index + 1)}/${chunkOfProjects.length}`);
     
     const projectIds = projectsToExport.map((project) => project.id);
     const projectsFinalReport: ProjectFinalReport[] = await getProjectsFinalReport(projectIds);
     getLogger().info(projectsFinalReport.map((projectFinalReport) => projectFinalReport.project.id));
 
-    
-    projectsFinalReport.forEach(async (projectFinalReport) => {
-      const csvContent = projectFinalReport.documentFinalReports.reduce((result, documentFinalReport) => {
-        const rowFinalReports: RowFinalReport[] = (documentFinalReport.rowFinalReports || []);
-        if (rowFinalReports.length > 0) {
-          const contentRowFinalReports = rowFinalReports.reduce((resultRow, rowFinalReport) => {
-            resultRow.push(generateContent(
-              projectFinalReport.project,
-              documentFinalReport.document,
-              rowFinalReport.line + 1,
-              documentFinalReport.cabinet,
-              rowFinalReport.finalReport,
-              documentFinalReport.teamMember,
-              ));
-            return resultRow;
-          }, [] as string[][]);
-          result = [...result, ...contentRowFinalReports];
-        } else {
-          result = [...result, generateContent(
-            projectFinalReport.project,
-            documentFinalReport.document,
-            1,
-            documentFinalReport.cabinet,
-            documentFinalReport.finalReport,
-            documentFinalReport.teamMember,
-            )];
-        }
-        return result;
-      }, [] as string[][]);
+    for (const projectFinalReport of projectsFinalReport) {
+      const csvContent = generateCSVContent(projectFinalReport);
       const csvData = unparse([header, ...csvContent]);
       await publishFile(`${projectFinalReport.project.name}_${projectFinalReport.project.id}`, csvData, config);
-    });
+    };
 
     getLogger().info(`[END] export projects... ${(index + 1)}/${chunkOfProjects.length}`);
-  });
+  }
+  getLogger().info('exiting script...');
 };
 
-function generateContent(project, document, line, cabinet, finalReport, teamMember): string[] {
+function generateCSVContent(projectFinalReport: ProjectFinalReport) {
+  return projectFinalReport.documentFinalReports.reduce<string[][]>((result, documentFinalReport) => {
+    const rowFinalReports: RowFinalReport[] = (documentFinalReport.rowFinalReports || []);
+    if (rowFinalReports.length > 0) {
+      const contentRowFinalReports = rowFinalReports.reduce<string[][]>((resultRow, rowFinalReport) => {
+        return [
+          ...resultRow,
+          generateContent(
+            projectFinalReport.project,
+            documentFinalReport.document,
+            rowFinalReport.line + 1,
+            documentFinalReport.cabinet,
+            rowFinalReport.finalReport,
+            documentFinalReport.teamMember,
+          )
+        ];
+      }, []);
+      result = [...result, ...contentRowFinalReports];
+    } else {
+      result = [...result, generateContent(
+        projectFinalReport.project,
+        documentFinalReport.document,
+        1,
+        documentFinalReport.cabinet,
+        documentFinalReport.finalReport,
+        documentFinalReport.teamMember,
+        )];
+    }
+    return result;
+  }, []);
+}
+
+function generateContent(project: Project, document: TextDocument, line: number, cabinet: Cabinet, finalReport: FinalReport, teamMember?: Maybe<TeamMember> | undefined): string[] {
   return [
     project.name,
     document.fileName,
-    line,
-    teamMember?.user?.email || teamMember?.invitationEmail || teamMember?.id,
+    '' + line,
+    teamMember?.user?.email || teamMember?.invitationEmail || teamMember?.id || '',
     cabinet.role,
-    cabinet.role === 'REVIEWER' ? finalReport.totalResolvedLabels : finalReport.totalAppliedLabels,
-    cabinet.role === 'REVIEWER' ? 'N/A' : finalReport.totalAcceptedLabels,
-    cabinet.role === 'REVIEWER' ? 'N/A' : finalReport.totalRejectedLabels,
-    cabinet.role === 'REVIEWER' ? 'N/A' : finalReport.precision,
-    cabinet.role === 'REVIEWER' ? 'N/A' : finalReport.recall,
-    cabinet.role === 'REVIEWER' ? 'N/A' : (finalReport.totalRejectedLabels === 0 ? 1 : 0),
-    cabinet.role === 'REVIEWER' ? 'N/A' : (finalReport.totalRejectedLabels > 0 ? 1 : 0),
+    '' + (cabinet.role === 'REVIEWER' ? finalReport.totalResolvedLabels : finalReport.totalAppliedLabels),
+    '' + (cabinet.role === 'REVIEWER' ? 'N/A' : finalReport.totalAcceptedLabels),
+    '' + (cabinet.role === 'REVIEWER' ? 'N/A' : finalReport.totalRejectedLabels),
+    '' + (cabinet.role === 'REVIEWER' ? 'N/A' : finalReport.precision),
+    '' + (cabinet.role === 'REVIEWER' ? 'N/A' : finalReport.recall),
+    '' + (cabinet.role === 'REVIEWER' ? 'N/A' : (finalReport.totalRejectedLabels === 0 ? 1 : 0)),
+    '' + (cabinet.role === 'REVIEWER' ? 'N/A' : (finalReport.totalRejectedLabels > 0 ? 1 : 0)),
     cabinet.role === 'REVIEWER' ? 'N/A' : finalReport.totalAcceptedLabels > 0 && finalReport.totalAppliedLabels > 0
       ? (finalReport.totalAcceptedLabels / finalReport.totalAppliedLabels * 100) + '%'
       : 'N/A',
