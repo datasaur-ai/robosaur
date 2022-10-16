@@ -8230,13 +8230,9 @@
             "description": null,
             "args": [],
             "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "TeamMember",
-                "ofType": null
-              }
+              "kind": "OBJECT",
+              "name": "TeamMember",
+              "ofType": null
             },
             "isDeprecated": false,
             "deprecationReason": null
@@ -11174,6 +11170,22 @@
           },
           {
             "name": "totalRejectedLabels",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "totalResolvedLabels",
             "description": null,
             "args": [],
             "type": {

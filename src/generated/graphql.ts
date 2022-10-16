@@ -1100,7 +1100,7 @@ export type DocumentFinalReport = {
   document: TextDocument;
   finalReport: FinalReport;
   rowFinalReports?: Maybe<Array<RowFinalReport>>;
-  teamMember: TeamMember;
+  teamMember?: Maybe<TeamMember>;
 };
 
 export type DocumentForPredictionInput = {
@@ -1450,6 +1450,7 @@ export type FinalReport = {
   totalAcceptedLabels: Scalars['Int'];
   totalAppliedLabels: Scalars['Int'];
   totalRejectedLabels: Scalars['Int'];
+  totalResolvedLabels: Scalars['Int'];
 };
 
 export enum FontSize {

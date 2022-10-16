@@ -10,8 +10,8 @@
   },
   "export": {
     "source": "local",
-    "prefix": "quickstart/final-report/export",
-    "teamId": "181",
+    "prefix": "quickstart/final-report/export/280",
+    "teamId": "280",
     "statusFilter": [],
     "format": "CSV",
     "fileTransformerId": null,
@@ -20,7 +20,7 @@
       "kind": "ROW_BASED",
       "date": {
         "newestDate": "2022-10-31",
-        "oldestDate": "2022-01-01"
+        "oldestDate": "2021-01-01"
       },
       "tags": []
     }

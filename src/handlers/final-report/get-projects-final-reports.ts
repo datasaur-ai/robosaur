@@ -18,6 +18,7 @@ const GET_PROJECTS_FINAL_REPORT_QUERY = gql`
             totalAppliedLabels
             totalAcceptedLabels
             totalRejectedLabels
+            totalResolvedLabels
             precision
             recall
           }

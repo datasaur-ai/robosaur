@@ -64,7 +64,7 @@ const handleStateless = async () => {
     getLogger().info(projectsFinalReport.map((projectFinalReport) => projectFinalReport.project.id));
 
     
-    projectsFinalReport.forEach((projectFinalReport) => {
+    projectsFinalReport.forEach(async (projectFinalReport) => {
       const csvContent = projectFinalReport.documentFinalReports.reduce((result, documentFinalReport) => {
         const rowFinalReports: RowFinalReport[] = (documentFinalReport.rowFinalReports || []);
         if (rowFinalReports.length > 0) {
@@ -73,10 +73,10 @@ const handleStateless = async () => {
               projectFinalReport.project,
               documentFinalReport.document,
               rowFinalReport.line + 1,
-              documentFinalReport.teamMember,
               documentFinalReport.cabinet,
-              rowFinalReport.finalReport
-            ));
+              rowFinalReport.finalReport,
+              documentFinalReport.teamMember,
+              ));
             return resultRow;
           }, [] as string[][]);
           result = [...result, ...contentRowFinalReports];
@@ -85,30 +85,29 @@ const handleStateless = async () => {
             projectFinalReport.project,
             documentFinalReport.document,
             1,
-            documentFinalReport.teamMember,
             documentFinalReport.cabinet,
-            documentFinalReport.finalReport
-          )];
+            documentFinalReport.finalReport,
+            documentFinalReport.teamMember,
+            )];
         }
         return result;
       }, [] as string[][]);
       const csvData = unparse([header, ...csvContent]);
-      publishFile(`${projectFinalReport.project.name}_${projectFinalReport.project.id}`, csvData, config);
+      await publishFile(`${projectFinalReport.project.name}_${projectFinalReport.project.id}`, csvData, config);
     });
 
     getLogger().info(`[END] export projects... ${(index + 1)}/${chunkOfProjects.length}`);
   });
-  getLogger().info('exiting script...');
 };
 
-function generateContent(project, document, line, teamMember, cabinet, finalReport): string[] {
+function generateContent(project, document, line, cabinet, finalReport, teamMember): string[] {
   return [
     project.name,
     document.fileName,
     line,
-    teamMember.user?.email || teamMember.invitationEmail || teamMember.id,
+    teamMember?.user?.email || teamMember?.invitationEmail || teamMember?.id,
     cabinet.role,
-    finalReport.totalAppliedLabels,
+    cabinet.role === 'REVIEWER' ? finalReport.totalResolvedLabels : finalReport.totalAppliedLabels,
     cabinet.role === 'REVIEWER' ? 'N/A' : finalReport.totalAcceptedLabels,
     cabinet.role === 'REVIEWER' ? 'N/A' : finalReport.totalRejectedLabels,
     cabinet.role === 'REVIEWER' ? 'N/A' : finalReport.precision,
