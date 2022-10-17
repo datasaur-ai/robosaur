@@ -221,7 +221,7 @@ export interface CreateConfig {
    */
   tagNames?: string[];
 
-  autoLabel: AutoLabelConfig;
+  autoLabel?: AutoLabelConfig;
 }
 
 export interface CredentialsConfig {

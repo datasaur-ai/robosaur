@@ -7,20 +7,18 @@ import { DocumentAssignment } from '../assignment/interfaces';
 import { getConfig, setConfigByJSONFile } from '../config/config';
 import { CreateConfig, FilesConfig, StorageSources } from '../config/interfaces';
 import { getProjectCreationValidators } from '../config/schema/validator';
-import { autoLabelTokenProject } from '../datasaur/auto-label';
 import { JobStatus } from '../datasaur/get-jobs';
 import { getLocalDocuments } from '../documents/get-local-documents';
 import { getObjectStorageDocuments } from '../documents/get-object-storage-documents';
 import { LocalDocument, RemoteDocument } from '../documents/interfaces';
-import { AutoLabelProjectOptionsInput, GqlAutoLabelServiceProvider, Job } from '../generated/graphql';
 import { getLogger } from '../logger';
 import { setConfigFromPcw } from '../transformer/pcw-transformer/setConfigFromPcw';
 import { getLabelSetsFromDirectory } from '../utils/labelset';
 import { pollJobsUntilCompleted } from '../utils/polling.helper';
 import { getQuestionSetFromFile } from '../utils/questionset';
 import { getState } from '../utils/states/getStates';
-import { ProjectState } from '../utils/states/interfaces';
 import { ScriptState } from '../utils/states/script-state';
+import { handleAutoLabel } from './auto-label.handler';
 import { ScriptAction } from './constants';
 import { handleCreateProject } from './create-project.handler';
 import { doCreateProjectAndUpdateState, getProjectNamesFromFolderNames } from './creation/helper';
@@ -64,10 +62,7 @@ export async function handleCreateProjects(configFile: string, options: ProjectC
   const results = await submitProjectCreationJob(createConfig, projectsToBeCreated, scriptState, dryRun);
   await checkProjectCreationJob(results, scriptState, cwd, dryRun);
 
-  const projectsToAutoLabel = getProjectsToAutoLabel(projectsToBeCreated, scriptState);
-
-  const autoLabelResults = await submitAutoLabelJob(projectsToAutoLabel, dryRun);
-  await checkAutoLabelJob(autoLabelResults, dryRun);
+  await handleAutoLabel(projectsToBeCreated, dryRun);
 }
 
 async function setProjectCreationConfig(cwd: string, configFile: string, usePcw: boolean, withoutPcw: boolean) {
@@ -234,60 +229,5 @@ async function checkProjectCreationJob(
 
     scriptState.updateStatesFromProjectCreationJobs(jobs);
     await scriptState.save();
-  }
-}
-
-function getProjectsToAutoLabel(projectsToBeCreated: { name: string; fullPath: string }[], scriptState: ScriptState) {
-  const newProjectNames = projectsToBeCreated.map((project) => project.name);
-  const filtered = new Map(
-    [...scriptState.getTeamProjectsState().getProjects()].filter(([name, _]) => newProjectNames.includes(name)),
-  );
-  return filtered;
-}
-
-async function submitAutoLabelJob(projectsToAutoLabel: Map<string, ProjectState>, dryRun: boolean) {
-  let results: any[] = [];
-  if (dryRun || !getConfig().create.autoLabel.enableAutoLabel) {
-    getLogger().info(`projects to be auto labeled: ${projectsToAutoLabel}`);
-  } else {
-    for (const [_, projectState] of projectsToAutoLabel) {
-      const autoLabelConfig = getConfig().create.autoLabel;
-      const targetApiInput = {
-        endpoint: autoLabelConfig.targetApiEndpoint,
-        secretKey: autoLabelConfig.targetApiSecretKey,
-      };
-      const options: AutoLabelProjectOptionsInput = {
-        serviceProvider: GqlAutoLabelServiceProvider.Custom,
-        numberOfFilesPerRequest: autoLabelConfig.numberOfFilesPerRequest,
-      };
-
-      getLogger().info(`submitting auto-label job for ${projectState.projectId}...`);
-      const result = await autoLabelTokenProject(
-        projectState.projectId ?? '',
-        autoLabelConfig.labelerEmail,
-        targetApiInput,
-        options,
-      );
-      results.push(result);
-    }
-  }
-  return results;
-}
-
-async function checkAutoLabelJob(results: Job[], dryRun: any) {
-  if (dryRun) {
-    getLogger().info(`check auto label dry run`);
-  } else {
-    getLogger().info(`sending query for auto label project status...`);
-
-    const jobs = await pollJobsUntilCompleted(results.map((r: { id: any }) => r.id || ''));
-
-    const jobFailed = jobs.filter((j) => j.status === JobStatus.FAILED);
-    const jobOK = jobs.filter((j) => j.status === JobStatus.DELIVERED).map((j) => j.id);
-    getLogger().info(`all auto label jobs finished.`, { success: jobOK, fail: jobFailed.map((j) => j.id) });
-    getLogger().info(`completed ${jobs.length} jobs; ${jobOK.length} successful and ${jobFailed.length} failed`);
-    for (const job of jobFailed) {
-      getLogger().error(`error for ${job.id}`, { ...job });
-    }
   }
 }
