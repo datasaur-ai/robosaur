@@ -105,7 +105,8 @@ async function getProjectsToBeCreated(
 async function setLabelSetsOrQuestions(createConfig: CreateConfig) {
   if (createConfig.documentSettings.kind == 'TOKEN_BASED' || createConfig.kinds?.includes('TOKEN_BASED')) {
     if (!createConfig.labelSets) createConfig.labelSets = getLabelSetsFromDirectory(getConfig());
-  } else if (
+  }
+  if (
     createConfig.documentSettings.kind == 'ROW_BASED' ||
     createConfig.documentSettings.kind == 'DOCUMENT_BASED' ||
     createConfig.kinds?.includes('ROW_BASED') ||
