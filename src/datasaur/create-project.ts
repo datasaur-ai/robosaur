@@ -78,8 +78,6 @@ export async function createProject(
     },
   };
 
-  console.log('variables', JSON.stringify(variables, null, 2));
-
   const data = await query(CREATE_PROJECT_MUTATION, variables);
   return data.result;
 }
