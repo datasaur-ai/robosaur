@@ -58,7 +58,7 @@ const populateConfig = async (payload: PCWPayload) => {
   getConfig().create.kinds = payload.kinds || [];
   getConfig().create.tagNames = payload.tagNames;
   getConfig().create.documentSettings.customTextExtractionAPIId =
-    payload.documentSettings.customTextExtractionAPIId ?? '';
+    payload.documentSettings.customTextExtractionAPIId ?? undefined;
 };
 
 export const setConfigFromPcw = async (input: Config) => {
