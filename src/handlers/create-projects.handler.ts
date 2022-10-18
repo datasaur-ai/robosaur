@@ -18,6 +18,7 @@ import { pollJobsUntilCompleted } from '../utils/polling.helper';
 import { getQuestionSetFromFile } from '../utils/questionset';
 import { getState } from '../utils/states/getStates';
 import { ScriptState } from '../utils/states/script-state';
+import { handleAutoLabel } from './auto-label.handler';
 import { ScriptAction } from './constants';
 import { handleCreateProject } from './create-project.handler';
 import { doCreateProjectAndUpdateState, getProjectNamesFromFolderNames } from './creation/helper';
@@ -60,6 +61,8 @@ export async function handleCreateProjects(configFile: string, options: ProjectC
 
   const results = await submitProjectCreationJob(createConfig, projectsToBeCreated, scriptState, dryRun);
   await checkProjectCreationJob(results, scriptState, cwd, dryRun);
+
+  await handleAutoLabel(projectsToBeCreated, dryRun);
 }
 
 async function setProjectCreationConfig(cwd: string, configFile: string, usePcw: boolean, withoutPcw: boolean) {

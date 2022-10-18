@@ -221,6 +221,8 @@ export interface CreateConfig {
    * @description Optional. Tags to be applied to created projects
    */
   tagNames?: string[];
+
+  autoLabel?: AutoLabelConfig;
 }
 
 export interface CredentialsConfig {
@@ -387,4 +389,13 @@ export interface SplitDocumentConfig {
   linesPerFile: number;
   filesPerFolder: number;
   resultFolder: string;
+}
+
+export interface AutoLabelConfig {
+  enableAutoLabel: boolean;
+  projectId: string;
+  labelerEmail: string;
+  targetApiEndpoint: string;
+  targetApiSecretKey: string;
+  numberOfFilesPerRequest: number;
 }
