@@ -37,7 +37,7 @@ export async function createProject(
     };
   });
 
-  projectDocuments[0]['settings'] = { questions: settings.questions };
+  projectDocuments.forEach((doc) => (doc['settings'] = { ...doc['settings'], questions: settings.questions }));
 
   let labelSetIDs: string[] | null = null;
   if (

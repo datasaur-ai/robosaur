@@ -21,7 +21,7 @@ const populateConfig = async (payload: PCWPayload) => {
   getConfig().create.projectSettings = getProjectSettings(payload);
 
   if (payload.documents && payload.documents.length > 0) {
-    getConfig().create.docFileOptions = mapDocFileOptions.fromPcw(payload.documents[0].docFileOptions!);
+    getConfig().create.docFileOptions = mapDocFileOptions.fromPcw(payload.documents[0].docFileOptions ?? {});
   }
 
   if (payload.splitDocumentOption) {

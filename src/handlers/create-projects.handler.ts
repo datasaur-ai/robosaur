@@ -56,7 +56,7 @@ export async function handleCreateProjects(configFile: string, options: ProjectC
 
   const projectsToBeCreated = await getProjectsToBeCreated(createConfig.files, scriptState, dryRun);
 
-  await setLabelSetsOrQuestions(createConfig);
+  await setLabelSetsAndQuestions(createConfig);
 
   const results = await submitProjectCreationJob(createConfig, projectsToBeCreated, scriptState, dryRun);
   await checkProjectCreationJob(results, scriptState, cwd, dryRun);
@@ -102,10 +102,11 @@ async function getProjectsToBeCreated(
   return projectsToBeCreated;
 }
 
-async function setLabelSetsOrQuestions(createConfig: CreateConfig) {
+async function setLabelSetsAndQuestions(createConfig: CreateConfig) {
   if (createConfig.documentSettings.kind == 'TOKEN_BASED' || createConfig.kinds?.includes('TOKEN_BASED')) {
     if (!createConfig.labelSets) createConfig.labelSets = getLabelSetsFromDirectory(getConfig());
-  } else if (
+  }
+  if (
     createConfig.documentSettings.kind == 'ROW_BASED' ||
     createConfig.documentSettings.kind == 'DOCUMENT_BASED' ||
     createConfig.kinds?.includes('ROW_BASED') ||
