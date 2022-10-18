@@ -37,7 +37,7 @@ export async function createProject(
     };
   });
 
-  projectDocuments[0]['settings'] = { questions: settings.questions };
+  projectDocuments.forEach((doc) => (doc['settings'] = { ...doc['settings'], questions: settings.questions }));
 
   let labelSetIDs: string[] | null = null;
   if (
@@ -77,6 +77,8 @@ export async function createProject(
       splitDocumentOption: settings.splitDocumentOption,
     },
   };
+
+  console.log('variables', JSON.stringify(variables, null, 2));
 
   const data = await query(CREATE_PROJECT_MUTATION, variables);
   return data.result;

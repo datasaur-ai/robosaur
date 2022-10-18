@@ -1,5 +1,5 @@
 import { createReadStream, readdirSync } from 'fs';
-import { basename, join, resolve } from 'path';
+import { basename, join } from 'path';
 import { LocalDocument } from './interfaces';
 
 export function getLocalDocuments(path: string): LocalDocument[] {
