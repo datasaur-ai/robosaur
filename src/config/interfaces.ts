@@ -107,6 +107,7 @@ export interface CreateConfig {
     enableEditLabelSet: boolean;
     enableEditSentence: boolean;
     hideLabelerNamesDuringReview: boolean;
+    hideOriginalSentencesDuringReview: boolean;
     hideRejectedLabelsDuringReview: boolean;
     hideLabelsFromInactiveLabelSetDuringReview: boolean;
   };
