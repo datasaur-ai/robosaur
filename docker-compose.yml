@@ -1,0 +1,19 @@
+version: '3'
+services:
+  robosaur:
+    build:
+      context: .
+      dockerfile: robosaur.Dockerfile
+      network: host
+    environment:
+      - MONGODB_CONNSTRING=mongodb://robosaur:password@mongodb
+    ports:
+      - 3000:3000
+    volumes:
+      - ./docker-config:/home/robosaur/config
+      - ./docker-logs:/home/robosaur/logs
+  mongodb:
+    image: mongo:5.0
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=robosaur
+      - MONGO_INITDB_ROOT_PASSWORD=password
