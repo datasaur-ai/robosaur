@@ -4,7 +4,6 @@ services:
     build:
       context: .
       dockerfile: robosaur.Dockerfile
-      network: host
     environment:
       - MONGODB_CONNSTRING=mongodb://robosaur:password@mongodb
     ports:
