@@ -15,7 +15,7 @@ const loggerTestingConfig: LoggerOptions = {
     format.timestamp({
       format: 'YYYY-MM-DD HH:mm:ss',
     }),
-    format.json(),
+    format.logstash(),
     format.errors({ stack: true }),
   ),
   silent: false,
@@ -35,7 +35,7 @@ const loggerDefaultConfig: LoggerOptions = {
     format.timestamp({
       format: 'YYYY-MM-DD HH:mm:ss',
     }),
-    format.json(),
+    format.logstash(),
     format.errors({ stack: true }),
   ),
   silent: false,
