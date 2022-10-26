@@ -53,6 +53,9 @@ export interface Config {
   // apply tags to project
   applyTags: ApplyTagsConfig;
 
+  // split document
+  splitDocument: SplitDocumentConfig;
+
   // database config
   database: DatabaseConfig;
 }
@@ -144,6 +147,7 @@ export interface CreateConfig {
     enableEditLabelSet: boolean;
     enableEditSentence: boolean;
     hideLabelerNamesDuringReview: boolean;
+    hideOriginalSentencesDuringReview: boolean;
     hideRejectedLabelsDuringReview: boolean;
     hideLabelsFromInactiveLabelSetDuringReview: boolean;
   };
@@ -192,6 +196,7 @@ export interface CreateConfig {
     anonymizationEntityTypes?: Array<string>;
     anonymizationMaskingMethod?: string;
     anonymizationRegExps?: Array<string>;
+    customTextExtractionAPIId?: string;
   };
   type?: TextDocumentType;
   kinds?: string[];
@@ -252,6 +257,13 @@ export interface CreateConfig {
     strategy: SplitDocumentStrategy;
     number: number;
   };
+
+  /**
+   * @description Optional. Tags to be applied to created projects
+   */
+  tagNames?: string[];
+
+  autoLabel?: AutoLabelConfig;
 }
 
 export interface CredentialsConfig {
@@ -410,4 +422,21 @@ interface WithStorage {
    * the GCS or S3 bucket name, without gs:// or s3:// prefix
    */
   bucketName: string;
+}
+
+export interface SplitDocumentConfig {
+  path: string;
+  header: boolean;
+  linesPerFile: number;
+  filesPerFolder: number;
+  resultFolder: string;
+}
+
+export interface AutoLabelConfig {
+  enableAutoLabel: boolean;
+  projectId: string;
+  labelerEmail: string;
+  targetApiEndpoint: string;
+  targetApiSecretKey: string;
+  numberOfFilesPerRequest: number;
 }

@@ -45,6 +45,13 @@
         "tokenizer": "WINK"
       },
       "tagNames": ["TAG"]
+    },
+    "autoLabel": {
+      "enableAutoLabel": false,
+      "labelerEmail": "<EMAIL>",
+      "targetApiEndpoint": "<API_ENDPOINT>",
+      "targetApiSecretKey": "<API_SECRET>",
+      "numberOfFilesPerRequest": 1
     }
   }
 }

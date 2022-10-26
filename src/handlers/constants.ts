@@ -22,5 +22,6 @@ export const enum ScriptAction {
   PROJECT_CREATION = 'CREATION',
   PROJECT_EXPORT = 'EXPORT',
   APPLY_TAGS = 'APPLY_TAGS',
+  SPLIT_DOCUMENT = 'SPLIT_DOCUMENT',
   NONE = 'NONE',
 }
