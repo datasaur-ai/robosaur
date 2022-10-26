@@ -29,7 +29,7 @@ export function getDatabaseValidators() {
 }
 
 function validateConfigDatabase(config: Config) {
-  if (!databaseSchemaValidator(config.splitDocument)) {
+  if (!databaseSchemaValidator(config.database)) {
     getLogger().error(`config.database has some errors`, { errors: databaseSchemaValidator.errors });
     throw new Error(`config.database has some errors: ${JSON.stringify(databaseSchemaValidator.errors)}`);
   }

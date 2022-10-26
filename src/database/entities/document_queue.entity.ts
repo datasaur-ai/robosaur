@@ -1,5 +1,5 @@
 import { Column, Entity, ObjectID, ObjectIdColumn } from 'typeorm';
-import { DataPayload } from './data';
+import { DataPayload } from './data.entity';
 
 @Entity()
 export class DocumentQueueEntity {

@@ -1,7 +1,7 @@
 {
   "database": {
     "url": "mongodb://vulcan:vulcan@localhost:27017",
-    "database": "vulcan",
+    "database": "konver",
     "authSource": "admin"
   },
   "create": {
