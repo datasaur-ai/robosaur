@@ -3,6 +3,7 @@ import { Config, StorageSources } from '../interfaces';
 import { applyTagsSchemaValidator } from './apply-tags-schema-validator';
 import { assignmentSchemaValidator } from './assignment-schema-validator';
 import { credentialsSchemaValidator } from './credential-schema-validator';
+import { databaseSchemaValidator } from './database-schema-validator';
 import { documentsSchemaValidator } from './documents-schema-validator';
 import { exportSchemaValidator } from './export-schema-validator';
 import { splitDocumentSchemaValidator } from './split-document-schema-validator';
@@ -23,10 +24,21 @@ export function getSplitDocumentValidators() {
   return [validateConfigSplitDocument];
 }
 
-function validateConfigSplitDocument(config: Config) {
+export function getDatabaseValidators() {
+  return [validateConfigDatabase];
+}
+
+function validateConfigDatabase(config: Config) {
   if (!splitDocumentSchemaValidator(config.splitDocument)) {
     getLogger().error(`config.splitDocument has some errors`, { errors: splitDocumentSchemaValidator.errors });
     throw new Error(`config.splitDocument has some errors: ${JSON.stringify(splitDocumentSchemaValidator.errors)}`);
+  }
+}
+
+function validateConfigSplitDocument(config: Config) {
+  if (!databaseSchemaValidator(config.splitDocument)) {
+    getLogger().error(`config.database has some errors`, { errors: databaseSchemaValidator.errors });
+    throw new Error(`config.database has some errors: ${JSON.stringify(databaseSchemaValidator.errors)}`);
   }
 }
 

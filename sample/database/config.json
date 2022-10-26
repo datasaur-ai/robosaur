@@ -1,6 +1,5 @@
 {
   "database": {
-    "type": "mongodb",
     "url": "mongodb://vulcan:vulcan@localhost:27017",
     "database": "vulcan",
     "authSource": "admin"
