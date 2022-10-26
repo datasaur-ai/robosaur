@@ -29,16 +29,16 @@ export function getDatabaseValidators() {
 }
 
 function validateConfigDatabase(config: Config) {
-  if (!splitDocumentSchemaValidator(config.splitDocument)) {
-    getLogger().error(`config.splitDocument has some errors`, { errors: splitDocumentSchemaValidator.errors });
-    throw new Error(`config.splitDocument has some errors: ${JSON.stringify(splitDocumentSchemaValidator.errors)}`);
+  if (!databaseSchemaValidator(config.splitDocument)) {
+    getLogger().error(`config.database has some errors`, { errors: databaseSchemaValidator.errors });
+    throw new Error(`config.database has some errors: ${JSON.stringify(databaseSchemaValidator.errors)}`);
   }
 }
 
 function validateConfigSplitDocument(config: Config) {
-  if (!databaseSchemaValidator(config.splitDocument)) {
-    getLogger().error(`config.database has some errors`, { errors: databaseSchemaValidator.errors });
-    throw new Error(`config.database has some errors: ${JSON.stringify(databaseSchemaValidator.errors)}`);
+  if (!splitDocumentSchemaValidator(config.splitDocument)) {
+    getLogger().error(`config.splitDocument has some errors`, { errors: splitDocumentSchemaValidator.errors });
+    throw new Error(`config.splitDocument has some errors: ${JSON.stringify(splitDocumentSchemaValidator.errors)}`);
   }
 }
 
