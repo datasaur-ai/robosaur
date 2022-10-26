@@ -1,31 +1,16 @@
 {
   "datasaur": {
-    "host": "https://app.datasaur.ai",
-    "clientId": "<DATASAUR_CLIENT_ID>",
-    "clientSecret": "<DATASAUR_CLIENT_SECRET>"
+    "host": "http://localhost:8080",
+    "clientId": "1bc4b6e2-e290-4399-9e54-967bb2ce8cb5",
+    "clientSecret": "541e4d95-bd65-4340-a1ab-00abed4cab59"
   },
   "projectState": {
     "source": "local",
     "path": "quickstart/state/projectState.json"
   },
-  "export": {
-    "source": "local",
-    "prefix": "quickstart/token-based/export",
-    "teamId": "<TEAM_ID>",
-    "statusFilter": [],
-    "format": "JSON_ADVANCED",
-    "fileTransformerId": null,
-    "projectFilter": {
-      "kind": "TOKEN_BASED",
-      "date": {
-        "newestDate": "2022-02-01",
-        "oldestDate": "2022-01-01"
-      },
-      "tags": []
-    }
-  },
   "create": {
-    "teamId": "<TEAM_ID>",
+    "kinds": ["TOKEN_BASED", "DOCUMENT_BASED"],
+    "teamId": 262,
     "files": {
       "source": "local",
       "path": "quickstart/token-based/documents"
@@ -35,29 +20,31 @@
     },
     "pcwAssignmentStrategy": "AUTO",
     "pcwPayload": {
+      "type": "ASR",
       "projectSettings": {
+        "autoMarkDocumentAsComplete": false,
+        "enableEditLabelSet": false,
+        "enableEditSentence": true,
+        "hideLabelerNamesDuringReview": false,
+        "hideLabelsFromInactiveLabelSetDuringReview": false,
+        "hideOriginalSentencesDuringReview": false,
+        "hideRejectedLabelsDuringReview": true,
         "conflictResolution": {
           "mode": "PEER_REVIEW",
           "consensus": 1
-        },
-        "enableEditLabelSet": false,
-        "enableEditSentence": false,
-        "hideLabelerNamesDuringReview": false,
-        "hideRejectedLabelsDuringReview": true,
-        "hideLabelsFromInactiveLabelSetDuringReview": false
+        }
       },
       "documentSettings": {
-        "kind": "TOKEN_BASED",
-        "fileTransformerId": null,
-
+        "fileTransformerId": 876,
         "allowCharacterBasedLabeling": false,
         "allowArcDrawing": true,
-        "allowMultiLabels": true,
+        "allowMultiLabels": false,
         "allTokensMustBeLabeled": false,
         "textLabelMaxTokenLength": 999999,
         "sentenceSeparator": "\n",
         "tokenizer": "WINK"
-      }
+      },
+      "tagNames": ["TAG"]
     }
   }
 }

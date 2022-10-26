@@ -52,6 +52,49 @@ export interface Config {
 
   // apply tags to project
   applyTags: ApplyTagsConfig;
+
+  // split document
+  splitDocument: SplitDocumentConfig;
+
+  // database config
+  database: DatabaseConfig;
+}
+
+export interface DatabaseConfig {
+  /**
+   * This takes precedence over host, port, username, and password. Specifies the URL of the MongoDB server
+   */
+  url: string;
+
+  /**
+   * Specifies host of MongoDB server if url is undefined
+   */
+  host: string;
+
+  /**
+   * Specifies port of MongoDB server if url is undefined
+   */
+  port: number;
+
+  /**
+   * Specifies username of MongoDB server if url is undefined
+   */
+  username: string;
+
+  /**
+   * Specifies password of MongoDB server if url is undefined
+   */
+  password: string;
+
+  /**
+   * Specifies database used in MongoDB server
+   */
+  database: string;
+
+  /**
+   * Specifies the authentication database
+   */
+  authSource: string;
 }
 
 export interface CreateConfig {
