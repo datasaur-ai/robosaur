@@ -4,7 +4,6 @@ import { handleApplyTags } from './handlers/apply-tags.handler';
 import { handleCreateProject } from './handlers/create-project.handler';
 import { handleCreateProjects } from './handlers/create-projects.handler';
 import { handleExportProjects } from './handlers/export-projects.handler';
-import { handleSplitDocument } from './handlers/split-document.handler';
 import { handleTest } from './handlers/test.handler';
 import { getLogger } from './logger';
 

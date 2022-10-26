@@ -53,9 +53,6 @@ export interface Config {
   // apply tags to project
   applyTags: ApplyTagsConfig;
 
-  // split document
-  splitDocument: SplitDocumentConfig;
-
   // database config
   database: DatabaseConfig;
 }
