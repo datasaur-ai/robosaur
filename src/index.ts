@@ -5,14 +5,11 @@ import { handleCreateProject } from './handlers/create-project.handler';
 import { handleCreateProjects } from './handlers/create-projects.handler';
 import { handleExportProjects } from './handlers/export-projects.handler';
 import { handleSplitDocument } from './handlers/split-document.handler';
-import { handleTest } from './handlers/test.handler';
 import { getLogger } from './logger';
 
 const program = new Command();
 
 program.name(packageJson.name).version(packageJson.version);
-
-program.command('test <configFile>').description('testing').action(handleTest);
 
 program
   .command('create-project <projectName> <configFile>')

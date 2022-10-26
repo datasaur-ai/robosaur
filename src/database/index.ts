@@ -3,7 +3,7 @@ import { getConfig } from '../config/config';
 
 let databaseSource: DataSource;
 
-export const initDatabase = async () => {
+export const initDatabase = () => {
   const config = getConfig();
 
   databaseSource = new DataSource({
