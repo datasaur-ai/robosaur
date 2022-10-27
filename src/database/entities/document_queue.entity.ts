@@ -1,7 +1,7 @@
 import { Column, Entity, ObjectID, ObjectIdColumn } from 'typeorm';
 import { DataPayload } from './data.entity';
 
-@Entity()
+@Entity({ name: 'document_queue' })
 export class DocumentQueueEntity {
   @ObjectIdColumn()
   id: ObjectID;
