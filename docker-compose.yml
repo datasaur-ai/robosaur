@@ -5,7 +5,7 @@ services:
       context: .
       dockerfile: robosaur.Dockerfile
     environment:
-      - MONGODB_CONNSTRING=mongodb://robosaur:password@mongodb
+      - MONGODB_CONNSTRING=mongodb://vulcan:vulcan@mongodb:27017/
     ports:
       - 6969:6969
     volumes:
@@ -17,7 +17,8 @@ services:
   mongodb:
     image: mongo:4.2
     environment:
-      - MONGO_INITDB_ROOT_USERNAME=robosaur
-      - MONGO_INITDB_ROOT_PASSWORD=password
+      - MONGO_INITDB_ROOT_USERNAME=vulcan
+      - MONGO_INITDB_ROOT_PASSWORD=vulcan
+      - MONGO_INITDB_DATABASE=vulcan
     ports:
       - 27017:27017
