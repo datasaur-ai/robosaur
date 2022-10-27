@@ -5,4 +5,4 @@ node_modules/
 quickstart/
 sample/
 docker-*/
-start-robosaur.sh
+restart-robosaur.sh
