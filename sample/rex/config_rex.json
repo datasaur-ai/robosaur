@@ -1,0 +1,214 @@
+{
+  "datasaur": {
+    "host": "https://app.datasaur.ai",
+    "clientId": "<DATASAUR_CLIENT_ID>",
+    "clientSecret": "<DATASAUR_CLIENT_SECRET>"
+  },
+  "projectState": {
+    "source": "local",
+    "path": "<path/to/stateFile.json>"
+  },
+  "create": {
+    "teamId": "<TEAM_ID>",
+    "files": {
+      "source": "local",
+      "path": "<path/to/files/directory>"
+    },
+    "pcwPayloadSource": {
+      "source": "inline"
+    },
+    "pcwAssignmentStrategy": "AUTO",
+    "pcwPayload": {
+      "projectSettings": {
+        "conflictResolution": {
+          "mode": "PEER_REVIEW",
+          "consensus": 1
+        },
+        "enableEditLabelSet": false,
+        "enableEditSentence": false,
+        "hideLabelerNamesDuringReview": false,
+        "hideRejectedLabelsDuringReview": true,
+        "hideLabelsFromInactiveLabelSetDuringReview": false
+      },
+      "documentSettings": {
+        "fileTransformerId": null,
+        "allowCharacterBasedLabeling": false,
+        "allowArcDrawing": true,
+        "allowMultiLabels": true,
+        "allTokensMustBeLabeled": false,
+        "textLabelMaxTokenLength": 999999,
+        "sentenceSeparator": "\n",
+        "tokenizer": "WINK",
+        "transcriptMethod": "CUSTOM_API",
+        "customTextExtractionAPIId": "<CUSTOM_API_ID>"
+      },
+      "labelSets": [
+        {
+          "name": "Rex Label Set",
+          "options": [
+            {
+              "id": "SUYMZaeWloeJhuM33yO-L",
+              "parentId": null,
+              "label": "mata_uang",
+              "color": null
+            },
+            {
+              "id": "ErWr05_taeMm_CmkAWrCq",
+              "parentId": null,
+              "label": "tanggal_transaksi",
+              "color": null
+            },
+            {
+              "id": "GPuJQDlsWdT5ap_18mDQ5",
+              "parentId": null,
+              "label": "nomor_rekening_sumber_dana",
+              "color": null
+            },
+            {
+              "id": "lSuMbGf1eY0pt3F9K4xWF",
+              "parentId": null,
+              "label": "nama_rekening_sumber_dana",
+              "color": null
+            },
+            {
+              "id": "gMJer9xsGikvjlyCAAG62",
+              "parentId": null,
+              "label": "nominal_transaksi_debet",
+              "color": null
+            },
+            {
+              "id": "InwDoTqhF-_BI5gJfZpi_",
+              "parentId": null,
+              "label": "nomor_rekening_tujuan",
+              "color": null
+            },
+            {
+              "id": "rS9VUo4z_qef7iLKuvbRo",
+              "parentId": null,
+              "label": "nama_rekening_tujuan",
+              "color": null
+            },
+            {
+              "id": "1ABTAZiCnsl1Jsx2_oZqg",
+              "parentId": null,
+              "label": "bank_tujuan",
+              "color": null
+            },
+            {
+              "id": "Zt_F8BdiU6cWvL7aOLQI9",
+              "parentId": null,
+              "label": "nominal_transaksi_tujuan",
+              "color": null
+            },
+            {
+              "id": "9xLXMO7csX9K1u8-FGGrV",
+              "parentId": null,
+              "label": "nominal_transaksi_biaya",
+              "color": null
+            },
+            {
+              "id": "3_0c_fXZZqv2jqs9ajsNh",
+              "parentId": null,
+              "label": "nomor_rekening_biaya",
+              "color": null
+            },
+            {
+              "id": "Gi63t1wJo8VY8_Y0WDGhp",
+              "parentId": null,
+              "label": "berita_kredit",
+              "color": null
+            },
+            {
+              "id": "o4BMohsC1BPYbT8LYFhhi",
+              "parentId": null,
+              "label": "checksum",
+              "color": null
+            },
+            {
+              "id": "PcN6lwaxcovv_irMtnwpU",
+              "parentId": null,
+              "label": "total_transaksi_debet",
+              "color": null
+            },
+            {
+              "id": "bvqKnQeiga1CnDUnGxart",
+              "parentId": null,
+              "label": "total_transaksi_kredit",
+              "color": null
+            },
+            {
+              "id": "Fzqu5Kh658frxUGl_Czmb",
+              "parentId": null,
+              "label": "total_pembayaran",
+              "color": null
+            },
+            {
+              "id": "hVtkQxEBhL-Mbuykua_pD",
+              "parentId": null,
+              "label": "total_debet",
+              "color": null
+            },
+            {
+              "id": "HssD60UtaJTb-N7PaEt0A",
+              "parentId": null,
+              "label": "total_biaya",
+              "color": null
+            },
+            {
+              "id": "XPtv6emj9xwm3RnLtnhyt",
+              "parentId": null,
+              "label": "berita_debet",
+              "color": null
+            },
+            {
+              "id": "RcMepZG8RwcAzXLzY-0BT",
+              "parentId": null,
+              "label": "nama_rekening_biaya",
+              "color": null
+            },
+            {
+              "id": "yZn0-fk6bv1upWsJ6P2mK",
+              "parentId": null,
+              "label": "layanan",
+              "color": null
+            },
+            {
+              "id": "mgwDBHtNZHcalJqQRJtBz",
+              "parentId": null,
+              "label": "status_penduduk",
+              "color": null
+            },
+            {
+              "id": "_w4V7zLScttg8Fql_7QIx",
+              "parentId": null,
+              "label": "jenis_penerima",
+              "color": null
+            },
+            {
+              "id": "7iQliX_3OaacVlml8gp-M",
+              "parentId": null,
+              "label": "no_urut",
+              "color": null
+            }
+          ]
+        }
+      ],
+      "documentAssignments": [
+        {
+          "teamMemberId": "<TEAM_MEMBER_ID>",
+          "role": "LABELER_AND_REVIEWER"
+        }
+      ],
+      "tagNames": ["SI", "team-15"],
+      "kinds": ["TOKEN_BASED"],
+      "type": "OCR"
+    },
+    "autoLabel": {
+      "enableAutoLabel": true,
+      "labelerEmail": "<EMAIL>",
+      "targetApiEndpoint": "<FIELD_EXTRACTOR_URL>",
+      "targetApiSecretKey": "<FIELD_EXTRACTOR_SECRET>",
+      "numberOfFilesPerRequest": 1
+    }
+  }
+}
