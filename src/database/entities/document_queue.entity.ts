@@ -1,5 +1,5 @@
 import { Column, Entity, ObjectID, ObjectIdColumn } from 'typeorm';
-import { DataPayload } from './data.entity';
+import { DataPayload } from './data';
 
 @Entity({ name: 'document_queue' })
 export class DocumentQueueEntity {
@@ -10,5 +10,8 @@ export class DocumentQueueEntity {
   team: number;
 
   @Column((type) => DataPayload)
-  data: DataPayload;
+  data?: DataPayload;
+
+  @Column()
+  save_keeping_id: number;
 }

@@ -1,5 +1,5 @@
 import { Column, Entity, ObjectID, ObjectIdColumn } from 'typeorm';
-import { DataPayload } from './data.entity';
+import { DataPayload } from './data';
 
 @Entity({ name: 'process_record' })
 export class ProcessRecordEntity {
@@ -7,5 +7,5 @@ export class ProcessRecordEntity {
   id: ObjectID;
 
   @Column((type) => DataPayload)
-  data: DataPayload;
+  data?: DataPayload;
 }
