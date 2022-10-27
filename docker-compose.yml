@@ -7,12 +7,17 @@ services:
     environment:
       - MONGODB_CONNSTRING=mongodb://robosaur:password@mongodb
     ports:
-      - 3000:3000
+      - 6969:6969
     volumes:
       - ./docker-config:/home/robosaur/config
+      - ./docker-state:/home/robosaur/state
       - ./docker-logs:/home/robosaur/logs
+    extra_hosts:
+      - 'host.docker.internal:172.17.0.1'
   mongodb:
     image: mongo:5.0
     environment:
       - MONGO_INITDB_ROOT_USERNAME=robosaur
       - MONGO_INITDB_ROOT_PASSWORD=password
+    ports:
+      - 27017:27017
