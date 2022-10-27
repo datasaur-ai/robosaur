@@ -199,7 +199,7 @@
           "role": "LABELER_AND_REVIEWER"
         }
       ],
-      "tagNames": ["<TAG_1>", "<TAG_2>"],
+      "tagNames": ["SI", "team-15"],
       "kinds": ["TOKEN_BASED"],
       "type": "OCR"
     },
