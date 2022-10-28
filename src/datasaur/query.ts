@@ -25,7 +25,11 @@ export async function query<T = any, V = any>(
         // most likely because the access token is expired so try to re-generate a new access token
         currentClient = undefined;
         client = await getClient();
+      } else {
+        throw error;
       }
+    } else {
+      throw error;
     }
   }
   return client.request<T, V>(document, variables, requestHeaders);
