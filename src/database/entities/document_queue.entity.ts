@@ -1,15 +1,18 @@
-import { Column, Entity, ObjectID, ObjectIdColumn } from 'typeorm';
+import { Column, Entity, ObjectID, ObjectIdColumn, PrimaryColumn } from 'typeorm';
 import { DataPayload } from './data';
 
 @Entity({ name: 'document_queue' })
 export class DocumentQueueEntity {
   @ObjectIdColumn()
-  id: ObjectID;
+  _id: ObjectID;
+
+  @PrimaryColumn()
+  id: number;
 
   @Column()
   team: number;
 
-  @Column((type) => DataPayload)
+  @Column({ type: 'json' })
   data?: DataPayload;
 
   @Column()

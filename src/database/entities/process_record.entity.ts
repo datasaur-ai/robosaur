@@ -4,8 +4,8 @@ import { DataPayload } from './data';
 @Entity({ name: 'process_record' })
 export class ProcessRecordEntity {
   @ObjectIdColumn()
-  id: ObjectID;
+  _id: ObjectID;
 
-  @Column((type) => DataPayload)
+  @Column({ type: 'json' })
   data?: DataPayload;
 }

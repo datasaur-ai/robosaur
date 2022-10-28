@@ -1,10 +1,13 @@
-import { Column, Entity, ObjectID, ObjectIdColumn } from 'typeorm';
+import { Column, Entity, ObjectID, ObjectIdColumn, PrimaryColumn } from 'typeorm';
 import { TeamsEntity } from './teams.entity';
 
 @Entity({ name: 'labels' })
 export class LabelsEntity {
   @ObjectIdColumn()
-  id: ObjectID;
+  _id: ObjectID;
+
+  @PrimaryColumn()
+  id: number;
 
   @Column()
   name: string;
