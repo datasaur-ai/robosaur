@@ -6,13 +6,20 @@ import { getProjectCreationValidators } from '../config/schema/validator';
 import { createProject } from '../datasaur/create-project';
 import { getJobs, JobStatus } from '../datasaur/get-jobs';
 import { getDocuments } from '../documents/get-documents';
-import { getLogger } from '../logger';
+import { getLogger, getLoggerService } from '../logger';
 import { getLabelSetsFromDirectory } from '../utils/labelset';
 import { sleep } from '../utils/sleep';
 import { ScriptAction } from './constants';
 
 export async function handleCreateProject(projectName: string, configFile: string) {
   const cwd = process.cwd();
+
+  getLoggerService().registerResolver(() => {
+    return {
+      command: 'create-project',
+    };
+  });
+
   setConfigByJSONFile(resolve(cwd, configFile), getProjectCreationValidators(), ScriptAction.PROJECT_CREATION);
 
   const projectSetting = getConfig().create;

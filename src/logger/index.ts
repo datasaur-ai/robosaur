@@ -4,13 +4,6 @@ import { LoggerService } from './logger-service';
 
 export { loggerNamespace } from './logger-namespace';
 
-let logger: Logger;
-
-export function getLogger(config = getConfigFromEnvironment()): Logger {
-  if (!logger) logger = createLogger(config);
-  return logger;
-}
-
 let loggerService: LoggerService;
 
 export function getLoggerService(config = getConfigFromEnvironment()): LoggerService {
@@ -18,4 +11,8 @@ export function getLoggerService(config = getConfigFromEnvironment()): LoggerSer
     loggerService = new LoggerService(createLogger(config));
   }
   return loggerService;
+}
+
+export function getLogger(): Logger {
+  return getLoggerService().getLogger();
 }

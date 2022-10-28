@@ -9,7 +9,7 @@ import { getProject } from '../datasaur/get-project';
 import { getTeamTags } from '../datasaur/get-team-tags';
 import { updateProjectTag } from '../datasaur/update-project-tag';
 import { Tag } from '../generated/graphql';
-import { getLogger } from '../logger';
+import { getLogger, getLoggerService } from '../logger';
 import { getStorageClient } from '../utils/object-storage';
 import { defaultCSVConfig, readCSVFile } from '../utils/readCSVFile';
 import { sleep } from '../utils/sleep';
@@ -19,6 +19,11 @@ interface ApplyTagsOption {
 }
 
 export async function handleApplyTags(configFile: string, option: ApplyTagsOption) {
+  getLoggerService().registerResolver(() => {
+    return {
+      command: 'auto-label',
+    };
+  });
   setConfigByJSONFile(configFile, getApplyTagValidators(), ScriptAction.APPLY_TAGS);
 
   const config = getConfig().applyTags;

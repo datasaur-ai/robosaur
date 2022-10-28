@@ -9,6 +9,7 @@ function registerLoggerResolver() {
     const resolved = loggerNamespace.get('jobId');
     return {
       jobId: resolved,
+      command: 'run-consumer',
     };
   });
 }

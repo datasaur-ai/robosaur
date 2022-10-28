@@ -11,7 +11,7 @@ import { JobStatus } from '../datasaur/get-jobs';
 import { getLocalDocuments } from '../documents/get-local-documents';
 import { getObjectStorageDocuments } from '../documents/get-object-storage-documents';
 import { LocalDocument, RemoteDocument } from '../documents/interfaces';
-import { getLogger } from '../logger';
+import { getLogger, getLoggerService } from '../logger';
 import { setConfigFromPcw } from '../transformer/pcw-transformer/setConfigFromPcw';
 import { getLabelSetsFromDirectory } from '../utils/labelset';
 import { pollJobsUntilCompleted } from '../utils/polling.helper';
@@ -47,6 +47,11 @@ const PROJECT_BEFORE_SAVE = 5;
 export async function handleCreateProjects(configFile: string, options: ProjectCreationOption) {
   const { dryRun, withoutPcw, usePcw } = options;
   const cwd = process.cwd();
+  getLoggerService().registerResolver(() => {
+    return {
+      command: 'create-projects',
+    };
+  });
 
   await setProjectCreationConfig(cwd, configFile, usePcw, withoutPcw);
 

@@ -2,13 +2,18 @@ import { getConfig } from '../config/config';
 import { autoLabelTokenProject } from '../datasaur/auto-label';
 import { JobStatus } from '../datasaur/get-jobs';
 import { AutoLabelProjectOptionsInput, GqlAutoLabelServiceProvider, Job } from '../generated/graphql';
-import { getLogger } from '../logger';
+import { getLogger, getLoggerService } from '../logger';
 import { pollJobsUntilCompleted } from '../utils/polling.helper';
 import { getState } from '../utils/states/getStates';
 import { ProjectState } from '../utils/states/interfaces';
 import { ScriptState } from '../utils/states/script-state';
 
 export async function handleAutoLabel(projects: { name: string; fullPath: string }[], dryRun: boolean) {
+  getLoggerService().registerResolver(() => {
+    return {
+      command: 'auto-label',
+    };
+  });
   if (!getConfig().create.autoLabel?.enableAutoLabel) return;
 
   const scriptState = await getState();
