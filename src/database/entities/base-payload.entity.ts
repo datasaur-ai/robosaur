@@ -1,13 +1,32 @@
 import { Column, ObjectID, ObjectIdColumn, PrimaryColumn } from 'typeorm';
 
+/**
+ * 'reading_result': {
+    '<id_page-index>': [
+        [
+            [
+                xmin:integer,
+                ymin:integer,
+                xmax:integer,
+                ymax:integer
+            ],
+            text:string,
+            label:string,
+            reading-confidence:float
+        ],
+        …
+    ],
+    …
+}
+ */
 export class ReadingResult {
-  [id_page_index: string]: Array<any>;
+  [id_page_index: string]: [[[number, number, number, number], string, string, number]];
 }
 
 export class DocumentData {
   [id_page_index: string]: {
     [label_name: string]: {
-      id: string;
+      id: string; // id format's is uuid
       text: string;
       confidence_mapping: number;
       confidence_reading: number;

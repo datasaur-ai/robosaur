@@ -1,5 +1,7 @@
 import { Column, Entity, ObjectID, ObjectIdColumn, PrimaryColumn } from 'typeorm';
 
+export const TEAM_SURATINSTRUKSI = '15';
+
 @Entity({ name: 'teams' })
 export class TeamsEntity {
   @ObjectIdColumn()
