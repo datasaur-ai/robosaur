@@ -8,6 +8,11 @@
     "source": "local",
     "path": "<path/to/stateFile.json>"
   },
+  "database": {
+    "url": "mongodb://vulcan:vulcan@localhost:27017",
+    "database": "konver",
+    "authSource": "admin"
+  },
   "create": {
     "teamId": "<TEAM_ID>",
     "files": {
