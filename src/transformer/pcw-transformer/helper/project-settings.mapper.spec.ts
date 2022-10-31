@@ -10,7 +10,7 @@ describe('projectSettingsMapper', () => {
       enableEditSentence: true,
       hideLabelerNamesDuringReview: false,
       hideLabelsFromInactiveLabelSetDuringReview: false,
-      hideOriginalSentencesDuringReview: true,
+      hideOriginalSentencesDuringReview: false,
       hideRejectedLabelsDuringReview: true,
       conflictResolution: { consensus: 1, mode: ConflictResolutionMode.Manual },
     };
@@ -20,6 +20,7 @@ describe('projectSettingsMapper', () => {
       enableEditSentence: true,
       hideLabelerNamesDuringReview: false,
       hideLabelsFromInactiveLabelSetDuringReview: false,
+      hideOriginalSentencesDuringReview: false,
       hideRejectedLabelsDuringReview: true,
       conflictResolution: { consensus: 1, mode: ConflictResolutionMode.Manual },
     };
@@ -35,7 +36,7 @@ describe('projectSettingsMapper', () => {
       enableEditSentence: true,
       hideLabelerNamesDuringReview: false,
       hideLabelsFromInactiveLabelSetDuringReview: false,
-      hideOriginalSentencesDuringReview: true,
+      hideOriginalSentencesDuringReview: false,
       hideRejectedLabelsDuringReview: true,
       consensus: 3,
     };
@@ -45,6 +46,7 @@ describe('projectSettingsMapper', () => {
       enableEditSentence: true,
       hideLabelerNamesDuringReview: false,
       hideLabelsFromInactiveLabelSetDuringReview: false,
+      hideOriginalSentencesDuringReview: false,
       hideRejectedLabelsDuringReview: true,
       consensus: 3,
     };
@@ -60,7 +62,7 @@ describe('projectSettingsMapper', () => {
       enableEditSentence: true,
       hideLabelerNamesDuringReview: false,
       hideLabelsFromInactiveLabelSetDuringReview: false,
-      hideOriginalSentencesDuringReview: true,
+      hideOriginalSentencesDuringReview: false,
       hideRejectedLabelsDuringReview: true,
     };
 
@@ -69,6 +71,7 @@ describe('projectSettingsMapper', () => {
       enableEditSentence: true,
       hideLabelerNamesDuringReview: false,
       hideLabelsFromInactiveLabelSetDuringReview: false,
+      hideOriginalSentencesDuringReview: false,
       hideRejectedLabelsDuringReview: true,
       consensus: 1,
     };
@@ -78,6 +81,7 @@ describe('projectSettingsMapper', () => {
       enableEditSentence: true,
       hideLabelerNamesDuringReview: false,
       hideLabelsFromInactiveLabelSetDuringReview: false,
+      hideOriginalSentencesDuringReview: false,
       hideRejectedLabelsDuringReview: true,
       conflictResolution: { consensus: 1, mode: ConflictResolutionMode.PeerReview },
     };

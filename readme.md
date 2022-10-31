@@ -35,10 +35,31 @@ npm run start -- create-projects quickstart/row-based/config/config.json
 
 For more in-depth breakdown, please refer to [row-based.md](row-based.md)
 
+## Running Robosaur Container Locally
+
+Docker and docker-compose are required to run Robosaur containers locally.
+
+Before running the container, create a folder named docker-config. Then, place the documents folder containing all the files needed for the project, and the config files necessary to run Robosaur in there (i.e. the config.json and PCW payload).
+
+When running for the first time,
+
+```
+docker-compose up --build -d
+```
+
+Check the Robosaur activity logs in the newly created `docker-logs/winston.log`.
+
+To restart the container,
+
+```
+./restart-robosaur.sh
+```
+
 ## Contents
 
 - [Robosaur](#robosaur)
   - [Quickstart](#quickstart)
+  - [Running Robosaur Container Locally](#running-robosaur-container-locally)
   - [Contents](#contents)
   - [Requirements](#requirements)
   - [Usage](#usage)
