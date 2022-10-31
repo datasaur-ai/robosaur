@@ -1,48 +1,38 @@
-import { getLoggerService, loggerNamespace } from '../logger';
+import { getLogger, getLoggerService, loggerNamespace } from '../logger';
+import { createProcessWrapper } from '../logger/wrap-process';
 
 const random = () => {
   return Math.floor(Math.random() * 5) + 1;
 };
 
-function registerLoggerResolver() {
-  getLoggerService().registerResolver(() => {
-    const resolved = loggerNamespace.get('jobId');
-    return {
-      jobId: resolved,
-      command: 'run-consumer',
-    };
-  });
-}
-
-function setJobId(jobId: string) {
-  loggerNamespace.set('jobId', jobId);
-}
+const contextKey = 'jobId';
 
 // simulate consumer
 function consumeDataFromDatabase(onJob: (jobId: number) => void | Promise<void>) {
   setInterval(() => {
-    const delayedSecond = random();
-    loggerNamespace.run(() => {
-      setJobId(`${delayedSecond}-${Math.random()}`);
-      onJob(delayedSecond);
-    });
+    const randomJobId = random();
+    onJob(randomJobId);
   }, 2000);
 }
 
 export async function handleRunConsumer(configFile: string) {
-  registerLoggerResolver();
+  getLoggerService().registerResolver(() => {
+    return {
+      command: 'run-consumer',
+    };
+  });
 
-  consumeDataFromDatabase((jobId) => {
-    // get logger instance
-    const logger = getLoggerService().getLogger();
+  const processWrapper = createProcessWrapper(contextKey);
 
-    // test logging
-    logger.info(`running ${jobId} second job`);
-
-    // simulate job complete
-    setTimeout(() => {
-      // test logging
-      logger.info(`completed ${jobId} second job`);
-    }, jobId * 1000);
+  consumeDataFromDatabase(async (jobId: number) => {
+    await processWrapper(
+      () => jobId, // this is the context resolver, any value returned here will be printed to log
+      async () => {
+        getLogger().info('the context is available to any logger inside processWrapper.');
+        setTimeout(() => {
+          getLogger().info('job completed');
+        }, 120);
+      },
+    );
   });
 }
