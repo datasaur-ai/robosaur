@@ -6,6 +6,7 @@ import { JobStatus } from '../datasaur/get-jobs';
 import { getProjects } from '../datasaur/get-projects';
 import { getTeamTags } from '../datasaur/get-team-tags';
 import { ExportResult } from '../datasaur/interfaces';
+import { createSimpleHandlerContext } from '../execution';
 import { getLogger, getLoggerService } from '../logger';
 import { pollJobsUntilCompleted } from '../utils/polling.helper';
 import { publishProjectFiles } from '../utils/publish/publishProjectFiles';
@@ -111,7 +112,9 @@ const handleStateless = async (unzip: boolean) => {
   getLogger().info('exiting script...');
 };
 
-export async function handleExportProjects(configFile: string, { unzip }: { unzip: boolean }) {
+export const handleExportProjects = createSimpleHandlerContext('export-projects', _handleExportProjects);
+
+async function _handleExportProjects(configFile: string, { unzip }: { unzip: boolean }) {
   getLoggerService().registerResolver(() => {
     return {
       command: 'export-projects',
