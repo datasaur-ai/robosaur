@@ -15,6 +15,7 @@
     "adm-zip": "0.5.9",
     "ajv": "8.9.0",
     "axios": "0.21.4",
+    "cls-hooked": "^4.2.2",
     "commander": "7.2.0",
     "dotenv": "10.0.0",
     "graphql": "15.8.0",
@@ -24,13 +25,15 @@
     "minio": "7.0.26",
     "papaparse": "5.3.1",
     "qs": "6.10.3",
-    "winston": "3.4.0"
+    "winston": "^3.4.0",
+    "winston-daily-rotate-file": "^4.7.1"
   },
   "devDependencies": {
     "@graphql-codegen/cli": "2.6.2",
     "@graphql-codegen/introspection": "2.1.1",
     "@graphql-codegen/typescript": "2.4.7",
     "@types/adm-zip": "0.4.34",
+    "@types/cls-hooked": "^4.3.3",
     "@types/graphql": "^14.5.0",
     "@types/jest": "27.4.0",
     "@types/minio": "7.0.11",

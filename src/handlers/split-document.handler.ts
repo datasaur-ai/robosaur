@@ -6,6 +6,7 @@ import { getConfig, setConfigByJSONFile } from '../config/config';
 import { getSplitDocumentValidators } from '../config/schema/validator';
 import { ScriptAction } from './constants';
 import { getLogger } from '../logger';
+import { createSimpleHandlerContext } from '../execution';
 
 const clearDirectory = (dirPath: string) => {
   if (!existsSync(dirPath)) {
@@ -32,7 +33,9 @@ const prepareDirectory = (dirPath: string) => {
   }
 };
 
-export async function handleSplitDocument(configFile: string) {
+export const handleSplitDocument = createSimpleHandlerContext('split-document', _handleSplitDocument);
+
+export async function _handleSplitDocument(configFile: string) {
   setConfigByJSONFile(configFile, getSplitDocumentValidators(), ScriptAction.SPLIT_DOCUMENT);
 
   const path = getConfig().splitDocument.path;

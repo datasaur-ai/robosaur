@@ -1,3 +1,6 @@
+import { config } from 'dotenv';
+config();
+
 import { Command, InvalidOptionArgumentError } from 'commander';
 import packageJson from '../package.json';
 import { handleApplyTags } from './handlers/apply-tags.handler';
@@ -6,6 +9,7 @@ import { handleCreateProjects } from './handlers/create-projects.handler';
 import { handleExportProjects } from './handlers/export-projects.handler';
 import { handleSplitDocument } from './handlers/split-document.handler';
 import { getLogger } from './logger';
+import { handleSimpleCommand } from './handlers/simple-command';
 
 const program = new Command();
 
@@ -50,6 +54,8 @@ program
   )
   .description('Applies tags to projects based on the given config file')
   .action(handleApplyTags);
+
+program.command('simple-command').action(handleSimpleCommand);
 
 program.parseAsync(process.argv);
 
