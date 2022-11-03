@@ -1,3 +1,6 @@
+import { config } from 'dotenv';
+config();
+
 import { Command, InvalidOptionArgumentError } from 'commander';
 import packageJson from '../package.json';
 import { handleApplyTags } from './handlers/apply-tags.handler';

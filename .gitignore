@@ -6,3 +6,5 @@ logs/
 quickstart/export
 quickstart/state
 docker-*/
+
+.env
