@@ -1,6 +1,7 @@
 import { getLoggerService } from '../logger/index';
 import { executionNamespace } from './execution-namespace';
 import { randomUUID } from 'crypto';
+import { getExecutionValue } from './helpers';
 
 export interface HandlerContextCallback<T extends unknown[]> {
   (...args: T): void | Promise<void>;
@@ -48,7 +49,7 @@ export function createConsumerHandlerContext<T extends unknown[], U extends unkn
   onJob: HandlerContextCallback<U>,
 ) {
   getLoggerService().registerResolver(() => {
-    const traceId = executionNamespace.get('trace-id');
+    const traceId = getExecutionValue('trace-id');
     return {
       'trace-id': traceId,
       command: commandName,
