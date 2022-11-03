@@ -13,12 +13,15 @@ import { getLogger } from '../logger';
 import { getStorageClient } from '../utils/object-storage';
 import { defaultCSVConfig, readCSVFile } from '../utils/readCSVFile';
 import { sleep } from '../utils/sleep';
+import { createSimpleHandlerContext } from '../execution';
 
 interface ApplyTagsOption {
   method: 'PUT' | 'PATCH';
 }
 
-export async function handleApplyTags(configFile: string, option: ApplyTagsOption) {
+export const handleApplyTags = createSimpleHandlerContext('apply-tags', _handleApplyTags);
+
+async function _handleApplyTags(configFile: string, option: ApplyTagsOption) {
   setConfigByJSONFile(configFile, getApplyTagValidators(), ScriptAction.APPLY_TAGS);
 
   const config = getConfig().applyTags;
