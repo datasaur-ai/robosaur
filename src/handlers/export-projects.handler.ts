@@ -81,14 +81,14 @@ export async function handleExportProjects(configFile: string, { unzip }: { unzi
   const validProjectsFromDatasaur = await filterProjectsToExport();
   scriptState.addProjectsToExport(validProjectsFromDatasaur);
 
-  const projectToExports: [string, ProjectState][] = await getProjectsToExport(validProjectsFromDatasaur, scriptState);
-  if (projectToExports.length === 0) {
+  const projectsToExport: [string, ProjectState][] = await getProjectsToExport(validProjectsFromDatasaur, scriptState);
+  if (projectsToExport.length === 0) {
     getLogger().info(`no projects left to export, exiting script...`);
     return;
   }
-  getLogger().info(`found ${projectToExports.length} projects to export`);
+  getLogger().info(`found ${projectsToExport.length} projects to export`);
 
-  const results = await runProjectExport(projectToExports, unzip, scriptState);
+  const results = await runProjectExport(projectsToExport, unzip, scriptState);
   await checkProjectExportJobs(results);
   await scriptState.save();
 }
@@ -140,11 +140,11 @@ async function getProjectsToExport(validProjectsFromDatasaur: any[], scriptState
   return projectsToExport;
 }
 
-async function runProjectExport(projectToExports: any[], unzip: boolean, scriptState: ScriptState) {
+async function runProjectExport(projectsToExport: any[], unzip: boolean, scriptState: ScriptState) {
   const { source } = getConfig().export;
 
   const results: Array<{ projectName: string; exportId: string; jobStatus: JobStatus | 'PUBLISHED' }> = [];
-  for (const [name, project] of projectToExports) {
+  for (const [name, project] of projectsToExport) {
     const temp = {
       projectName: project.projectName,
       jobStatus: project.export?.jobStatus ?? JobStatus.NONE,
