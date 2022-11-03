@@ -4,7 +4,7 @@ import { getProjectExportValidators } from '../config/schema/validator';
 import { exportProject } from '../datasaur/export-project';
 import { JobStatus } from '../datasaur/get-jobs';
 import { getProjects } from '../datasaur/get-projects';
-import { ExportResult } from '../datasaur/interfaces';
+import { ExportResult, Project } from '../datasaur/interfaces';
 import { getLogger } from '../logger';
 import { pollJobsUntilCompleted } from '../utils/polling.helper';
 import { publishProjectFiles } from '../utils/publish/publishProjectFiles';
@@ -14,6 +14,12 @@ import { ProjectState } from '../utils/states/interfaces';
 import { ScriptState } from '../utils/states/script-state';
 import { ScriptAction } from './constants';
 import { getTagIds, shouldExport } from './export/helper';
+
+interface ExportStatusObject {
+  projectName: string;
+  jobStatus: JobStatus | 'PUBLISHED';
+  exportId: string;
+}
 
 const handleStateless = async (unzip: boolean) => {
   const { source } = getConfig().export;
@@ -27,11 +33,7 @@ const handleStateless = async (unzip: boolean) => {
   const results: Array<{ projectName: string; exportId: string; jobStatus: JobStatus | 'PUBLISHED' }> = [];
   for (const project of projectsToExport) {
     const filename = `${project.name}_${project.id}`;
-    const temp: {
-      projectName: string;
-      jobStatus: JobStatus | 'PUBLISHED';
-      exportId: string;
-    } = {
+    const temp: ExportStatusObject = {
       projectName: filename,
       jobStatus: JobStatus.NONE,
       exportId: '',
@@ -115,11 +117,11 @@ async function filterProjectsToExport() {
   return await getProjects(filter);
 }
 
-async function getProjectsToExport(validProjectsFromDatasaur: any[], scriptState: ScriptState) {
+async function getProjectsToExport(validProjectsFromDatasaur: Project[], scriptState: ScriptState) {
   const { statusFilter } = getConfig().export;
 
   // from script state, retrieves all projects that are eligible for export
-  const validProjectNamesFromDatasaur = validProjectsFromDatasaur.map((p: { name: any }) => p.name);
+  const validProjectNamesFromDatasaur = validProjectsFromDatasaur.map((p) => p.name);
   const projectsToExport = Array.from(scriptState.getTeamProjectsState().getProjects()).filter(
     ([_name, projectState]) => {
       if (
@@ -140,18 +142,18 @@ async function getProjectsToExport(validProjectsFromDatasaur: any[], scriptState
   return projectsToExport;
 }
 
-async function runProjectExport(projectsToExport: any[], unzip: boolean, scriptState: ScriptState) {
+async function runProjectExport(projectsToExport: [string, ProjectState][], unzip: boolean, scriptState: ScriptState) {
   const { source } = getConfig().export;
 
   const results: Array<{ projectName: string; exportId: string; jobStatus: JobStatus | 'PUBLISHED' }> = [];
   for (const [name, project] of projectsToExport) {
-    const temp = {
+    const temp: ExportStatusObject = {
       projectName: project.projectName,
       jobStatus: project.export?.jobStatus ?? JobStatus.NONE,
       exportId: project.export?.jobId ?? '',
     };
 
-    const retval = await submitProjectExportJob(project.projectId, name);
+    const retval = await submitProjectExportJob(project.projectId!, name);
     temp.exportId = retval.exportId;
     temp.jobStatus = retval.queued ? JobStatus.QUEUED : JobStatus.IN_PROGRESS;
 
@@ -218,7 +220,7 @@ async function submitProjectExportJob(projectId: string, name: string) {
   return retval;
 }
 
-async function checkProjectExportJobs(results: any[]) {
+async function checkProjectExportJobs(results: ExportStatusObject[]) {
   const exportOK = results.filter((r) => r.jobStatus === 'PUBLISHED' || r.jobStatus === JobStatus.DELIVERED);
   const exportFail = results.filter((r) => !(r.jobStatus === 'PUBLISHED' || r.jobStatus === JobStatus.DELIVERED));
   getLogger().info(
