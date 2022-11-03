@@ -9,6 +9,9 @@
     "start": "ts-node src/index.ts",
     "codegen": "graphql-codegen --config codegen.yml"
   },
+  "engines": {
+    "node": ">=14.17.0"
+  },
   "dependencies": {
     "@azure/storage-blob": "~12.9.0",
     "@google-cloud/storage": "5.18.0",
