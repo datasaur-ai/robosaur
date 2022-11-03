@@ -12,7 +12,7 @@ import { getLocalDocuments } from '../documents/get-local-documents';
 import { getObjectStorageDocuments } from '../documents/get-object-storage-documents';
 import { LocalDocument, RemoteDocument } from '../documents/interfaces';
 import { createSimpleHandlerContext } from '../execution';
-import { getLogger, getLoggerService } from '../logger';
+import { getLogger } from '../logger';
 import { setConfigFromPcw } from '../transformer/pcw-transformer/setConfigFromPcw';
 import { getLabelSetsFromDirectory } from '../utils/labelset';
 import { pollJobsUntilCompleted } from '../utils/polling.helper';
@@ -47,7 +47,7 @@ const PROJECT_BEFORE_SAVE = 5;
 
 export const handleCreateProjects = createSimpleHandlerContext('create-projects', _handleCreateProjects);
 
-export async function _handleCreateProjects(configFile: string, options: ProjectCreationOption) {
+async function _handleCreateProjects(configFile: string, options: ProjectCreationOption) {
   const { dryRun, withoutPcw, usePcw } = options;
   const cwd = process.cwd();
 

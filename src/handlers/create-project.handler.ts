@@ -7,7 +7,7 @@ import { createProject } from '../datasaur/create-project';
 import { getJobs, JobStatus } from '../datasaur/get-jobs';
 import { getDocuments } from '../documents/get-documents';
 import { createSimpleHandlerContext } from '../execution';
-import { getLogger, getLoggerService } from '../logger';
+import { getLogger } from '../logger';
 import { getLabelSetsFromDirectory } from '../utils/labelset';
 import { sleep } from '../utils/sleep';
 import { ScriptAction } from './constants';

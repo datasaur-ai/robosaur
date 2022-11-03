@@ -5,7 +5,7 @@ import { basename, join, resolve } from 'path';
 import { getConfig, setConfigByJSONFile } from '../config/config';
 import { getSplitDocumentValidators } from '../config/schema/validator';
 import { createSimpleHandlerContext } from '../execution';
-import { getLogger, getLoggerService } from '../logger';
+import { getLogger } from '../logger';
 import { ScriptAction } from './constants';
 
 const clearDirectory = (dirPath: string) => {
