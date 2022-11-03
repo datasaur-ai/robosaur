@@ -6,7 +6,7 @@ const random = () => {
 };
 
 interface Job {
-  jobId: string;
+  traceId: string;
   payload: string;
 }
 
@@ -24,7 +24,7 @@ async function processJob(jobObject: any) {
 export async function _handleRunConsumer(process: ProcessJob<unknown[]>, configFile: string) {
   getLogger().info('Begin running consumer', { configFile });
   setInterval(() => {
-    const job: Job = { jobId: `${random()}`, payload: 'some-payload-data' };
-    process(job.jobId, job);
+    const job: Job = { traceId: `${random()}`, payload: 'some-payload-data' };
+    process(job.traceId, job);
   }, 2000);
 }
