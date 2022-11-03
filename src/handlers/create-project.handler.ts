@@ -16,7 +16,6 @@ export const handleCreateProject = createSimpleHandlerContext('create-project', 
 
 async function _handleCreateProject(projectName: string, configFile: string) {
   const cwd = process.cwd();
-
   setConfigByJSONFile(resolve(cwd, configFile), getProjectCreationValidators(), ScriptAction.PROJECT_CREATION);
 
   const projectSetting = getConfig().create;
