@@ -4,7 +4,6 @@ import { getProjectExportValidators } from '../config/schema/validator';
 import { exportProject } from '../datasaur/export-project';
 import { JobStatus } from '../datasaur/get-jobs';
 import { getProjects } from '../datasaur/get-projects';
-import { getTeamTags } from '../datasaur/get-team-tags';
 import { ExportResult } from '../datasaur/interfaces';
 import { getLogger } from '../logger';
 import { pollJobsUntilCompleted } from '../utils/polling.helper';
@@ -12,41 +11,21 @@ import { publishProjectFiles } from '../utils/publish/publishProjectFiles';
 import { publishZipFile } from '../utils/publish/publishZipFile';
 import { getState } from '../utils/states/getStates';
 import { ProjectState } from '../utils/states/interfaces';
-import { isExportedStatusLower } from '../utils/states/isExportedStatusLower';
+import { ScriptState } from '../utils/states/script-state';
 import { ScriptAction } from './constants';
+import { getTagIds, shouldExport } from './export/helper';
 
 const handleStateless = async (unzip: boolean) => {
-  const {
-    statusFilter,
-    teamId,
-    format: exportFormat,
-    fileTransformerId: exportFileTransformerId,
-    source,
-    projectFilter,
-  } = getConfig().export;
-  const filterTagIds = projectFilter && projectFilter.tags ? await getTagIds(teamId, projectFilter.tags) : undefined;
+  const { source } = getConfig().export;
 
-  const filter = {
-    statuses: statusFilter,
-    teamId,
-    kinds: projectFilter?.kind ? [projectFilter?.kind] : [],
-    daysCreatedRange: projectFilter?.date
-      ? {
-          newestDate: projectFilter.date.newestDate,
-          oldestDate: projectFilter.date?.oldestDate,
-        }
-      : undefined,
-    tags: filterTagIds,
-  };
-  getLogger().info('retrieving projects with filters', { filter });
-  const projectToExports = await getProjects(filter);
+  const projectsToExport = await filterProjectsToExport();
 
-  getLogger().info(`found ${projectToExports.length} projects to export`);
+  getLogger().info(`found ${projectsToExport.length} projects to export`);
 
-  getLogger().info(projectToExports.map((project) => project.name + '_' + project.id));
+  getLogger().info(projectsToExport.map((project) => project.name + '_' + project.id));
 
   const results: Array<{ projectName: string; exportId: string; jobStatus: JobStatus | 'PUBLISHED' }> = [];
-  for (const project of projectToExports) {
+  for (const project of projectsToExport) {
     const filename = `${project.name}_${project.id}`;
     const temp: {
       projectName: string;
@@ -58,24 +37,7 @@ const handleStateless = async (unzip: boolean) => {
       exportId: '',
     };
 
-    getLogger().info('submitting export job to Datasaur...', {
-      create: {
-        id: project.id,
-        name: filename,
-        format: exportFormat,
-        fileTransformerId: exportFileTransformerId,
-      },
-    });
-    let retval: ExportResult | null = null;
-    try {
-      retval = await exportProject(project.id, filename, exportFormat, exportFileTransformerId);
-    } catch (error) {
-      retval = {
-        exportId: 'dummyexport',
-        fileUrl: 'dummyfile',
-      } as ExportResult;
-      getLogger().error(`fail in exportProject query`, { error: JSON.stringify(error), message: error.message });
-    }
+    const retval = await submitProjectExportJob(project.id, filename);
     temp.exportId = retval.exportId;
     temp.jobStatus = retval.queued ? JobStatus.QUEUED : JobStatus.IN_PROGRESS;
 
@@ -99,16 +61,7 @@ const handleStateless = async (unzip: boolean) => {
     results.push(temp);
   }
 
-  const exportOK = results.filter((r) => r.jobStatus === 'PUBLISHED' || r.jobStatus === JobStatus.DELIVERED);
-  const exportFail = results.filter((r) => !(r.jobStatus === 'PUBLISHED' || r.jobStatus === JobStatus.DELIVERED));
-  getLogger().info(
-    `completed ${results.length} export jobs; ${exportOK.length} successful and ${exportFail.length} failed`,
-    {
-      success: exportOK,
-      fail: exportFail,
-    },
-  );
-  getLogger().info('exiting script...');
+  await checkProjectExportJobs(results);
 };
 
 export async function handleExportProjects(configFile: string, { unzip }: { unzip: boolean }) {
@@ -125,18 +78,27 @@ export async function handleExportProjects(configFile: string, { unzip }: { unzi
   const scriptState = await getState();
   await scriptState.updateInProgressProjectCreationStates();
 
-  const {
-    statusFilter,
-    teamId,
-    format: exportFormat,
-    fileTransformerId: exportFileTransformerId,
-    source,
-    projectFilter,
-  } = getConfig().export;
+  const validProjectsFromDatasaur = await filterProjectsToExport();
+  scriptState.addProjectsToExport(validProjectsFromDatasaur);
+
+  const projectToExports: [string, ProjectState][] = await getProjectsToExport(validProjectsFromDatasaur, scriptState);
+  if (projectToExports.length === 0) {
+    getLogger().info(`no projects left to export, exiting script...`);
+    return;
+  }
+  getLogger().info(`found ${projectToExports.length} projects to export`);
+
+  const results = await runProjectExport(projectToExports, unzip, scriptState);
+  await checkProjectExportJobs(results);
+  await scriptState.save();
+}
+
+async function filterProjectsToExport() {
+  const { projectFilter, teamId, statusFilter } = getConfig().export;
+
   const filterTagIds = projectFilter && projectFilter.tags ? await getTagIds(teamId, projectFilter.tags) : undefined;
 
   // retrieves projects from Datasaur matching the status filters
-  // add or update the projects in script state
   const filter = {
     statuses: statusFilter,
     teamId,
@@ -150,12 +112,15 @@ export async function handleExportProjects(configFile: string, { unzip }: { unzi
     tags: filterTagIds,
   };
   getLogger().info('retrieving projects with filters', { filter });
-  const validProjectsFromDatasaur = await getProjects(filter);
-  scriptState.addProjectsToExport(validProjectsFromDatasaur);
+  return await getProjects(filter);
+}
+
+async function getProjectsToExport(validProjectsFromDatasaur: any[], scriptState: ScriptState) {
+  const { statusFilter } = getConfig().export;
 
   // from script state, retrieves all projects that are eligible for export
-  const validProjectNamesFromDatasaur = validProjectsFromDatasaur.map((p) => p.name);
-  const projectToExports = Array.from(scriptState.getTeamProjectsState().getProjects()).filter(
+  const validProjectNamesFromDatasaur = validProjectsFromDatasaur.map((p: { name: any }) => p.name);
+  const projectsToExport = Array.from(scriptState.getTeamProjectsState().getProjects()).filter(
     ([_name, projectState]) => {
       if (
         statusFilter.includes(projectState.projectStatus) &&
@@ -172,39 +137,21 @@ export async function handleExportProjects(configFile: string, { unzip }: { unzi
       return false;
     },
   );
+  return projectsToExport;
+}
 
-  if (projectToExports.length === 0) {
-    getLogger().info(`no projects left to export, exiting script...`);
-    return;
-  }
-  getLogger().info(`found ${projectToExports.length} projects to export`);
+async function runProjectExport(projectToExports: any[], unzip: boolean, scriptState: ScriptState) {
+  const { source } = getConfig().export;
 
   const results: Array<{ projectName: string; exportId: string; jobStatus: JobStatus | 'PUBLISHED' }> = [];
-  for (const [_key, [name, project]] of projectToExports.entries()) {
+  for (const [name, project] of projectToExports) {
     const temp = {
       projectName: project.projectName,
       jobStatus: project.export?.jobStatus ?? JobStatus.NONE,
       exportId: project.export?.jobId ?? '',
     };
 
-    getLogger().info('submitting export job to Datasaur...', {
-      create: {
-        id: project.projectId,
-        name: project.projectName,
-        format: exportFormat,
-        fileTransformerId: exportFileTransformerId,
-      },
-    });
-    let retval: ExportResult | null = null;
-    try {
-      retval = await exportProject(project.projectId as string, name, exportFormat, exportFileTransformerId);
-    } catch (error) {
-      retval = {
-        exportId: 'dummyexport',
-        fileUrl: 'dummyfile',
-      } as ExportResult;
-      getLogger().error(`fail in exportProject query`, { error: JSON.stringify(error), message: error.message });
-    }
+    const retval = await submitProjectExportJob(project.projectId, name);
     temp.exportId = retval.exportId;
     temp.jobStatus = retval.queued ? JobStatus.QUEUED : JobStatus.IN_PROGRESS;
 
@@ -243,6 +190,35 @@ export async function handleExportProjects(configFile: string, { unzip }: { unzi
     results.push(temp);
   }
 
+  return results;
+}
+
+async function submitProjectExportJob(projectId: string, name: string) {
+  const { format: exportFormat, fileTransformerId: exportFileTransformerId } = getConfig().export;
+
+  getLogger().info('submitting export job to Datasaur...', {
+    create: {
+      id: projectId,
+      name: name,
+      format: exportFormat,
+      fileTransformerId: exportFileTransformerId,
+    },
+  });
+  let retval: ExportResult | null = null;
+  try {
+    retval = await exportProject(projectId, name, exportFormat, exportFileTransformerId);
+  } catch (error) {
+    retval = {
+      exportId: 'dummyexport',
+      fileUrl: 'dummyfile',
+    } as ExportResult;
+    getLogger().error(`fail in exportProject query`, { error: JSON.stringify(error), message: error.message });
+  }
+
+  return retval;
+}
+
+async function checkProjectExportJobs(results: any[]) {
   const exportOK = results.filter((r) => r.jobStatus === 'PUBLISHED' || r.jobStatus === JobStatus.DELIVERED);
   const exportFail = results.filter((r) => !(r.jobStatus === 'PUBLISHED' || r.jobStatus === JobStatus.DELIVERED));
   getLogger().info(
@@ -252,27 +228,5 @@ export async function handleExportProjects(configFile: string, { unzip }: { unzi
       fail: exportFail,
     },
   );
-  await scriptState.save();
   getLogger().info('exiting script...');
-}
-
-async function getTagIds(teamId: string, tagsName: string[]) {
-  if (tagsName.length === 0) return undefined;
-  const tags = await getTeamTags(teamId);
-
-  return tagsName.map((tagName) => {
-    const tag = tags.find((tag) => tag.name === tagName);
-    if (tag === undefined) {
-      throw new Error(`Tag ${tagName} is not found.`);
-    }
-    return tag.id;
-  });
-}
-
-function shouldExport(state: ProjectState) {
-  if (!state.export || state.export.jobStatus !== 'PUBLISHED' || isExportedStatusLower(state)) {
-    return true;
-  }
-
-  return false;
 }
