@@ -3,7 +3,7 @@ import { autoLabelTokenProject } from '../datasaur/auto-label';
 import { JobStatus } from '../datasaur/get-jobs';
 import { createSimpleHandlerContext } from '../execution';
 import { AutoLabelProjectOptionsInput, GqlAutoLabelServiceProvider, Job } from '../generated/graphql';
-import { getLogger, getLoggerService } from '../logger';
+import { getLogger } from '../logger';
 import { pollJobsUntilCompleted } from '../utils/polling.helper';
 import { getState } from '../utils/states/getStates';
 import { ProjectState } from '../utils/states/interfaces';
