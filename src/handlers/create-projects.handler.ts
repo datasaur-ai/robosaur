@@ -44,7 +44,11 @@ interface ProjectConfiguration {
 const LIMIT_RETRY = 3;
 const PROJECT_BEFORE_SAVE = 5;
 
-export async function handleCreateProjects(configFile: string, options: ProjectCreationOption) {
+export async function handleCreateProjects(
+  configFile: string,
+  options: ProjectCreationOption,
+  errorCallback?: (name: string, msg: string) => void,
+) {
   const { dryRun, withoutPcw, usePcw } = options;
   const cwd = process.cwd();
 
@@ -60,9 +64,9 @@ export async function handleCreateProjects(configFile: string, options: ProjectC
   await setLabelSetsAndQuestions(createConfig);
 
   const results = await submitProjectCreationJob(createConfig, projectsToBeCreated, scriptState, dryRun);
-  await checkProjectCreationJob(results, scriptState, cwd, dryRun);
+  await checkProjectCreationJob(results, scriptState, cwd, dryRun, errorCallback);
 
-  await handleAutoLabel(projectsToBeCreated, dryRun);
+  await handleAutoLabel(projectsToBeCreated, dryRun, errorCallback);
 }
 
 async function setProjectCreationConfig(cwd: string, configFile: string, usePcw: boolean, withoutPcw: boolean) {
@@ -209,6 +213,7 @@ async function checkProjectCreationJob(
   scriptState: ScriptState,
   cwd: string,
   dryRun: boolean,
+  errorCallback?: (name: string, msg: string) => void,
 ) {
   if (dryRun) {
     let filepath = resolve(cwd, `dry-run-output-${Date.now()}.json`);
@@ -226,6 +231,9 @@ async function checkProjectCreationJob(
     getLogger().info(`completed ${jobs.length} jobs; ${createOK.length} successful and ${createFail.length} failed`);
     for (const job of createFail) {
       getLogger().error(`error for ${job.id}`, { ...job });
+      if (errorCallback) {
+        errorCallback('ProjectCreationError', `error for ${job.id}: ${job}`);
+      }
     }
 
     scriptState.updateStatesFromProjectCreationJobs(jobs);
