@@ -14,6 +14,7 @@ import { ProjectState } from '../utils/states/interfaces';
 import { ScriptState } from '../utils/states/script-state';
 import { ScriptAction } from './constants';
 import { getTagIds, shouldExport } from './export/helper';
+import { handleSaveToDatabase } from './save-to-database.handler';
 
 interface ExportStatusObject {
   projectName: string;
@@ -93,6 +94,8 @@ export async function handleExportProjects(configFile: string, { unzip }: { unzi
   const results = await runProjectExport(projectsToExport, unzip, scriptState);
   await checkProjectExportJobs(results);
   await scriptState.save();
+
+  await handleSaveToDatabase(configFile);
 }
 
 async function filterProjectsToExport() {
