@@ -16,7 +16,7 @@ services:
       - 'host.docker.internal:172.17.0.1'
   mongodb:
     image: mongo:4.2
-      restart: always
+    restart: always
     ports:
       - 27017:27017
     environment:
