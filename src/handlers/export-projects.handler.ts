@@ -1,6 +1,7 @@
 import { getConfig, setConfigByJSONFile } from '../config/config';
 import { StateConfig } from '../config/interfaces';
 import { getProjectExportValidators } from '../config/schema/validator';
+import { deleteProject } from '../datasaur/delete-project';
 import { exportProject } from '../datasaur/export-project';
 import { JobStatus } from '../datasaur/get-jobs';
 import { getProjects } from '../datasaur/get-projects';
@@ -15,7 +16,6 @@ import { ProjectState } from '../utils/states/interfaces';
 import { ScriptState } from '../utils/states/script-state';
 import { ScriptAction } from './constants';
 import { getTagIds, shouldExport } from './export/helper';
-import { handleSaveToDatabase } from './save-to-database.handler';
 
 interface ExportStatusObject {
   projectName: string;
@@ -95,10 +95,23 @@ async function _handleExportProjects(configFile: string, { unzip }: { unzip: boo
   getLogger().info(`found ${projectsToExport.length} projects to export`);
 
   const results = await runProjectExport(projectsToExport, unzip, scriptState);
-  await checkProjectExportJobs(results);
+  const OKResults = await checkProjectExportJobs(results);
   await scriptState.save();
 
-  await handleSaveToDatabase(configFile);
+  const OKProjectNames = OKResults.map((exportResult) => exportResult.projectName);
+  const projectsToDelete = Array.from(scriptState.getTeamProjectsState().getProjects()).filter(
+    ([_name, projectState]) => {
+      if (OKProjectNames.includes(projectState.projectName)) {
+        return true;
+      }
+      return false;
+    },
+  );
+  console.log(projectsToDelete);
+
+  for (const [_name, projectState] of projectsToDelete) {
+    await deleteProject(projectState.projectId!);
+  }
 }
 
 async function filterProjectsToExport() {
@@ -237,4 +250,6 @@ async function checkProjectExportJobs(results: ExportStatusObject[]) {
     },
   );
   getLogger().info('exiting script...');
+
+  return exportOK;
 }
