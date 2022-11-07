@@ -1,5 +1,5 @@
 import { readdirSync } from 'fs';
-import { resolve } from 'path';
+import path, { resolve } from 'path';
 import { getConfig, setConfigByJSONFile } from '../config/config';
 import { getDatabaseValidators } from '../config/schema/validator';
 import { initDatabase } from '../database';
@@ -8,7 +8,7 @@ import { getRepository } from '../database/repository';
 import { getLogger } from '../logger';
 import { readJSONFile } from '../utils/readJSONFile';
 
-export async function handleSaveToDatabase(configFile: string) {
+export async function handleSaveToDatabase(configFile: string, id: number) {
   setConfigByJSONFile(configFile, getDatabaseValidators());
   initDatabase();
 
@@ -20,11 +20,26 @@ export async function handleSaveToDatabase(configFile: string) {
   getLogger().info(`found ${folders.length} projects to save into database...`);
 
   for (const folder of folders) {
-    getLogger().info(`saving export results of project ${folder} into database...`);
+    let documentData = {};
+    let readingResult = {};
+
+    getLogger().info(`processing export results of project ${folder}...`);
     readdirSync(folder).forEach(async (file) => {
-      getLogger().info(`saving export results of ${file} into database...`);
+      getLogger().info(`checking file ${file}...`);
       const json = readJSONFile(resolve(folder, file));
-      await team15Repository.insert(json);
+
+      // file name should be <ID>_<PAGE_NUMBER>.jpg
+      const filename = path.parse(file).name;
+      documentData[filename] = json.document_data;
+      readingResult[filename] = json.reading_result;
     });
+
+    const record = await team15Repository.findOneByOrFail(id);
+
+    record.document_data = documentData;
+    record.document_data_initial = documentData;
+    record.reading_result = readingResult;
+
+    await team15Repository.save(record);
   }
 }
