@@ -1,9 +1,13 @@
+import { config } from 'dotenv';
+config();
+
 import { Command, InvalidOptionArgumentError } from 'commander';
 import packageJson from '../package.json';
 import { handleApplyTags } from './handlers/apply-tags.handler';
 import { handleCreateProject } from './handlers/create-project.handler';
 import { handleCreateProjects } from './handlers/create-projects.handler';
 import { handleExportProjects } from './handlers/export-projects.handler';
+import { handleRunConsumer } from './handlers/run-consumer';
 import { handleSplitDocument } from './handlers/split-document.handler';
 import { getLogger } from './logger';
 
@@ -50,6 +54,8 @@ program
   )
   .description('Applies tags to projects based on the given config file')
   .action(handleApplyTags);
+
+program.command(`run-consumer <configFile>`).description('Run Consumer').action(handleRunConsumer);
 
 program.parseAsync(process.argv);
 

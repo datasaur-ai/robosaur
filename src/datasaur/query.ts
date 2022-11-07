@@ -1,3 +1,4 @@
+import { randomUUID } from 'crypto';
 import { GraphQLClient } from 'graphql-request';
 import { ClientError, RequestDocument } from 'graphql-request/dist/types';
 import packageJson from '../../package.json';
@@ -14,11 +15,22 @@ export async function query<T = any, V = any>(
   requestHeaders?: HeadersInit,
 ): Promise<T> {
   let client = await getClient();
+  const requestId = randomUUID();
+  const logger = getLogger().child({ 'request-id': requestId });
+
+  // TODO: send trace-id to backend
+  // client.setHeader('x-trace-id', getExecutionValue('trace-id'));
+
+  client.setHeader('x-request-id', requestId);
   client.setHeader('user-agent', `Robosaur/${packageJson.version}+${process.platform}+${process.version}`);
   client.setEndpoint(appendGQLTitleAsQuery(endpointUrl, document));
   try {
-    return await client.request<T, V>(document, variables, requestHeaders);
+    logger.info('Request begin', { document });
+    const result = await client.request<T, V>(document, variables, requestHeaders);
+    logger.info('Request finished');
+    return result;
   } catch (error) {
+    logger.error('Request error', error);
     if (error instanceof ClientError) {
       const firstError = error.response?.errors?.[0];
       if (firstError?.message === 'Unauthorized' && firstError?.extensions?.type === 'AuthenticationError') {

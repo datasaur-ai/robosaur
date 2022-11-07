@@ -5,6 +5,7 @@ import { exportProject } from '../datasaur/export-project';
 import { JobStatus } from '../datasaur/get-jobs';
 import { getProjects } from '../datasaur/get-projects';
 import { ExportResult, Project } from '../datasaur/interfaces';
+import { createSimpleHandlerContext } from '../execution';
 import { getLogger } from '../logger';
 import { pollJobsUntilCompleted } from '../utils/polling.helper';
 import { publishProjectFiles } from '../utils/publish/publishProjectFiles';
@@ -67,7 +68,9 @@ const handleStateless = async (unzip: boolean) => {
   await checkProjectExportJobs(results);
 };
 
-export async function handleExportProjects(configFile: string, { unzip }: { unzip: boolean }) {
+export const handleExportProjects = createSimpleHandlerContext('export-projects', _handleExportProjects);
+
+async function _handleExportProjects(configFile: string, { unzip }: { unzip: boolean }) {
   setConfigByJSONFile(configFile, getProjectExportValidators(), ScriptAction.PROJECT_EXPORT);
 
   const stateless = getConfig().export.executionMode === StateConfig.STATELESS;

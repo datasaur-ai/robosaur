@@ -1,11 +1,12 @@
 import { existsSync, mkdirSync, readdirSync, readFileSync, rmdirSync, unlinkSync, writeFileSync } from 'fs';
-import { parse, unparse } from 'papaparse';
 import { chunk } from 'lodash';
+import { parse, unparse } from 'papaparse';
 import { basename, join, resolve } from 'path';
 import { getConfig, setConfigByJSONFile } from '../config/config';
 import { getSplitDocumentValidators } from '../config/schema/validator';
-import { ScriptAction } from './constants';
+import { createSimpleHandlerContext } from '../execution';
 import { getLogger } from '../logger';
+import { ScriptAction } from './constants';
 
 const clearDirectory = (dirPath: string) => {
   if (!existsSync(dirPath)) {
@@ -32,7 +33,9 @@ const prepareDirectory = (dirPath: string) => {
   }
 };
 
-export async function handleSplitDocument(configFile: string) {
+export const handleSplitDocument = createSimpleHandlerContext('split-document', _handleSplitDocument);
+
+export async function _handleSplitDocument(configFile: string) {
   setConfigByJSONFile(configFile, getSplitDocumentValidators(), ScriptAction.SPLIT_DOCUMENT);
 
   const path = getConfig().splitDocument.path;
