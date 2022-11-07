@@ -3,22 +3,25 @@ import * as Papa from 'papaparse';
 import { getConfig, setConfigByJSONFile } from '../config/config';
 import { ApplyTagsConfig, StorageSources } from '../config/interfaces';
 import { getApplyTagValidators } from '../config/schema/validator';
-import { ScriptAction } from './constants';
 import { createTags } from '../datasaur/create-tag';
 import { getProject } from '../datasaur/get-project';
 import { getTeamTags } from '../datasaur/get-team-tags';
 import { updateProjectTag } from '../datasaur/update-project-tag';
+import { createSimpleHandlerContext } from '../execution';
 import { Tag } from '../generated/graphql';
 import { getLogger } from '../logger';
 import { getStorageClient } from '../utils/object-storage';
 import { defaultCSVConfig, readCSVFile } from '../utils/readCSVFile';
 import { sleep } from '../utils/sleep';
+import { ScriptAction } from './constants';
 
 interface ApplyTagsOption {
   method: 'PUT' | 'PATCH';
 }
 
-export async function handleApplyTags(configFile: string, option: ApplyTagsOption) {
+export const handleApplyTags = createSimpleHandlerContext('apply-tags', _handleApplyTags);
+
+async function _handleApplyTags(configFile: string, option: ApplyTagsOption) {
   setConfigByJSONFile(configFile, getApplyTagValidators(), ScriptAction.APPLY_TAGS);
 
   const config = getConfig().applyTags;

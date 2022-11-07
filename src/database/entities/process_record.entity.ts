@@ -8,4 +8,8 @@ export class ProcessRecordEntity {
 
   @Column({ type: 'json' })
   data?: DataPayload;
+
+  constructor(payload?: DataPayload) {
+    this.data = payload;
+  }
 }

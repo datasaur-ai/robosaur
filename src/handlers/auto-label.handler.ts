@@ -1,6 +1,7 @@
 import { getConfig } from '../config/config';
 import { autoLabelTokenProject } from '../datasaur/auto-label';
 import { JobStatus } from '../datasaur/get-jobs';
+import { createSimpleHandlerContext } from '../execution';
 import { AutoLabelProjectOptionsInput, GqlAutoLabelServiceProvider, Job } from '../generated/graphql';
 import { getLogger } from '../logger';
 import { pollJobsUntilCompleted } from '../utils/polling.helper';
@@ -9,7 +10,9 @@ import { ProjectState } from '../utils/states/interfaces';
 import { ScriptState } from '../utils/states/script-state';
 import { AutoLabelError } from './error/auto-label-error';
 
-export async function handleAutoLabel(
+export const handleAutoLabel = createSimpleHandlerContext('auto-label', _handleAutoLabel);
+
+async function _handleAutoLabel(
   projects: { name: string; fullPath: string }[],
   dryRun: boolean,
   errorCallback?: (error: Error) => void,

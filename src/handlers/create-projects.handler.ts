@@ -11,6 +11,7 @@ import { JobStatus } from '../datasaur/get-jobs';
 import { getLocalDocuments } from '../documents/get-local-documents';
 import { getObjectStorageDocuments } from '../documents/get-object-storage-documents';
 import { LocalDocument, RemoteDocument } from '../documents/interfaces';
+import { createSimpleHandlerContext } from '../execution';
 import { getLogger } from '../logger';
 import { setConfigFromPcw } from '../transformer/pcw-transformer/setConfigFromPcw';
 import { getLabelSetsFromDirectory } from '../utils/labelset';
@@ -45,7 +46,9 @@ interface ProjectConfiguration {
 const LIMIT_RETRY = 3;
 const PROJECT_BEFORE_SAVE = 5;
 
-export async function handleCreateProjects(
+export const handleCreateProjects = createSimpleHandlerContext('create-projects', _handleCreateProjects);
+
+async function _handleCreateProjects(
   configFile: string,
   options: ProjectCreationOption,
   errorCallback?: (error: Error) => void,

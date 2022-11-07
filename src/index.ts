@@ -1,15 +1,25 @@
+import { config } from 'dotenv';
+config();
+
 import { Command, InvalidOptionArgumentError } from 'commander';
 import packageJson from '../package.json';
 import { handleApplyTags } from './handlers/apply-tags.handler';
 import { handleCreateProject } from './handlers/create-project.handler';
 import { handleCreateProjects } from './handlers/create-projects.handler';
 import { handleExportProjects } from './handlers/export-projects.handler';
+import { handleRunConsumer } from './handlers/run-consumer';
 import { handleSplitDocument } from './handlers/split-document.handler';
+import { handleStartConsumer } from './handlers/start-consumer.handler';
+import { handleTest } from './handlers/test.handler';
 import { getLogger } from './logger';
 
 const program = new Command();
 
 program.name(packageJson.name).version(packageJson.version);
+
+program.command('test <configFile>').action(handleTest);
+
+program.command('start-consumer <configFile>').description('start OCR consumer').action(handleStartConsumer);
 
 program
   .command('create-project <projectName> <configFile>')
@@ -50,6 +60,8 @@ program
   )
   .description('Applies tags to projects based on the given config file')
   .action(handleApplyTags);
+
+program.command(`run-consumer <configFile>`).description('Run Consumer').action(handleRunConsumer);
 
 program.parseAsync(process.argv);
 
