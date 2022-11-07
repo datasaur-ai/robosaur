@@ -1,6 +1,7 @@
 import { Team15 } from '../../database/entities/teamPayloads/team_15.entity';
 import { getRepository } from '../../database/repository';
 import { formatDate } from '../utils/format-date';
+import { OCR_STATUS } from './interface';
 
 export const updateSaveKeepingStatus = async (id: number) => {
   const currentTime = formatDate(new Date());
@@ -18,7 +19,7 @@ export const updateSaveKeepingStatus = async (id: number) => {
   }
 
   saveKeeping.start_ocr = currentTime;
-  saveKeeping.ocr_status = 'In Progress';
+  saveKeeping.ocr_status = OCR_STATUS.IN_PROGRESS;
   saveKeepingRepo.save(saveKeeping);
 
   return saveKeeping;

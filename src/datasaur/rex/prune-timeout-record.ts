@@ -4,12 +4,13 @@ import { getRepository } from '../../database/repository';
 import { getLogger } from '../../logger';
 import { formatDate } from '../utils/format-date';
 import { parseDate } from '../utils/parse-date';
+import { OCR_STATUS } from './interface';
 
-const MAX_MINUTES = 30;
+const MAX_TIMEOUT_IN_MINUTES = Number(process.env.MAX_TIMEOUT_IN_MINUTES ?? 30);
 
-export const pruneTimeoutRecord = async () => {
+export const pruneTimeoutRecord = async (teamId: number) => {
   const recordRepo = await getRepository(ProcessRecordEntity);
-  const records = await recordRepo.find();
+  const records = await recordRepo.find({ where: { data: { team_id: teamId } } });
 
   for (const record of records) {
     const saveKeepingId = record.data?.id;
@@ -22,14 +23,12 @@ export const pruneTimeoutRecord = async () => {
       continue;
     }
 
-    console.log(saveKeeping.start_ocr);
     const timeInMinutes = _countTime(saveKeeping.start_ocr);
-    console.log(timeInMinutes);
 
-    if (timeInMinutes >= MAX_MINUTES) {
+    if (timeInMinutes >= MAX_TIMEOUT_IN_MINUTES) {
       getLogger().warn('found a timed out process, removing the process...');
       saveKeeping.end_ocr = formatDate(new Date());
-      saveKeeping.ocr_status = 'Worker timeout on DYNAMIC-OCR';
+      saveKeeping.ocr_status = OCR_STATUS.TIMEOUT;
       await team15Repo.save(saveKeeping);
       await recordRepo.delete(record);
     }
@@ -38,9 +37,6 @@ export const pruneTimeoutRecord = async () => {
 
 const _countTime = (recordTimestamp: string) => {
   const recordTime = parseDate(recordTimestamp);
-  console.log(
-    `${recordTime.getFullYear()} ${recordTime.getMonth()} ${recordTime.getDate()} | ${recordTime.getHours()} ${recordTime.getMinutes()} ${recordTime.getSeconds()}`,
-  );
   const timeNow = new Date();
 
   const td = timeNow.getTime() - recordTime.getTime();

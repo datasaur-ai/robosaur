@@ -7,6 +7,7 @@ import { DocumentQueueEntity } from '../database/entities/document_queue.entity'
 import { Team15 } from '../database/entities/teamPayloads/team_15.entity';
 import { TeamsEntity } from '../database/entities/teams.entity';
 import { getRepository } from '../database/repository';
+import { SI_TEAM_ID } from '../datasaur/rex/interface';
 
 export async function handleTest(configFile: string) {
   setConfigByJSONFile(configFile, getDatabaseValidators());
@@ -15,24 +16,24 @@ export async function handleTest(configFile: string) {
   const data: DataPayload = {
     id: 1,
     file_page_size: 1,
-    file_type: 'a',
-    filename: 'a',
-    hcp_ori_document_dir: 'a',
-    original_filename: 'asdf',
-    parsed_image_dir: 'a',
-    team_id: 1,
+    file_type: 'DUMMY',
+    filename: 'DUMMY',
+    hcp_ori_document_dir: 'DUMMY',
+    original_filename: 'DUMMY',
+    parsed_image_dir: 'DUMMY',
+    team_id: SI_TEAM_ID,
   };
 
   const document = new DocumentQueueEntity();
   document.data = data;
-  document.team = 1;
+  document.team = SI_TEAM_ID;
   document.id = 2;
   document.save_keeping_id = 1;
 
   const team = new TeamsEntity();
-  team.name = 'test';
-  team.url = '';
-  team.id = 1;
+  team.name = 'SURAT_INSTRUKSI';
+  team.url = 'DUMMY';
+  team.id = SI_TEAM_ID;
 
   const docRepo = await getRepository(DocumentQueueEntity);
 
@@ -73,15 +74,15 @@ export async function handleTest(configFile: string) {
     continuous_index: [0],
     document_data: documentData,
     document_data_initial: documentData,
-    document_extension: 'asd',
-    end_ocr: 'asd',
-    filename: 'asd',
-    hcp_ori_document_dir: 'asd',
-    original_filename: 'asd',
-    page_count: 'asd',
-    parsed_image_dir: 'asd',
+    document_extension: 'DUMMY',
+    end_ocr: 'DUMMY',
+    filename: 'DUMMY',
+    hcp_ori_document_dir: 'DUMMY',
+    original_filename: 'DUMMY',
+    page_count: 'DUMMY',
+    parsed_image_dir: 'DUMMY',
     reading_result: reading_result,
-    received_request: 'ad',
+    received_request: 'DUMMY',
     id: 1,
   });
 
