@@ -4,9 +4,9 @@ import { abortJob } from './abort-job';
 import { checkRecordStatus } from './check-record-status';
 
 export const orchestrateJob = async (payload: Team15, configFile: string) => {
-  let isError = false;
-  const errorCallback = async (name: string, msg: string) => {
-    await abortJob(payload, `${name}: ${msg}`);
+  const errorCallback = async (error: Error) => {
+    await abortJob(payload, `${error.name}: ${error.message}`);
+    throw error;
   };
 
   if (!(await checkRecordStatus(payload.id))) {
@@ -19,7 +19,11 @@ export const orchestrateJob = async (payload: Team15, configFile: string) => {
     await abortJob(payload, 'Job is cancelled by client');
     return;
   }
-  await handleCreateProjects(configFile, { dryRun: false, usePcw: true, withoutPcw: false }, errorCallback);
+  try {
+    await handleCreateProjects(configFile, { dryRun: false, usePcw: true, withoutPcw: false }, errorCallback);
+  } catch (e) {
+    return;
+  }
   // Call project export
   // Call post process
 };

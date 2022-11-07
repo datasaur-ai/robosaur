@@ -7,11 +7,12 @@ import { pollJobsUntilCompleted } from '../utils/polling.helper';
 import { getState } from '../utils/states/getStates';
 import { ProjectState } from '../utils/states/interfaces';
 import { ScriptState } from '../utils/states/script-state';
+import { AutoLabelError } from './error/auto-label-error';
 
 export async function handleAutoLabel(
   projects: { name: string; fullPath: string }[],
   dryRun: boolean,
-  errorCallback?: (name: string, msg: string) => void,
+  errorCallback?: (error: Error) => void,
 ) {
   if (!getConfig().create.autoLabel?.enableAutoLabel) return;
 
@@ -58,7 +59,7 @@ async function submitAutoLabelJob(projectsToAutoLabel: Map<string, ProjectState>
   return results;
 }
 
-async function checkAutoLabelJob(results: Job[], dryRun: any, errorCallback?: (name: string, msg: string) => void) {
+async function checkAutoLabelJob(results: Job[], dryRun: any, errorCallback?: (error: Error) => void) {
   if (dryRun) {
     getLogger().info(`check auto label dry run`);
   } else {
@@ -73,7 +74,7 @@ async function checkAutoLabelJob(results: Job[], dryRun: any, errorCallback?: (n
     for (const job of jobFailed) {
       getLogger().error(`error for ${job.id}`, { ...job });
       if (errorCallback) {
-        errorCallback('AutoLabelError', `error for ${job.id}: ${job}`);
+        errorCallback(new AutoLabelError(`error for ${job.id}: ${job}`));
       }
     }
   }

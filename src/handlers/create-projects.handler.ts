@@ -22,6 +22,7 @@ import { handleAutoLabel } from './auto-label.handler';
 import { ScriptAction } from './constants';
 import { handleCreateProject } from './create-project.handler';
 import { doCreateProjectAndUpdateState, getProjectNamesFromFolderNames } from './creation/helper';
+import { ProjectCreationError } from './error/project-creation-error';
 
 interface ProjectCreationOption {
   dryRun: boolean;
@@ -47,7 +48,7 @@ const PROJECT_BEFORE_SAVE = 5;
 export async function handleCreateProjects(
   configFile: string,
   options: ProjectCreationOption,
-  errorCallback?: (name: string, msg: string) => void,
+  errorCallback?: (error: Error) => void,
 ) {
   const { dryRun, withoutPcw, usePcw } = options;
   const cwd = process.cwd();
@@ -213,7 +214,7 @@ async function checkProjectCreationJob(
   scriptState: ScriptState,
   cwd: string,
   dryRun: boolean,
-  errorCallback?: (name: string, msg: string) => void,
+  errorCallback?: (error: Error) => void,
 ) {
   if (dryRun) {
     let filepath = resolve(cwd, `dry-run-output-${Date.now()}.json`);
@@ -232,7 +233,7 @@ async function checkProjectCreationJob(
     for (const job of createFail) {
       getLogger().error(`error for ${job.id}`, { ...job });
       if (errorCallback) {
-        errorCallback('ProjectCreationError', `error for ${job.id}: ${job}`);
+        errorCallback(new ProjectCreationError(`error for ${job.id}: ${job}`));
       }
     }
 
