@@ -1,0 +1,8 @@
+version: '3.1'
+services:
+  robosaur:
+    image: datasaur/robosaur:${DOCKER_TAG}
+    build:
+      context: ./../
+      dockerfile: robosaur.Dockerfile    
+    
