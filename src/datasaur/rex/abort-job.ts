@@ -2,8 +2,9 @@ import { ProcessRecordEntity } from '../../database/entities/process_record.enti
 import { Team15 } from '../../database/entities/teamPayloads/team_15.entity';
 import { getRepository } from '../../database/repository';
 import { getLogger } from '../../logger';
+import { formatDate } from '../utils/format-date';
 
-export const abortJob = async (payload: Team15, error: string) => {
+export const abortJob = async (payload: Team15, message: string, error?: Error) => {
   const saveKeepingRepo = await getRepository(Team15);
   const recordRepo = await getRepository(ProcessRecordEntity);
 
@@ -13,7 +14,9 @@ export const abortJob = async (payload: Team15, error: string) => {
     recordRepo.delete(record);
   }
 
-  saveKeepingRepo.save({ ...payload, end_ocr: 'End', ocr_status: error });
+  saveKeepingRepo.save({ ...payload, end_ocr: formatDate(new Date()), ocr_status: message });
 
-  getLogger().error(error);
+  if (error) {
+    getLogger().error(error.message);
+  }
 };
