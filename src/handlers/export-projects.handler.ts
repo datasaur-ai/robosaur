@@ -95,19 +95,18 @@ async function _handleExportProjects(configFile: string, { unzip }: { unzip: boo
   getLogger().info(`found ${projectsToExport.length} projects to export`);
 
   const results = await runProjectExport(projectsToExport, unzip, scriptState);
-  const OKResults = await checkProjectExportJobs(results);
+  const successResults = await checkProjectExportJobs(results);
   await scriptState.save();
 
-  const OKProjectNames = OKResults.map((exportResult) => exportResult.projectName);
+  const successProjectNames = successResults.map((exportResult) => exportResult.projectName);
   const projectsToDelete = Array.from(scriptState.getTeamProjectsState().getProjects()).filter(
     ([_name, projectState]) => {
-      if (OKProjectNames.includes(projectState.projectName)) {
+      if (successProjectNames.includes(projectState.projectName)) {
         return true;
       }
       return false;
     },
   );
-  console.log(projectsToDelete);
 
   for (const [_name, projectState] of projectsToDelete) {
     await deleteProject(projectState.projectId!);
