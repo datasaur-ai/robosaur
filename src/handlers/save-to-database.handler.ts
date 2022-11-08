@@ -34,7 +34,7 @@ export async function handleSaveToDatabase(configFile: string, id: number) {
       readingResult[filename] = json.reading_result;
     });
 
-    const record = await team15Repository.findOneByOrFail(id);
+    const record = await team15Repository.findOneByOrFail(Number(id));
 
     record.document_data = documentData;
     record.document_data_initial = documentData;

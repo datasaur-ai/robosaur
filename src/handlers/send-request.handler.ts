@@ -1,11 +1,17 @@
 import axios from 'axios';
+import { setConfigByJSONFile } from '../config/config';
+import { getDatabaseValidators } from '../config/schema/validator';
+import { initDatabase } from '../database';
 import { Team15 } from '../database/entities/teamPayloads/team_15.entity';
 import { getRepository } from '../database/repository';
 import { getLogger } from '../logger';
 
-export async function sendRequestToEndpoint(id: number, exportEndpoint: string) {
+export async function sendRequestToEndpoint(configFile: string, id: number) {
+  setConfigByJSONFile(configFile, getDatabaseValidators());
+  initDatabase();
   const team15Repository = await getRepository(Team15);
-  const data = await team15Repository.findOneByOrFail(id);
+  const data = await team15Repository.findOneByOrFail(Number(id));
+  const exportEndpoint = process.env.EXPORT_ENDPOINT;
 
   const payload = {
     document_data: data.document_data,
@@ -33,6 +39,7 @@ export async function sendRequestToEndpoint(id: number, exportEndpoint: string) 
         url: exportEndpoint,
         timeout: 10000,
       });
+      counterRetry += LIMIT_RETRY;
       return response;
     } catch (error) {
       if (counterRetry >= LIMIT_RETRY) {
@@ -46,6 +53,7 @@ export async function sendRequestToEndpoint(id: number, exportEndpoint: string) 
           error: JSON.stringify(error),
           message: error.message,
         });
+        counterRetry += 1;
       }
     }
   }

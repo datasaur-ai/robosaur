@@ -21,6 +21,5 @@ export async function handleExport(configFile: string, data: DataPayload) {
   // receives json format with reading_result and document_data
   await handleSaveToDatabase(configFile, data.id);
 
-  const exportEndpoint = process.env.EXPORT_ENDPOINT ?? '';
-  await sendRequestToEndpoint(data.id, exportEndpoint);
+  await sendRequestToEndpoint(configFile, data.id);
 }
