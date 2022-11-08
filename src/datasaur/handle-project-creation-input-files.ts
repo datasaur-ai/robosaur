@@ -1,4 +1,5 @@
 import axios, { AxiosResponse } from 'axios';
+import axiosRetry from 'axios-retry';
 import { unlinkSync, writeFileSync } from 'fs';
 import { Logger } from 'winston';
 import { DataPayload } from '../database/entities/data';
@@ -61,12 +62,23 @@ class ProjectCreationInputFilesHandler {
   }
 
   private async downloadFile(): Promise<AxiosResponse<DownloadFileResponseData>> {
+    const { HCP_URL_AUTH, HCP_RETRY_DELAY, HCP_MAX_RETRY } = process.env;
     const remoteFilePath = this.remoteFilePath();
-    const authToken = process.env.HCP_URL_AUTH;
+    const authToken = HCP_URL_AUTH;
     const headers = authToken ? { Authorization: authToken } : undefined;
+    axiosRetry(axios, {
+      retries: Number(HCP_MAX_RETRY ?? 5),
+      retryDelay: (currentRetry) => {
+        this.logger.info(`Trying to download document (${currentRetry})..`);
+        return Number(HCP_RETRY_DELAY ?? 5) * 1000;
+      },
+      retryCondition: ({ response }) => {
+        return 500 <= (response as AxiosResponse<DownloadFileResponseData>).status;
+      },
+    });
     const response = await axios.get<DownloadFileResponseData>(remoteFilePath, { headers });
-    if (response.status !== 200) {
-      this.logger.error(`Download document request failed at ${remoteFilePath}`);
+    if (response.status === 400) {
+      this.logger.error(`Document at ${remoteFilePath} was not found`);
       throw new Error();
     }
     return response;
@@ -115,9 +127,9 @@ class ProjectCreationInputFilesHandler {
   }
 
   private filePath(): string {
+    const imageDirectory = this.data?.parsed_image_dir ?? '';
     const dataId = this.data?.id ?? '';
     const paddedPage = this.currentPage.toString().padStart(3, '0');
-    const imageDirectory = this.data?.parsed_image_dir ?? '';
     return `${imageDirectory}/${dataId}_${paddedPage}}`;
   }
 
