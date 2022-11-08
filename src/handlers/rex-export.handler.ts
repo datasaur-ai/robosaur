@@ -1,7 +1,7 @@
 import { DataPayload } from '../database/entities/data';
 import { handleExportProjects } from './export-projects.handler';
-import { handleSaveToDatabase } from './save-to-database.handler';
-import { sendRequestToEndpoint } from './send-request.handler';
+import { saveExportResultsToDatabase } from '../export/save-to-database';
+import { sendRequestToEndpoint } from '../export/send-request';
 
 const testDataPayload: DataPayload = {
   id: 1,
@@ -19,7 +19,7 @@ export async function handleExport(configFile: string, data: DataPayload) {
   await handleExportProjects(configFile, { unzip: true });
 
   // receives json format with reading_result and document_data
-  await handleSaveToDatabase(configFile, data.id);
+  await saveExportResultsToDatabase(configFile, data.id);
 
   await sendRequestToEndpoint(configFile, data.id);
 }

@@ -8,7 +8,7 @@ import { getRepository } from '../database/repository';
 import { getLogger } from '../logger';
 import { readJSONFile } from '../utils/readJSONFile';
 
-export async function handleSaveToDatabase(configFile: string, id: number) {
+export async function saveExportResultsToDatabase(configFile: string, id: number) {
   setConfigByJSONFile(configFile, getDatabaseValidators());
   initDatabase();
 
