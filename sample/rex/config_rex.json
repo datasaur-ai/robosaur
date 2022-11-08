@@ -211,8 +211,8 @@
     "autoLabel": {
       "enableAutoLabel": true,
       "labelerEmail": "<EMAIL>",
-      "targetApiEndpoint": "http://40.88.146.178/surat-instruksi/field-extractor",
-      "targetApiSecretKey": "secret",
+      "targetApiEndpoint": "<FIELD_EXTRACTOR_URL>",
+      "targetApiSecretKey": "<FIELD_EXTRACTOR_SECRET>",
       "numberOfFilesPerRequest": 1
     }
   }
