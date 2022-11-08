@@ -11,7 +11,9 @@ const DELETE_PROJECT_MUTATION = gql`
 
 export async function deleteProject(projectId: string) {
   const variables = {
-    projectId,
+    input: {
+      projectId,
+    },
   };
 
   const data = await query(DELETE_PROJECT_MUTATION, variables);
