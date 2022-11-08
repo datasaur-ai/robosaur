@@ -5,6 +5,8 @@ import { initDatabase } from '../database';
 import { Team15 } from '../database/entities/teamPayloads/team_15.entity';
 import { getRepository } from '../database/repository';
 import { getLogger } from '../logger';
+import { sleep } from '../utils/sleep';
+import { OCR_STATUS } from './constants';
 
 export async function sendRequestToEndpoint(configFile: string, id: number) {
   setConfigByJSONFile(configFile, getDatabaseValidators());
@@ -17,10 +19,10 @@ export async function sendRequestToEndpoint(configFile: string, id: number) {
     document_data: data.document_data,
     document_path: data.hcp_ori_document_dir,
     transaction_id: data.id,
-    status: isOCRSuccessful(data.ocr_status) ? 'Success' : 'Failed',
+    status: isOCRSuccessful(data.ocr_status) ? OCR_STATUS.SUCCESS : OCR_STATUS.FAILED,
     message: {
-      indonesian: `OCR ${isOCRSuccessful(data.ocr_status) ? 'Berhasil' : 'Gagal'}`,
-      english: `OCR ${isOCRSuccessful(data.ocr_status) ? 'Success' : 'Failed'}`,
+      indonesian: `OCR ${isOCRSuccessful(data.ocr_status) ? OCR_STATUS.BERHASIL : OCR_STATUS.GAGAL}`,
+      english: `OCR ${isOCRSuccessful(data.ocr_status) ? OCR_STATUS.SUCCESS : OCR_STATUS.FAILED}`,
     },
     received_request: data.received_request,
     start_ocr: data.start_ocr,
@@ -37,7 +39,7 @@ export async function sendRequestToEndpoint(configFile: string, id: number) {
         headers: { 'content-type': 'application/x-www-form-urlencoded' },
         data: payload,
         url: exportEndpoint,
-        timeout: 10000,
+        timeout: 30000,
       });
       counterRetry += LIMIT_RETRY;
       return response;
@@ -54,11 +56,12 @@ export async function sendRequestToEndpoint(configFile: string, id: number) {
           message: error.message,
         });
         counterRetry += 1;
+        sleep(1000);
       }
     }
   }
 }
 
 function isOCRSuccessful(ocr_status) {
-  return ocr_status === 'Read';
+  return ocr_status === OCR_STATUS.READ;
 }
