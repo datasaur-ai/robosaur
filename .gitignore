@@ -8,3 +8,5 @@ quickstart/state
 docker-*/
 
 .env
+
+on-premise/build/**
