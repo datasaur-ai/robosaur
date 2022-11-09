@@ -10,8 +10,10 @@ mkdir build
 
 cp -r scheme/default/* ./build
 
-
-cp ./../sample/rex/config_rex.json ./build
+mkdir ./build/docker-config
+mkdir ./build/docker-state
+mkdir ./build/docker-logs
+cp ./../sample/rex/config_rex.json ./build/docker-config/
 
 export CI_REGISTRY=682361690817.dkr.ecr.us-east-1.amazonaws.com
 export DOCKER_TAG=$dockerTag

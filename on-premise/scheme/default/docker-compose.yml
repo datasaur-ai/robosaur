@@ -11,4 +11,3 @@ services:
       - ./docker-config:/home/robosaur/config
       - ./docker-state:/home/robosaur/state
       - ./docker-logs:/home/robosaur/logs
-    
