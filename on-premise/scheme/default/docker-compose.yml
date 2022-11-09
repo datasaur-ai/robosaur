@@ -3,9 +3,6 @@ services:
   robosaur:
     image: datasaur/robosaur:${DOCKER_TAG}
     container_name: datasaur-robosaur
-    build:
-      context: ./../
-      dockerfile: robosaur.Dockerfile
     env_file:
       - ./robosaur.env
     ports:
