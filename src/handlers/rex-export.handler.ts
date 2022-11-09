@@ -16,7 +16,7 @@ const testDataPayload: DataPayload = {
 
 export async function handleExport(configFile: string, data: DataPayload) {
   // TODO: implement post processing and delete the exported file
-  await handleExportProjects(configFile, { unzip: true });
+  await handleExportProjects(configFile, { unzip: true, deleteProjectAfterExport: true });
 
   // receives json format with reading_result and document_data
   await saveExportResultsToDatabase(configFile, data.id);

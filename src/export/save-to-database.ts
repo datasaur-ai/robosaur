@@ -7,6 +7,7 @@ import { Team15 } from '../database/entities/teamPayloads/team_15.entity';
 import { getRepository } from '../database/repository';
 import { getLogger } from '../logger';
 import { readJSONFile } from '../utils/readJSONFile';
+import { postProcessDocumentData } from './post-process';
 
 export async function saveExportResultsToDatabase(configFile: string, id: number) {
   setConfigByJSONFile(configFile, getDatabaseValidators());
@@ -30,7 +31,7 @@ export async function saveExportResultsToDatabase(configFile: string, id: number
 
       // file name should be <ID>_<PAGE_NUMBER>.jpg
       const filename = path.parse(file).name;
-      documentData[filename] = json.document_data;
+      documentData[filename] = postProcessDocumentData(json.document_data);
       readingResult[filename] = json.reading_result;
     });
 
