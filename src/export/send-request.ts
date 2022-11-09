@@ -36,7 +36,7 @@ export async function sendRequestToEndpoint(configFile: string, id: number) {
     try {
       const response = await axios({
         method: 'POST',
-        headers: { 'content-type': 'application/x-www-form-urlencoded' },
+        headers: { 'content-type': 'application/json' },
         data: payload,
         url: exportEndpoint,
         timeout: 30000,

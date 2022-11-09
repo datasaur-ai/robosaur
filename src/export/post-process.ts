@@ -8,7 +8,7 @@ export async function postProcessDocumentData(data) {
 
   const response = await axios({
     method: 'POST',
-    headers: { 'content-type': 'application/x-www-form-urlencoded' },
+    headers: { 'content-type': 'application/json' },
     data: payload,
     url: postProcessEndpoint,
     timeout: 30000,
