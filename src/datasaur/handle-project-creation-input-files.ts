@@ -50,27 +50,27 @@ class ProjectCreationInputFilesHandler {
       const documentRecognitionResponse = await this.postDocumentRecognition(fileContent);
 
       // Step 3: Keep or remove the downloaded file
-      if (!this.isInstructionLetterDocument(documentRecognitionResponse)) {
+      const recognitionResult = documentRecognitionResponse.data;
+      if (!this.isInstructionLetterDocument(recognitionResult)) {
         unlinkSync(localFilePath);
         this.logger.error(`Document is not an instruction letter`);
         continue;
       }
 
-      const imageContent = documentRecognitionResponse.data.image_data?.join('') ?? '';
+      const imageContent = recognitionResult.image_data?.join('') ?? '';
       writeFileSync(localFilePath, imageContent);
     }
   }
 
   private async downloadFile(): Promise<AxiosResponse<DownloadFileResponseData>> {
-    const { HCP_URL_AUTH, HCP_RETRY_DELAY, HCP_MAX_RETRY } = process.env;
     const remoteFilePath = this.remoteFilePath();
-    const authToken = HCP_URL_AUTH;
+    const authToken = process.env.HCP_URL_AUTH;
     const headers = authToken ? { Authorization: authToken } : undefined;
     axiosRetry(axios, {
-      retries: Number(HCP_MAX_RETRY ?? 5),
+      retries: 5,
       retryDelay: (currentRetry) => {
         this.logger.info(`Trying to download document (${currentRetry})..`);
-        return Number(HCP_RETRY_DELAY ?? 5) * 1000;
+        return 5000;
       },
       retryCondition: ({ response }) => {
         return 500 <= (response as AxiosResponse<DownloadFileResponseData>).status;
@@ -102,8 +102,8 @@ class ProjectCreationInputFilesHandler {
     return response;
   }
 
-  private isInstructionLetterDocument(response: AxiosResponse<DocumentRecognitionResponseData>): boolean {
-    const { document_prediction: documentPredictions, image_data: imageData } = response.data;
+  private isInstructionLetterDocument(data: DocumentRecognitionResponseData): boolean {
+    const { document_prediction: documentPredictions, image_data: imageData } = data;
     if (!imageData) {
       return false;
     }
@@ -116,9 +116,8 @@ class ProjectCreationInputFilesHandler {
   }
 
   private localFilePath(): string {
-    const temporaryDirectoryName = process.env.TEMPORARY_DIRECTORY;
     const projectName = this.job.id;
-    return `../../${temporaryDirectoryName}/${projectName}/${this.filePath()}`;
+    return `../../temps/${projectName}/${this.filePath()}`;
   }
 
   private remoteFilePath(): string {
