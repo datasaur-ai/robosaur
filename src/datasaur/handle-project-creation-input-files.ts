@@ -1,24 +1,18 @@
-import axios, { AxiosError } from 'axios';
+import axios from 'axios';
 import axiosRetry from 'axios-retry';
-import { existsSync, mkdirSync, unlinkSync, writeFileSync } from 'fs';
+import { createReadStream, createWriteStream, existsSync, mkdirSync, unlinkSync, writeFileSync } from 'fs';
+import * as stream from 'stream';
+import { promisify } from 'util';
 import { Logger } from 'winston';
 import { DataPayload } from '../database/entities/data';
 import { DocumentQueueEntity } from '../database/entities/document_queue.entity';
-import { TEAM_SURATINSTRUKSI } from '../database/entities/teams.entity';
 import { getLogger } from '../logger';
 import { getStorageClient } from '../utils/object-storage';
 
-interface DocumentRecognitionRequestData {
-  id: string;
-  key: string;
-  teamId: string;
-  file: ArrayBuffer;
-}
-
 interface DocumentRecognitionResponseData {
-  orientation_prediction: string[];
-  document_prediction: string[];
-  image_data?: string[];
+  orientation_preds: number[];
+  document_preds: string[];
+  images_data: (string | null)[];
 }
 
 class ProjectCreationInputFilesHandler {
@@ -39,25 +33,17 @@ class ProjectCreationInputFilesHandler {
       this.createLocalDirectory();
 
       // Step 1: Download file
-      const fileContent = await this.downloadFile();
-      this.storeFile(fileContent);
+      await this.downloadFile();
 
       // Step 2: Document recognition API
-      const response = await this.postDocumentRecognition(fileContent);
+      const recognitionResult = await this.postDocumentRecognition();
 
       // Step 3: Keep or remove the downloaded file
-      if (!this.isInstructionLetterDocument(response)) {
-        this.deleteFile();
-        this.logger.error(`Document is not an instruction letter`);
-        continue;
-      }
-
-      const imageContent = response.image_data?.join('') ?? '';
-      this.storeFile(Buffer.from(imageContent));
+      this.cleanUp(recognitionResult);
     }
   }
 
-  private async downloadFile(): Promise<ArrayBuffer> {
+  private async downloadFile(): Promise<void> {
     const bucketName = process.env.S3_BUCKET_NAME ?? '';
     const objectName = this.filePath();
     const fileUrl = await getStorageClient().getObjectUrl(bucketName, objectName);
@@ -67,63 +53,74 @@ class ProjectCreationInputFilesHandler {
         this.logger.info(`Trying to download (${currentRetry})..`);
         return 5000;
       },
-      retryCondition: ({ response }: AxiosError<ArrayBuffer>) => {
+      retryCondition: ({ response }) => {
         return response ? 500 <= response.status && response.status <= 599 : false;
       },
     });
-    const headers = { Accept: 'application/octet-stream' };
     try {
-      const response = await axios.get<ArrayBuffer>(fileUrl, { headers });
-      return response.data;
-    } catch ({ response, message }) {
+      const response = await axios.get(fileUrl, { responseType: 'stream' });
+      const pipeline = promisify(stream.pipeline);
+      await pipeline(response.data, createWriteStream(this.localFilePath()));
+    } catch (error) {
+      const { response } = error;
       if (400 <= response.status && response.status <= 499) {
         this.logger.error(`Not found: ${fileUrl}`);
-      } else {
-        this.logger.error(`Error: ${message}`);
       }
-      throw new Error();
+      throw error;
     }
   }
 
-  private async postDocumentRecognition(fileContent: ArrayBuffer): Promise<DocumentRecognitionResponseData> {
+  // Todo
+  private async postDocumentRecognition(): Promise<DocumentRecognitionResponseData> {
     const apiUrl = process.env.DOCUMENT_RECOGNITION_API_URL ?? '';
-    const apiAuth = process.env.DOCUMENT_RECOGNITION_API_AUTH ?? '';
-    const requestData: DocumentRecognitionRequestData = {
-      id: this.job.id.toString(),
-      key: apiAuth,
-      teamId: TEAM_SURATINSTRUKSI,
-      file: fileContent,
+    const FormData = require('form-data');
+    const form = new FormData();
+    form.append('file', createReadStream(this.localFilePath()));
+    const headers = {
+      'Content-Type': 'multipart/form-data',
     };
-    const response = await axios.post<DocumentRecognitionResponseData>(apiUrl, requestData);
-    if (response.status !== 200) {
-      this.logger.error(`Document recognition request failed at ${apiUrl} ${requestData}`);
-      throw new Error();
+    try {
+      const response = await axios.post<DocumentRecognitionResponseData>(apiUrl, form, {
+        headers,
+      });
+      return response.data;
+    } catch (error) {
+      const { response } = error;
+      if (400 <= response.status && response.status <= 499) {
+        this.logger.error(`Not found: ${apiUrl}`);
+      }
+      throw error;
     }
-    return response.data;
   }
 
-  private isInstructionLetterDocument(data: DocumentRecognitionResponseData): boolean {
-    const { document_prediction: documentPredictions, image_data: imageData } = data;
-    if (!imageData) {
-      return false;
-    }
-    for (const documentPrediction of documentPredictions) {
-      if (documentPrediction !== 'SURAT_INSTRUKSI') {
-        return false;
+  // Todo
+  private cleanUp(data: DocumentRecognitionResponseData): void {
+    const {
+      orientation_preds: orientationPredictions,
+      document_preds: documentPredictions,
+      images_data: imagesData,
+    } = data;
+    const totalPages = orientationPredictions.length;
+    for (let i = 0; i < totalPages; i++) {
+      if (documentPredictions[i] !== 'SURAT_INSTRUKSI') {
+        this.deleteFile();
+        return;
+      }
+      if (orientationPredictions[i] !== 0 && imagesData[i] !== null) {
+        this.storeFile(imagesData[i] as string);
+        return;
       }
     }
-    return true;
   }
 
   private createLocalDirectory() {
-    if (existsSync(this.localFileDirectoryPath())) {
-      return;
+    if (!existsSync(this.localFileDirectoryPath())) {
+      mkdirSync(this.localFileDirectoryPath(), { recursive: true });
     }
-    mkdirSync(this.localFileDirectoryPath(), { recursive: true });
   }
 
-  private storeFile(fileContent: ArrayBuffer): void {
-    writeFileSync(this.localFilePath(), Buffer.from(fileContent));
+  private storeFile(base64Content: string): void {
+    writeFileSync(this.localFilePath(), Buffer.from(base64Content, 'base64'));
   }
 
   private deleteFile(): void {
@@ -170,8 +167,7 @@ class ProjectCreationInputFilesHandler {
 }
 
 export async function handleProjectCreationInputFiles(job: DocumentQueueEntity): Promise<void> {
-  if (!job.data) {
-    return;
+  if (job.data) {
+    await new ProjectCreationInputFilesHandler(job).handle();
   }
-  await new ProjectCreationInputFilesHandler(job).handle();
 }
