@@ -1,21 +1,18 @@
-import axios, { AxiosResponse } from 'axios';
+import axios, { AxiosError } from 'axios';
 import axiosRetry from 'axios-retry';
-import { unlinkSync, writeFileSync } from 'fs';
+import { existsSync, mkdirSync, unlinkSync, writeFileSync } from 'fs';
 import { Logger } from 'winston';
 import { DataPayload } from '../database/entities/data';
 import { DocumentQueueEntity } from '../database/entities/document_queue.entity';
 import { TEAM_SURATINSTRUKSI } from '../database/entities/teams.entity';
 import { getLogger } from '../logger';
-
-interface DownloadFileResponseData {
-  content: string;
-}
+import { getStorageClient } from '../utils/object-storage';
 
 interface DocumentRecognitionRequestData {
   id: string;
   key: string;
   teamId: string;
-  file: string;
+  file: ArrayBuffer;
 }
 
 interface DocumentRecognitionResponseData {
@@ -27,7 +24,7 @@ interface DocumentRecognitionResponseData {
 class ProjectCreationInputFilesHandler {
   private readonly data?: DataPayload;
   private readonly logger: Logger = getLogger();
-  private currentPage: number = -1;
+  private _currentPage: number = 0;
 
   constructor(private readonly job: DocumentQueueEntity) {
     this.data = this.job.data;
@@ -38,56 +35,59 @@ class ProjectCreationInputFilesHandler {
 
     for (let page = 0; page < totalPage; page++) {
       this.logger.info(`Processing page number ${page + 1}..`);
-      this.setCurrentPage(page);
+      this.currentPage = page;
+      this.createLocalDirectory();
 
       // Step 1: Download file
-      const downloadDocumentResponse = await this.downloadFile();
-      const localFilePath = this.localFilePath();
-      const fileContent = downloadDocumentResponse.data.content;
-      writeFileSync(localFilePath, fileContent);
+      const fileContent = await this.downloadFile();
+      this.storeFile(fileContent);
 
       // Step 2: Document recognition API
-      const documentRecognitionResponse = await this.postDocumentRecognition(fileContent);
+      const response = await this.postDocumentRecognition(fileContent);
 
       // Step 3: Keep or remove the downloaded file
-      const recognitionResult = documentRecognitionResponse.data;
-      if (!this.isInstructionLetterDocument(recognitionResult)) {
-        unlinkSync(localFilePath);
+      if (!this.isInstructionLetterDocument(response)) {
+        this.deleteFile();
         this.logger.error(`Document is not an instruction letter`);
         continue;
       }
 
-      const imageContent = recognitionResult.image_data?.join('') ?? '';
-      writeFileSync(localFilePath, imageContent);
+      const imageContent = response.image_data?.join('') ?? '';
+      this.storeFile(Buffer.from(imageContent));
     }
   }
 
-  private async downloadFile(): Promise<AxiosResponse<DownloadFileResponseData>> {
-    const remoteFilePath = this.remoteFilePath();
-    const authToken = process.env.HCP_URL_AUTH;
-    const headers = authToken ? { Authorization: authToken } : undefined;
+  private async downloadFile(): Promise<ArrayBuffer> {
+    const bucketName = process.env.S3_BUCKET_NAME ?? '';
+    const objectName = this.filePath();
+    const fileUrl = await getStorageClient().getObjectUrl(bucketName, objectName);
     axiosRetry(axios, {
       retries: 5,
       retryDelay: (currentRetry) => {
-        this.logger.info(`Trying to download document (${currentRetry})..`);
+        this.logger.info(`Trying to download (${currentRetry})..`);
         return 5000;
       },
-      retryCondition: ({ response }) => {
-        return 500 <= (response as AxiosResponse<DownloadFileResponseData>).status;
+      retryCondition: ({ response }: AxiosError<ArrayBuffer>) => {
+        return response ? 500 <= response.status && response.status <= 599 : false;
       },
     });
-    const response = await axios.get<DownloadFileResponseData>(remoteFilePath, { headers });
-    if (response.status === 400) {
-      this.logger.error(`Document at ${remoteFilePath} was not found`);
+    const headers = { Accept: 'application/octet-stream' };
+    try {
+      const response = await axios.get<ArrayBuffer>(fileUrl, { headers });
+      return response.data;
+    } catch ({ response, message }) {
+      if (400 <= response.status && response.status <= 499) {
+        this.logger.error(`Not found: ${fileUrl}`);
+      } else {
+        this.logger.error(`Error: ${message}`);
+      }
       throw new Error();
     }
-    return response;
   }
 
-  private async postDocumentRecognition(fileContent: string): Promise<AxiosResponse<DocumentRecognitionResponseData>> {
-    const { DOCUMENT_RECOGNITION_API_URL, DOCUMENT_RECOGNITION_API_AUTH } = process.env;
-    const apiUrl = DOCUMENT_RECOGNITION_API_URL ?? '';
-    const apiAuth = DOCUMENT_RECOGNITION_API_AUTH ?? '';
+  private async postDocumentRecognition(fileContent: ArrayBuffer): Promise<DocumentRecognitionResponseData> {
+    const apiUrl = process.env.DOCUMENT_RECOGNITION_API_URL ?? '';
+    const apiAuth = process.env.DOCUMENT_RECOGNITION_API_AUTH ?? '';
     const requestData: DocumentRecognitionRequestData = {
       id: this.job.id.toString(),
       key: apiAuth,
@@ -99,7 +99,7 @@ class ProjectCreationInputFilesHandler {
       this.logger.error(`Document recognition request failed at ${apiUrl} ${requestData}`);
       throw new Error();
     }
-    return response;
+    return response.data;
   }
 
   private isInstructionLetterDocument(data: DocumentRecognitionResponseData): boolean {
@@ -115,30 +115,62 @@ class ProjectCreationInputFilesHandler {
     return true;
   }
 
-  private localFilePath(): string {
-    const projectName = this.job.id;
-    return `../../temps/${projectName}/${this.filePath()}`;
+  private createLocalDirectory() {
+    if (existsSync(this.localFileDirectoryPath())) {
+      return;
+    }
+    mkdirSync(this.localFileDirectoryPath(), { recursive: true });
   }
 
-  private remoteFilePath(): string {
-    const hcpUrl = process.env.HCP_URL ?? '';
-    return `${hcpUrl}/${this.filePath()}`;
+  private storeFile(fileContent: ArrayBuffer): void {
+    writeFileSync(this.localFilePath(), Buffer.from(fileContent));
+  }
+
+  private deleteFile(): void {
+    unlinkSync(this.localFilePath());
+  }
+
+  private localFilePath(): string {
+    return `${this.localDirectoryPath()}/${this.filePath()}`;
+  }
+
+  private localFileDirectoryPath(): string {
+    return `${this.localDirectoryPath()}/${this.fileDirectoryPath()}`;
+  }
+
+  private localDirectoryPath(): string {
+    const projectName = this.job.id;
+    return `temps/${projectName}`;
   }
 
   private filePath(): string {
-    const imageDirectory = this.data?.parsed_image_dir ?? '';
-    const dataId = this.data?.id ?? '';
-    const paddedPage = this.currentPage.toString().padStart(3, '0');
-    return `${imageDirectory}/${dataId}_${paddedPage}}`;
+    return `${this.fileDirectoryPath()}/${this.fileName()}`;
   }
 
-  private setCurrentPage(currentPage: number): void {
-    this.currentPage = currentPage;
+  private fileDirectoryPath(): string {
+    const imageDirectory = this.data?.parsed_image_dir ?? '';
+    return imageDirectory.replace(/^\/+/, '');
+  }
+
+  private fileName(): string {
+    const { id, file_type } = this.data ?? {};
+    const dataId = id ?? '';
+    const paddedPage = this.currentPage.toString().padStart(3, '0');
+    const fileType = file_type ? `.${file_type}` : '';
+    return `${dataId}_${paddedPage}${fileType}`;
+  }
+
+  get currentPage(): number {
+    return this._currentPage;
+  }
+
+  set currentPage(page: number) {
+    this._currentPage = page;
   }
 }
 
 export async function handleProjectCreationInputFiles(job: DocumentQueueEntity): Promise<void> {
-  if (!this.job.data) {
+  if (!job.data) {
     return;
   }
   await new ProjectCreationInputFilesHandler(job).handle();

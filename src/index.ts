@@ -65,7 +65,7 @@ program
 program.command(`run-consumer <configFile>`).description('Run Consumer').action(handleRunConsumer);
 
 program
-  .command(`handle-project-creation-input-files`)
+  .command(`handle-project-creation-input-files <configFile>`)
   .description('Run handle project creation input files')
   .action(debugHandleProjectCreationInputFiles);
 
