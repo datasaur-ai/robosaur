@@ -13,7 +13,7 @@ export async function debugHandleProjectCreationInputFiles(configFile: string): 
   data.team_id = 1;
   data.hcp_ori_document_dir = '/original/4/10242022/10002.jpg';
   data.file_type = 'jpg';
-  data.file_page_size = 10;
+  data.file_page_size = 2;
   data.original_filename = '2.invoice.jpg';
 
   const job = new DocumentQueueEntity();

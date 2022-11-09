@@ -1,5 +1,4 @@
-import axios from 'axios';
-import axiosRetry from 'axios-retry';
+import axios, { AxiosResponse } from 'axios';
 import { createReadStream, createWriteStream, existsSync, mkdirSync, unlinkSync, writeFileSync } from 'fs';
 import * as stream from 'stream';
 import { promisify } from 'util';
@@ -13,6 +12,7 @@ interface DocumentRecognitionResponseData {
   orientation_preds: number[];
   document_preds: string[];
   images_data: (string | null)[];
+  status: string;
 }
 
 class ProjectCreationInputFilesHandler {
@@ -28,15 +28,15 @@ class ProjectCreationInputFilesHandler {
     const totalPage = this.data?.file_page_size ?? 0;
 
     for (let page = 0; page < totalPage; page++) {
-      this.logger.info(`Processing page number ${page + 1}..`);
+      this.logger.info(`Processing document page ${page + 1}..`);
       this.currentPage = page;
       this.createLocalDirectory();
 
-      // Step 1: Download file
+      // Step 1: Download document
       await this.downloadFile();
 
       // Step 2: Document recognition API
-      const recognitionResult = await this.postDocumentRecognition();
+      const recognitionResult = await this.recognizeDocument();
 
       // Step 3: Keep or remove the downloaded file
       this.cleanUp(recognitionResult);
@@ -47,53 +47,58 @@ class ProjectCreationInputFilesHandler {
     const bucketName = process.env.S3_BUCKET_NAME ?? '';
     const objectName = this.filePath();
     const fileUrl = await getStorageClient().getObjectUrl(bucketName, objectName);
-    axiosRetry(axios, {
-      retries: 5,
-      retryDelay: (currentRetry) => {
-        this.logger.info(`Trying to download (${currentRetry})..`);
-        return 5000;
-      },
-      retryCondition: ({ response }) => {
-        return response ? 500 <= response.status && response.status <= 599 : false;
-      },
-    });
-    try {
-      const response = await axios.get(fileUrl, { responseType: 'stream' });
-      const pipeline = promisify(stream.pipeline);
-      await pipeline(response.data, createWriteStream(this.localFilePath()));
-    } catch (error) {
-      const { response } = error;
-      if (400 <= response.status && response.status <= 499) {
-        this.logger.error(`Not found: ${fileUrl}`);
+    let currentRetry = 0;
+    const maxRetries = 5;
+    const retryDelay = 5;
+    do {
+      try {
+        this.logger.info(`Downloading document..`);
+        const response = await axios.get(fileUrl, { responseType: 'stream' });
+        const pipeline = promisify(stream.pipeline);
+        await pipeline(response.data, createWriteStream(this.localFilePath()));
+        break;
+      } catch (error) {
+        const { response } = error;
+        const { status } = response;
+        this.handleAxiosError(fileUrl, response);
+        if (400 <= status && status <= 499) {
+          throw error;
+        }
       }
-      throw error;
-    }
+      currentRetry++;
+      await new Promise((f) => setTimeout(f, retryDelay * 1000));
+      this.logger.warn(`Retrying (${currentRetry})..`);
+    } while (currentRetry <= maxRetries);
   }
 
-  // Todo
-  private async postDocumentRecognition(): Promise<DocumentRecognitionResponseData> {
+  private async recognizeDocument(): Promise<DocumentRecognitionResponseData> {
     const apiUrl = process.env.DOCUMENT_RECOGNITION_API_URL ?? '';
     const FormData = require('form-data');
     const form = new FormData();
     form.append('file', createReadStream(this.localFilePath()));
-    const headers = {
-      'Content-Type': 'multipart/form-data',
-    };
     try {
+      this.logger.info(`Processing document..`);
       const response = await axios.post<DocumentRecognitionResponseData>(apiUrl, form, {
-        headers,
+        headers: form.getHeaders(),
       });
       return response.data;
     } catch (error) {
-      const { response } = error;
-      if (400 <= response.status && response.status <= 499) {
-        this.logger.error(`Not found: ${apiUrl}`);
-      }
+      this.handleAxiosError(apiUrl, error.response);
       throw error;
     }
   }
 
-  // Todo
+  private handleAxiosError<T>(url: string, response: AxiosResponse<T>) {
+    const { status } = response;
+    if (status === 404) {
+      this.logger.error(`Not found: ${url}`);
+    } else if (400 <= status && status <= 499) {
+      this.logger.error(`Bad request: ${url}`);
+    } else if (500 <= status && status <= 599) {
+      this.logger.error(`Server error: ${url}`);
+    }
+  }
+
   private cleanUp(data: DocumentRecognitionResponseData): void {
     const {
       orientation_preds: orientationPredictions,
@@ -104,13 +109,16 @@ class ProjectCreationInputFilesHandler {
     for (let i = 0; i < totalPages; i++) {
       if (documentPredictions[i] !== 'SURAT_INSTRUKSI') {
         this.deleteFile();
+        this.logger.info('The document is not instruction letter. Downloaded file has been deleted.');
         return;
       }
       if (orientationPredictions[i] !== 0 && imagesData[i] !== null) {
         this.storeFile(imagesData[i] as string);
+        this.logger.info('The document is instruction letter. New file has been kept.');
         return;
       }
     }
+    this.logger.info('No action is taken.');
   }
 
   private createLocalDirectory() {
