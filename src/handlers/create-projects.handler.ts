@@ -51,30 +51,50 @@ export const handleCreateProjects = createSimpleHandlerContext('create-projects'
 async function _handleCreateProjects(
   configFile: string,
   options: ProjectCreationOption,
-  errorCallback?: (error: Error) => void,
+  errorCallback?: (error: Error) => Promise<void>,
 ) {
+  getLogger().info('Start create projects process');
   const { dryRun, withoutPcw, usePcw } = options;
   const cwd = process.cwd();
 
-  await setProjectCreationConfig(cwd, configFile, usePcw, withoutPcw);
+  getLogger().info('Process 1');
+  await setProjectCreationConfig(cwd, configFile, usePcw, withoutPcw, errorCallback);
 
+  getLogger().info('Process 2');
   const scriptState = await getState();
   await scriptState.updateInProgressProjectCreationStates();
 
+  getLogger().info('Process 3');
   const createConfig = getConfig().create;
 
+  getLogger().info('Process 4');
   const projectsToBeCreated = await getProjectsToBeCreated(createConfig.files, scriptState, dryRun);
 
+  getLogger().info('Process 5');
   await setLabelSetsAndQuestions(createConfig);
 
+  getLogger().info('Process 6');
   const results = await submitProjectCreationJob(createConfig, projectsToBeCreated, scriptState, dryRun);
+  getLogger().info('Process 7');
   await checkProjectCreationJob(results, scriptState, cwd, dryRun, errorCallback);
 
+  getLogger().info('Process 1');
   await handleAutoLabel(projectsToBeCreated, dryRun, errorCallback);
 }
 
-async function setProjectCreationConfig(cwd: string, configFile: string, usePcw: boolean, withoutPcw: boolean) {
-  setConfigByJSONFile(resolve(cwd, configFile), getProjectCreationValidators(), ScriptAction.PROJECT_CREATION);
+async function setProjectCreationConfig(
+  cwd: string,
+  configFile: string,
+  usePcw: boolean,
+  withoutPcw: boolean,
+  errorCallback?: (error: Error) => Promise<void>,
+) {
+  getLogger().info('setProjectCreationConfig 1');
+  if (!errorCallback) {
+    getLogger().info('setConfigFile');
+    setConfigByJSONFile(resolve(cwd, configFile), getProjectCreationValidators(), ScriptAction.PROJECT_CREATION);
+  }
+  getLogger().info('setProjectCreationConfig 2');
 
   if (withoutPcw) {
     getLogger().info('withoutPcw is set to true, parsing config...');
@@ -217,7 +237,7 @@ async function checkProjectCreationJob(
   scriptState: ScriptState,
   cwd: string,
   dryRun: boolean,
-  errorCallback?: (error: Error) => void,
+  errorCallback?: (error: Error) => Promise<void>,
 ) {
   if (dryRun) {
     let filepath = resolve(cwd, `dry-run-output-${Date.now()}.json`);
@@ -236,7 +256,7 @@ async function checkProjectCreationJob(
     for (const job of createFail) {
       getLogger().error(`error for ${job.id}`, { ...job });
       if (errorCallback) {
-        errorCallback(new ProjectCreationError(`error for ${job.id}: ${job}`));
+        await errorCallback(new ProjectCreationError(`error for ${job.id}: ${job}`));
       }
     }
 

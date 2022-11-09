@@ -15,7 +15,7 @@ export const handleAutoLabel = createSimpleHandlerContext('auto-label', _handleA
 async function _handleAutoLabel(
   projects: { name: string; fullPath: string }[],
   dryRun: boolean,
-  errorCallback?: (error: Error) => void,
+  errorCallback?: (error: Error) => Promise<void>,
 ) {
   if (!getConfig().create.autoLabel?.enableAutoLabel) return;
 
@@ -62,7 +62,7 @@ async function submitAutoLabelJob(projectsToAutoLabel: Map<string, ProjectState>
   return results;
 }
 
-async function checkAutoLabelJob(results: Job[], dryRun: any, errorCallback?: (error: Error) => void) {
+async function checkAutoLabelJob(results: Job[], dryRun: any, errorCallback?: (error: Error) => Promise<void>) {
   if (dryRun) {
     getLogger().info(`check auto label dry run`);
   } else {
@@ -77,7 +77,7 @@ async function checkAutoLabelJob(results: Job[], dryRun: any, errorCallback?: (e
     for (const job of jobFailed) {
       getLogger().error(`error for ${job.id}`, { ...job });
       if (errorCallback) {
-        errorCallback(new AutoLabelError(`error for ${job.id}: ${job}`));
+        await errorCallback(new AutoLabelError(`error for ${job.id}: ${job}`));
       }
     }
   }

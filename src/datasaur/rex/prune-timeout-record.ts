@@ -10,7 +10,7 @@ const MAX_TIMEOUT_IN_MINUTES = Number(process.env.MAX_TIMEOUT_IN_MINUTES ?? 30);
 
 export const pruneTimeoutRecord = async (teamId: number) => {
   const recordRepo = await getRepository(ProcessRecordEntity);
-  const records = await recordRepo.find({ where: { data: { team_id: teamId } } });
+  const records = await recordRepo.findBy({ 'data.team_id': teamId });
 
   for (const record of records) {
     const saveKeepingId = record.data?.id;

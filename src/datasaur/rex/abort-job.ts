@@ -8,7 +8,7 @@ export const abortJob = async (payload: Team15, message: string, error?: Error) 
   const saveKeepingRepo = await getRepository(Team15);
   const recordRepo = await getRepository(ProcessRecordEntity);
 
-  const record = await recordRepo.findOne({ where: { data: { id: payload.id } } });
+  const record = await recordRepo.findOneBy({ 'data.id': payload.id });
 
   if (record) {
     recordRepo.delete(record);
