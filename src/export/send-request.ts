@@ -34,6 +34,7 @@ export async function sendRequestToEndpoint(configFile: string, id: number) {
   const LIMIT_RETRY = Number(process.env.LIMIT_RETRY);
   while (counterRetry < LIMIT_RETRY) {
     try {
+      getLogger().info(`sending request to ${exportEndpoint}...`, { payload });
       const response = await axios({
         method: 'POST',
         headers: { 'content-type': 'application/json' },
@@ -42,6 +43,7 @@ export async function sendRequestToEndpoint(configFile: string, id: number) {
         timeout: 30000,
       });
       counterRetry += LIMIT_RETRY;
+      getLogger().info(`successfully sent payload to endpoint`, { response: response.data });
       return response;
     } catch (error) {
       if (counterRetry >= LIMIT_RETRY) {

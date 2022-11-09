@@ -117,8 +117,18 @@ async function _handleExportProjects(configFile: string, options: ProjectExportO
       },
     );
 
-    for (const [_name, projectState] of projectsToDelete) {
-      await deleteProject(projectState.projectId!);
+    for (const [name, projectState] of projectsToDelete) {
+      getLogger().info(`deleting project ${name} with id ${projectState.projectId}...`);
+      try {
+        await deleteProject(projectState.projectId!);
+        getLogger().info(`project ${projectState.projectId} has been deleted`);
+      } catch (error) {
+        getLogger().error(`delete project failed`, {
+          error: JSON.stringify(error),
+          message: error.message,
+          stack: error?.stack,
+        });
+      }
     }
   }
 }
