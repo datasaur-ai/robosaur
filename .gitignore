@@ -8,3 +8,7 @@ quickstart/state
 docker-*/
 
 .env
+
+on-premise/build/**
+on-premise/build/*.tar.gz
+
