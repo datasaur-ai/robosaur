@@ -4,8 +4,7 @@ import * as minio from 'minio';
 import * as stream from 'stream';
 import { promisify } from 'util';
 import { Logger } from 'winston';
-import { DataPayload } from '../database/entities/data';
-import { DocumentQueueEntity } from '../database/entities/document_queue.entity';
+import { Team15 } from '../database/entities/teamPayloads/team_15.entity';
 import { getLogger } from '../logger';
 
 interface DocumentRecognitionResponseData {
@@ -16,19 +15,14 @@ interface DocumentRecognitionResponseData {
 }
 
 class ProjectCreationInputFilesHandler {
-  private readonly data?: DataPayload;
   private readonly logger: Logger = getLogger();
   private currentPage: number = 0;
 
-  constructor(private readonly job: DocumentQueueEntity) {
-    this.data = this.job.data;
-  }
+  constructor(private readonly data: Team15) {}
 
   public async handle(): Promise<void> {
-    const totalPage = this.data?.file_page_size ?? 0;
-
-    for (let page = 0; page < totalPage; page++) {
-      this.logger.info(`Processing document page ${page + 1}..`);
+    for (let page = 1; page <= this.totalDocumentPage(); page++) {
+      this.logger.info(`Processing document page ${page}..`);
       this.currentPage = page;
       this.createLocalDirectory();
 
@@ -41,6 +35,11 @@ class ProjectCreationInputFilesHandler {
       // Step 3: Keep or remove the downloaded file
       this.cleanUp(recognitionResult);
     }
+  }
+
+  private totalDocumentPage(): number {
+    const { page_count } = this.data;
+    return page_count ? Number(page_count) : 1;
   }
 
   private async downloadFile(): Promise<void> {
@@ -153,7 +152,7 @@ class ProjectCreationInputFilesHandler {
   }
 
   private localDirectoryPath(): string {
-    const projectName = this.job.id;
+    const projectName = this.data.id;
     return `temps/${projectName}`;
   }
 
@@ -167,16 +166,12 @@ class ProjectCreationInputFilesHandler {
   }
 
   private fileName(): string {
-    const { id, file_type } = this.data ?? {};
-    const dataId = id ?? '';
+    const dataId = this.data.id;
     const paddedPage = this.currentPage.toString().padStart(3, '0');
-    const fileType = file_type ? `.${file_type}` : '';
-    return `${dataId}_${paddedPage}${fileType}`;
+    return `${dataId}_${paddedPage}`;
   }
 }
 
-export async function handleProjectCreationInputFiles(job: DocumentQueueEntity): Promise<void> {
-  if (job.data) {
-    await new ProjectCreationInputFilesHandler(job).handle();
-  }
+export async function handleProjectCreationInputFiles(data: Team15): Promise<void> {
+  await new ProjectCreationInputFilesHandler(data).handle();
 }
