@@ -13,18 +13,10 @@
     "database": "konver",
     "authSource": "admin"
   },
-  "credentials": {
-    "s3": {
-      "s3Endpoint": "<S3_ENDPOINT>",
-      "s3AccessKey": "<S3_ACCESS_KEY>",
-      "s3SecretKey": "<S3_SECRET_KEY>",
-      "s3Region": "<S3_REGION>"
-    }
-  },
   "create": {
     "teamId": "<TEAM_ID>",
     "files": {
-      "source": "s3",
+      "source": "local",
       "path": "<path/to/files/directory>"
     },
     "pcwPayloadSource": {

@@ -1,12 +1,12 @@
 import axios, { AxiosResponse } from 'axios';
 import { createReadStream, createWriteStream, existsSync, mkdirSync, unlinkSync, writeFileSync } from 'fs';
+import * as minio from 'minio';
 import * as stream from 'stream';
 import { promisify } from 'util';
 import { Logger } from 'winston';
 import { DataPayload } from '../database/entities/data';
 import { DocumentQueueEntity } from '../database/entities/document_queue.entity';
 import { getLogger } from '../logger';
-import { getStorageClient } from '../utils/object-storage';
 
 interface DocumentRecognitionResponseData {
   orientation_preds: number[];
@@ -18,7 +18,7 @@ interface DocumentRecognitionResponseData {
 class ProjectCreationInputFilesHandler {
   private readonly data?: DataPayload;
   private readonly logger: Logger = getLogger();
-  private _currentPage: number = 0;
+  private currentPage: number = 0;
 
   constructor(private readonly job: DocumentQueueEntity) {
     this.data = this.job.data;
@@ -46,7 +46,7 @@ class ProjectCreationInputFilesHandler {
   private async downloadFile(): Promise<void> {
     const bucketName = process.env.S3_BUCKET_NAME ?? '';
     const objectName = this.filePath();
-    const fileUrl = await getStorageClient().getObjectUrl(bucketName, objectName);
+    const fileUrl = await this.getObjectUrl(bucketName, objectName);
     let currentRetry = 0;
     const maxRetries = 5;
     const retryDelay = 5;
@@ -72,7 +72,7 @@ class ProjectCreationInputFilesHandler {
   }
 
   private async recognizeDocument(): Promise<DocumentRecognitionResponseData> {
-    const apiUrl = process.env.DOCUMENT_RECOGNITION_API_URL ?? '';
+    const apiUrl = process.env.DOCUMENT_RECOGNITION_API_ENDPOINT ?? '';
     const FormData = require('form-data');
     const form = new FormData();
     form.append('file', createReadStream(this.localFilePath()));
@@ -121,6 +121,19 @@ class ProjectCreationInputFilesHandler {
     this.logger.info('No action is taken.');
   }
 
+  private async getObjectUrl(bucketName: string, objectName: string): Promise<string> {
+    return new minio.Client(this.getMinioConfig()).presignedUrl('get', bucketName, objectName);
+  }
+
+  private getMinioConfig(): minio.ClientOptions {
+    return {
+      endPoint: process.env.S3_ENDPOINT ?? '',
+      accessKey: process.env.S3_ACCESS_KEY ?? '',
+      secretKey: process.env.S3_SECRET_KEY ?? '',
+      region: process.env.S3_REGION,
+    };
+  }
+
   private createLocalDirectory() {
     if (!existsSync(this.localFileDirectoryPath())) {
       mkdirSync(this.localFileDirectoryPath(), { recursive: true });
@@ -163,14 +176,6 @@ class ProjectCreationInputFilesHandler {
     const paddedPage = this.currentPage.toString().padStart(3, '0');
     const fileType = file_type ? `.${file_type}` : '';
     return `${dataId}_${paddedPage}${fileType}`;
-  }
-
-  get currentPage(): number {
-    return this._currentPage;
-  }
-
-  set currentPage(page: number) {
-    this._currentPage = page;
   }
 }
 

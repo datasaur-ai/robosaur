@@ -1,11 +1,8 @@
-import { setConfigByJSONFile } from '../config/config';
 import { DataPayload } from '../database/entities/data';
 import { DocumentQueueEntity } from '../database/entities/document_queue.entity';
 import { handleProjectCreationInputFiles } from './handle-project-creation-input-files';
 
-export async function debugHandleProjectCreationInputFiles(configFile: string): Promise<void> {
-  setConfigByJSONFile(configFile);
-
+export async function debugHandleProjectCreationInputFiles(): Promise<void> {
   const data = new DataPayload();
   data.id = 10002;
   data.filename = '2.invoice';
