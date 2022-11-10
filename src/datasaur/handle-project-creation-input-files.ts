@@ -166,9 +166,10 @@ class ProjectCreationInputFilesHandler {
   }
 
   private fileName(): string {
-    const dataId = this.data.id;
+    const { id: dataId, document_extension } = this.data;
     const paddedPage = this.currentPage.toString().padStart(3, '0');
-    return `${dataId}_${paddedPage}`;
+    const documentExtension = document_extension ? `.${document_extension}` : '';
+    return `${dataId}_${paddedPage}${documentExtension}`;
   }
 }
 
