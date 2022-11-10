@@ -21,9 +21,8 @@ class ProjectCreationInputFilesHandler {
   constructor(private readonly data: Team15) {}
 
   public async handle(): Promise<void> {
-    for (let page = 0; page < this.totalDocumentPage(); page++) {
-      this.logger.info(`Processing document page ${page + 1}..`);
-      this.currentPage = page;
+    for (this.currentPage = 0; this.currentPage < this.totalDocumentPage(); this.currentPage++) {
+      this.logger.info(`Processing document page ${this.currentPage + 1}..`);
       this.createLocalDirectory();
 
       // Step 1: Download document
