@@ -542,3 +542,8 @@ Robosaur **does not** support providing documents through PCW payload. The `docu
 ```
 
 Robosaur supports using PCW's labeler and reviewer assignment settings, but note that `assignment` option **should not** be provided. Also, `documents` option used for assigning specific documents for each labelers will be ignored. Instead, use `pcwAssignmentStrategy` option to specify `AUTO` or `ALL` assignment method.
+
+
+## On Premise
+- run ./build.sh <version tag>
+- the result will be stored at folder `on-premise/`
