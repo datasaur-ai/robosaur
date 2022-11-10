@@ -1,6 +1,7 @@
 import { getConfig, setConfigByJSONFile } from '../config/config';
 import { StateConfig } from '../config/interfaces';
 import { getProjectExportValidators } from '../config/schema/validator';
+import { deleteProject } from '../datasaur/delete-project';
 import { exportProject } from '../datasaur/export-project';
 import { JobStatus } from '../datasaur/get-jobs';
 import { getProjects } from '../datasaur/get-projects';
@@ -15,6 +16,11 @@ import { ProjectState } from '../utils/states/interfaces';
 import { ScriptState } from '../utils/states/script-state';
 import { ScriptAction } from './constants';
 import { getTagIds, shouldExport } from './export/helper';
+
+interface ProjectExportOption {
+  unzip: boolean;
+  deleteProjectAfterExport: boolean;
+}
 
 interface ExportStatusObject {
   projectName: string;
@@ -69,7 +75,9 @@ const handleStateless = async (unzip: boolean) => {
 
 export const handleExportProjects = createSimpleHandlerContext('export-projects', _handleExportProjects);
 
-async function _handleExportProjects(configFile: string, { unzip }: { unzip: boolean }) {
+async function _handleExportProjects(configFile: string, options: ProjectExportOption) {
+  const { unzip, deleteProjectAfterExport } = options;
+
   setConfigByJSONFile(configFile, getProjectExportValidators(), ScriptAction.PROJECT_EXPORT);
 
   const stateless = getConfig().export.executionMode === StateConfig.STATELESS;
@@ -94,8 +102,35 @@ async function _handleExportProjects(configFile: string, { unzip }: { unzip: boo
   getLogger().info(`found ${projectsToExport.length} projects to export`);
 
   const results = await runProjectExport(projectsToExport, unzip, scriptState);
-  await checkProjectExportJobs(results);
+  const successResults = await checkProjectExportJobs(results);
   await scriptState.save();
+
+  const successProjectNames = successResults.map((exportResult) => exportResult.projectName);
+
+  if (deleteProjectAfterExport) {
+    const projectsToDelete = Array.from(scriptState.getTeamProjectsState().getProjects()).filter(
+      ([_name, projectState]) => {
+        if (successProjectNames.includes(projectState.projectName)) {
+          return true;
+        }
+        return false;
+      },
+    );
+
+    for (const [name, projectState] of projectsToDelete) {
+      getLogger().info(`deleting project ${name} with id ${projectState.projectId}...`);
+      try {
+        await deleteProject(projectState.projectId!);
+        getLogger().info(`project ${projectState.projectId} has been deleted`);
+      } catch (error) {
+        getLogger().error(`delete project failed`, {
+          error: JSON.stringify(error),
+          message: error.message,
+          stack: error?.stack,
+        });
+      }
+    }
+  }
 }
 
 async function filterProjectsToExport() {
@@ -234,4 +269,6 @@ async function checkProjectExportJobs(results: ExportStatusObject[]) {
     },
   );
   getLogger().info('exiting script...');
+
+  return exportOK;
 }

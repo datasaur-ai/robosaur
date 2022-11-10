@@ -17,7 +17,7 @@
     "teamId": "<TEAM_ID>",
     "files": {
       "source": "local",
-      "path": "<path/to/files/directory>"
+      "path": "temps"
     },
     "pcwPayloadSource": {
       "source": "inline"
