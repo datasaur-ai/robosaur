@@ -1,6 +1,8 @@
 import axios from 'axios';
 
 export async function postProcessDocumentData(data) {
+  if (!data) return null;
+
   const payload = {
     document_data: data,
   };
@@ -14,5 +16,5 @@ export async function postProcessDocumentData(data) {
     timeout: 30000,
   });
 
-  return response.data.document_data;
+  return response.data;
 }

@@ -7,6 +7,7 @@ import { Team15 } from '../database/entities/teamPayloads/team_15.entity';
 import { getRepository } from '../database/repository';
 import { getLogger } from '../logger';
 import { readJSONFile } from '../utils/readJSONFile';
+import { deleteFolder } from './delete-folder';
 import { postProcessDocumentData } from './post-process';
 
 export async function saveExportResultsToDatabase(configFile: string, id: number) {
@@ -25,15 +26,19 @@ export async function saveExportResultsToDatabase(configFile: string, id: number
     let readingResult = {};
 
     getLogger().info(`processing export results of project ${folder}...`);
-    readdirSync(folder).forEach(async (file) => {
+    const files = readdirSync(folder);
+    for (const file of files) {
       getLogger().info(`checking file ${file}...`);
       const json = readJSONFile(resolve(folder, file));
 
-      // file name should be <ID>_<PAGE_NUMBER>.jpg
-      const filename = path.parse(file).name;
+      const filenameWithExtension = path.parse(file).name.split('_');
+      filenameWithExtension.splice(-2);
+      const filename = filenameWithExtension.join('_');
+
+      getLogger().info(`post processing document_data of ${file}...`);
       documentData[filename] = await postProcessDocumentData(json.document_data);
       readingResult[filename] = json.reading_result;
-    });
+    }
 
     const record = await team15Repository.findOneByOrFail(Number(id));
 
@@ -42,5 +47,7 @@ export async function saveExportResultsToDatabase(configFile: string, id: number
     record.reading_result = readingResult;
 
     await team15Repository.save(record);
+
+    deleteFolder(folder);
   }
 }
