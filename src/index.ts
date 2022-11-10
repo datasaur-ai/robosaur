@@ -38,6 +38,7 @@ program
 program
   .command(`export-projects <configFile>`)
   .option('-u --unzip', 'Unzips the exported projects, only storing the final version accepted by reviewers')
+  .option('--delete-project-after-export', 'Deletes project after export process has been completed')
   .description('Export all projects based on the given config file')
   .action(handleExportProjects);
 
