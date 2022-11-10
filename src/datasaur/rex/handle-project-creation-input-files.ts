@@ -4,8 +4,8 @@ import * as minio from 'minio';
 import * as stream from 'stream';
 import { promisify } from 'util';
 import { Logger } from 'winston';
-import { Team15 } from '../database/entities/teamPayloads/team_15.entity';
-import { getLogger } from '../logger';
+import { Team15 } from '../../database/entities/teamPayloads/team_15.entity';
+import { getLogger } from '../../logger';
 
 interface DocumentRecognitionResponseData {
   orientation_preds: number[];

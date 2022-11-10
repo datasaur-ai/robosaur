@@ -11,7 +11,6 @@ import { handleSplitDocument } from './handlers/split-document.handler';
 import { handleStartConsumer } from './handlers/start-consumer.handler';
 import { handleTest } from './handlers/test.handler';
 import { getLogger } from './logger';
-import { debugHandleProjectCreationInputFiles } from './datasaur/handle-project-creation-input-files.debug';
 
 const program = new Command();
 

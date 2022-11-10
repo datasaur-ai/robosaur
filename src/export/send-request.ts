@@ -4,9 +4,9 @@ import { getDatabaseValidators } from '../config/schema/validator';
 import { initDatabase } from '../database';
 import { Team15 } from '../database/entities/teamPayloads/team_15.entity';
 import { getRepository } from '../database/repository';
+import { OCR_STATUS } from '../datasaur/rex/interface';
 import { getLogger } from '../logger';
 import { sleep } from '../utils/sleep';
-import { OCR_STATUS } from './constants';
 
 export async function sendRequestToEndpoint(configFile: string, id: number) {
   setConfigByJSONFile(configFile, getDatabaseValidators());
