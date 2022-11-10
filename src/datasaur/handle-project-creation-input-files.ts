@@ -33,7 +33,7 @@ class ProjectCreationInputFilesHandler {
       const recognitionResult = await this.recognizeDocument();
 
       // Step 3: Keep or remove the downloaded file
-      this.cleanUp(recognitionResult);
+      this.filterDocumentFile(recognitionResult);
     }
   }
 
@@ -98,7 +98,7 @@ class ProjectCreationInputFilesHandler {
     }
   }
 
-  private cleanUp(data: DocumentRecognitionResponseData): void {
+  private filterDocumentFile(data: DocumentRecognitionResponseData): void {
     const {
       orientation_preds: orientationPredictions,
       document_preds: documentPredictions,
