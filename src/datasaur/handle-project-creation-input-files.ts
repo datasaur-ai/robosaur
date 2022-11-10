@@ -45,7 +45,7 @@ class ProjectCreationInputFilesHandler {
 
   private async downloadFile(): Promise<void> {
     const bucketName = process.env.S3_BUCKET_NAME ?? '';
-    const objectName = this.filePath();
+    const objectName = this.remoteFilePath();
     const fileUrl = await this.getObjectUrl(bucketName, objectName);
     let currentRetry = 0;
     const maxRetries = 5;
@@ -135,8 +135,8 @@ class ProjectCreationInputFilesHandler {
   }
 
   private createLocalDirectory() {
-    if (!existsSync(this.localFileDirectoryPath())) {
-      mkdirSync(this.localFileDirectoryPath(), { recursive: true });
+    if (!existsSync(this.localDirectoryPath())) {
+      mkdirSync(this.localDirectoryPath(), { recursive: true });
     }
   }
 
@@ -149,11 +149,7 @@ class ProjectCreationInputFilesHandler {
   }
 
   private localFilePath(): string {
-    return `${this.localDirectoryPath()}/${this.filePath()}`;
-  }
-
-  private localFileDirectoryPath(): string {
-    return `${this.localDirectoryPath()}/${this.fileDirectoryPath()}`;
+    return `${this.localDirectoryPath()}/${this.fileName()}`;
   }
 
   private localDirectoryPath(): string {
@@ -161,11 +157,11 @@ class ProjectCreationInputFilesHandler {
     return `temps/${projectName}`;
   }
 
-  private filePath(): string {
-    return `${this.fileDirectoryPath()}/${this.fileName()}`;
+  private remoteFilePath(): string {
+    return `${this.remoteDirectoryPath()}/${this.fileName()}`;
   }
 
-  private fileDirectoryPath(): string {
+  private remoteDirectoryPath(): string {
     const imageDirectory = this.data?.parsed_image_dir ?? '';
     return imageDirectory.replace(/^\/+/, '');
   }
