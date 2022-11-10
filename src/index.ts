@@ -12,6 +12,7 @@ import { handleSplitDocument } from './handlers/split-document.handler';
 import { handleStartConsumer } from './handlers/start-consumer.handler';
 import { handleTest } from './handlers/test.handler';
 import { getLogger } from './logger';
+import { debugHandleProjectCreationInputFiles } from './datasaur/handle-project-creation-input-files.debug';
 
 const program = new Command();
 
@@ -63,6 +64,11 @@ program
   .action(handleApplyTags);
 
 program.command(`run-consumer <configFile>`).description('Run Consumer').action(handleRunConsumer);
+
+program
+  .command(`handle-project-creation-input-files`)
+  .description('Run handle project creation input files')
+  .action(debugHandleProjectCreationInputFiles);
 
 program.parseAsync(process.argv);
 
