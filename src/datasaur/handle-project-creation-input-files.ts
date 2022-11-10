@@ -112,7 +112,7 @@ class ProjectCreationInputFilesHandler {
       }
       if (orientationPredictions[i] !== 0 && imagesData[i] !== null) {
         this.storeFile(imagesData[i] as string);
-        this.logger.info('The document is instruction letter. New file has been kept.');
+        this.logger.info('The document is instruction letter and orientation is wrong. Corrected file has been kept.');
         return;
       }
     }
