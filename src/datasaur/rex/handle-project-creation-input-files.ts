@@ -44,6 +44,8 @@ class ProjectCreationInputFilesHandler {
   private async downloadFile(): Promise<void> {
     const bucketName = process.env.S3_BUCKET_NAME ?? '';
     const objectName = this.remoteFilePath();
+    getLogger().info(bucketName);
+    getLogger().info(objectName);
     const fileUrl = await this.getObjectUrl(bucketName, objectName);
     let currentRetry = 0;
     const maxRetries = 5;
@@ -156,7 +158,8 @@ class ProjectCreationInputFilesHandler {
   }
 
   private remoteFilePath(): string {
-    return `${this.remoteDirectoryPath()}/${this.fileName()}`;
+    const directoryPath = this.remoteDirectoryPath();
+    return `${directoryPath}${directoryPath ? '/' : ''}${this.fileName()}`;
   }
 
   private remoteDirectoryPath(): string {
