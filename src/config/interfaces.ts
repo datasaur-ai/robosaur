@@ -61,6 +61,16 @@ export interface Config {
 
   // update file transformer
   updateFileTransformer: UpdateFileTransformerConfig;
+
+  // update custom API
+  updateCustomAPI: UpdateCustomAPIConfig;
+}
+
+export interface UpdateCustomAPIConfig {
+  id: string;
+  name: string;
+  endpointURL: string;
+  secret?: string;
 }
 
 export interface UpdateFileTransformerConfig {

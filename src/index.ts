@@ -13,6 +13,7 @@ import { handleStartConsumer } from './handlers/start-consumer.handler';
 import { handleTest } from './handlers/test.handler';
 import { handleUpdateFileTransformer } from './handlers/update-file-transformer.handler';
 import { getLogger } from './logger';
+import { handleUpdateCustomAPI } from './handlers/update-custom-api.handler';
 
 const program = new Command();
 
@@ -69,6 +70,8 @@ program
   .command(`update-file-transformer <configFile>`)
   .description('Updates file transformer')
   .action(handleUpdateFileTransformer);
+
+program.command(`update-custom-api <configFile>`).description('Updates custom API').action(handleUpdateCustomAPI);
 
 program.parseAsync(process.argv);
 

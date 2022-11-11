@@ -11,7 +11,7 @@ export const handleUpdateFileTransformer = createSimpleHandlerContext(
   _handleUpdateFileTransformer,
 );
 
-export async function _handleUpdateFileTransformer(configFile: string) {
+async function _handleUpdateFileTransformer(configFile: string) {
   setConfigByJSONFile(configFile, getUpdateFileTransformerValidators(), ScriptAction.UPDATE_FILE_TRANSFORMER);
 
   const fileTransformerId = getConfig().updateFileTransformer.fileTransformerId;
