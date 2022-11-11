@@ -70,7 +70,7 @@ class ProjectCreationInputFilesHandler {
   }
 
   private async recognizeDocument(): Promise<DocumentRecognitionResponseData> {
-    const apiUrl = process.env.DOCUMENT_RECOGNITION_ENDPOINT ?? '';
+    const apiUrl = process.env.DOCUMENT_RECOGNIZER_ENDPOINT ?? '';
     const FormData = require('form-data');
     const form = new FormData();
     form.append('file', createReadStream(this.localFilePath()));
