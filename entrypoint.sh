@@ -1,6 +1,6 @@
 #!/bin/sh
 
-npm run start -- create-projects /home/robosaur/config/config.json
+npm run start -- run-consumer /home/robosaur/config/config.json
 
 while true
 do
