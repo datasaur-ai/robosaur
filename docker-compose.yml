@@ -23,8 +23,6 @@ services:
       - MONGO_INITDB_ROOT_USERNAME=vulcan
       - MONGO_INITDB_ROOT_PASSWORD=vulcan
       - MONGO_INITDB_DATABASE=vulcan
-    ports:
-      - 27017:27017
   mongo-express:
     image: mongo-express
     restart: always
