@@ -58,6 +58,14 @@ export interface Config {
 
   // database config
   database: DatabaseConfig;
+
+  // update file transformer
+  updateFileTransformer: UpdateFileTransformerConfig;
+}
+
+export interface UpdateFileTransformerConfig {
+  fileTransformerId: string;
+  path: string;
 }
 
 export interface DatabaseConfig {

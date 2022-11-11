@@ -11,6 +11,7 @@ import { handleRunConsumer } from './handlers/run-consumer';
 import { handleSplitDocument } from './handlers/split-document.handler';
 import { handleStartConsumer } from './handlers/start-consumer.handler';
 import { handleTest } from './handlers/test.handler';
+import { handleUpdateFileTransformer } from './handlers/update-file-transformer.handler';
 import { getLogger } from './logger';
 
 const program = new Command();
@@ -63,6 +64,11 @@ program
   .action(handleApplyTags);
 
 program.command(`run-consumer <configFile>`).description('Run Consumer').action(handleRunConsumer);
+
+program
+  .command(`update-file-transformer <configFile>`)
+  .description('Updates file transformer')
+  .action(handleUpdateFileTransformer);
 
 program.parseAsync(process.argv);
 

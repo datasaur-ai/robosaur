@@ -7,6 +7,7 @@ import { databaseSchemaValidator } from './database-schema-validator';
 import { documentsSchemaValidator } from './documents-schema-validator';
 import { exportSchemaValidator } from './export-schema-validator';
 import { splitDocumentSchemaValidator } from './split-document-schema-validator';
+import { updateFileTransformerSchemaValidator } from './update-file-transformer-schema-validator';
 
 export function getProjectCreationValidators() {
   return [validateConfigCredentials, validateConfigAssignment, validateConfigDocuments];
@@ -26,6 +27,21 @@ export function getSplitDocumentValidators() {
 
 export function getDatabaseValidators() {
   return [validateConfigDatabase];
+}
+
+export function getUpdateFileTransformerValidators() {
+  return [validateConfigUpdateFileTransformer];
+}
+
+function validateConfigUpdateFileTransformer(config: Config) {
+  if (!updateFileTransformerSchemaValidator(config.updateFileTransformer)) {
+    getLogger().error(`config.updateFileTransformer has some errors`, {
+      errors: updateFileTransformerSchemaValidator.errors,
+    });
+    throw new Error(
+      `config.updateFileTransformer has some errors: ${JSON.stringify(updateFileTransformerSchemaValidator.errors)}`,
+    );
+  }
 }
 
 function validateConfigDatabase(config: Config) {
