@@ -3,6 +3,7 @@ config();
 
 import { Command, InvalidOptionArgumentError } from 'commander';
 import packageJson from '../package.json';
+import { debugHandleProjectCreationInputFiles } from './datasaur/handle-project-creation-input-files.debug';
 import { handleApplyTags } from './handlers/apply-tags.handler';
 import { handleCreateProject } from './handlers/create-project.handler';
 import { handleCreateProjects } from './handlers/create-projects.handler';
@@ -11,9 +12,9 @@ import { handleRunConsumer } from './handlers/run-consumer';
 import { handleSplitDocument } from './handlers/split-document.handler';
 import { handleStartConsumer } from './handlers/start-consumer.handler';
 import { handleTest } from './handlers/test.handler';
+import { handleUpdateCustomAPI } from './handlers/update-custom-api.handler';
 import { handleUpdateFileTransformer } from './handlers/update-file-transformer.handler';
 import { getLogger } from './logger';
-import { handleUpdateCustomAPI } from './handlers/update-custom-api.handler';
 
 const program = new Command();
 
@@ -72,6 +73,11 @@ program
   .action(handleUpdateFileTransformer);
 
 program.command(`update-custom-api <configFile>`).description('Updates custom API').action(handleUpdateCustomAPI);
+
+program
+  .command(`handle-project-creation-input-files`)
+  .description('Run handle project creation input files')
+  .action(debugHandleProjectCreationInputFiles);
 
 program.parseAsync(process.argv);
 
