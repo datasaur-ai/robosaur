@@ -211,7 +211,7 @@
     "autoLabel": {
       "enableAutoLabel": true,
       "labelerEmail": "<EMAIL>",
-      "targetApiEndpoint": "<FIELD_EXTRACTOR_URL>",
+      "targetApiEndpoint": "http://field-extractor:9015/field-extractor",
       "targetApiSecretKey": "<FIELD_EXTRACTOR_SECRET>",
       "numberOfFilesPerRequest": 1
     }

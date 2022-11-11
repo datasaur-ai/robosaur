@@ -11,3 +11,7 @@ services:
       - ./docker-config:/home/robosaur/config
       - ./docker-state:/home/robosaur/state
       - ./docker-logs:/home/robosaur/logs
+networks:
+  default:
+    external:
+      name: ${DOCKER_NETWORK_NAME}
