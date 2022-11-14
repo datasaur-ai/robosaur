@@ -6,6 +6,8 @@ import { exportProject } from '../datasaur/export-project';
 import { JobStatus } from '../datasaur/get-jobs';
 import { getProjects } from '../datasaur/get-projects';
 import { ExportResult, Project } from '../datasaur/interfaces';
+import { DeleteProjectError } from '../datasaur/rex/errors/delete-project-error';
+import { ExportProjectError } from '../datasaur/rex/errors/export-project-error';
 import { createSimpleHandlerContext } from '../execution';
 import { getLogger } from '../logger';
 import { pollJobsUntilCompleted } from '../utils/polling.helper';
@@ -15,8 +17,6 @@ import { getState } from '../utils/states/getStates';
 import { ProjectState } from '../utils/states/interfaces';
 import { ScriptState } from '../utils/states/script-state';
 import { ScriptAction } from './constants';
-import { DeleteProjectError } from './error/delete-project-error';
-import { ExportProjectError } from './error/export-project-error';
 import { getTagIds, shouldExport } from './export/helper';
 
 interface ProjectExportOption {

@@ -8,7 +8,7 @@ import { pollJobsUntilCompleted } from '../utils/polling.helper';
 import { getState } from '../utils/states/getStates';
 import { ProjectState } from '../utils/states/interfaces';
 import { ScriptState } from '../utils/states/script-state';
-import { AutoLabelError } from './error/auto-label-error';
+import { AutoLabelError } from '../datasaur/rex/errors/auto-label-error';
 
 export const handleAutoLabel = createSimpleHandlerContext('auto-label', _handleAutoLabel);
 

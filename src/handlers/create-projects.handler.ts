@@ -8,6 +8,7 @@ import { getConfig, setConfigByJSONFile } from '../config/config';
 import { CreateConfig, FilesConfig, StorageSources } from '../config/interfaces';
 import { getProjectCreationValidators } from '../config/schema/validator';
 import { JobStatus } from '../datasaur/get-jobs';
+import { ProjectCreationError } from '../datasaur/rex/errors/project-creation-error';
 import { getLocalDocuments } from '../documents/get-local-documents';
 import { getObjectStorageDocuments } from '../documents/get-object-storage-documents';
 import { LocalDocument, RemoteDocument } from '../documents/interfaces';
@@ -23,7 +24,6 @@ import { handleAutoLabel } from './auto-label.handler';
 import { ScriptAction } from './constants';
 import { handleCreateProject } from './create-project.handler';
 import { doCreateProjectAndUpdateState, getProjectNamesFromFolderNames } from './creation/helper';
-import { ProjectCreationError } from './error/project-creation-error';
 
 interface ProjectCreationOption {
   dryRun: boolean;

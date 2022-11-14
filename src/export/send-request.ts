@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { Team15 } from '../database/entities/teamPayloads/team_15.entity';
 import { getRepository } from '../database/repository';
+import { SendGatewayError } from '../datasaur/rex/errors/send-gateway-error';
 import { OCR_STATUS, PAYLOAD_MESSAGE, PAYLOAD_STATUS } from '../datasaur/rex/interface';
 import { getLogger } from '../logger';
 import { sleep } from '../utils/sleep';
@@ -48,7 +49,7 @@ export async function sendRequestToEndpoint(id: number) {
           error: JSON.stringify(error),
           message: error.message,
         });
-        return;
+        throw new SendGatewayError(error);
       } else {
         getLogger().warn(`error sending request, retrying...`, {
           error: JSON.stringify(error),
