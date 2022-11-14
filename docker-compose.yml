@@ -31,4 +31,4 @@ services:
     environment:
       ME_CONFIG_MONGODB_ADMINUSERNAME: vulcan
       ME_CONFIG_MONGODB_ADMINPASSWORD: vulcan
-      ME_CONFIG_MONGODB_URL: mongodb://vulcan:vulcan@mongo:27017/
+      ME_CONFIG_MONGODB_URL: mongodb://vulcan:vulcan@mongodb:27017/
