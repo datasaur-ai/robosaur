@@ -35,8 +35,6 @@ export const startConsumer = async (process: ProcessJob<unknown[]>) => {
     const saveKeeping = await createRecordAndReturnSaveKeeping(document);
 
     // Run Service
-    await process(`${document.id}`, saveKeeping);
-
-    getLogger().info(`document ${saveKeeping?.filename} is currently in progress`);
+    await process(`${document.save_keeping_id}`, saveKeeping);
   }
 };

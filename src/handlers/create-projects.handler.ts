@@ -8,6 +8,7 @@ import { getConfig, setConfigByJSONFile } from '../config/config';
 import { CreateConfig, FilesConfig, StorageSources } from '../config/interfaces';
 import { getProjectCreationValidators } from '../config/schema/validator';
 import { JobStatus } from '../datasaur/get-jobs';
+import { ProjectCreationError } from '../datasaur/rex/errors/project-creation-error';
 import { getLocalDocuments } from '../documents/get-local-documents';
 import { getObjectStorageDocuments } from '../documents/get-object-storage-documents';
 import { LocalDocument, RemoteDocument } from '../documents/interfaces';
@@ -47,11 +48,16 @@ const PROJECT_BEFORE_SAVE = 5;
 
 export const handleCreateProjects = createSimpleHandlerContext('create-projects', _handleCreateProjects);
 
-async function _handleCreateProjects(configFile: string, options: ProjectCreationOption) {
+async function _handleCreateProjects(
+  configFile: string,
+  options: ProjectCreationOption,
+  errorCallback?: (error: Error) => Promise<void>,
+) {
+  getLogger().info('Start create projects process');
   const { dryRun, withoutPcw, usePcw } = options;
   const cwd = process.cwd();
 
-  await setProjectCreationConfig(cwd, configFile, usePcw, withoutPcw);
+  await setProjectCreationConfig(cwd, configFile, usePcw, withoutPcw, errorCallback);
 
   const scriptState = await getState();
   await scriptState.updateInProgressProjectCreationStates();
@@ -63,13 +69,21 @@ async function _handleCreateProjects(configFile: string, options: ProjectCreatio
   await setLabelSetsAndQuestions(createConfig);
 
   const results = await submitProjectCreationJob(createConfig, projectsToBeCreated, scriptState, dryRun);
-  await checkProjectCreationJob(results, scriptState, cwd, dryRun);
+  await checkProjectCreationJob(results, scriptState, cwd, dryRun, errorCallback);
 
-  await handleAutoLabel(projectsToBeCreated, dryRun);
+  await handleAutoLabel(projectsToBeCreated, dryRun, errorCallback);
 }
 
-async function setProjectCreationConfig(cwd: string, configFile: string, usePcw: boolean, withoutPcw: boolean) {
-  setConfigByJSONFile(resolve(cwd, configFile), getProjectCreationValidators(), ScriptAction.PROJECT_CREATION);
+async function setProjectCreationConfig(
+  cwd: string,
+  configFile: string,
+  usePcw: boolean,
+  withoutPcw: boolean,
+  errorCallback?: (error: Error) => Promise<void>,
+) {
+  if (!errorCallback) {
+    setConfigByJSONFile(resolve(cwd, configFile), getProjectCreationValidators(), ScriptAction.PROJECT_CREATION);
+  }
 
   if (withoutPcw) {
     getLogger().info('withoutPcw is set to true, parsing config...');
@@ -212,6 +226,7 @@ async function checkProjectCreationJob(
   scriptState: ScriptState,
   cwd: string,
   dryRun: boolean,
+  errorCallback?: (error: Error) => Promise<void>,
 ) {
   if (dryRun) {
     let filepath = resolve(cwd, `dry-run-output-${Date.now()}.json`);
@@ -229,6 +244,9 @@ async function checkProjectCreationJob(
     getLogger().info(`completed ${jobs.length} jobs; ${createOK.length} successful and ${createFail.length} failed`);
     for (const job of createFail) {
       getLogger().error(`error for ${job.id}`, { ...job });
+      if (errorCallback) {
+        await errorCallback(new ProjectCreationError(`error for ${job.id}: ${job}`));
+      }
     }
 
     scriptState.updateStatesFromProjectCreationJobs(jobs);

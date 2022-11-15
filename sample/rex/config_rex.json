@@ -6,7 +6,7 @@
   },
   "projectState": {
     "source": "local",
-    "path": "<path/to/stateFile.json>"
+    "path": "/home/robosaur/sample/rex/state.json"
   },
   "database": {
     "url": "mongodb://vulcan:vulcan@localhost:27017",
@@ -212,8 +212,17 @@
       "enableAutoLabel": true,
       "labelerEmail": "<EMAIL>",
       "targetApiEndpoint": "http://field-extractor:9015/field-extractor",
-      "targetApiSecretKey": "<FIELD_EXTRACTOR_SECRET>",
+      "targetApiSecretKey": "secret",
       "numberOfFilesPerRequest": 1
     }
+  },
+  "export": {
+    "source": "local",
+    "prefix": "sample/rex/export",
+    "teamId": "<TEAM_ID>",
+    "statusFilter": [],
+    "executionMode": "stateful",
+    "format": "CUSTOM",
+    "fileTransformerId": "<FILE_TRANSFORMER_ID>"
   }
 }

@@ -9,8 +9,9 @@ services:
       - 6969:6969
     volumes:
       - ./docker-config:/home/robosaur/config
-      - ./docker-state:/home/robosaur/state
+      - ./docker-state:/home/robosaur/sample/rex
       - ./docker-logs:/home/robosaur/logs
+      - ./docker-export:/home/robosaur/sample/rex/export
 networks:
   default:
     external:
