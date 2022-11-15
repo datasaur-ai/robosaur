@@ -20,9 +20,10 @@ export DOCKER_TAG=$dockerTag
 
 docker-compose -f docker-compose.build.yml build
 
+echo ${dockerTag} > build/version
+
 docker save datasaur/robosaur:${dockerTag} | gzip > build/datasaur-robosaur.tar.gz
 
-echo ${dockerTag} > build/version
 mv build datasaur-robosaur-${dockerTag}
 tar -czf datasaur-robosaur-${dockerTag}.tar.gz datasaur-robosaur-${dockerTag}
 rm -fr datasaur-robosaur-${dockerTag}
