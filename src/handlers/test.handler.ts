@@ -13,7 +13,7 @@ export async function handleTest(configFile: string) {
   initDatabase();
 
   const data: DataPayload = {
-    _id: 1,
+    id: 1,
     file_page_size: 1,
     file_type: 'pdf',
     filename: '1_0002.pdf',

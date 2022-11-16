@@ -1,5 +1,5 @@
 export class DataPayload {
-  _id: number;
+  id: number;
   filename: string;
   parsed_image_dir: string;
   team_id: number;
