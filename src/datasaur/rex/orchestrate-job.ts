@@ -30,14 +30,14 @@ export const orchestrateJob = async (payload: Team15, configFile: string) => {
   };
 
   try {
-    getLogger().info(`Job ${payload.id} started`);
+    getLogger().info(`Job ${payload._id} started`);
 
-    await checkRecordStatus(payload.id);
+    await checkRecordStatus(payload._id);
 
-    getLogger().info(`Job ${payload.id} cleaning temporary folder`);
+    getLogger().info(`Job ${payload._id} cleaning temporary folder`);
     cleanUpTempFolders();
 
-    getLogger().info(`Job ${payload.id} prepare input files`);
+    getLogger().info(`Job ${payload._id} prepare input files`);
     // Call project creation input handler
     try {
       await handleProjectCreationInputFiles(payload);
@@ -46,8 +46,8 @@ export const orchestrateJob = async (payload: Team15, configFile: string) => {
       return;
     }
 
-    await checkRecordStatus(payload.id);
-    getLogger().info(`Job ${payload.id} creating projects`);
+    await checkRecordStatus(payload._id);
+    getLogger().info(`Job ${payload._id} creating projects`);
     // Run create-projects command and trigger ML-Assisted Labeling
     try {
       await handleCreateProjects(configFile, { dryRun: false, usePcw: true, withoutPcw: false }, errorCallback);
@@ -58,8 +58,8 @@ export const orchestrateJob = async (payload: Team15, configFile: string) => {
       return;
     }
 
-    await checkRecordStatus(payload.id);
-    getLogger().info(`Job ${payload.id} exporting projects`);
+    await checkRecordStatus(payload._id);
+    getLogger().info(`Job ${payload._id} exporting projects`);
     // Call project export
     try {
       await handleExport(configFile, payload, errorCallback);
@@ -73,17 +73,17 @@ export const orchestrateJob = async (payload: Team15, configFile: string) => {
 
     // Apply post processing
     try {
-      getLogger().info(`Job ${payload.id} saving result to database...`);
-      await saveExportResultsToDatabase(payload.id);
+      getLogger().info(`Job ${payload._id} saving result to database...`);
+      await saveExportResultsToDatabase(payload._id);
 
-      getLogger().info(`Job ${payload.id} sending result back to gateway...`);
-      await sendRequestToEndpoint(payload.id);
+      getLogger().info(`Job ${payload._id} sending result back to gateway...`);
+      await sendRequestToEndpoint(payload._id);
     } catch (e) {
       await cleanUp(e);
       return;
     }
 
-    getLogger().info(`Job ${payload.id} job finished. Cleaning up job`);
+    getLogger().info(`Job ${payload._id} job finished. Cleaning up job`);
 
     await abortJob(payload, OCR_STATUS.READ);
     cleanUpTempFolders();

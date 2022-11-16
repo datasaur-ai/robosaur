@@ -17,7 +17,7 @@ export const pruneTimeoutRecord = async (teamId: number) => {
 
     const team15Repo = await getRepository(Team15);
 
-    const saveKeeping = await team15Repo.findOne({ where: { id: saveKeepingId } });
+    const saveKeeping = await team15Repo.findOne({ where: { _id: saveKeepingId } });
 
     if (!saveKeeping || !saveKeeping.start_ocr) {
       continue;

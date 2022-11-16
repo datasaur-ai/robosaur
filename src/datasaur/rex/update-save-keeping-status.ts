@@ -10,7 +10,7 @@ export const updateSaveKeepingStatus = async (id: number) => {
 
   const saveKeeping = await saveKeepingRepo.findOne({
     where: {
-      id,
+      _id: id,
     },
   });
 
