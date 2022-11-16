@@ -4,8 +4,6 @@ services:
     build:
       context: .
       dockerfile: robosaur.Dockerfile
-    environment:
-      - MONGODB_CONNSTRING=mongodb://vulcan:vulcan@mongodb:27017/
     ports:
       - 6969:6969
     volumes:
