@@ -20,7 +20,8 @@ export const updateSaveKeepingStatus = async (id: number) => {
 
   saveKeeping.start_ocr = currentTime;
   saveKeeping.ocr_status = OCR_STATUS.IN_PROGRESS;
-  saveKeepingRepo.save(saveKeeping);
+
+  await saveKeepingRepo.update({ _id: saveKeeping._id }, saveKeeping);
 
   return saveKeeping;
 };

@@ -13,7 +13,7 @@ export const pruneTimeoutRecord = async (teamId: number) => {
   const records = await recordRepo.findBy({ 'data.team_id': teamId });
 
   for (const record of records) {
-    const saveKeepingId = record.data?.id;
+    const saveKeepingId = record.data?._id;
 
     const team15Repo = await getRepository(Team15);
 
@@ -29,7 +29,7 @@ export const pruneTimeoutRecord = async (teamId: number) => {
       getLogger().warn('found a timed out process, removing the process...');
       saveKeeping.end_ocr = formatDate(new Date());
       saveKeeping.ocr_status = OCR_STATUS.TIMEOUT;
-      await team15Repo.save(saveKeeping);
+      await team15Repo.update({ _id: saveKeeping._id }, saveKeeping);
       await recordRepo.delete(record);
     }
   }

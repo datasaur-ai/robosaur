@@ -5,5 +5,5 @@ import { OCR_STATUS } from './interface';
 export const updateStatus = async (payload: Team15, status: OCR_STATUS) => {
   const saveKeepingRepo = await getRepository(Team15);
 
-  saveKeepingRepo.save({ ...payload, ocr_status: status });
+  saveKeepingRepo.update({ _id: payload._id }, { ...payload, ocr_status: status });
 };

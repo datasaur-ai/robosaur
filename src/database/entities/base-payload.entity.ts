@@ -1,4 +1,4 @@
-import { Column, PrimaryColumn } from 'typeorm';
+import { Column, ObjectIdColumn, PrimaryColumn } from 'typeorm';
 
 /**
  * 'reading_result': {
@@ -39,7 +39,7 @@ export class DocumentData {
   };
 }
 export abstract class BasePayload {
-  @PrimaryColumn()
+  @ObjectIdColumn({ generated: false })
   _id: number;
 
   @Column()

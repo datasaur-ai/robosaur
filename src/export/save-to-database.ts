@@ -41,7 +41,7 @@ export async function saveExportResultsToDatabase(id: number) {
     record.document_data_initial = documentData;
     record.reading_result = readingResult;
 
-    await team15Repository.save(record);
+    await team15Repository.update({ _id: record._id }, record);
 
     deleteFolder(folder);
   }

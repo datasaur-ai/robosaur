@@ -13,7 +13,7 @@ export async function handleTest(configFile: string) {
   initDatabase();
 
   const data: DataPayload = {
-    id: 1,
+    _id: 1,
     file_page_size: 1,
     file_type: 'pdf',
     filename: '1_0002.pdf',
@@ -54,7 +54,7 @@ export async function handleTest(configFile: string) {
     parsed_image_dir: '',
     reading_result: {},
     received_request: '',
-    id: 1,
+    _id: 1,
   });
 
   process.exit(0);
