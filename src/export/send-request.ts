@@ -14,7 +14,7 @@ export async function sendRequestToEndpoint(id: number) {
   const payload = {
     document_data: data.document_data,
     document_path: data.hcp_ori_document_dir,
-    transaction_id: data.id,
+    transaction_id: data._id,
     status: isOCRSuccessful(data.ocr_status) ? PAYLOAD_STATUS.SUCCESS : PAYLOAD_STATUS.FAILED,
     message: {
       indonesian: `${
