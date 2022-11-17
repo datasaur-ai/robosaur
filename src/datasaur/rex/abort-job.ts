@@ -15,7 +15,10 @@ export const abortJob = async (id: number, message: string, error?: Error) => {
     await recordRepo.delete(record);
   }
 
-  saveKeepingRepo.update({ _id: payload._id }, { ...payload, end_ocr: formatDate(new Date()), ocr_status: message });
+  await saveKeepingRepo.update(
+    { _id: payload._id },
+    { ...payload, end_ocr: formatDate(new Date()), ocr_status: message },
+  );
 
   if (error) {
     getLogger().error(error.message);
