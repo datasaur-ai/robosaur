@@ -30,3 +30,6 @@ ls -la datasaur-robosaur-${dockerTag}
 echo "compressing above files"
 tar -czf datasaur-robosaur-${dockerTag}.tar.gz datasaur-robosaur-${dockerTag}
 rm -fr datasaur-robosaur-${dockerTag}
+
+aws s3 cp datasaur-robosaur-${dockerTag}.tar.gz s3://datasaur-on-premise/bca/datasaur-robosaur-${dockerTag}.tar.gz
+aws s3 presign --expires-in=604800 s3://datasaur-on-premise/bca/datasaur-robosaur-${dockerTag}.tar.gz
