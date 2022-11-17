@@ -65,7 +65,7 @@ export const orchestrateJob = async (payload: Team15, configFile: string) => {
     // Call project export
     try {
       await handleExport(configFile, payload, errorCallback);
-      await updateStatus(payload, OCR_STATUS.READ);
+      await updateStatus(payload._id, OCR_STATUS.READ);
     } catch (e) {
       if (!(e instanceof OcrError)) {
         await cleanUp(new ExportProjectError(e));
