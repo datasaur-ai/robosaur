@@ -12,7 +12,7 @@ export const abortJob = async (id: number, message: string, error?: Error) => {
   const record = await recordRepo.findOneBy({ 'data.id': payload._id });
 
   if (record) {
-    recordRepo.delete(record);
+    await recordRepo.delete(record);
   }
 
   saveKeepingRepo.update({ _id: payload._id }, { ...payload, end_ocr: formatDate(new Date()), ocr_status: message });
