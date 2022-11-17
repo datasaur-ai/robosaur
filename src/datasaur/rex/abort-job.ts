@@ -7,7 +7,11 @@ import { formatDate } from '../utils/format-date';
 export const abortJob = async (id: number, message: string, error?: Error) => {
   getLogger().info(`Aborting job ${id}`);
   const saveKeepingRepo = await getRepository(Team15);
-  const payload = await saveKeepingRepo.findOneByOrFail(Number(id));
+  const payload = await saveKeepingRepo.findOneOrFail({
+    where: {
+      _id: id,
+    },
+  });
   const recordRepo = await getRepository(ProcessRecordEntity);
 
   const record = await recordRepo.findOneBy({ 'data.id': Number(id) });

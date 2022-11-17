@@ -35,7 +35,11 @@ export async function saveExportResultsToDatabase(id: number) {
       readingResult[filename] = json.reading_result;
     }
 
-    const record = await team15Repository.findOneByOrFail(Number(id));
+    const record = await team15Repository.findOneOrFail({
+      where: {
+        _id: id,
+      },
+    });
 
     getLogger().info(`Updating save keeping in database. Before`, record);
 
