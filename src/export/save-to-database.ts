@@ -40,6 +40,7 @@ export async function saveExportResultsToDatabase(id: number) {
     record.document_data = documentData;
     record.document_data_initial = documentData;
     record.reading_result = readingResult;
+    record.continuous_index = Array(Number(record.page_count ?? 1)).fill(0);
 
     await team15Repository.update({ _id: record._id }, record);
 

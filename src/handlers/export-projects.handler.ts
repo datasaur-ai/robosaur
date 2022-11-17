@@ -223,6 +223,12 @@ async function runProjectExport(
 
     const jobResult = (await pollJobsUntilCompleted([retval.exportId]))[0];
     getLogger().info(`export job finished`, { ...jobResult });
+    if (jobResult.status === JobStatus.FAILED) {
+      getLogger().error(`export job failed`, { ...jobResult });
+      if (errorCallback) {
+        errorCallback(new ExportProjectError(`${jobResult}`));
+      }
+    }
     temp.jobStatus = jobResult?.status;
     scriptState.updateStatesFromProjectExportJobs([jobResult]);
     await scriptState.save();

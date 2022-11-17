@@ -7,7 +7,9 @@ import { getLogger } from '../../logger';
 import { abortJob } from './abort-job';
 import { checkRecordStatus } from './check-record-status';
 import { cleanUpTempFolders } from './cleanUpTempFolders';
+import { ExportProjectError } from './errors/export-project-error';
 import { OcrError } from './errors/ocr-error';
+import { ProjectCreationError } from './errors/project-creation-error';
 import { handleProjectCreationInputFiles } from './handle-project-creation-input-files';
 import { OCR_STATUS } from './interface';
 import { updateStatus } from './updateStatus';
@@ -20,7 +22,7 @@ export const orchestrateJob = async (payload: Team15, configFile: string) => {
     } else {
       status = OCR_STATUS.UNKNOWN_ERROR;
     }
-    await abortJob(payload, `${status}`, error);
+    await abortJob(payload._id, `${status}`, error);
     cleanUpTempFolders();
   };
 
@@ -53,7 +55,7 @@ export const orchestrateJob = async (payload: Team15, configFile: string) => {
       await handleCreateProjects(configFile, { dryRun: false, usePcw: true, withoutPcw: false }, errorCallback);
     } catch (e) {
       if (!(e instanceof OcrError)) {
-        await cleanUp(e);
+        await cleanUp(new ProjectCreationError(e));
       }
       return;
     }
@@ -66,12 +68,11 @@ export const orchestrateJob = async (payload: Team15, configFile: string) => {
       await updateStatus(payload, OCR_STATUS.READ);
     } catch (e) {
       if (!(e instanceof OcrError)) {
-        await cleanUp(e);
+        await cleanUp(new ExportProjectError(e));
       }
       return;
     }
 
-    // Apply post processing
     try {
       getLogger().info(`Job ${payload._id} saving result to database...`);
       await saveExportResultsToDatabase(payload._id);
@@ -85,7 +86,7 @@ export const orchestrateJob = async (payload: Team15, configFile: string) => {
 
     getLogger().info(`Job ${payload._id} job finished. Cleaning up job`);
 
-    await abortJob(payload, OCR_STATUS.READ);
+    await abortJob(payload._id, OCR_STATUS.READ);
     cleanUpTempFolders();
   } catch (e) {
     await cleanUp(e);
