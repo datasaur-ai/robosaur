@@ -5,6 +5,7 @@ import { SendGatewayError } from '../datasaur/rex/errors/send-gateway-error';
 import { OCR_STATUS, PAYLOAD_MESSAGE, PAYLOAD_STATUS } from '../datasaur/rex/interface';
 import { getLogger } from '../logger';
 import { sleep } from '../utils/sleep';
+import { base64Encode } from '../datasaur/utils/decode-encode';
 
 export async function sendRequestToEndpoint(id: number) {
   const team15Repository = await getRepository(Team15);
@@ -32,7 +33,7 @@ export async function sendRequestToEndpoint(id: number) {
   const LIMIT_RETRY = Number(process.env.LIMIT_RETRY);
   while (counterRetry < LIMIT_RETRY) {
     try {
-      getLogger().info(`sending request to ${exportEndpoint}...`, { payload });
+      getLogger().info(`sending request to ${exportEndpoint}...`, { payload: base64Encode(JSON.stringify(payload)) });
       const response = await axios({
         method: 'POST',
         headers: { 'content-type': 'application/json' },
@@ -41,7 +42,7 @@ export async function sendRequestToEndpoint(id: number) {
         timeout: 30000,
       });
       counterRetry += LIMIT_RETRY;
-      getLogger().info(`successfully sent payload to endpoint`, { response: response.data });
+      getLogger().info(`successfully sent payload to endpoint`, { response: base64Encode(response.data) });
       return response;
     } catch (error) {
       if (counterRetry >= LIMIT_RETRY) {
