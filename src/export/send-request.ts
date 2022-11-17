@@ -10,6 +10,7 @@ import { base64Encode } from '../datasaur/utils/decode-encode';
 export async function sendRequestToEndpoint(id: number) {
   const team15Repository = await getRepository(Team15);
   const data = await team15Repository.findOneByOrFail(Number(id));
+  getLogger().info(`Retrieved data from database for gateway payload`);
   const exportEndpoint = process.env.EXPORT_ENDPOINT;
 
   const payload = {
@@ -28,6 +29,8 @@ export async function sendRequestToEndpoint(id: number) {
     end_ocr: data.end_ocr,
     continuous_index: data.continuous_index,
   };
+
+  getLogger().info(`Payload to be sent`, payload);
 
   let counterRetry = 0;
   const LIMIT_RETRY = Number(process.env.LIMIT_RETRY);

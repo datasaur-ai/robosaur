@@ -5,20 +5,29 @@ import { getLogger } from '../../logger';
 import { formatDate } from '../utils/format-date';
 
 export const abortJob = async (id: number, message: string, error?: Error) => {
+  getLogger().info(`Aborting job ${id}`);
   const saveKeepingRepo = await getRepository(Team15);
   const payload = await saveKeepingRepo.findOneByOrFail(Number(id));
   const recordRepo = await getRepository(ProcessRecordEntity);
 
-  const record = await recordRepo.findOneBy({ 'data.id': payload._id });
+  const record = await recordRepo.findOneBy({ 'data.id': Number(id) });
 
   if (record) {
+    getLogger().info(`Deleting record`, record);
+
     await recordRepo.delete(record);
+  } else {
+    getLogger().info(`Process record not found`);
   }
+
+  getLogger().info(`Updating save keeping. Adding end_ocr..`, payload);
 
   await saveKeepingRepo.update(
     { _id: payload._id },
     { ...payload, end_ocr: formatDate(new Date()), ocr_status: message },
   );
+
+  getLogger().info(`Updated save keeping`);
 
   if (error) {
     getLogger().error(error.message);
