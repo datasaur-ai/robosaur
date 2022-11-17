@@ -11,4 +11,5 @@ docker-*/
 
 on-premise/build/**
 on-premise/build/*.tar.gz
+on-premise/*.tar.gz
 temps/**/*

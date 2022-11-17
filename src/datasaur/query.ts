@@ -5,6 +5,7 @@ import packageJson from '../../package.json';
 import { getConfig } from '../config/config';
 import { getLogger } from '../logger';
 import { getAccessToken } from './get-access-token';
+import { base64Encode } from './utils/decode-encode';
 
 let currentClient: GraphQLClient | undefined;
 let endpointUrl: string;
@@ -25,7 +26,7 @@ export async function query<T = any, V = any>(
   client.setHeader('user-agent', `Robosaur/${packageJson.version}+${process.platform}+${process.version}`);
   client.setEndpoint(appendGQLTitleAsQuery(endpointUrl, document));
   try {
-    logger.info('Request begin', { document });
+    logger.info('Request begin', { document: base64Encode(JSON.stringify(document)) });
     const result = await client.request<T, V>(document, variables, requestHeaders);
     logger.info('Request finished');
     return result;
