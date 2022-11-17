@@ -16,6 +16,7 @@ import { updateStatus } from './updateStatus';
 
 export const orchestrateJob = async (payload: Team15, configFile: string) => {
   const cleanUp = async (error: Error) => {
+    getLogger().info(`Clean up ${payload._id} started`, { payload });
     let status: OCR_STATUS;
     if (error instanceof OcrError) {
       status = error.status;
@@ -67,6 +68,7 @@ export const orchestrateJob = async (payload: Team15, configFile: string) => {
       await handleExport(configFile, payload, errorCallback);
       await updateStatus(payload._id, OCR_STATUS.READ);
     } catch (e) {
+      getLogger().error(`error at handle export`, e);
       if (!(e instanceof OcrError)) {
         await cleanUp(new ExportProjectError(e));
       }
@@ -80,6 +82,7 @@ export const orchestrateJob = async (payload: Team15, configFile: string) => {
       getLogger().info(`Job ${payload._id} sending result back to gateway...`);
       await sendRequestToEndpoint(payload._id);
     } catch (e) {
+      getLogger().error(`error at saving post processing`, e);
       await cleanUp(e);
       return;
     }
@@ -89,6 +92,7 @@ export const orchestrateJob = async (payload: Team15, configFile: string) => {
     await abortJob(payload._id, OCR_STATUS.READ);
     cleanUpTempFolders();
   } catch (e) {
+    getLogger().error(`error orchestrating`, e);
     await cleanUp(e);
     return;
   }

@@ -11,20 +11,22 @@ export const abortJob = async (id: number, message: string, error?: Error) => {
   const recordRepo = await getRepository(ProcessRecordEntity);
 
   const record = await recordRepo.findOneBy({ 'data.id': Number(id) });
-
+  
   if (record) {
     getLogger().info(`Deleting record`, record);
 
-    await recordRepo.delete(record);
+    const result = await recordRepo.delete(record);
+
+    getLogger().info(`Deleted record, ${JSON.stringify(result)}`);
   } else {
     getLogger().info(`Process record not found`);
   }
 
   getLogger().info(`Updating save keeping. Adding end_ocr..`, payload);
 
-  await saveKeepingRepo.update({ _id: payload._id }, { end_ocr: formatDate(new Date()), ocr_status: message });
+  const result = await saveKeepingRepo.update({ _id: payload._id }, { end_ocr: formatDate(new Date()), ocr_status: message });
 
-  getLogger().info(`Updated save keeping`);
+  getLogger().info(`Updated save keeping, ${JSON.stringify(result)}`);
 
   if (error) {
     getLogger().error(error.message);
