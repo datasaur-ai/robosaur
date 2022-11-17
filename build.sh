@@ -22,7 +22,7 @@ docker-compose -f docker-compose.build.yml build
 echo "saving robosaur image"
 
 docker save datasaur/robosaur:${dockerTag} | gzip > build/datasaur-robosaur.tar.gz
-rm -r datasaur-robosaur-${dockerTag}
+rm -rf datasaur-robosaur-${dockerTag}
 mv build datasaur-robosaur-${dockerTag}
 echo "creating artifact"
 
