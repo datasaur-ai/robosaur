@@ -16,7 +16,7 @@ export function createSimpleHandlerContext<T extends unknown[]>(
   callback: HandlerContextCallback<T>,
 ): HandlerContextCallback<T> {
   return function (...args) {
-    return executionNamespace.runPromise(async () => {
+    return executionNamespace.runAndReturn(async () => {
       // generate random traceId
       const traceId = generateRandomTraceId();
       executionNamespace.set('traceId', traceId);
@@ -57,11 +57,11 @@ export function createConsumerHandlerContext<T extends unknown[], U extends unkn
   });
 
   const wrappedProcessJob = (traceId: string, ...args: U) => {
-    return executionNamespace.runPromise(async () => {
+    return executionNamespace.runAndReturn(async () => {
       executionNamespace.set('trace-id', traceId);
       return onJob(...args);
     });
   };
 
-  return (...args: T) => consumerFn(wrappedProcessJob, ...args);
+  return async (...args: T) => consumerFn(wrappedProcessJob, ...args);
 }
