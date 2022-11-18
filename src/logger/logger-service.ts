@@ -10,6 +10,10 @@ export class LoggerService {
     this.resolvers.push(resolver);
   }
 
+  popResolver() {
+    this.resolvers.pop();
+  }
+
   public error(message: string, ...args: any[]) {
     this.getLogger().error(message, ...args);
   }
