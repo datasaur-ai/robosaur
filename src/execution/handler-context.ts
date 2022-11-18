@@ -1,7 +1,7 @@
 import { getLoggerService } from '../logger/index';
 import { executionNamespace } from './execution-namespace';
 import { randomUUID } from 'crypto';
-import { getExecutionValue } from './helpers';
+import { getExecutionValue, preventNewTraceIdGeneration } from './helpers';
 
 export interface HandlerContextCallback<T extends unknown[]> {
   (...args: T): void | Promise<void>;
@@ -18,8 +18,15 @@ export function createSimpleHandlerContext<T extends unknown[]>(
   return function (...args) {
     return executionNamespace.runAndReturn(async () => {
       // generate random traceId
-      const traceId = generateRandomTraceId();
-      executionNamespace.set('traceId', traceId);
+      const shouldPreventNewTraceIdGeneration = getExecutionValue('prevent-new-traceid-generation');
+
+      let traceId;
+      if (!shouldPreventNewTraceIdGeneration) {
+        traceId = generateRandomTraceId();
+        executionNamespace.set('trace-id', traceId);
+      } else {
+        traceId = getExecutionValue('trace-id');
+      }
 
       // register resolver for logging and tracing
       getLoggerService().registerResolver(() => {
@@ -30,7 +37,9 @@ export function createSimpleHandlerContext<T extends unknown[]>(
       });
 
       // run the callback
-      return callback(...args);
+      const result = await Promise.resolve(callback(...args));
+      getLoggerService().popResolver();
+      return result;
     });
   };
 }
@@ -58,10 +67,15 @@ export function createConsumerHandlerContext<T extends unknown[], U extends unkn
 
   const wrappedProcessJob = (traceId: string, ...args: U) => {
     return executionNamespace.runAndReturn(async () => {
+      preventNewTraceIdGeneration();
       executionNamespace.set('trace-id', traceId);
       return onJob(...args);
     });
   };
 
-  return async (...args: T) => consumerFn(wrappedProcessJob, ...args);
+  return async (...args: T) => {
+    const result = await Promise.resolve(consumerFn(wrappedProcessJob, ...args));
+    getLoggerService().popResolver();
+    return result;
+  };
 }
