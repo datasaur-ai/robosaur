@@ -22,7 +22,6 @@ export function createSimpleHandlerContext<T extends unknown[]>(
 
       let traceId;
       if (!shouldPreventNewTraceIdGeneration) {
-        console.log('generate new');
         traceId = generateRandomTraceId();
         executionNamespace.set('trace-id', traceId);
       } else {
