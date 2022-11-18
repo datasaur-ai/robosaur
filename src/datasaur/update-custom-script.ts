@@ -18,5 +18,6 @@ export async function updateFileTransformer(fileTransformerId, content) {
     },
   };
 
-  await query(UPDATE_FILE_TRANSFORMER_MUTATION, variables);
+  const data = await query(UPDATE_FILE_TRANSFORMER_MUTATION, variables);
+  return data.result;
 }

@@ -20,5 +20,6 @@ export async function updateCustomAPI(customAPIId, name, endpointURL, secret) {
     },
   };
 
-  await query(UPDATE_CUSTOM_API, variables);
+  const data = await query(UPDATE_CUSTOM_API, variables);
+  return data.result;
 }
