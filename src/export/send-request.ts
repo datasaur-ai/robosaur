@@ -1,28 +1,28 @@
 import axios from 'axios';
-import { setConfigByJSONFile } from '../config/config';
-import { getDatabaseValidators } from '../config/schema/validator';
-import { initDatabase } from '../database';
 import { Team15 } from '../database/entities/teamPayloads/team_15.entity';
 import { getRepository } from '../database/repository';
+import { SendGatewayError } from '../datasaur/rex/errors/send-gateway-error';
+import { OCR_STATUS, PAYLOAD_MESSAGE, PAYLOAD_STATUS } from '../datasaur/rex/interface';
 import { getLogger } from '../logger';
 import { sleep } from '../utils/sleep';
-import { OCR_STATUS } from './constants';
+import { base64Encode } from '../datasaur/utils/decode-encode';
 
-export async function sendRequestToEndpoint(configFile: string, id: number) {
-  setConfigByJSONFile(configFile, getDatabaseValidators());
-  initDatabase();
+export async function sendRequestToEndpoint(id: number) {
   const team15Repository = await getRepository(Team15);
   const data = await team15Repository.findOneByOrFail(Number(id));
+  getLogger().info(`Retrieved data from database for gateway payload`);
   const exportEndpoint = process.env.EXPORT_ENDPOINT;
 
   const payload = {
     document_data: data.document_data,
     document_path: data.hcp_ori_document_dir,
-    transaction_id: data.id,
-    status: isOCRSuccessful(data.ocr_status) ? OCR_STATUS.SUCCESS : OCR_STATUS.FAILED,
+    transaction_id: data._id,
+    status: isOCRSuccessful(data.ocr_status) ? PAYLOAD_STATUS.SUCCESS : PAYLOAD_STATUS.FAILED,
     message: {
-      indonesian: `OCR ${isOCRSuccessful(data.ocr_status) ? OCR_STATUS.BERHASIL : OCR_STATUS.GAGAL}`,
-      english: `OCR ${isOCRSuccessful(data.ocr_status) ? OCR_STATUS.SUCCESS : OCR_STATUS.FAILED}`,
+      indonesian: `${
+        isOCRSuccessful(data.ocr_status) ? PAYLOAD_MESSAGE.indonesia.SUCCESS : PAYLOAD_MESSAGE.indonesia.FAILED
+      }`,
+      english: `${isOCRSuccessful(data.ocr_status) ? PAYLOAD_MESSAGE.english.SUCCESS : PAYLOAD_MESSAGE.english.FAILED}`,
     },
     received_request: data.received_request,
     start_ocr: data.start_ocr,
@@ -30,11 +30,13 @@ export async function sendRequestToEndpoint(configFile: string, id: number) {
     continuous_index: data.continuous_index,
   };
 
+  getLogger().info(`Payload to be sent`, payload);
+
   let counterRetry = 0;
   const LIMIT_RETRY = Number(process.env.LIMIT_RETRY);
   while (counterRetry < LIMIT_RETRY) {
     try {
-      getLogger().info(`sending request to ${exportEndpoint}...`, { payload });
+      getLogger().info(`sending request to ${exportEndpoint}...`, { payload: base64Encode(JSON.stringify(payload)) });
       const response = await axios({
         method: 'POST',
         headers: { 'content-type': 'application/json' },
@@ -43,7 +45,7 @@ export async function sendRequestToEndpoint(configFile: string, id: number) {
         timeout: 30000,
       });
       counterRetry += LIMIT_RETRY;
-      getLogger().info(`successfully sent payload to endpoint`, { response: response.data });
+      getLogger().info(`successfully sent payload to endpoint`, { response: base64Encode(response.data) });
       return response;
     } catch (error) {
       if (counterRetry >= LIMIT_RETRY) {
@@ -51,7 +53,7 @@ export async function sendRequestToEndpoint(configFile: string, id: number) {
           error: JSON.stringify(error),
           message: error.message,
         });
-        return;
+        throw new SendGatewayError(error);
       } else {
         getLogger().warn(`error sending request, retrying...`, {
           error: JSON.stringify(error),

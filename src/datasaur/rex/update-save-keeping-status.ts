@@ -10,7 +10,7 @@ export const updateSaveKeepingStatus = async (id: number) => {
 
   const saveKeeping = await saveKeepingRepo.findOne({
     where: {
-      id,
+      _id: id,
     },
   });
 
@@ -20,7 +20,8 @@ export const updateSaveKeepingStatus = async (id: number) => {
 
   saveKeeping.start_ocr = currentTime;
   saveKeeping.ocr_status = OCR_STATUS.IN_PROGRESS;
-  saveKeepingRepo.save(saveKeeping);
+
+  await saveKeepingRepo.update({ _id: saveKeeping._id }, saveKeeping);
 
   return saveKeeping;
 };

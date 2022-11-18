@@ -10,14 +10,14 @@ const MAX_TIMEOUT_IN_MINUTES = Number(process.env.MAX_TIMEOUT_IN_MINUTES ?? 30);
 
 export const pruneTimeoutRecord = async (teamId: number) => {
   const recordRepo = await getRepository(ProcessRecordEntity);
-  const records = await recordRepo.find({ where: { data: { team_id: teamId } } });
+  const records = await recordRepo.findBy({ 'data.team_id': teamId });
 
   for (const record of records) {
     const saveKeepingId = record.data?.id;
 
     const team15Repo = await getRepository(Team15);
 
-    const saveKeeping = await team15Repo.findOne({ where: { id: saveKeepingId } });
+    const saveKeeping = await team15Repo.findOne({ where: { _id: saveKeepingId } });
 
     if (!saveKeeping || !saveKeeping.start_ocr) {
       continue;
@@ -29,7 +29,7 @@ export const pruneTimeoutRecord = async (teamId: number) => {
       getLogger().warn('found a timed out process, removing the process...');
       saveKeeping.end_ocr = formatDate(new Date());
       saveKeeping.ocr_status = OCR_STATUS.TIMEOUT;
-      await team15Repo.save(saveKeeping);
+      await team15Repo.update({ _id: saveKeeping._id }, saveKeeping);
       await recordRepo.delete(record);
     }
   }

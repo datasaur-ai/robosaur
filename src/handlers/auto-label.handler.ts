@@ -8,17 +8,22 @@ import { pollJobsUntilCompleted } from '../utils/polling.helper';
 import { getState } from '../utils/states/getStates';
 import { ProjectState } from '../utils/states/interfaces';
 import { ScriptState } from '../utils/states/script-state';
+import { AutoLabelError } from '../datasaur/rex/errors/auto-label-error';
 
 export const handleAutoLabel = createSimpleHandlerContext('auto-label', _handleAutoLabel);
 
-async function _handleAutoLabel(projects: { name: string; fullPath: string }[], dryRun: boolean) {
+async function _handleAutoLabel(
+  projects: { name: string; fullPath: string }[],
+  dryRun: boolean,
+  errorCallback?: (error: Error) => Promise<void>,
+) {
   if (!getConfig().create.autoLabel?.enableAutoLabel) return;
 
   const scriptState = await getState();
   const projectsToAutoLabel = getProjectsToAutoLabel(projects, scriptState);
 
   const autoLabelResults = await submitAutoLabelJob(projectsToAutoLabel, dryRun);
-  await checkAutoLabelJob(autoLabelResults, dryRun);
+  await checkAutoLabelJob(autoLabelResults, dryRun, errorCallback);
 }
 
 function getProjectsToAutoLabel(projectsToBeCreated: { name: string; fullPath: string }[], scriptState: ScriptState) {
@@ -57,7 +62,7 @@ async function submitAutoLabelJob(projectsToAutoLabel: Map<string, ProjectState>
   return results;
 }
 
-async function checkAutoLabelJob(results: Job[], dryRun: any) {
+async function checkAutoLabelJob(results: Job[], dryRun: any, errorCallback?: (error: Error) => Promise<void>) {
   if (dryRun) {
     getLogger().info(`check auto label dry run`);
   } else {
@@ -71,6 +76,9 @@ async function checkAutoLabelJob(results: Job[], dryRun: any) {
     getLogger().info(`completed ${jobs.length} jobs; ${jobOK.length} successful and ${jobFailed.length} failed`);
     for (const job of jobFailed) {
       getLogger().error(`error for ${job.id}`, { ...job });
+      if (errorCallback) {
+        await errorCallback(new AutoLabelError(`error for ${job.id}: ${job}`));
+      }
     }
   }
 }

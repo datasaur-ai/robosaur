@@ -4,8 +4,11 @@ import * as minio from 'minio';
 import * as stream from 'stream';
 import { promisify } from 'util';
 import { Logger } from 'winston';
-import { Team15 } from '../database/entities/teamPayloads/team_15.entity';
-import { getLogger } from '../logger';
+import { Team15 } from '../../database/entities/teamPayloads/team_15.entity';
+import { getLogger } from '../../logger';
+import { DownloadFileError } from './errors/download-file-error';
+import { NoSIError } from './errors/no-si-error';
+import { RecognizeDocumentError } from './errors/recognize-document-error';
 
 interface DocumentRecognitionResponseData {
   orientation_preds: number[];
@@ -17,6 +20,7 @@ interface DocumentRecognitionResponseData {
 class ProjectCreationInputFilesHandler {
   private readonly logger: Logger = getLogger();
   private currentPage: number = 0;
+  private SICount: number = 0;
 
   constructor(private readonly data: Team15) {}
 
@@ -33,6 +37,10 @@ class ProjectCreationInputFilesHandler {
 
       // Step 3: Keep or remove the downloaded file
       this.filterDocumentFile(recognitionResult);
+    }
+
+    if (this.SICount === 0) {
+      throw new NoSIError();
     }
   }
 
@@ -60,7 +68,7 @@ class ProjectCreationInputFilesHandler {
         const { status } = response;
         this.handleAxiosError(fileUrl, response);
         if (400 <= status && status <= 499) {
-          throw error;
+          throw new DownloadFileError(error);
         }
       }
       currentRetry++;
@@ -82,7 +90,7 @@ class ProjectCreationInputFilesHandler {
       return response.data;
     } catch (error) {
       this.handleAxiosError(apiUrl, error.response);
-      throw error;
+      throw new RecognizeDocumentError(error);
     }
   }
 
@@ -109,6 +117,8 @@ class ProjectCreationInputFilesHandler {
         this.deleteFile();
         this.logger.info('The document is not instruction letter. Downloaded file has been deleted.');
         return;
+      } else {
+        this.SICount += 1;
       }
       if (orientationPredictions[i] !== 0 && imagesData[i] !== null) {
         this.storeFile(imagesData[i] as string);
@@ -151,12 +161,13 @@ class ProjectCreationInputFilesHandler {
   }
 
   private localDirectoryPath(): string {
-    const projectName = this.data.id;
+    const projectName = this.data._id;
     return `temps/${projectName}`;
   }
 
   private remoteFilePath(): string {
-    return `${this.remoteDirectoryPath()}/${this.fileName()}`;
+    const directoryPath = this.remoteDirectoryPath();
+    return `${directoryPath}${directoryPath ? '/' : ''}${this.fileName()}`;
   }
 
   private remoteDirectoryPath(): string {
@@ -165,9 +176,9 @@ class ProjectCreationInputFilesHandler {
   }
 
   private fileName(): string {
-    const { id: dataId, document_extension } = this.data;
+    const { _id: dataId, document_extension } = this.data;
     const paddedPage = this.currentPage.toString().padStart(3, '0');
-    const documentExtension = document_extension ? `.${document_extension}` : '';
+    const documentExtension = document_extension ? `${document_extension}` : '';
     return `${dataId}_${paddedPage}${documentExtension}`;
   }
 }

@@ -6,6 +6,8 @@ import { exportProject } from '../datasaur/export-project';
 import { JobStatus } from '../datasaur/get-jobs';
 import { getProjects } from '../datasaur/get-projects';
 import { ExportResult, Project } from '../datasaur/interfaces';
+import { DeleteProjectError } from '../datasaur/rex/errors/delete-project-error';
+import { ExportProjectError } from '../datasaur/rex/errors/export-project-error';
 import { createSimpleHandlerContext } from '../execution';
 import { getLogger } from '../logger';
 import { pollJobsUntilCompleted } from '../utils/polling.helper';
@@ -75,10 +77,16 @@ const handleStateless = async (unzip: boolean) => {
 
 export const handleExportProjects = createSimpleHandlerContext('export-projects', _handleExportProjects);
 
-async function _handleExportProjects(configFile: string, options: ProjectExportOption) {
+async function _handleExportProjects(
+  configFile: string,
+  options: ProjectExportOption,
+  errorCallback?: (error: Error) => Promise<void>,
+) {
   const { unzip, deleteProjectAfterExport } = options;
 
-  setConfigByJSONFile(configFile, getProjectExportValidators(), ScriptAction.PROJECT_EXPORT);
+  if (!errorCallback) {
+    setConfigByJSONFile(configFile, getProjectExportValidators(), ScriptAction.PROJECT_EXPORT);
+  }
 
   const stateless = getConfig().export.executionMode === StateConfig.STATELESS;
 
@@ -101,7 +109,7 @@ async function _handleExportProjects(configFile: string, options: ProjectExportO
   }
   getLogger().info(`found ${projectsToExport.length} projects to export`);
 
-  const results = await runProjectExport(projectsToExport, unzip, scriptState);
+  const results = await runProjectExport(projectsToExport, unzip, scriptState, errorCallback);
   const successResults = await checkProjectExportJobs(results);
   await scriptState.save();
 
@@ -128,6 +136,9 @@ async function _handleExportProjects(configFile: string, options: ProjectExportO
           message: error.message,
           stack: error?.stack,
         });
+        if (errorCallback) {
+          errorCallback(new DeleteProjectError(error));
+        }
       }
     }
   }
@@ -180,7 +191,12 @@ async function getProjectsToExport(validProjectsFromDatasaur: Project[], scriptS
   return projectsToExport;
 }
 
-async function runProjectExport(projectsToExport: [string, ProjectState][], unzip: boolean, scriptState: ScriptState) {
+async function runProjectExport(
+  projectsToExport: [string, ProjectState][],
+  unzip: boolean,
+  scriptState: ScriptState,
+  errorCallback?: (error: Error) => Promise<void>,
+) {
   const { source } = getConfig().export;
 
   const results: Array<{ projectName: string; exportId: string; jobStatus: JobStatus | 'PUBLISHED' }> = [];
@@ -207,6 +223,12 @@ async function runProjectExport(projectsToExport: [string, ProjectState][], unzi
 
     const jobResult = (await pollJobsUntilCompleted([retval.exportId]))[0];
     getLogger().info(`export job finished`, { ...jobResult });
+    if (jobResult.status === JobStatus.FAILED) {
+      getLogger().error(`export job failed`, { ...jobResult });
+      if (errorCallback) {
+        errorCallback(new ExportProjectError(`${jobResult}`));
+      }
+    }
     temp.jobStatus = jobResult?.status;
     scriptState.updateStatesFromProjectExportJobs([jobResult]);
     await scriptState.save();
@@ -224,6 +246,9 @@ async function runProjectExport(projectsToExport: [string, ProjectState][], unzi
         error: JSON.stringify(error),
         message: error.message,
       });
+      if (errorCallback) {
+        errorCallback(new ExportProjectError(error));
+      }
       scriptState.updateStatesFromProjectExportJobs([{ ...jobResult, status: JobStatus.FAILED as JobStatus }]);
     }
     await scriptState.save();

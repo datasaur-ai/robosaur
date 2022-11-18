@@ -1,8 +1,6 @@
 import { readdirSync } from 'fs';
 import path, { resolve } from 'path';
-import { getConfig, setConfigByJSONFile } from '../config/config';
-import { getDatabaseValidators } from '../config/schema/validator';
-import { initDatabase } from '../database';
+import { getConfig } from '../config/config';
 import { Team15 } from '../database/entities/teamPayloads/team_15.entity';
 import { getRepository } from '../database/repository';
 import { getLogger } from '../logger';
@@ -10,10 +8,7 @@ import { readJSONFile } from '../utils/readJSONFile';
 import { deleteFolder } from './delete-folder';
 import { postProcessDocumentData } from './post-process';
 
-export async function saveExportResultsToDatabase(configFile: string, id: number) {
-  setConfigByJSONFile(configFile, getDatabaseValidators());
-  initDatabase();
-
+export async function saveExportResultsToDatabase(id: number) {
   const team15Repository = await getRepository(Team15);
   const outputPath = getConfig().export.prefix;
 
@@ -40,13 +35,22 @@ export async function saveExportResultsToDatabase(configFile: string, id: number
       readingResult[filename] = json.reading_result;
     }
 
-    const record = await team15Repository.findOneByOrFail(Number(id));
+    const record = await team15Repository.findOneOrFail({
+      where: {
+        _id: id,
+      },
+    });
+
+    getLogger().info(`Updating save keeping in database. Before`, record);
 
     record.document_data = documentData;
     record.document_data_initial = documentData;
     record.reading_result = readingResult;
+    record.continuous_index = Array(Number(record.page_count ?? 1)).fill(0);
 
-    await team15Repository.save(record);
+    await team15Repository.update({ _id: record._id }, record);
+
+    getLogger().info(`Updating save keeping in database. After`, record);
 
     deleteFolder(folder);
   }
