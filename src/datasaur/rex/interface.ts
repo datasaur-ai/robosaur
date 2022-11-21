@@ -32,4 +32,17 @@ export const PAYLOAD_MESSAGE = {
   },
 };
 
+export enum HEALTH_STATUS {
+  READY = 'READY',
+  STOPPED = 'STOPPED',
+  INITIAL = 'INITIALIZING',
+}
+
+export const healthPath = 'health-check.json';
+
+export interface Health {
+  status: HEALTH_STATUS;
+  timestamp: Date;
+}
+
 export const SI_TEAM_ID = 15;

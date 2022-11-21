@@ -12,6 +12,12 @@ services:
       - ./docker-state:/home/robosaur/sample/rex
       - ./docker-logs:/home/robosaur/logs
       - ./docker-export:/home/robosaur/sample/rex/export
+    healthcheck:
+      test: ['CMD', 'npm', 'start', 'health-check']
+      interval: 30s
+      timeout: 30s
+      retries: 5
+      start_period: 30s
 networks:
   default:
     external:

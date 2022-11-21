@@ -13,6 +13,7 @@ import { handleTest } from './handlers/test.handler';
 import { handleUpdateCustomAPI } from './handlers/update-custom-api.handler';
 import { handleUpdateFileTransformer } from './handlers/update-file-transformer.handler';
 import { getLogger } from './logger';
+import { healthCheck } from './handlers/health-check.handler';
 
 const program = new Command();
 
@@ -69,6 +70,8 @@ program
   .action(handleUpdateFileTransformer);
 
 program.command(`update-custom-api <configFile>`).description('Updates custom API').action(handleUpdateCustomAPI);
+
+program.command(`health-check`).description('Check for consumer health').action(healthCheck);
 
 program.parseAsync(process.argv);
 
