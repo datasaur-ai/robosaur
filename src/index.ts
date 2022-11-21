@@ -10,6 +10,8 @@ import { handleExportProjects } from './handlers/export-projects.handler';
 import { handleSplitDocument } from './handlers/split-document.handler';
 import { handleStartConsumer } from './handlers/start-consumer.handler';
 import { handleTest } from './handlers/test.handler';
+import { handleUpdateCustomAPI } from './handlers/update-custom-api.handler';
+import { handleUpdateFileTransformer } from './handlers/update-file-transformer.handler';
 import { getLogger } from './logger';
 import { healthCheck } from './handlers/health-check.handler';
 
@@ -61,6 +63,13 @@ program
   )
   .description('Applies tags to projects based on the given config file')
   .action(handleApplyTags);
+
+program
+  .command(`update-file-transformer <configFile>`)
+  .description('Updates file transformer')
+  .action(handleUpdateFileTransformer);
+
+program.command(`update-custom-api <configFile>`).description('Updates custom API').action(handleUpdateCustomAPI);
 
 program.command(`health-check`).description('Check for consumer health').action(healthCheck);
 
