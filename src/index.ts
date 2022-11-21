@@ -11,6 +11,7 @@ import { handleSplitDocument } from './handlers/split-document.handler';
 import { handleStartConsumer } from './handlers/start-consumer.handler';
 import { handleTest } from './handlers/test.handler';
 import { getLogger } from './logger';
+import { healthCheck } from './handlers/health-check.handler';
 
 const program = new Command();
 
@@ -60,6 +61,8 @@ program
   )
   .description('Applies tags to projects based on the given config file')
   .action(handleApplyTags);
+
+program.command(`health-check`).description('Check for consumer health').action(healthCheck);
 
 program.parseAsync(process.argv);
 
