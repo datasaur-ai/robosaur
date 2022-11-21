@@ -1,20 +1,29 @@
 {
   "datasaur": {
-    "host": "https://app.datasaur.ai",
-    "clientId": "<DATASAUR_CLIENT_ID>",
-    "clientSecret": "<DATASAUR_CLIENT_SECRET>"
+    "host": "https://frontend-qa.release.datasaur.ai",
+    "clientId": "8bfdb1a2-5233-4731-9f62-fcdd76075c27",
+    "clientSecret": "0ea57ad4-071b-40e2-943c-597e1d486d8b"
   },
   "projectState": {
     "source": "local",
-    "path": "/home/robosaur/sample/rex/state.json"
+    "path": "sample/rex/state.json"
   },
   "database": {
     "url": "mongodb://vulcan:vulcan@localhost:27017",
     "database": "konver",
     "authSource": "admin"
   },
+  "export": {
+    "source": "local",
+    "prefix": "/home/robosaur/sample/rex/export",
+    "teamId": "28",
+    "statusFilter": [],
+    "executionMode": "stateful",
+    "format": "CUSTOM",
+    "fileTransformerId": "192"
+  },
   "create": {
-    "teamId": "<TEAM_ID>",
+    "teamId": "28",
     "files": {
       "source": "local",
       "path": "temps"
@@ -45,7 +54,7 @@
         "sentenceSeparator": "\n",
         "tokenizer": "WINK",
         "transcriptMethod": "CUSTOM_API",
-        "customTextExtractionAPIId": "<CUSTOM_API_ID>"
+        "customTextExtractionAPIId": "12"
       },
       "labelSets": [
         {
@@ -200,7 +209,7 @@
       ],
       "documentAssignments": [
         {
-          "teamMemberId": "<TEAM_MEMBER_ID>",
+          "teamMemberId": "59",
           "role": "LABELER_AND_REVIEWER"
         }
       ],
@@ -210,19 +219,10 @@
     },
     "autoLabel": {
       "enableAutoLabel": true,
-      "labelerEmail": "<EMAIL>",
-      "targetApiEndpoint": "http://field-extractor:9015/field-extractor",
+      "labelerEmail": "jeremia.daniel@yahoo.com",
+      "targetApiEndpoint": "http://40.88.146.178/si/field-extractor",
       "targetApiSecretKey": "secret",
       "numberOfFilesPerRequest": 1
     }
-  },
-  "export": {
-    "source": "local",
-    "prefix": "sample/rex/export",
-    "teamId": "<TEAM_ID>",
-    "statusFilter": [],
-    "executionMode": "stateful",
-    "format": "CUSTOM",
-    "fileTransformerId": "<FILE_TRANSFORMER_ID>"
   }
 }

@@ -9,6 +9,7 @@ import { getLogger } from '../../logger';
 import { DownloadFileError } from './errors/download-file-error';
 import { NoSIError } from './errors/no-si-error';
 import { RecognizeDocumentError } from './errors/recognize-document-error';
+import * as https from 'https';
 
 interface DocumentRecognitionResponseData {
   orientation_preds: number[];
@@ -25,12 +26,17 @@ class ProjectCreationInputFilesHandler {
   constructor(private readonly data: Team15) {}
 
   public async handle(): Promise<void> {
+    const OBJECT_STORAGE_CLIENT = process.env.OBJECT_STORAGE_CLIENT ?? 'S3';
     for (this.currentPage = 0; this.currentPage < this.totalDocumentPage(); this.currentPage++) {
       this.logger.info(`Processing document page ${this.currentPage + 1}..`);
       this.createLocalDirectory();
 
       // Step 1: Download document
-      await this.downloadFile();
+      if (OBJECT_STORAGE_CLIENT === 'S3') {
+        await this.downloadFileFromS3();
+      } else if (OBJECT_STORAGE_CLIENT === 'HCP') {
+        await this.downloadFileFromHCP();
+      }
 
       // Step 2: Document recognition API
       const recognitionResult = await this.recognizeDocument();
@@ -49,7 +55,53 @@ class ProjectCreationInputFilesHandler {
     return page_count ? Number(page_count) : 1;
   }
 
-  private async downloadFile(): Promise<void> {
+  private async downloadFileFromHCP(): Promise<void> {
+    const HCP_AUTH = process.env.HCP_AUTH_KEY ?? '';
+    const HCP_ENDPOINT = process.env.HCP_ENDPOINT ?? '';
+    const fileUrl = `${HCP_ENDPOINT}/${this.remoteFilePath()}`;
+    const headers = {
+      Authorization: HCP_AUTH,
+    };
+
+    let currentRetry = 0;
+    const maxRetries = 5;
+    const retryDelay = 5;
+
+    do {
+      try {
+        this.logger.info(`Downloading document from HCP..`);
+        const pemPath = process.env.HCP_PEM_PATH;
+        let response: AxiosResponse;
+        if (pemPath) {
+          const request = axios.create({
+            httpsAgent: new https.Agent({
+              key: pemPath,
+            }),
+            headers,
+            responseType: 'stream',
+          });
+          response = await request.get(fileUrl);
+        } else {
+          response = await axios.get(fileUrl, { responseType: 'stream', headers });
+        }
+        const pipeline = promisify(stream.pipeline);
+        await pipeline(response.data, createWriteStream(this.localFilePath()));
+        break;
+      } catch (error) {
+        const { response } = error;
+        const { status } = response;
+        this.handleAxiosError(fileUrl, response);
+        if (400 <= status && status <= 499) {
+          throw new DownloadFileError(error);
+        }
+      }
+      currentRetry++;
+      await new Promise((f) => setTimeout(f, retryDelay * 1000));
+      this.logger.warn(`Retrying (${currentRetry})..`);
+    } while (currentRetry <= maxRetries);
+  }
+
+  private async downloadFileFromS3(): Promise<void> {
     const bucketName = process.env.S3_BUCKET_NAME ?? '';
     const objectName = this.remoteFilePath();
     const fileUrl = await this.getObjectUrl(bucketName, objectName);
@@ -58,7 +110,7 @@ class ProjectCreationInputFilesHandler {
     const retryDelay = 5;
     do {
       try {
-        this.logger.info(`Downloading document..`);
+        this.logger.info(`Downloading document from S3..`);
         const response = await axios.get(fileUrl, { responseType: 'stream' });
         const pipeline = promisify(stream.pipeline);
         await pipeline(response.data, createWriteStream(this.localFilePath()));
