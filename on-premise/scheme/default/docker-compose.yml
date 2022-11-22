@@ -18,8 +18,6 @@ services:
       timeout: 30s
       retries: 5
       start_period: 30s
-    environment:
-      - TZ=Asia/Jakarta
 networks:
   default:
     external:
