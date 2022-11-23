@@ -1,7 +1,13 @@
 import { ExportFormat, ProjectStatus } from '../datasaur/interfaces';
 import { PCWPayload, PCWWrapper } from '../transformer/pcw-transformer/interfaces';
 import { AssignmentConfig as ParsedAssignment } from '../assignment/interfaces';
-import { ConflictResolutionMode, TextDocumentType, TokenizationMethod, TranscriptMethod } from '../generated/graphql';
+import {
+  ConflictResolutionMode,
+  Role,
+  TextDocumentType,
+  TokenizationMethod,
+  TranscriptMethod,
+} from '../generated/graphql';
 
 export enum StorageSources {
   AMAZONS3 = 's3',
@@ -399,4 +405,5 @@ export interface AutoLabelConfig {
   targetApiEndpoint: string;
   targetApiSecretKey: string;
   numberOfFilesPerRequest: number;
+  role?: Role;
 }

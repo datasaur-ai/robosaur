@@ -1,5 +1,5 @@
 import { gql } from 'graphql-request';
-import { AutoLabelProjectOptionsInput, TargetApiInput } from '../generated/graphql';
+import { AutoLabelProjectOptionsInput, Role, TargetApiInput } from '../generated/graphql';
 import { query } from './query';
 
 const AUTO_LABEL_TOKEN_BASED_MUTATION = gql`
@@ -15,13 +15,15 @@ export async function autoLabelTokenProject(
   labelerEmail: string,
   targetAPI: TargetApiInput,
   options: AutoLabelProjectOptionsInput,
+  role?: Role,
 ) {
   const variables = {
     input: {
-      labelerEmail: labelerEmail,
-      targetAPI: targetAPI,
-      options: options,
-      projectId: projectId,
+      labelerEmail,
+      targetAPI,
+      options,
+      projectId,
+      role,
     },
   };
 
