@@ -226,6 +226,7 @@ export type AutoLabelTokenBasedInput = {
 
 export type AutoLabelTokenBasedOutput = {
   __typename?: 'AutoLabelTokenBasedOutput';
+  confidenceScore?: Maybe<Scalars['Float']>;
   deleted?: Maybe<Scalars['Boolean']>;
   end: TextCursor;
   label: Scalars['String'];
@@ -237,6 +238,7 @@ export type AutoLabelTokenBasedProjectInput = {
   labelerEmail: Scalars['String'];
   options: AutoLabelProjectOptionsInput;
   projectId: Scalars['ID'];
+  role?: InputMaybe<Role>;
   targetAPI: TargetApiInput;
 };
 
@@ -258,6 +260,81 @@ export type AwsMarketplaceSubscriptionInput = {
   action: Scalars['String'];
   customerId: Scalars['ID'];
   productCode: Scalars['String'];
+};
+
+export type BBoxLabel = {
+  __typename?: 'BBoxLabel';
+  bboxLabelClassId: Scalars['ID'];
+  caption?: Maybe<Scalars['String']>;
+  deleted: Scalars['Boolean'];
+  documentId: Scalars['ID'];
+  id: Scalars['ID'];
+  shapes: Array<BBoxShape>;
+};
+
+export type BBoxLabelClass = {
+  __typename?: 'BBoxLabelClass';
+  captionAllowed: Scalars['Boolean'];
+  captionRequired: Scalars['Boolean'];
+  color?: Maybe<Scalars['String']>;
+  id: Scalars['ID'];
+  name: Scalars['String'];
+};
+
+export type BBoxLabelClassInput = {
+  captionAllowed: Scalars['Boolean'];
+  captionRequired: Scalars['Boolean'];
+  color?: InputMaybe<Scalars['String']>;
+  id?: InputMaybe<Scalars['ID']>;
+  name: Scalars['String'];
+};
+
+export type BBoxLabelInput = {
+  bboxLabelClassId: Scalars['ID'];
+  caption?: InputMaybe<Scalars['String']>;
+  documentId: Scalars['ID'];
+  id?: InputMaybe<Scalars['ID']>;
+  shapes: Array<BBoxShapeInput>;
+};
+
+export type BBoxLabelSet = {
+  __typename?: 'BBoxLabelSet';
+  classes: Array<BBoxLabelClass>;
+  id: Scalars['ID'];
+  name: Scalars['String'];
+};
+
+export type BBoxLabelSetInput = {
+  classes: Array<BBoxLabelClassInput>;
+  id: Scalars['ID'];
+  name: Scalars['String'];
+};
+
+export type BBoxLabelSetProjectInput = {
+  name: Scalars['String'];
+  options: Array<BBoxLabelClassInput>;
+};
+
+export type BBoxPoint = {
+  __typename?: 'BBoxPoint';
+  x: Scalars['Float'];
+  y: Scalars['Float'];
+};
+
+export type BBoxPointInput = {
+  x: Scalars['Float'];
+  y: Scalars['Float'];
+};
+
+export type BBoxShape = {
+  __typename?: 'BBoxShape';
+  pageIndex: Scalars['Int'];
+  points: Array<BBoxPoint>;
+};
+
+export type BBoxShapeInput = {
+  pageIndex: Scalars['Int'];
+  points: Array<BBoxPointInput>;
 };
 
 export type BoundingBoxLabel = {
@@ -704,7 +781,6 @@ export type CreateTextDocumentInput = {
   fileUrl?: InputMaybe<Scalars['String']>;
   /** Document Name. It affects the document title section. */
   name?: InputMaybe<Scalars['String']>;
-  orderInProject?: InputMaybe<Scalars['Int']>;
   questionFile?: InputMaybe<Scalars['Upload']>;
   questionFileName?: InputMaybe<Scalars['String']>;
   settings?: InputMaybe<SettingsInput>;
@@ -829,6 +905,7 @@ export type DataProgramming = {
   labels: Array<DataProgrammingLabel>;
   labelsSignature: Scalars['String'];
   projectId: Scalars['ID'];
+  provider: DataProgrammingProvider;
   updatedAt: Scalars['String'];
 };
 
@@ -842,6 +919,11 @@ export type DataProgrammingLibraries = {
   __typename?: 'DataProgrammingLibraries';
   libraries: Array<Scalars['String']>;
 };
+
+export enum DataProgrammingProvider {
+  Snorkel = 'SNORKEL',
+  Stegosaurus = 'STEGOSAURUS'
+}
 
 export type Dataset = {
   __typename?: 'Dataset';
@@ -1092,6 +1174,15 @@ export type DocumentFileNameWithPart = {
    * Set this to `0` and `SplitDocumentOptionInput` to `null` to skip splitting the document.
    */
   part: Scalars['Int'];
+};
+
+export type DocumentFinalReport = {
+  __typename?: 'DocumentFinalReport';
+  cabinet: Cabinet;
+  document: TextDocument;
+  finalReport: FinalReport;
+  rowFinalReports?: Maybe<Array<RowFinalReport>>;
+  teamMember?: Maybe<TeamMember>;
 };
 
 export type DocumentForPredictionInput = {
@@ -1355,6 +1446,7 @@ export type ExtensionElementSettingInput = {
 export enum ExtensionId {
   AutoLabelRowExtensionId = 'AUTO_LABEL_ROW_EXTENSION_ID',
   AutoLabelTokenExtensionId = 'AUTO_LABEL_TOKEN_EXTENSION_ID',
+  BoundingBoxLabelingExtensionId = 'BOUNDING_BOX_LABELING_EXTENSION_ID',
   DashboardExtensionId = 'DASHBOARD_EXTENSION_ID',
   DataProgrammingExtensionId = 'DATA_PROGRAMMING_EXTENSION_ID',
   DictionaryExtensionId = 'DICTIONARY_EXTENSION_ID',
@@ -1433,6 +1525,16 @@ export enum FileTransformerPurpose {
   Export = 'EXPORT',
   Import = 'IMPORT'
 }
+
+export type FinalReport = {
+  __typename?: 'FinalReport';
+  precision: Scalars['Float'];
+  recall: Scalars['Float'];
+  totalAcceptedLabels: Scalars['Int'];
+  totalAppliedLabels: Scalars['Int'];
+  totalRejectedLabels: Scalars['Int'];
+  totalResolvedLabels: Scalars['Int'];
+};
 
 export enum FontSize {
   ExtraLarge = 'EXTRA_LARGE',
@@ -1878,7 +1980,6 @@ export enum GqlAutoLabelModelPrivacy {
 }
 
 export enum GqlAutoLabelServiceProvider {
-  Ardis = 'ARDIS',
   AssistedLabeling = 'ASSISTED_LABELING',
   CorenlpNer = 'CORENLP_NER',
   CorenlpPos = 'CORENLP_POS',
@@ -2131,6 +2232,7 @@ export enum KeyPayloadType {
 
 export enum LabelEntityType {
   Arrow = 'ARROW',
+  BboxBound = 'BBOX_BOUND',
   BoundingBox = 'BOUNDING_BOX',
   QuestionBound = 'QUESTION_BOUND',
   Span = 'SPAN',
@@ -2407,6 +2509,8 @@ export type LastUsedProject = {
 export type LaunchTextProjectInput = {
   /** Deprecated. Please use field `documentAssignments` instead. */
   assignees?: InputMaybe<Array<ProjectAssignmentByNameInput>>;
+  /** Optional. Label sets for bounding box labeling. No need to create them separately, just pass these data when launching the project. */
+  bboxLabelSets?: InputMaybe<Array<BBoxLabelSetProjectInput>>;
   /** Optional. Team projects only. Assign specific document to specific team member. */
   documentAssignments?: InputMaybe<Array<DocumentAssignmentInput>>;
   /** Document related configuration, such as token length and custom script. */
@@ -2599,6 +2703,7 @@ export type Mutation = {
   createTag: Tag;
   createTagsIfNotExist: Array<Tag>;
   createTeam: Team;
+  deleteBBoxLabels: Array<BBoxLabel>;
   deleteBoundingBox: Array<BoundingBoxLabel>;
   deleteComment: Scalars['Boolean'];
   deleteCustomAPI: CustomApi;
@@ -2624,7 +2729,7 @@ export type Mutation = {
   deleteLabelSetTagItems: LabelSet;
   /** Deletes the specified labelset templates. Returns true if the templates are deleted successfully. */
   deleteLabelSetTemplates?: Maybe<Scalars['Boolean']>;
-  deleteLabelingFunction: LabelingFunction;
+  deleteLabelingFunctions: Scalars['Boolean'];
   deleteLabelsOnTextDocument: DeleteLabelsOnTextDocumentResult;
   deleteMlModel: Scalars['Boolean'];
   deleteProject: Project;
@@ -2761,6 +2866,7 @@ export type Mutation = {
   /** Updates multiple labelset details at once. */
   updateMultipleLabelSet: Array<Maybe<LabelSet>>;
   updateProject: Project;
+  updateProjectBBoxLabelSet: BBoxLabelSet;
   updateProjectExtension?: Maybe<ProjectExtension>;
   updateProjectExtensionElementSetting?: Maybe<ExtensionElement>;
   updateProjectGuideline: Project;
@@ -2793,6 +2899,7 @@ export type Mutation = {
   updateTextDocumentLabels: TextDocument;
   updateTextDocumentSettings: TextDocumentSettings;
   updateTokenLabels: TextDocument;
+  upsertBBoxLabels: Array<BBoxLabel>;
   upsertBoundingBox: Array<BoundingBoxLabel>;
   upsertOauthClient?: Maybe<UpsertOauthClientResult>;
   upsertTimestampLabels: Array<TimestampLabel>;
@@ -2988,6 +3095,12 @@ export type MutationCreateTeamArgs = {
 };
 
 
+export type MutationDeleteBBoxLabelsArgs = {
+  documentId: Scalars['ID'];
+  labelIds: Array<Scalars['ID']>;
+};
+
+
 export type MutationDeleteBoundingBoxArgs = {
   boundingBoxLabelIds: Array<Scalars['ID']>;
   documentId: Scalars['ID'];
@@ -3049,8 +3162,8 @@ export type MutationDeleteLabelSetTemplatesArgs = {
 };
 
 
-export type MutationDeleteLabelingFunctionArgs = {
-  id: Scalars['ID'];
+export type MutationDeleteLabelingFunctionsArgs = {
+  labelingFunctionIds: Array<Scalars['ID']>;
 };
 
 
@@ -3446,6 +3559,11 @@ export type MutationUpdateProjectArgs = {
 };
 
 
+export type MutationUpdateProjectBBoxLabelSetArgs = {
+  input: BBoxLabelSetInput;
+};
+
+
 export type MutationUpdateProjectExtensionArgs = {
   input: UpdateProjectExtensionInput;
 };
@@ -3582,6 +3700,12 @@ export type MutationUpdateTextDocumentSettingsArgs = {
 
 export type MutationUpdateTokenLabelsArgs = {
   input: UpdateTokenLabelsInput;
+};
+
+
+export type MutationUpsertBBoxLabelsArgs = {
+  documentId: Scalars['ID'];
+  labels: Array<BBoxLabelInput>;
 };
 
 
@@ -3795,6 +3919,12 @@ export type ProjectExtension = {
   width: Scalars['Int'];
 };
 
+export type ProjectFinalReport = {
+  __typename?: 'ProjectFinalReport';
+  documentFinalReports: Array<DocumentFinalReport>;
+  project: Project;
+};
+
 export type ProjectLaunchJob = {
   __typename?: 'ProjectLaunchJob';
   job: Job;
@@ -3859,6 +3989,7 @@ export type ProjectSettings = {
   hideLabelsFromInactiveLabelSetDuringReview: Scalars['Boolean'];
   hideOriginalSentencesDuringReview: Scalars['Boolean'];
   hideRejectedLabelsDuringReview: Scalars['Boolean'];
+  shouldConfirmUnusedLabelSetItems: Scalars['Boolean'];
 };
 
 export type ProjectSettingsInput = {
@@ -3882,6 +4013,8 @@ export type ProjectSettingsInput = {
   hideLabelsFromInactiveLabelSetDuringReview?: InputMaybe<Scalars['Boolean']>;
   hideOriginalSentencesDuringReview?: InputMaybe<Scalars['Boolean']>;
   hideRejectedLabelsDuringReview?: InputMaybe<Scalars['Boolean']>;
+  /** Skip checking for unused label set item when marking document as complete */
+  shouldConfirmUnusedLabelSetItems?: InputMaybe<Scalars['Boolean']>;
 };
 
 export type ProjectTemplate = {
@@ -3912,6 +4045,7 @@ export type ProjectTemplateProjectSetting = {
   hideLabelsFromInactiveLabelSetDuringReview: Scalars['Boolean'];
   hideOriginalSentencesDuringReview: Scalars['Boolean'];
   hideRejectedLabelsDuringReview: Scalars['Boolean'];
+  shouldConfirmUnusedLabelSetItems: Scalars['Boolean'];
 };
 
 export type ProjectTemplateTextDocumentSetting = {
@@ -3984,6 +4118,8 @@ export type Query = {
   getAutoLabel: Array<AutoLabelTokenBasedOutput>;
   getAutoLabelModels: Array<AutoLabelModel>;
   getAutoLabelRowBased: Array<AutoLabelRowBasedOutput>;
+  getBBoxLabelSetsByProject: Array<BBoxLabelSet>;
+  getBBoxLabelsByDocument: Array<BBoxLabel>;
   getBoundingBoxConflictList: GetBoundingBoxConflictListResult;
   getBoundingBoxLabels: Array<BoundingBoxLabel>;
   getBoundingBoxPages: Array<BoundingBoxPage>;
@@ -4010,6 +4146,12 @@ export type Query = {
   getDatasets: DatasetPaginatedResponse;
   getDocumentAnswerConflicts: Array<ConflictAnswer>;
   getDocumentAnswers: DocumentAnswer;
+  getDocumentAnswersNew: DocumentAnswer;
+  /**
+   * TEMPORARY
+   * FOR TESTING REGARDING REFACTOR ABEL
+   */
+  getDocumentAnswersOld: DocumentAnswer;
   getDocumentLabelConflicts: Array<ConflictAnswer>;
   /**
    * Returns labelsets associated with the specified document.
@@ -4079,12 +4221,19 @@ export type Query = {
   getProjectTemplates: Array<ProjectTemplate>;
   /** Returns a paginated list of projects. */
   getProjects: ProjectPaginatedResponse;
+  getProjectsFinalReport: Array<ProjectFinalReport>;
   getQuestionSet: QuestionSet;
   getQuestionSetTemplate: QuestionSetTemplate;
   getQuestionSetTemplates: Array<QuestionSetTemplate>;
   getQuestionsByCabinetId: Array<Question>;
   getRowAnalyticEvents: RowAnalyticEventPaginatedResponse;
   getRowAnswerConflicts: Array<RowAnswerConflicts>;
+  getRowAnswersNewByLine: GetRowAnswersPaginatedResponse;
+  /**
+   * TEMPORARY
+   * FOR TESTING REGARDING REFACTOR ABEL
+   */
+  getRowAnswersOldByLine: GetRowAnswersPaginatedResponse;
   getRowAnswersPaginated: GetRowAnswersPaginatedResponse;
   getRowQuestions: Array<Question>;
   getSearchHistoryKeywords: Array<SearchHistoryKeyword>;
@@ -4222,6 +4371,16 @@ export type QueryGetAutoLabelRowBasedArgs = {
 };
 
 
+export type QueryGetBBoxLabelSetsByProjectArgs = {
+  projectId: Scalars['ID'];
+};
+
+
+export type QueryGetBBoxLabelsByDocumentArgs = {
+  documentId: Scalars['ID'];
+};
+
+
 export type QueryGetBoundingBoxConflictListArgs = {
   documentId: Scalars['ID'];
 };
@@ -4332,6 +4491,16 @@ export type QueryGetDocumentAnswerConflictsArgs = {
 
 
 export type QueryGetDocumentAnswersArgs = {
+  documentId: Scalars['ID'];
+};
+
+
+export type QueryGetDocumentAnswersNewArgs = {
+  documentId: Scalars['ID'];
+};
+
+
+export type QueryGetDocumentAnswersOldArgs = {
   documentId: Scalars['ID'];
 };
 
@@ -4583,6 +4752,11 @@ export type QueryGetProjectsArgs = {
 };
 
 
+export type QueryGetProjectsFinalReportArgs = {
+  projectIds: Array<Scalars['ID']>;
+};
+
+
 export type QueryGetQuestionSetArgs = {
   id: Scalars['ID'];
 };
@@ -4611,6 +4785,18 @@ export type QueryGetRowAnalyticEventsArgs = {
 
 export type QueryGetRowAnswerConflictsArgs = {
   input?: InputMaybe<GetRowAnswerConflictsInput>;
+};
+
+
+export type QueryGetRowAnswersNewByLineArgs = {
+  documentId: Scalars['ID'];
+  line: Scalars['Int'];
+};
+
+
+export type QueryGetRowAnswersOldByLineArgs = {
+  documentId: Scalars['ID'];
+  line: Scalars['Int'];
 };
 
 
@@ -5141,6 +5327,12 @@ export type RowAnswersInput = {
   line: Scalars['Int'];
 };
 
+export type RowFinalReport = {
+  __typename?: 'RowFinalReport';
+  finalReport: FinalReport;
+  line: Scalars['Int'];
+};
+
 export type SaveGeneralWorkspaceSettingsInput = {
   projectId: Scalars['ID'];
   settings: GeneralWorkspaceSettingsInput;
@@ -5345,7 +5537,6 @@ export type TeamSetting = {
   customAPICreationLimit: Scalars['Int'];
   defaultCustomTextExtractionAPIId?: Maybe<Scalars['ID']>;
   defaultExternalObjectStorageId?: Maybe<Scalars['ID']>;
-  enableArdisAutoLabel: Scalars['Boolean'];
   enableAssistedLabeling: Scalars['Boolean'];
   enableDataProgramming: Scalars['Boolean'];
   enableExportTeamOverview: Scalars['Boolean'];
@@ -5427,6 +5618,7 @@ export type TextDocumentSentencesArgs = {
 
 /** See [this documentation](https://datasaurai.gitbook.io/datasaur/creating-a-project#task-types). */
 export enum TextDocumentKind {
+  BboxBased = 'BBOX_BASED',
   DocumentBased = 'DOCUMENT_BASED',
   RowBased = 'ROW_BASED',
   TokenBased = 'TOKEN_BASED'
@@ -5454,6 +5646,7 @@ export type TextDocumentSettings = {
   editSentenceTokenizer: Scalars['String'];
   enableAnonymization: Scalars['Boolean'];
   enableTabularMarkdownParsing?: Maybe<Scalars['Boolean']>;
+  fileTransformerId?: Maybe<Scalars['String']>;
   /** Hide if the bounding box does not have span label corresponded with it */
   hideBoundingBoxIfNoSpanOrArrowLabel?: Maybe<Scalars['Boolean']>;
   id: Scalars['ID'];
@@ -5509,7 +5702,7 @@ export type TextDocumentSettingsInput = {
   fileTransformerId?: InputMaybe<Scalars['ID']>;
   /** Required for `.csv` files / row-based task. Sets the first row of data as header rows. Defaults to `null`. */
   firstRowAsHeader?: InputMaybe<Scalars['Boolean']>;
-  /** Might be deprecated, since we're using kinds to support mixed label set */
+  /** Deprecated, use kinds to support mixed labeling */
   kind?: InputMaybe<TextDocumentKind>;
   /** For Row Based Labeling. Defaults to `NONE`. */
   mediaDisplayStrategy?: InputMaybe<MediaDisplayStrategy>;
@@ -5565,6 +5758,7 @@ export enum TextDocumentType {
   Absa = 'ABSA',
   /** Audio Speech Recognition */
   Asr = 'ASR',
+  BoundingBox = 'BOUNDING_BOX',
   /** Coreference */
   Coref = 'COREF',
   Custom = 'CUSTOM',
@@ -5597,6 +5791,7 @@ export type TextDocumentViewerConfigInput = {
 
 export type TextLabel = {
   __typename?: 'TextLabel';
+  confidenceScore?: Maybe<Scalars['Float']>;
   deleted?: Maybe<Scalars['Boolean']>;
   documentId?: Maybe<Scalars['String']>;
   end: TextCursor;
@@ -5611,6 +5806,7 @@ export type TextLabel = {
 };
 
 export type TextLabelInput = {
+  confidenceScore?: InputMaybe<Scalars['Float']>;
   deleted?: InputMaybe<Scalars['Boolean']>;
   end: TextCursorInput;
   id: Scalars['String'];
@@ -5904,6 +6100,7 @@ export type UpdateProjectSettingsInput = {
   hideOriginalSentencesDuringReview?: InputMaybe<Scalars['Boolean']>;
   hideRejectedLabelsDuringReview?: InputMaybe<Scalars['Boolean']>;
   projectId: Scalars['ID'];
+  shouldConfirmUnusedLabelSetItems?: InputMaybe<Scalars['Boolean']>;
 };
 
 export type UpdateProjectTemplateInput = {
@@ -6097,6 +6294,7 @@ export type VisualizationParams = {
   colors?: Maybe<Array<Scalars['String']>>;
   hAxisTitle?: Maybe<Scalars['String']>;
   isStacked?: Maybe<Scalars['Boolean']>;
+  itemsPerPage?: Maybe<Scalars['Int']>;
   legend?: Maybe<Legend>;
   pieHoleText?: Maybe<Scalars['String']>;
   showTable?: Maybe<Scalars['Boolean']>;
