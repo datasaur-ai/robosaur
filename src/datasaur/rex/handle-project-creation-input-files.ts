@@ -26,8 +26,8 @@ class ProjectCreationInputFilesHandler {
   constructor(private readonly data: Team15) {}
 
   public async handle(): Promise<void> {
-    const OBJECT_STORAGE_CLIENT = process.env.OBJECT_STORAGE_CLIENT ?? 'S3';
     for (this.currentPage = 0; this.currentPage < this.totalDocumentPage(); this.currentPage++) {
+      const OBJECT_STORAGE_CLIENT = process.env.OBJECT_STORAGE_CLIENT ?? 'S3';
       this.logger.info(`Processing document page ${this.currentPage + 1}..`);
       this.createLocalDirectory();
 
