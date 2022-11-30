@@ -55,6 +55,7 @@ async function submitAutoLabelJob(projectsToAutoLabel: Map<string, ProjectState>
         autoLabelConfig?.labelerEmail ?? '',
         targetApiInput,
         options,
+        autoLabelConfig?.role,
       );
       results.push(result);
     }
