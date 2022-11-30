@@ -2,7 +2,7 @@ import axios from 'axios';
 import { Team15 } from '../database/entities/teamPayloads/team_15.entity';
 import { getRepository } from '../database/repository';
 import { SendGatewayError } from '../datasaur/rex/errors/send-gateway-error';
-import { OCR_STATUS, PAYLOAD_MESSAGE, PAYLOAD_STATUS } from '../datasaur/rex/interface';
+import { OCR_STATUS, PAYLOAD_MESSAGE, PAYLOAD_STATUS, SI_TEAM_ID } from '../datasaur/rex/interface';
 import { getLogger } from '../logger';
 import { sleep } from '../utils/sleep';
 import { base64Encode } from '../datasaur/utils/decode-encode';
@@ -32,6 +32,7 @@ export async function sendRequestToEndpoint(id: number) {
     start_ocr: data.start_ocr,
     end_ocr: data.end_ocr,
     continuous_index: data.continuous_index,
+    team_id: SI_TEAM_ID,
   };
 
   getLogger().info(`Payload to be sent`, payload);

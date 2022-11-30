@@ -82,7 +82,14 @@ class ProjectCreationInputFilesHandler {
           });
           response = await request.get(fileUrl);
         } else {
-          response = await axios.get(fileUrl, { responseType: 'stream', headers });
+          const request = axios.create({
+            httpsAgent: new https.Agent({
+              rejectUnauthorized: false,
+            }),
+            headers,
+            responseType: 'stream',
+          });
+          response = await request.get(fileUrl);
         }
         const pipeline = promisify(stream.pipeline);
         await pipeline(response.data, createWriteStream(this.localFilePath()));
