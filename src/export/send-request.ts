@@ -9,7 +9,11 @@ import { base64Encode } from '../datasaur/utils/decode-encode';
 
 export async function sendRequestToEndpoint(id: number) {
   const team15Repository = await getRepository(Team15);
-  const data = await team15Repository.findOneByOrFail(Number(id));
+  const data = await team15Repository.findOneOrFail({
+    where: {
+      _id: id,
+    },
+  });
   getLogger().info(`Retrieved data from database for gateway payload`);
   const exportEndpoint = process.env.EXPORT_ENDPOINT;
 
