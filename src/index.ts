@@ -1,9 +1,13 @@
+import { config } from 'dotenv';
+config();
+
 import { Command, InvalidOptionArgumentError } from 'commander';
 import packageJson from '../package.json';
 import { handleApplyTags } from './handlers/apply-tags.handler';
 import { handleCreateProject } from './handlers/create-project.handler';
 import { handleCreateProjects } from './handlers/create-projects.handler';
 import { handleExportProjects } from './handlers/export-projects.handler';
+import { handleSplitDocument } from './handlers/split-document.handler';
 import { getLogger } from './logger';
 
 const program = new Command();
@@ -28,6 +32,11 @@ program
   .option('-u --unzip', 'Unzips the exported projects, only storing the final version accepted by reviewers')
   .description('Export all projects based on the given config file')
   .action(handleExportProjects);
+
+program
+  .command(`split-document <configFile>`)
+  .description('Split document into multiple projects')
+  .action(handleSplitDocument);
 
 program
   .command(`apply-tags <configFile>`)

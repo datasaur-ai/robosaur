@@ -24,12 +24,12 @@ export async function createProject(
   documents: Document[],
   documentAssignments: DocumentAssignment[],
   settings: Config['create'],
-  tagNames: string[] = [],
 ) {
   const projectDocuments = documents.map((document) => {
     return {
       ...document,
       fileTransformerId: settings.documentSettings.fileTransformerId ?? undefined,
+      customTextExtractionAPIId: settings.documentSettings.customTextExtractionAPIId,
       docFileOptions: {
         ...settings.docFileOptions,
         firstRowAsHeader: settings?.docFileOptions?.firstRowAsHeader ?? !!settings.documentSettings?.firstRowAsHeader,
@@ -37,7 +37,7 @@ export async function createProject(
     };
   });
 
-  projectDocuments[0]['settings'] = { questions: settings.questions };
+  projectDocuments.forEach((doc) => (doc['settings'] = { ...doc['settings'], questions: settings.questions }));
 
   let labelSetIDs: string[] | null = null;
   if (
@@ -65,7 +65,7 @@ export async function createProject(
       kinds: settings.kinds,
       projectSettings: settings.projectSettings,
       documentAssignments,
-      tagNames,
+      tagNames: settings.tagNames,
       documents: projectDocuments,
       labelerExtensions: settings.kinds
         ? getExtensions(settings.kinds || []).LABELER

@@ -11,6 +11,7 @@ import { JobStatus } from '../datasaur/get-jobs';
 import { getLocalDocuments } from '../documents/get-local-documents';
 import { getObjectStorageDocuments } from '../documents/get-object-storage-documents';
 import { LocalDocument, RemoteDocument } from '../documents/interfaces';
+import { createSimpleHandlerContext } from '../execution';
 import { getLogger } from '../logger';
 import { setConfigFromPcw } from '../transformer/pcw-transformer/setConfigFromPcw';
 import { getLabelSetsFromDirectory } from '../utils/labelset';
@@ -18,6 +19,7 @@ import { pollJobsUntilCompleted } from '../utils/polling.helper';
 import { getQuestionSetFromFile } from '../utils/questionset';
 import { getState } from '../utils/states/getStates';
 import { ScriptState } from '../utils/states/script-state';
+import { handleAutoLabel } from './auto-label.handler';
 import { ScriptAction } from './constants';
 import { handleCreateProject } from './create-project.handler';
 import { doCreateProjectAndUpdateState, getProjectNamesFromFolderNames } from './creation/helper';
@@ -43,7 +45,9 @@ interface ProjectConfiguration {
 const LIMIT_RETRY = 3;
 const PROJECT_BEFORE_SAVE = 5;
 
-export async function handleCreateProjects(configFile: string, options: ProjectCreationOption) {
+export const handleCreateProjects = createSimpleHandlerContext('create-projects', _handleCreateProjects);
+
+async function _handleCreateProjects(configFile: string, options: ProjectCreationOption) {
   const { dryRun, withoutPcw, usePcw } = options;
   const cwd = process.cwd();
 
@@ -56,10 +60,12 @@ export async function handleCreateProjects(configFile: string, options: ProjectC
 
   const projectsToBeCreated = await getProjectsToBeCreated(createConfig.files, scriptState, dryRun);
 
-  await setLabelSetsOrQuestions(createConfig);
+  await setLabelSetsAndQuestions(createConfig);
 
   const results = await submitProjectCreationJob(createConfig, projectsToBeCreated, scriptState, dryRun);
   await checkProjectCreationJob(results, scriptState, cwd, dryRun);
+
+  await handleAutoLabel(projectsToBeCreated, dryRun);
 }
 
 async function setProjectCreationConfig(cwd: string, configFile: string, usePcw: boolean, withoutPcw: boolean) {
@@ -102,10 +108,11 @@ async function getProjectsToBeCreated(
   return projectsToBeCreated;
 }
 
-async function setLabelSetsOrQuestions(createConfig: CreateConfig) {
+async function setLabelSetsAndQuestions(createConfig: CreateConfig) {
   if (createConfig.documentSettings.kind == 'TOKEN_BASED' || createConfig.kinds?.includes('TOKEN_BASED')) {
     if (!createConfig.labelSets) createConfig.labelSets = getLabelSetsFromDirectory(getConfig());
-  } else if (
+  }
+  if (
     createConfig.documentSettings.kind == 'ROW_BASED' ||
     createConfig.documentSettings.kind == 'DOCUMENT_BASED' ||
     createConfig.kinds?.includes('ROW_BASED') ||

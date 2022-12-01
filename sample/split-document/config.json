@@ -1,0 +1,9 @@
+{
+  "splitDocument": {
+    "path": "sample/split-document/sample.csv",
+    "header": true,
+    "linesPerFile": 5,
+    "filesPerFolder": 5,
+    "resultFolder": "sample/split-document/result"
+  }
+}
