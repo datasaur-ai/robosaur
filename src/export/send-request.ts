@@ -50,7 +50,9 @@ export async function sendRequestToEndpoint(id: number) {
         timeout: 30000,
       });
       counterRetry += LIMIT_RETRY;
-      getLogger().info(`successfully sent payload to endpoint`, { response: base64Encode(response.data) });
+      getLogger().info(`successfully sent payload to endpoint`, {
+        response: base64Encode(JSON.stringify(response.data)),
+      });
       return response;
     } catch (error) {
       if (counterRetry >= LIMIT_RETRY) {
