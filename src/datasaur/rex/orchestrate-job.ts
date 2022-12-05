@@ -1,20 +1,25 @@
-import { saveExportResultsToDatabase } from '../../export/save-to-database';
-import { sendRequestToEndpoint } from '../../export/send-request';
-import { handleCreateProjects } from '../../handlers/create-projects.handler';
-import { handleExport } from '../../handlers/rex-export.handler';
-import { getLogger } from '../../logger';
-import { abortJob } from './abort-job';
-import { checkRecordStatus } from './check-record-status';
-import { cleanUpTempFolders } from './cleanUpTempFolders';
-import { ExportProjectError } from './errors/export-project-error';
-import { OcrError } from './errors/ocr-error';
-import { ProjectCreationError } from './errors/project-creation-error';
-import { handleProjectCreationInputFiles } from './handle-project-creation-input-files';
-import { OCR_STATUS } from './interface';
-import { updateStatus } from './updateStatus';
-import { BasePayload } from '../../database/entities/base-payload.entity';
+import { saveExportResultsToDatabase } from "../../export/save-to-database";
+import { sendRequestToEndpoint } from "../../export/send-request";
+import { handleCreateProjects } from "../../handlers/create-projects.handler";
+import { handleExport } from "../../handlers/rex-export.handler";
+import { getLogger } from "../../logger";
+import { abortJob } from "./abort-job";
+import { checkRecordStatus } from "./check-record-status";
+import { cleanUpTempFolders } from "./cleanUpTempFolders";
+import { ExportProjectError } from "./errors/export-project-error";
+import { OcrError } from "./errors/ocr-error";
+import { ProjectCreationError } from "./errors/project-creation-error";
+import { handleProjectCreationInputFiles } from "./handle-project-creation-input-files";
+import { OCR_STATUS } from "./interface";
+import { updateStatus } from "./updateStatus";
+import { BasePayload } from "../../database/entities/base-payload.entity";
 
-export const orchestrateJob = async (payload: BasePayload, configFile: string) => {
+export const orchestrateJob = async (
+  teamId: number,
+  payload: BasePayload,
+  configFile: string
+) => {
+  getLogger().info(`Working on Team ID: ${teamId}`);
   const cleanUp = async (error: Error) => {
     let status: OCR_STATUS;
     if (error instanceof OcrError) {
@@ -52,7 +57,11 @@ export const orchestrateJob = async (payload: BasePayload, configFile: string) =
     getLogger().info(`Job ${payload._id} creating projects`);
     // Run create-projects command and trigger ML-Assisted Labeling
     try {
-      await handleCreateProjects(configFile, { dryRun: false, usePcw: true, withoutPcw: false }, errorCallback);
+      await handleCreateProjects(
+        configFile,
+        { dryRun: false, usePcw: true, withoutPcw: false },
+        errorCallback
+      );
     } catch (e) {
       if (!(e instanceof OcrError)) {
         await cleanUp(new ProjectCreationError(e));
@@ -78,7 +87,7 @@ export const orchestrateJob = async (payload: BasePayload, configFile: string) =
       await saveExportResultsToDatabase(payload._id);
 
       getLogger().info(`Job ${payload._id} sending result back to gateway...`);
-      await sendRequestToEndpoint(payload._id);
+      await sendRequestToEndpoint(teamId, payload._id);
     } catch (e) {
       await cleanUp(e);
       return;

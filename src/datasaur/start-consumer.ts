@@ -1,30 +1,36 @@
-import { ProcessJob } from '../execution';
-import { getLogger } from '../logger';
-import { randbetween } from '../utils/randbetween';
-import { wait } from '../utils/wait';
-import { createRecordAndReturnSaveKeeping } from './rex/create-record-and-return-save-keeping';
-import { dequeueDocument } from './rex/dequeue-document';
-import { SI_TEAM_ID } from './rex/interface';
-import { validateRecord } from './rex/validate-record';
+import { ProcessJob } from "../execution";
+import { getLogger } from "../logger";
+import { randbetween } from "../utils/randbetween";
+import { wait } from "../utils/wait";
+import { createRecordAndReturnSaveKeeping } from "./rex/create-record-and-return-save-keeping";
+import { dequeueDocument } from "./rex/dequeue-document";
+import { validateRecord } from "./rex/validate-record";
 
 const MAX_DOCS = Number(process.env.MAX_DOCS ?? 3);
 
-export const startConsumer = async (process: ProcessJob<unknown[]>) => {
+export const startConsumer = async (
+  processJob: ProcessJob<unknown[]>,
+  teamId: number
+) => {
   while (true) {
     const sleeptime = randbetween(0, 10);
     wait(sleeptime);
 
-    const queueAvailable = await validateRecord(MAX_DOCS);
+    const queueAvailable = await validateRecord(teamId, MAX_DOCS);
 
     if (!queueAvailable) {
-      getLogger().info(`max number of concurrent process is reached [MAX_DOCS: ${MAX_DOCS}]`);
+      getLogger().info(
+        `max number of concurrent process is reached [MAX_DOCS: ${MAX_DOCS}]`
+      );
       continue;
     }
 
-    const document = await dequeueDocument(SI_TEAM_ID);
+    const document = await dequeueDocument(teamId);
 
     if (!document) {
-      getLogger().info(`no new document is found in the queue`);
+      getLogger().info(
+        `no new document is found in the queue for team: ${teamId}`
+      );
       continue;
     }
 
@@ -35,6 +41,6 @@ export const startConsumer = async (process: ProcessJob<unknown[]>) => {
     const saveKeeping = await createRecordAndReturnSaveKeeping(document);
 
     // Run Service
-    await process(`${document.save_keeping_id}`, saveKeeping);
+    await processJob(`${document.save_keeping_id}`, teamId, saveKeeping);
   }
 };
