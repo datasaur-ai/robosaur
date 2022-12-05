@@ -1,6 +1,6 @@
-import { ProcessRecordEntity } from "../../database/entities/process_record.entity";
-import { getRepository } from "../../database/repository";
-import { pruneTimeoutRecord } from "./prune-timeout-record";
+import { ProcessRecordEntity } from '../../database/entities/process_record.entity';
+import { getRepository } from '../../database/repository';
+import { pruneTimeoutRecord } from './prune-timeout-record';
 
 export const validateRecord = async (teamId: number, maxDocs: number) => {
   await pruneTimeoutRecord(teamId);

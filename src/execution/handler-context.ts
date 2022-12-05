@@ -1,7 +1,7 @@
-import { getLoggerService } from "../logger/index";
-import { executionNamespace } from "./execution-namespace";
-import { randomUUID } from "crypto";
-import { getExecutionValue, preventNewTraceIdGeneration } from "./helpers";
+import { getLoggerService } from '../logger/index';
+import { executionNamespace } from './execution-namespace';
+import { randomUUID } from 'crypto';
+import { getExecutionValue, preventNewTraceIdGeneration } from './helpers';
 
 export interface HandlerContextCallback<T extends unknown[]> {
   (...args: T): void | Promise<void>;
@@ -13,28 +13,26 @@ export function generateRandomTraceId() {
 
 export function createSimpleHandlerContext<T extends unknown[]>(
   commandName: string,
-  callback: HandlerContextCallback<T>
+  callback: HandlerContextCallback<T>,
 ): HandlerContextCallback<T> {
   return function (...args) {
     return executionNamespace.runAndReturn(async () => {
       // generate random traceId
-      const shouldPreventNewTraceIdGeneration = getExecutionValue(
-        "prevent-new-traceid-generation"
-      );
+      const shouldPreventNewTraceIdGeneration = getExecutionValue('prevent-new-traceid-generation');
 
       let traceId;
       if (!shouldPreventNewTraceIdGeneration) {
         traceId = generateRandomTraceId();
-        executionNamespace.set("trace-id", traceId);
+        executionNamespace.set('trace-id', traceId);
       } else {
-        traceId = getExecutionValue("trace-id");
+        traceId = getExecutionValue('trace-id');
       }
 
       // register resolver for logging and tracing
       getLoggerService().registerResolver(() => {
         return {
           command: commandName,
-          "trace-id": traceId,
+          'trace-id': traceId,
         };
       });
 
@@ -54,18 +52,15 @@ export interface ConsumerFn<T extends unknown[], U extends unknown[]> {
   (processJob: ProcessJob<U>, ...args: T);
 }
 
-export function createConsumerHandlerContext<
-  T extends unknown[],
-  U extends unknown[]
->(
+export function createConsumerHandlerContext<T extends unknown[], U extends unknown[]>(
   commandName: string,
   consumerFn: ConsumerFn<T, U>,
-  onJob: HandlerContextCallback<U>
+  onJob: HandlerContextCallback<U>,
 ) {
   getLoggerService().registerResolver(() => {
-    const traceId = getExecutionValue("trace-id");
+    const traceId = getExecutionValue('trace-id');
     return {
-      "trace-id": traceId,
+      'trace-id': traceId,
       command: commandName,
     };
   });
@@ -73,15 +68,13 @@ export function createConsumerHandlerContext<
   const wrappedProcessJob = (traceId: string, ...args: U) => {
     return executionNamespace.runAndReturn(async () => {
       preventNewTraceIdGeneration();
-      executionNamespace.set("trace-id", traceId);
+      executionNamespace.set('trace-id', traceId);
       return onJob(...args);
     });
   };
 
   return async (...args: T) => {
-    const result = await Promise.resolve(
-      consumerFn(wrappedProcessJob, ...args)
-    );
+    const result = await Promise.resolve(consumerFn(wrappedProcessJob, ...args));
     getLoggerService().popResolver();
     return result;
   };

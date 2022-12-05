@@ -1,15 +1,15 @@
-import { ProcessRecordEntity } from "../../database/entities/process_record.entity";
-import { getRepository, getTeamRepository } from "../../database/repository";
-import { getLogger } from "../../logger";
-import { formatDate } from "../utils/format-date";
-import { parseDate } from "../utils/parse-date";
-import { OCR_STATUS } from "./interface";
+import { ProcessRecordEntity } from '../../database/entities/process_record.entity';
+import { getRepository, getTeamRepository } from '../../database/repository';
+import { getLogger } from '../../logger';
+import { formatDate } from '../utils/format-date';
+import { parseDate } from '../utils/parse-date';
+import { OCR_STATUS } from './interface';
 
 const MAX_TIMEOUT_IN_MINUTES = Number(process.env.MAX_TIMEOUT_IN_MINUTES ?? 30);
 
 export const pruneTimeoutRecord = async (teamId: number) => {
   const recordRepo = await getRepository(ProcessRecordEntity);
-  const records = await recordRepo.findBy({ "data.team_id": teamId });
+  const records = await recordRepo.findBy({ 'data.team_id': teamId });
 
   for (const record of records) {
     const saveKeepingId = record.data?.id;
@@ -27,7 +27,7 @@ export const pruneTimeoutRecord = async (teamId: number) => {
     const timeInMinutes = _countTime(saveKeeping.start_ocr);
 
     if (timeInMinutes >= MAX_TIMEOUT_IN_MINUTES) {
-      getLogger().warn("found a timed out process, removing the process...");
+      getLogger().warn('found a timed out process, removing the process...');
       saveKeeping.end_ocr = formatDate(new Date());
       saveKeeping.ocr_status = OCR_STATUS.TIMEOUT;
       await teamRepo.update({ _id: saveKeeping._id }, saveKeeping);

@@ -1,17 +1,14 @@
-import { ProcessJob } from "../execution";
-import { getLogger } from "../logger";
-import { randbetween } from "../utils/randbetween";
-import { wait } from "../utils/wait";
-import { createRecordAndReturnSaveKeeping } from "./rex/create-record-and-return-save-keeping";
-import { dequeueDocument } from "./rex/dequeue-document";
-import { validateRecord } from "./rex/validate-record";
+import { ProcessJob } from '../execution';
+import { getLogger } from '../logger';
+import { randbetween } from '../utils/randbetween';
+import { wait } from '../utils/wait';
+import { createRecordAndReturnSaveKeeping } from './rex/create-record-and-return-save-keeping';
+import { dequeueDocument } from './rex/dequeue-document';
+import { validateRecord } from './rex/validate-record';
 
 const MAX_DOCS = Number(process.env.MAX_DOCS ?? 3);
 
-export const startConsumer = async (
-  processJob: ProcessJob<unknown[]>,
-  teamId: number
-) => {
+export const startConsumer = async (processJob: ProcessJob<unknown[]>, teamId: number) => {
   while (true) {
     const sleeptime = randbetween(0, 10);
     wait(sleeptime);
@@ -19,9 +16,7 @@ export const startConsumer = async (
     const queueAvailable = await validateRecord(teamId, MAX_DOCS);
 
     if (!queueAvailable) {
-      getLogger().info(
-        `max number of concurrent process is reached [MAX_DOCS: ${MAX_DOCS}]`
-      );
+      getLogger().info(`max number of concurrent process is reached [MAX_DOCS: ${MAX_DOCS}]`);
       continue;
     }
 
@@ -30,9 +25,7 @@ export const startConsumer = async (
     if (!document) {
       // only print the log at even sleep time
       if (sleeptime % 2 === 0) {
-        getLogger().info(
-          `no new document is found in the queue for team: ${teamId}`
-        );
+        getLogger().info(`no new document is found in the queue for team: ${teamId}`);
       }
       continue;
     }
