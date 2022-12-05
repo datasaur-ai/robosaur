@@ -28,9 +28,12 @@ export const startConsumer = async (
     const document = await dequeueDocument(teamId);
 
     if (!document) {
-      getLogger().info(
-        `no new document is found in the queue for team: ${teamId}`
-      );
+      // only print the log at even sleep time
+      if (sleeptime % 2 === 0) {
+        getLogger().info(
+          `no new document is found in the queue for team: ${teamId}`
+        );
+      }
       continue;
     }
 

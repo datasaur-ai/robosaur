@@ -6,7 +6,7 @@ import { BucketItem, ObjectStorageClient } from "./interfaces";
 import * as path from "path";
 import { S3 } from "aws-sdk";
 
-const EXPIRED_IN_SECONDS = 3600;
+export const EXPIRED_IN_SECONDS = 3600;
 
 const MULTI_PART_FILE_SIZE = 10 * 1024 * 1024;
 const MULTI_PART_QUEUE_SIZE = 50;
