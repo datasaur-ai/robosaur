@@ -2,6 +2,7 @@ import { StorageOptions } from '@google-cloud/storage';
 import { ClientOptions } from 'minio';
 import { getConfig } from '../../config/config';
 import { StorageSources } from '../../config/interfaces';
+import { S3 } from 'aws-sdk';
 
 export function getAzureBlobConfig() {
   return {
@@ -13,6 +14,17 @@ export function getAzureBlobConfig() {
 export function getGCSConfig(): StorageOptions {
   return {
     keyFilename: getConfig().credentials[StorageSources.GOOGLE].gcsCredentialJson,
+  };
+}
+
+export function getAwsS3Config(): S3.Types.ClientConfiguration {
+  const s3Credentials = getConfig().credentials[StorageSources.AMAZONS3];
+  return {
+    endpoint: s3Credentials.s3Endpoint || undefined,
+    signatureVersion: 'v4',
+    accessKeyId: s3Credentials.s3AccessKey,
+    secretAccessKey: s3Credentials.s3SecretKey,
+    region: s3Credentials.s3Region,
   };
 }
 

@@ -12,4 +12,5 @@ export interface ObjectStorageClient {
 export interface BucketItem {
   name: string;
   prefix?: string;
+  size?: number;
 }
