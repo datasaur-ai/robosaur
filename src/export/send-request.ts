@@ -7,7 +7,7 @@ import { sleep } from '../utils/sleep';
 import { base64Encode } from '../datasaur/utils/decode-encode';
 
 export async function sendRequestToEndpoint(teamId: number, id: number) {
-  const teamRepository = await getTeamRepository(teamId);
+  const teamRepository = await getTeamRepository();
   const data = await teamRepository.findOneOrFail({
     where: {
       _id: id,

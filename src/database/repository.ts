@@ -1,6 +1,7 @@
 import { EntityTarget, ObjectLiteral, MongoRepository, Entity } from 'typeorm';
 import getDataSource from '.';
 import { BasePayload } from './entities/base-payload.entity';
+import { TeamX } from './entities/teamPayloads/teamX.entity';
 
 export async function getRepository<Type extends ObjectLiteral>(
   entity: EntityTarget<Type>,
@@ -9,14 +10,7 @@ export async function getRepository<Type extends ObjectLiteral>(
   return databaseSource.getMongoRepository<Type>(entity);
 }
 
-export async function getTeamRepository(teamId: number): Promise<MongoRepository<BasePayload>> {
+export async function getTeamRepository<Type extends ObjectLiteral>(): Promise<MongoRepository<Type>> {
   const databaseSource = await getDataSource();
-  return databaseSource.getMongoRepository<BasePayload>(createTeamEntity(teamId + ''));
-}
-
-export function createTeamEntity(teamName: string) {
-  @Entity({ name: teamName })
-  class TeamEntityClass extends BasePayload {}
-
-  return TeamEntityClass;
+  return databaseSource.getMongoRepository<Type>(TeamX);
 }

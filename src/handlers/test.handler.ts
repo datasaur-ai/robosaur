@@ -3,7 +3,7 @@ import { getDatabaseValidators } from '../config/schema/validator';
 import { initDatabase } from '../database';
 import { DataPayload } from '../database/entities/data';
 import { DocumentQueueEntity } from '../database/entities/document_queue.entity';
-import { Team15 } from '../database/entities/teamPayloads/team_15.entity';
+import { TeamX } from '../database/entities/teamPayloads/teamX.entity';
 import { TeamsEntity } from '../database/entities/teams.entity';
 import { getRepository } from '../database/repository';
 import { SI_TEAM_ID } from '../datasaur/rex/interface';
@@ -41,7 +41,7 @@ export async function handleTest(configFile: string) {
   const teamRepo = await getRepository(TeamsEntity);
   await teamRepo.insertOne(team);
 
-  const col15Repo = await getRepository(Team15);
+  const col15Repo = await getRepository(TeamX);
 
   await col15Repo.insertOne({
     document_data: {},

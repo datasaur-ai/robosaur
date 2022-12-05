@@ -4,7 +4,6 @@ import * as minio from 'minio';
 import * as stream from 'stream';
 import { promisify } from 'util';
 import { Logger } from 'winston';
-import { Team15 } from '../../database/entities/teamPayloads/team_15.entity';
 import { getLogger } from '../../logger';
 import { DownloadFileError } from './errors/download-file-error';
 import { NoSIError } from './errors/no-si-error';
@@ -12,6 +11,7 @@ import { RecognizeDocumentError } from './errors/recognize-document-error';
 import * as https from 'https';
 import { AwsS3StorageClient, EXPIRED_IN_SECONDS } from '../../utils/object-storage/aws-s3-storage';
 import { S3 } from 'aws-sdk';
+import { BasePayload } from '../../database/entities/base-payload.entity';
 
 interface DocumentRecognitionResponseData {
   orientation_preds: number[];
@@ -25,7 +25,7 @@ class ProjectCreationInputFilesHandler {
   private currentPage: number = 0;
   private SICount: number = 0;
 
-  constructor(private readonly data: Team15) {}
+  constructor(private readonly data: BasePayload) {}
 
   public async handle(): Promise<void> {
     for (this.currentPage = 0; this.currentPage < this.totalDocumentPage(); this.currentPage++) {
@@ -261,6 +261,6 @@ class ProjectCreationInputFilesHandler {
   }
 }
 
-export async function handleProjectCreationInputFiles(data: Team15): Promise<void> {
+export async function handleProjectCreationInputFiles(data: BasePayload): Promise<void> {
   await new ProjectCreationInputFilesHandler(data).handle();
 }

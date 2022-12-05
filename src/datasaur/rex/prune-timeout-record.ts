@@ -14,7 +14,7 @@ export const pruneTimeoutRecord = async (teamId: number) => {
   for (const record of records) {
     const saveKeepingId = record.data?.id;
 
-    const teamRepo = await getTeamRepository(teamId);
+    const teamRepo = await getTeamRepository();
 
     const saveKeeping = await teamRepo.findOne({
       where: { _id: saveKeepingId },

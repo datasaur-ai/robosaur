@@ -2,9 +2,11 @@ import { DocumentQueueEntity } from '../../database/entities/document_queue.enti
 import { ProcessRecordEntity } from '../../database/entities/process_record.entity';
 import { getRepository } from '../../database/repository';
 import { updateSaveKeepingStatus } from './update-save-keeping-status';
+import { getLogger } from '../../logger';
 
-export const createRecordAndReturnSaveKeeping = async (document: DocumentQueueEntity) => {
-  const saveKeeping = await updateSaveKeepingStatus(document.save_keeping_id);
+export const createRecordAndReturnSaveKeeping = async (teamId: number, document: DocumentQueueEntity) => {
+  getLogger().info(`Team ${teamId} Create Record and Return Save Keeping`);
+  const saveKeeping = await updateSaveKeepingStatus(teamId, document.save_keeping_id);
 
   const recordRepo = await getRepository(ProcessRecordEntity);
   const record = new ProcessRecordEntity(document.data);

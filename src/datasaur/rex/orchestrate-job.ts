@@ -23,7 +23,7 @@ export const orchestrateJob = async (teamId: number, payload: BasePayload, confi
     } else {
       status = OCR_STATUS.UNKNOWN_ERROR;
     }
-    await abortJob(payload._id, `${status}`, error);
+    await abortJob(teamId, payload._id, `${status}`, error);
     cleanUpTempFolders();
   };
 
@@ -66,7 +66,7 @@ export const orchestrateJob = async (teamId: number, payload: BasePayload, confi
     // Call project export
     try {
       await handleExport(configFile, payload, errorCallback);
-      await updateStatus(payload._id, OCR_STATUS.READ);
+      await updateStatus(teamId, payload._id, OCR_STATUS.READ);
     } catch (e) {
       if (!(e instanceof OcrError)) {
         await cleanUp(new ExportProjectError(e));
@@ -76,7 +76,7 @@ export const orchestrateJob = async (teamId: number, payload: BasePayload, confi
 
     try {
       getLogger().info(`Job ${payload._id} saving result to database...`);
-      await saveExportResultsToDatabase(payload._id);
+      await saveExportResultsToDatabase(teamId, payload._id);
 
       getLogger().info(`Job ${payload._id} sending result back to gateway...`);
       await sendRequestToEndpoint(teamId, payload._id);
@@ -87,7 +87,7 @@ export const orchestrateJob = async (teamId: number, payload: BasePayload, confi
 
     getLogger().info(`Job ${payload._id} job finished. Cleaning up job`);
 
-    await abortJob(payload._id, OCR_STATUS.READ);
+    await abortJob(teamId, payload._id, OCR_STATUS.READ);
     cleanUpTempFolders();
   } catch (e) {
     await cleanUp(e);
