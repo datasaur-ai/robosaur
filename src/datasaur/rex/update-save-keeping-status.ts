@@ -1,12 +1,11 @@
-import { Team15 } from '../../database/entities/teamPayloads/team_15.entity';
-import { getRepository } from '../../database/repository';
 import { formatDate } from '../utils/format-date';
 import { OCR_STATUS } from './interface';
+import { getTeamRepository } from '../../database/repository';
 
-export const updateSaveKeepingStatus = async (id: number) => {
+export const updateSaveKeepingStatus = async (teamId: number, id: number) => {
   const currentTime = formatDate(new Date());
 
-  const saveKeepingRepo = await getRepository(Team15);
+  const saveKeepingRepo = await getTeamRepository();
 
   const saveKeeping = await saveKeepingRepo.findOne({
     where: {

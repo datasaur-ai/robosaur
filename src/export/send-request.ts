@@ -1,15 +1,14 @@
 import axios from 'axios';
-import { Team15 } from '../database/entities/teamPayloads/team_15.entity';
-import { getRepository } from '../database/repository';
+import { getTeamRepository } from '../database/repository';
 import { SendGatewayError } from '../datasaur/rex/errors/send-gateway-error';
-import { OCR_STATUS, PAYLOAD_MESSAGE, PAYLOAD_STATUS, SI_TEAM_ID } from '../datasaur/rex/interface';
+import { OCR_STATUS, PAYLOAD_MESSAGE, PAYLOAD_STATUS } from '../datasaur/rex/interface';
 import { getLogger } from '../logger';
 import { sleep } from '../utils/sleep';
 import { base64Encode } from '../datasaur/utils/decode-encode';
 
-export async function sendRequestToEndpoint(id: number) {
-  const team15Repository = await getRepository(Team15);
-  const data = await team15Repository.findOneOrFail({
+export async function sendRequestToEndpoint(teamId: number, id: number) {
+  const teamRepository = await getTeamRepository();
+  const data = await teamRepository.findOneOrFail({
     where: {
       _id: id,
     },
@@ -32,7 +31,7 @@ export async function sendRequestToEndpoint(id: number) {
     start_ocr: data.start_ocr,
     end_ocr: data.end_ocr,
     continuous_index: data.continuous_index,
-    team_id: SI_TEAM_ID,
+    team_id: teamId,
   };
 
   getLogger().info(`Payload to be sent`, payload);
@@ -41,7 +40,9 @@ export async function sendRequestToEndpoint(id: number) {
   const LIMIT_RETRY = Number(process.env.LIMIT_RETRY);
   while (counterRetry < LIMIT_RETRY) {
     try {
-      getLogger().info(`sending request to ${exportEndpoint}...`, { payload: base64Encode(JSON.stringify(payload)) });
+      getLogger().info(`sending request to ${exportEndpoint}...`, {
+        payload: base64Encode(JSON.stringify(payload)),
+      });
       const response = await axios({
         method: 'POST',
         headers: { 'content-type': 'application/json' },

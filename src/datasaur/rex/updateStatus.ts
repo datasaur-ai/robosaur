@@ -1,9 +1,8 @@
-import { Team15 } from '../../database/entities/teamPayloads/team_15.entity';
-import { getRepository } from '../../database/repository';
+import { getTeamRepository } from '../../database/repository';
 import { OCR_STATUS } from './interface';
 
-export const updateStatus = async (id: number, status: OCR_STATUS) => {
-  const saveKeepingRepo = await getRepository(Team15);
+export const updateStatus = async (teamId: number, id: number, status: OCR_STATUS) => {
+  const saveKeepingRepo = await getTeamRepository();
   const payload = await saveKeepingRepo.findOneOrFail({
     where: {
       _id: id,

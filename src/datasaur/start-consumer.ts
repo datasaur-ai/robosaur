@@ -4,37 +4,41 @@ import { randbetween } from '../utils/randbetween';
 import { wait } from '../utils/wait';
 import { createRecordAndReturnSaveKeeping } from './rex/create-record-and-return-save-keeping';
 import { dequeueDocument } from './rex/dequeue-document';
-import { SI_TEAM_ID } from './rex/interface';
 import { validateRecord } from './rex/validate-record';
 
 const MAX_DOCS = Number(process.env.MAX_DOCS ?? 3);
 
-export const startConsumer = async (process: ProcessJob<unknown[]>) => {
+export const startConsumer = async (processJob: ProcessJob<unknown[]>, teamId: number) => {
   while (true) {
     const sleeptime = randbetween(0, 10);
     wait(sleeptime);
 
-    const queueAvailable = await validateRecord(MAX_DOCS);
+    const queueAvailable = await validateRecord(teamId, MAX_DOCS);
 
     if (!queueAvailable) {
-      getLogger().info(`max number of concurrent process is reached [MAX_DOCS: ${MAX_DOCS}]`);
+      getLogger().info(`Team ${teamId} Max number of concurrent process is reached [MAX_DOCS: ${MAX_DOCS}]`);
       continue;
     }
 
-    const document = await dequeueDocument(SI_TEAM_ID);
+    const document = await dequeueDocument(teamId);
 
     if (!document) {
-      getLogger().info(`no new document is found in the queue`);
+      // only print the log at even sleep time
+      if (sleeptime % 2 === 0) {
+        getLogger().info(`Team ${teamId} No new document is found in the queue`);
+      }
       continue;
     }
 
     const saveKeepingId = document.save_keeping_id;
 
-    getLogger().info(`reading document with ID: ${saveKeepingId}`);
+    getLogger().info(`Team ${teamId} Reading document with ID: ${saveKeepingId}`);
 
-    const saveKeeping = await createRecordAndReturnSaveKeeping(document);
+    const saveKeeping = await createRecordAndReturnSaveKeeping(teamId, document);
 
     // Run Service
-    await process(`${document.save_keeping_id}`, saveKeeping);
+    getLogger().info(`Process Job Team ${teamId} and Save Keeping Id ${document.save_keeping_id}`);
+    // trace id is using save_keeping_id, thats why teamId is the 2nd argument
+    await processJob(`${document.save_keeping_id}`, teamId, saveKeeping);
   }
 };

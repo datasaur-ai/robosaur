@@ -1,12 +1,15 @@
 import { ProcessRecordEntity } from '../../database/entities/process_record.entity';
-import { Team15 } from '../../database/entities/teamPayloads/team_15.entity';
-import { getRepository } from '../../database/repository';
+import { getRepository, getTeamRepository } from '../../database/repository';
 import { getLogger } from '../../logger';
 import { formatDate } from '../utils/format-date';
 
-export const abortJob = async (id: number, message: string, error?: Error) => {
-  getLogger().info(`Aborting job ${id}`);
-  const saveKeepingRepo = await getRepository(Team15);
+export const abortJob = async (teamId: number, id: number, message: string, error?: Error) => {
+  if (error) {
+    getLogger().error(`Aborting job ${id} because of '${message}' detail error: ${JSON.stringify(error)}`);
+  } else {
+    getLogger().info(`Aborting job ${id}. message: ${message}`);
+  }
+  const saveKeepingRepo = await getTeamRepository();
   const payload = await saveKeepingRepo.findOneOrFail({
     where: {
       _id: id,

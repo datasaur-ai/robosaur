@@ -4,12 +4,14 @@ import * as minio from 'minio';
 import * as stream from 'stream';
 import { promisify } from 'util';
 import { Logger } from 'winston';
-import { Team15 } from '../../database/entities/teamPayloads/team_15.entity';
 import { getLogger } from '../../logger';
 import { DownloadFileError } from './errors/download-file-error';
 import { NoSIError } from './errors/no-si-error';
 import { RecognizeDocumentError } from './errors/recognize-document-error';
 import * as https from 'https';
+import { AwsS3StorageClient, EXPIRED_IN_SECONDS } from '../../utils/object-storage/aws-s3-storage';
+import { S3 } from 'aws-sdk';
+import { BasePayload } from '../../database/entities/base-payload.entity';
 
 interface DocumentRecognitionResponseData {
   orientation_preds: number[];
@@ -23,7 +25,7 @@ class ProjectCreationInputFilesHandler {
   private currentPage: number = 0;
   private SICount: number = 0;
 
-  constructor(private readonly data: Team15) {}
+  constructor(private readonly data: BasePayload) {}
 
   public async handle(): Promise<void> {
     for (this.currentPage = 0; this.currentPage < this.totalDocumentPage(); this.currentPage++) {
@@ -95,11 +97,15 @@ class ProjectCreationInputFilesHandler {
         await pipeline(response.data, createWriteStream(this.localFilePath()));
         break;
       } catch (error) {
-        const { response } = error;
-        const { status } = response;
-        this.handleAxiosError(fileUrl, response);
-        if (400 <= status && status <= 499) {
-          throw new DownloadFileError(error);
+        if (error.response) {
+          const { response } = error;
+          const { status } = response;
+          this.handleAxiosResponse(fileUrl, response);
+          if (400 <= status && status <= 499) {
+            throw new DownloadFileError(error);
+          }
+        } else {
+          this.logger.error(`Not an axios response ${JSON.stringify(error)}`);
         }
       }
       currentRetry++;
@@ -123,11 +129,15 @@ class ProjectCreationInputFilesHandler {
         await pipeline(response.data, createWriteStream(this.localFilePath()));
         break;
       } catch (error) {
-        const { response } = error;
-        const { status } = response;
-        this.handleAxiosError(fileUrl, response);
-        if (400 <= status && status <= 499) {
-          throw new DownloadFileError(error);
+        if (error.response) {
+          const { response } = error;
+          const { status } = response;
+          this.handleAxiosResponse(fileUrl, response);
+          if (400 <= status && status <= 499) {
+            throw new DownloadFileError(error);
+          }
+        } else {
+          this.logger.error(`Not an axios response ${JSON.stringify(error)}`);
         }
       }
       currentRetry++;
@@ -142,18 +152,22 @@ class ProjectCreationInputFilesHandler {
     const form = new FormData();
     form.append('file', createReadStream(this.localFilePath()));
     try {
-      this.logger.info(`Processing document..`);
+      this.logger.info(`Recognizing document..`);
       const response = await axios.post<DocumentRecognitionResponseData>(apiUrl, form, {
         headers: form.getHeaders(),
       });
       return response.data;
     } catch (error) {
-      this.handleAxiosError(apiUrl, error.response);
+      if (error.response) {
+        this.handleAxiosResponse(apiUrl, error.response);
+      } else {
+        this.logger.error(`Not an axios response ${JSON.stringify(error)}`);
+      }
       throw new RecognizeDocumentError(error);
     }
   }
 
-  private handleAxiosError<T>(url: string, response: AxiosResponse<T>) {
+  private handleAxiosResponse<T>(url: string, response: AxiosResponse<T>) {
     const { status } = response;
     if (status === 404) {
       this.logger.error(`Not found: ${url}`);
@@ -189,14 +203,19 @@ class ProjectCreationInputFilesHandler {
   }
 
   private async getObjectUrl(bucketName: string, objectName: string): Promise<string> {
-    return new minio.Client(this.getMinioConfig()).presignedUrl('get', bucketName, objectName);
+    // bypass the getStorageClient method because we are not reading s3 config from config file. We read the s3 from env var
+    return AwsS3StorageClient.getClient(this.getS3Config()).getSignedUrlPromise('getObject', {
+      Bucket: bucketName,
+      Key: objectName,
+      Expires: EXPIRED_IN_SECONDS,
+    });
   }
 
-  private getMinioConfig(): minio.ClientOptions {
+  private getS3Config(): S3.Types.ClientConfiguration {
     return {
-      endPoint: process.env.S3_ENDPOINT ?? '',
-      accessKey: process.env.S3_ACCESS_KEY ?? '',
-      secretKey: process.env.S3_SECRET_KEY ?? '',
+      endpoint: process.env.S3_ENDPOINT ?? '',
+      accessKeyId: process.env.S3_ACCESS_KEY ?? '',
+      secretAccessKey: process.env.S3_SECRET_KEY ?? '',
       region: process.env.S3_REGION,
     };
   }
@@ -242,6 +261,6 @@ class ProjectCreationInputFilesHandler {
   }
 }
 
-export async function handleProjectCreationInputFiles(data: Team15): Promise<void> {
+export async function handleProjectCreationInputFiles(data: BasePayload): Promise<void> {
   await new ProjectCreationInputFilesHandler(data).handle();
 }

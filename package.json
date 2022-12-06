@@ -18,6 +18,7 @@
     "adm-zip": "0.5.9",
     "ajv": "8.9.0",
     "axios": "0.21.4",
+    "aws-sdk": "^2.959.0",
     "cls-hooked": "^4.2.2",
     "commander": "7.2.0",
     "dotenv": "10.0.0",

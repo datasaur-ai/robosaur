@@ -1,4 +1,3 @@
-import { Team15 } from '../../database/entities/teamPayloads/team_15.entity';
 import { saveExportResultsToDatabase } from '../../export/save-to-database';
 import { sendRequestToEndpoint } from '../../export/send-request';
 import { handleCreateProjects } from '../../handlers/create-projects.handler';
@@ -13,8 +12,10 @@ import { ProjectCreationError } from './errors/project-creation-error';
 import { handleProjectCreationInputFiles } from './handle-project-creation-input-files';
 import { OCR_STATUS } from './interface';
 import { updateStatus } from './updateStatus';
+import { BasePayload } from '../../database/entities/base-payload.entity';
 
-export const orchestrateJob = async (payload: Team15, configFile: string) => {
+export const orchestrateJob = async (teamId: number, payload: BasePayload, configFile: string) => {
+  getLogger().info(`Working on Team ID: ${teamId}`);
   const cleanUp = async (error: Error) => {
     let status: OCR_STATUS;
     if (error instanceof OcrError) {
@@ -22,7 +23,7 @@ export const orchestrateJob = async (payload: Team15, configFile: string) => {
     } else {
       status = OCR_STATUS.UNKNOWN_ERROR;
     }
-    await abortJob(payload._id, `${status}`, error);
+    await abortJob(teamId, payload._id, `${status}`, error);
     cleanUpTempFolders();
   };
 
@@ -65,7 +66,7 @@ export const orchestrateJob = async (payload: Team15, configFile: string) => {
     // Call project export
     try {
       await handleExport(configFile, payload, errorCallback);
-      await updateStatus(payload._id, OCR_STATUS.READ);
+      await updateStatus(teamId, payload._id, OCR_STATUS.READ);
     } catch (e) {
       if (!(e instanceof OcrError)) {
         await cleanUp(new ExportProjectError(e));
@@ -75,10 +76,10 @@ export const orchestrateJob = async (payload: Team15, configFile: string) => {
 
     try {
       getLogger().info(`Job ${payload._id} saving result to database...`);
-      await saveExportResultsToDatabase(payload._id);
+      await saveExportResultsToDatabase(teamId, payload._id);
 
       getLogger().info(`Job ${payload._id} sending result back to gateway...`);
-      await sendRequestToEndpoint(payload._id);
+      await sendRequestToEndpoint(teamId, payload._id);
     } catch (e) {
       await cleanUp(e);
       return;
@@ -86,7 +87,7 @@ export const orchestrateJob = async (payload: Team15, configFile: string) => {
 
     getLogger().info(`Job ${payload._id} job finished. Cleaning up job`);
 
-    await abortJob(payload._id, OCR_STATUS.READ);
+    await abortJob(teamId, payload._id, OCR_STATUS.READ);
     cleanUpTempFolders();
   } catch (e) {
     await cleanUp(e);

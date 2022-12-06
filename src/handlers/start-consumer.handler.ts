@@ -1,7 +1,7 @@
 import { setConfigByJSONFile } from '../config/config';
 import { getDatabaseValidators } from '../config/schema/validator';
 import { initDatabase } from '../database';
-import { HEALTH_STATUS } from '../datasaur/rex/interface';
+import { HEALTH_STATUS, SI_TEAM_ID } from '../datasaur/rex/interface';
 import { orchestrateJob } from '../datasaur/rex/orchestrate-job';
 import { updateHealthStatus } from '../datasaur/rex/update-health-status';
 import { startConsumer } from '../datasaur/start-consumer';
@@ -24,7 +24,7 @@ const startUp = () => {
 
 export const handleStartConsumer = createConsumerHandlerContext('start-consumer', _handleStartConsumer, orchestrateJob);
 
-export async function _handleStartConsumer(process: ProcessJob<unknown[]>, configFile: string) {
+export async function _handleStartConsumer(processJob: ProcessJob<unknown[]>, configFile: string) {
   try {
     startUp();
     updateHealthStatus(HEALTH_STATUS.INITIAL);
@@ -35,7 +35,13 @@ export async function _handleStartConsumer(process: ProcessJob<unknown[]>, confi
 
     updateHealthStatus(HEALTH_STATUS.READY);
 
-    await startConsumer(process);
+    const teamId = process.env.TEAM_ID;
+    if (!teamId) {
+      getLogger().error('Team Id not found in environment variables');
+      return;
+    }
+
+    await startConsumer(processJob, Number.parseInt(teamId));
   } catch (e) {
     updateHealthStatus(HEALTH_STATUS.STOPPED);
   } finally {

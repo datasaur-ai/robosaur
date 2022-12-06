@@ -3,10 +3,12 @@ import { existsSync, rmSync } from 'fs';
 import { getConfig } from '../../config/config';
 
 export const cleanUpTempFolders = () => {
-  const statePath = getConfig().projectState.path;
-  clearDirectory('temps');
-  clearDirectory('sample/rex/export');
-  if (existsSync(statePath)) {
-    rmSync(statePath);
+  if (process.env.DEBUG !== 'true') {
+    const statePath = getConfig().projectState.path;
+    clearDirectory('temps');
+    clearDirectory('sample/rex/export');
+    if (existsSync(statePath)) {
+      rmSync(statePath);
+    }
   }
 };
