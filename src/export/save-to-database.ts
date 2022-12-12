@@ -53,7 +53,7 @@ export async function saveExportResultsToDatabase(teamId: number, id: number) {
     record.document_data_initial = documentData;
     record.reading_result = readingResult;
     record.end_ocr = formatDate(new Date());
-    record.end_status = OCR_STATUS.READ;
+    record.ocr_status = OCR_STATUS.READ;
     record.continuous_index = Array(Number(record.page_count ?? 1)).fill(0);
 
     await teamRepository.update({ _id: record._id }, record);
