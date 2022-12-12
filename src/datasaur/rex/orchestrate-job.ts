@@ -11,7 +11,6 @@ import { OcrError } from './errors/ocr-error';
 import { ProjectCreationError } from './errors/project-creation-error';
 import { handleProjectCreationInputFiles } from './handle-project-creation-input-files';
 import { OCR_STATUS } from './interface';
-import { updateStatus } from './updateStatus';
 import { BasePayload } from '../../database/entities/base-payload.entity';
 
 export const orchestrateJob = async (teamId: number, payload: BasePayload, configFile: string) => {
@@ -66,7 +65,6 @@ export const orchestrateJob = async (teamId: number, payload: BasePayload, confi
     // Call project export
     try {
       await handleExport(configFile, payload, errorCallback);
-      await updateStatus(teamId, payload._id, OCR_STATUS.READ);
     } catch (e) {
       if (!(e instanceof OcrError)) {
         await cleanUp(new ExportProjectError(e));

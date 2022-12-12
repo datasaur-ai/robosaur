@@ -6,7 +6,13 @@ import { readJSONFile } from '../utils/readJSONFile';
 import { deleteFolder } from './delete-folder';
 import { postProcessDocumentData } from './post-process';
 import { getTeamRepository } from '../database/repository';
+import { formatDate } from '../datasaur/utils/format-date';
+import { OCR_STATUS } from '../datasaur/rex/interface';
 
+/**
+ *
+ * Updating status and save the ocr reading result to database
+ */
 export async function saveExportResultsToDatabase(teamId: number, id: number) {
   const teamRepository = await getTeamRepository();
   const outputPath = getConfig().export.prefix;
@@ -40,11 +46,14 @@ export async function saveExportResultsToDatabase(teamId: number, id: number) {
       },
     });
 
+    getLogger().info(`Post processing is successful`);
     getLogger().info(`Updating save keeping in database. Before`, record);
 
     record.document_data = documentData;
     record.document_data_initial = documentData;
     record.reading_result = readingResult;
+    record.end_ocr = formatDate(new Date());
+    record.end_status = OCR_STATUS.READ;
     record.continuous_index = Array(Number(record.page_count ?? 1)).fill(0);
 
     await teamRepository.update({ _id: record._id }, record);
