@@ -31,6 +31,7 @@ export async function sendRequestToEndpoint(teamId: number, id: number) {
     start_ocr: data.start_ocr,
     end_ocr: data.end_ocr,
     continuous_index: data.continuous_index,
+    filename: data.original_filename,
     team_id: teamId,
   };
 
