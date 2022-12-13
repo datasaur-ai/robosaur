@@ -5,9 +5,11 @@ import { formatDate } from '../utils/format-date';
 
 export const abortJob = async (teamId: number, id: number, message: string, error?: Error) => {
   if (error) {
-    getLogger().error(`Aborting job ${id} because of '${message}' detail error: ${JSON.stringify(error)}`);
+    getLogger().error(
+      `Team ${teamId} Aborting job ${id} because of '${message}' detail error: ${JSON.stringify(error)}`,
+    );
   } else {
-    getLogger().info(`Aborting job ${id}. message: ${message}`);
+    getLogger().info(`Team ${teamId} Aborting job ${id}. message: ${message}`);
   }
   const saveKeepingRepo = await getTeamRepository();
   const payload = await saveKeepingRepo.findOneOrFail({
@@ -27,9 +29,9 @@ export const abortJob = async (teamId: number, id: number, message: string, erro
     getLogger().info(`Process record not found`);
   }
 
-  getLogger().info(`Updating save keeping. Adding end_ocr..`, payload);
+  getLogger().info(`Updating save keeping. Updating ocr_status to ${message}`, payload);
 
-  await saveKeepingRepo.update({ _id: payload._id }, { end_ocr: formatDate(new Date()), ocr_status: message });
+  await saveKeepingRepo.update({ _id: payload._id }, { ocr_status: message });
 
   getLogger().info(`Updated save keeping`);
 
