@@ -1,0 +1,20 @@
+  robosaur-${NAME}:
+    image: datasaur/robosaur:${DOCKER_TAG}
+    container_name: datasaur-robosaur-${NAME}
+    env_file:
+      - ./robosaur.env
+    environment:
+      - TEAM_ID=${NAME}
+    ports:
+      - 6969
+    volumes:
+      - ./docker-config-${NAME}:/home/robosaur/config
+      - ./docker-state-${NAME}:/home/robosaur/sample/rex
+      - ./docker-logs-${NAME}:/home/robosaur/logs
+      - ./docker-export-${NAME}:/home/robosaur/sample/rex/export
+    healthcheck:
+      test: ['CMD', 'npm', 'start', 'health-check']
+      interval: 30s
+      timeout: 30s
+      retries: 5
+      start_period: 30s

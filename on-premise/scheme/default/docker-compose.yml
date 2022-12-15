@@ -1,24 +1,46 @@
 version: '3.1'
+networks:
+  default:
+    external:
+      name: ${DOCKER_NETWORK_NAME}
 services:
-  robosaur:
+  robosaur-15:
     image: datasaur/robosaur:${DOCKER_TAG}
-    container_name: datasaur-robosaur
+    container_name: datasaur-robosaur-15
     env_file:
       - ./robosaur.env
+    environment:
+      - TEAM_ID=15
     ports:
-      - 6969:6969
+      - 6969
     volumes:
-      - ./docker-config:/home/robosaur/config
-      - ./docker-state:/home/robosaur/sample/rex
-      - ./docker-logs:/home/robosaur/logs
-      - ./docker-export:/home/robosaur/sample/rex/export
+      - ./docker-config-15:/home/robosaur/config
+      - ./docker-state-15:/home/robosaur/sample/rex
+      - ./docker-logs-15:/home/robosaur/logs
+      - ./docker-export-15:/home/robosaur/sample/rex/export
     healthcheck:
       test: ['CMD', 'npm', 'start', 'health-check']
       interval: 30s
       timeout: 30s
       retries: 5
       start_period: 30s
-networks:
-  default:
-    external:
-      name: ${DOCKER_NETWORK_NAME}
+  robosaur-16:
+    image: datasaur/robosaur:${DOCKER_TAG}
+    container_name: datasaur-robosaur-16
+    env_file:
+      - ./robosaur.env
+    environment:
+      - TEAM_ID=16
+    ports:
+      - 6969
+    volumes:
+      - ./docker-config-16:/home/robosaur/config
+      - ./docker-state-16:/home/robosaur/sample/rex
+      - ./docker-logs-16:/home/robosaur/logs
+      - ./docker-export-16:/home/robosaur/sample/rex/export
+    healthcheck:
+      test: ['CMD', 'npm', 'start', 'health-check']
+      interval: 30s
+      timeout: 30s
+      retries: 5
+      start_period: 30s
