@@ -12,7 +12,7 @@ export enum OCR_STATUS {
   SEND_GATEWAY_ERROR = 'Failed to send document ocr result to channel',
   NO_SI_ERROR = 'Document type is not recognized by the classifier',
   TIMEOUT = 'Worker timeout on SURAT-INSTRUKSI',
-  UNKNOWN_ERROR = `Unrecognized Error on SURAT-INSTRUKSI`,
+  UNKNOWN_ERROR = `Unknown error on SURAT-INSTRUKSI`,
 }
 
 export enum PAYLOAD_STATUS {
@@ -22,12 +22,26 @@ export enum PAYLOAD_STATUS {
 
 export const PAYLOAD_MESSAGE = {
   english: {
-    SUCCESS: 'OCR Success',
-    FAILED: 'OCR Failed',
+    [OCR_STATUS.READ]: 'OCR Success',
+    [OCR_STATUS.STOPPED]: 'OCR Stopped',
+    [OCR_STATUS.DOWNLOAD_ERROR]: 'Failed to download images from HCP',
+    [OCR_STATUS.DOCUMENT_RECOGNITION_ERROR]: 'Document Detection Failed',
+    [OCR_STATUS.FIELD_EXTRACTOR_ERROR]: 'Field Extractor Failed to Detect Targeted Field Value',
+    [OCR_STATUS.PROJECT_CREATION_ERROR]: 'Text Extractor Failed to Read Text',
+    [OCR_STATUS.EXPORT_PROJECT_ERROR]: 'File Transformer Failed to Export',
+    [OCR_STATUS.POST_PROCESS_ERROR]: 'Post Processing Failed to process File Transformer values',
+    [OCR_STATUS.NO_SI_ERROR]: 'Document type is not recognized by classifier ',
   },
   indonesia: {
-    SUCCESS: 'OCR Berhasil',
-    FAILED: 'OCR Gagal',
+    [OCR_STATUS.READ]: 'OCR Berhasil',
+    [OCR_STATUS.STOPPED]: 'OCR Berhenti',
+    [OCR_STATUS.DOWNLOAD_ERROR]: 'Gagal mengunduh gambar dari HCP    ',
+    [OCR_STATUS.DOCUMENT_RECOGNITION_ERROR]: 'Deteksi Dokumen Gagal',
+    [OCR_STATUS.FIELD_EXTRACTOR_ERROR]: 'Field Extractor Gagal Mendeteksi Field yang Dicari',
+    [OCR_STATUS.PROJECT_CREATION_ERROR]: 'Text Extractor Gagal Membaca Teks',
+    [OCR_STATUS.EXPORT_PROJECT_ERROR]: 'File Transformer Gagal Melakukan Ekspor',
+    [OCR_STATUS.POST_PROCESS_ERROR]: 'Post Processing Gagal memproses File Transformer values',
+    [OCR_STATUS.NO_SI_ERROR]: 'Tipe dokumen tidak diketahui oleh classifier',
   },
 };
 

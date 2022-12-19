@@ -2,6 +2,7 @@ import { ProcessRecordEntity } from '../../database/entities/process_record.enti
 import { getRepository, getTeamRepository } from '../../database/repository';
 import { getLogger } from '../../logger';
 import { sendRequestToEndpoint } from '../../export/send-request';
+import { OCR_STATUS } from './interface';
 
 export const abortJob = async (teamId: number, id: number, message: string, error?: Error) => {
   if (error) {
@@ -35,8 +36,11 @@ export const abortJob = async (teamId: number, id: number, message: string, erro
 
   getLogger().info(`Updated save keeping`);
 
-  getLogger().info(`Job ${payload._id} sending result back to gateway...`);
-  await sendRequestToEndpoint(teamId, payload._id);
+  if (![OCR_STATUS.UNKNOWN_ERROR, OCR_STATUS.STOPPED].map((status) => status.toString()).includes(message)) {
+    // send any error except UNKNOWN_ERROR and STOPPED
+    getLogger().info(`Job ${payload._id} sending result back to gateway...`);
+    await sendRequestToEndpoint(teamId, payload._id);
+  }
 
   if (error) {
     getLogger().error(error.message);
