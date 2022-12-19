@@ -8,7 +8,7 @@
     ports:
       - 6969
     volumes:
-      - ./docker-config-${NAME}:/home/robosaur/config
+      - ./docker-config:/home/robosaur/config
       - ./docker-state-${NAME}:/home/robosaur/sample/rex
       - ./docker-logs-${NAME}:/home/robosaur/logs
       - ./docker-export-${NAME}:/home/robosaur/sample/rex/export
