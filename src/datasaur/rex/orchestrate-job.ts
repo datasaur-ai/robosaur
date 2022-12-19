@@ -1,5 +1,4 @@
 import { saveExportResultsToDatabase } from '../../export/save-to-database';
-import { sendRequestToEndpoint } from '../../export/send-request';
 import { handleCreateProjects } from '../../handlers/create-projects.handler';
 import { handleExport } from '../../handlers/rex-export.handler';
 import { getLogger } from '../../logger';
@@ -75,9 +74,6 @@ export const orchestrateJob = async (teamId: number, payload: BasePayload, confi
     try {
       getLogger().info(`Job ${payload._id} saving result to database...`);
       await saveExportResultsToDatabase(teamId, payload._id);
-
-      getLogger().info(`Job ${payload._id} sending result back to gateway...`);
-      await sendRequestToEndpoint(teamId, payload._id);
     } catch (e) {
       await cleanUp(e);
       return;
