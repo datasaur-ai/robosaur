@@ -1,6 +1,6 @@
 {
   "name": "robosaur",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Datasaur template for creating and exporting projects.",
   "main": "src/index.ts",
   "scripts": {
