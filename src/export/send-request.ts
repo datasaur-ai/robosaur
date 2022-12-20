@@ -22,10 +22,8 @@ export async function sendRequestToEndpoint(teamId: number, id: number) {
     transaction_id: data._id,
     status: isOCRSuccessful(data.ocr_status) ? PAYLOAD_STATUS.SUCCESS : PAYLOAD_STATUS.FAILED,
     message: {
-      indonesian: `${
-        isOCRSuccessful(data.ocr_status) ? PAYLOAD_MESSAGE.indonesia.SUCCESS : PAYLOAD_MESSAGE.indonesia.FAILED
-      }`,
-      english: `${isOCRSuccessful(data.ocr_status) ? PAYLOAD_MESSAGE.english.SUCCESS : PAYLOAD_MESSAGE.english.FAILED}`,
+      indonesian: `${PAYLOAD_MESSAGE.indonesia[data.ocr_status]}`,
+      english: `${PAYLOAD_MESSAGE.english[data.ocr_status]}`,
     },
     received_request: data.received_request,
     start_ocr: data.start_ocr,
@@ -59,11 +57,14 @@ export async function sendRequestToEndpoint(teamId: number, id: number) {
       return response;
     } catch (error) {
       if (counterRetry >= LIMIT_RETRY) {
-        getLogger().error(`reached retry limit for sending OCR results to endpoint...`, {
-          error: JSON.stringify(error),
-          message: error.message,
-        });
-        throw new SendGatewayError(error);
+        getLogger().error(
+          `reached retry limit for sending OCR results to endpoint... updating the OCR status to SEND_GATEWAY_ERROR`,
+          {
+            error: JSON.stringify(error),
+            message: error.message,
+          },
+        );
+        await teamRepository.update({ _id: id }, { ocr_status: OCR_STATUS.SEND_GATEWAY_ERROR });
       } else {
         getLogger().warn(`error sending request, retrying...`, {
           error: JSON.stringify(error),

@@ -6,7 +6,6 @@ import { exportProject } from '../datasaur/export-project';
 import { JobStatus } from '../datasaur/get-jobs';
 import { getProjects } from '../datasaur/get-projects';
 import { ExportResult, Project } from '../datasaur/interfaces';
-import { DeleteProjectError } from '../datasaur/rex/errors/delete-project-error';
 import { ExportProjectError } from '../datasaur/rex/errors/export-project-error';
 import { createSimpleHandlerContext } from '../execution';
 import { getLogger } from '../logger';
@@ -136,9 +135,6 @@ async function _handleExportProjects(
           message: error.message,
           stack: error?.stack,
         });
-        if (errorCallback) {
-          errorCallback(new DeleteProjectError(error));
-        }
       }
     }
   }

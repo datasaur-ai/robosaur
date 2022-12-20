@@ -1,24 +1,6 @@
 version: '3.1'
-services:
-  robosaur:
-    image: datasaur/robosaur:${DOCKER_TAG}
-    container_name: datasaur-robosaur
-    env_file:
-      - ./robosaur.env
-    ports:
-      - 6969:6969
-    volumes:
-      - ./docker-config:/home/robosaur/config
-      - ./docker-state:/home/robosaur/sample/rex
-      - ./docker-logs:/home/robosaur/logs
-      - ./docker-export:/home/robosaur/sample/rex/export
-    healthcheck:
-      test: ['CMD', 'npm', 'start', 'health-check']
-      interval: 30s
-      timeout: 30s
-      retries: 5
-      start_period: 30s
 networks:
   default:
     external:
       name: ${DOCKER_NETWORK_NAME}
+services:
