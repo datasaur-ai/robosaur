@@ -7,7 +7,7 @@ export enum OCR_STATUS {
   DOCUMENT_RECOGNITION_ERROR = 'Failed to process document on document-recognition',
   FIELD_EXTRACTOR_ERROR = 'Failed to process document on field-extractor',
   PROJECT_CREATION_ERROR = 'Failed to process document on text-extractor',
-  EXPORT_PROJECT_ERROR = '“Failed to process document on export file transformer',
+  EXPORT_PROJECT_ERROR = 'Failed to process document on export file transformer',
   POST_PROCESS_ERROR = 'Failed to process document on post processing',
   SEND_GATEWAY_ERROR = 'Failed to send document ocr result to channel',
   NO_SI_ERROR = 'Document type is not recognized by the classifier',
