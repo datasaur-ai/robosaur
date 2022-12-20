@@ -9,6 +9,10 @@ import { getTeamRepository } from '../database/repository';
 import { formatDate } from '../datasaur/utils/format-date';
 import { OCR_STATUS } from '../datasaur/rex/interface';
 
+function addLeadingZeros(num: number, totalLength: number): string {
+  return String(num).padStart(totalLength, '0');
+}
+
 /**
  *
  * Updating status and save the ocr reading result to database
@@ -27,6 +31,18 @@ export async function saveExportResultsToDatabase(teamId: number, id: number) {
 
     getLogger().info(`processing export results of project ${folder}...`);
     const files = readdirSync(folder);
+
+    const record = await teamRepository.findOneOrFail({
+      where: {
+        _id: id,
+      },
+    });
+
+    for (let i = 0; i < record.page_count; i++) {
+      const filename = id + '_' + addLeadingZeros(i, 3);
+      documentData[filename] = null;
+    }
+
     for (const file of files) {
       getLogger().info(`checking file ${file}...`);
       const json = readJSONFile(resolve(folder, file));
@@ -39,12 +55,6 @@ export async function saveExportResultsToDatabase(teamId: number, id: number) {
       documentData[filename] = await postProcessDocumentData(json.document_data);
       readingResult[filename] = json.reading_result;
     }
-
-    const record = await teamRepository.findOneOrFail({
-      where: {
-        _id: id,
-      },
-    });
 
     getLogger().info(`Post processing is successful`);
     getLogger().info(`Updating save keeping in database. Before`, record);
