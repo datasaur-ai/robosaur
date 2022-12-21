@@ -3,6 +3,7 @@ import { getRepository, getTeamRepository } from '../../database/repository';
 import { getLogger } from '../../logger';
 import { sendRequestToEndpoint } from '../../export/send-request';
 import { OCR_STATUS } from './interface';
+import { formatDate } from '../utils/format-date';
 
 export const abortJob = async (teamId: number, id: number, message: string, error?: Error) => {
   if (error) {
@@ -32,7 +33,10 @@ export const abortJob = async (teamId: number, id: number, message: string, erro
 
   getLogger().info(`Updating save keeping. Updating ocr_status to ${message}`, payload);
 
-  await saveKeepingRepo.update({ _id: payload._id }, { ocr_status: message });
+  await saveKeepingRepo.update(
+    { _id: payload._id },
+    { ocr_status: message, end_ocr: message !== OCR_STATUS.UNKNOWN_ERROR ? formatDate(new Date()) : null },
+  );
 
   getLogger().info(`Updated save keeping`);
 
