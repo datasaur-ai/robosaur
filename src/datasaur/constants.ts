@@ -51,4 +51,8 @@ export const EXTENSIONS = {
       ExtensionID.FILE_COLLECTION_EXTENSION_ID,
     ],
   },
+  BBOX_BASED: {
+    LABELER: [],
+    REVIEWER: [],
+  },
 };
