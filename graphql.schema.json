@@ -494,6 +494,18 @@
         "fields": null,
         "inputFields": [
           {
+            "name": "arrowLabelRequired",
+            "description": "Optional. Defaults to false.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "Boolean",
+              "ofType": null
+            },
+            "defaultValue": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "labelSetId",
             "description": "Required. The labelset to modify.",
             "type": {
@@ -557,6 +569,26 @@
         "fields": null,
         "inputFields": [
           {
+            "name": "arrowRules",
+            "description": "Optional. Only has effect if type is ARROW.",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "LabelClassArrowRuleInput",
+                  "ofType": null
+                }
+              }
+            },
+            "defaultValue": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "color",
             "description": "Optional. The labelset item color when shown in web UI. 6 digit hex string, prefixed by #. Example: #df3920.",
             "type": {
@@ -603,6 +635,18 @@
                 "name": "String",
                 "ofType": null
               }
+            },
+            "defaultValue": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "type",
+            "description": "Optional. Can be SPAN, ARROW, or ALL. Defaults to ALL.",
+            "type": {
+              "kind": "ENUM",
+              "name": "LabelClassType",
+              "ofType": null
             },
             "defaultValue": null,
             "isDeprecated": false,
@@ -753,7 +797,7 @@
               "name": null,
               "ofType": {
                 "kind": "ENUM",
-                "name": "TextDocumentKind",
+                "name": "ProjectKind",
                 "ofType": null
               }
             },
@@ -1348,7 +1392,7 @@
           },
           {
             "name": "id",
-            "description": null,
+            "description": "The hashCode of this label.",
             "args": [],
             "type": {
               "kind": "NON_NULL",
@@ -1614,7 +1658,7 @@
           },
           {
             "name": "id",
-            "description": null,
+            "description": "Optional. The hashCode of this label.",
             "type": {
               "kind": "SCALAR",
               "name": "ID",
@@ -4364,6 +4408,16 @@
         "possibleTypes": null
       },
       {
+        "kind": "SCALAR",
+        "name": "ConflictAnswerScalar",
+        "description": null,
+        "fields": null,
+        "inputFields": null,
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
         "kind": "OBJECT",
         "name": "ConflictAnswerSentence",
         "description": null,
@@ -5429,6 +5483,18 @@
         "description": null,
         "fields": null,
         "inputFields": [
+          {
+            "name": "arrowLabelRequired",
+            "description": "Optional. Defaults to false.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "Boolean",
+              "ofType": null
+            },
+            "defaultValue": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
           {
             "name": "index",
             "description": "The labelset's zero-based index in a project.\nEach project can have up to 5 labelset.",
@@ -7795,124 +7861,6 @@
                 "kind": "SCALAR",
                 "name": "String",
                 "ofType": null
-              }
-            },
-            "defaultValue": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          }
-        ],
-        "interfaces": null,
-        "enumValues": null,
-        "possibleTypes": null
-      },
-      {
-        "kind": "INPUT_OBJECT",
-        "name": "DeleteLabelSetTagItemInput",
-        "description": null,
-        "fields": null,
-        "inputFields": [
-          {
-            "name": "labelSetId",
-            "description": "Required. The labelset to modify.",
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "ID",
-                "ofType": null
-              }
-            },
-            "defaultValue": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "labelSetSignature",
-            "description": "Optional. The labelset's signature.",
-            "type": {
-              "kind": "SCALAR",
-              "name": "String",
-              "ofType": null
-            },
-            "defaultValue": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "tagItemId",
-            "description": "Required. The ID of the labelset item to be deleted.",
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "ID",
-                "ofType": null
-              }
-            },
-            "defaultValue": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          }
-        ],
-        "interfaces": null,
-        "enumValues": null,
-        "possibleTypes": null
-      },
-      {
-        "kind": "INPUT_OBJECT",
-        "name": "DeleteLabelSetTagItemsInput",
-        "description": null,
-        "fields": null,
-        "inputFields": [
-          {
-            "name": "labelSetId",
-            "description": "Required. The labelset to modify.",
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "ID",
-                "ofType": null
-              }
-            },
-            "defaultValue": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "labelSetSignature",
-            "description": "Optional. The labelset's signature.",
-            "type": {
-              "kind": "SCALAR",
-              "name": "String",
-              "ofType": null
-            },
-            "defaultValue": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "tagItemIds",
-            "description": "Required. IDs of the items to be deleted.",
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "LIST",
-                "name": null,
-                "ofType": {
-                  "kind": "NON_NULL",
-                  "name": null,
-                  "ofType": {
-                    "kind": "SCALAR",
-                    "name": "ID",
-                    "ofType": null
-                  }
-                }
               }
             },
             "defaultValue": null,
@@ -13527,132 +13475,6 @@
       },
       {
         "kind": "INPUT_OBJECT",
-        "name": "GetLabelSetsFilterInput",
-        "description": null,
-        "fields": null,
-        "inputFields": [
-          {
-            "name": "keyword",
-            "description": "Optional. Filter labelsets by its `LabelSet.name` or `Project.name` field.",
-            "type": {
-              "kind": "SCALAR",
-              "name": "String",
-              "ofType": null
-            },
-            "defaultValue": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "projectStatuses",
-            "description": "Optional. Filter labelsets by its associated project's status.",
-            "type": {
-              "kind": "LIST",
-              "name": null,
-              "ofType": {
-                "kind": "NON_NULL",
-                "name": null,
-                "ofType": {
-                  "kind": "ENUM",
-                  "name": "GqlProjectStatus",
-                  "ofType": null
-                }
-              }
-            },
-            "defaultValue": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "teamId",
-            "description": "Required. Filter labelsets by team.",
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "ID",
-                "ofType": null
-              }
-            },
-            "defaultValue": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          }
-        ],
-        "interfaces": null,
-        "enumValues": null,
-        "possibleTypes": null
-      },
-      {
-        "kind": "INPUT_OBJECT",
-        "name": "GetLabelSetsPaginatedInput",
-        "description": null,
-        "fields": null,
-        "inputFields": [
-          {
-            "name": "cursor",
-            "description": "Cursor to the current page of result.",
-            "type": {
-              "kind": "SCALAR",
-              "name": "String",
-              "ofType": null
-            },
-            "defaultValue": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "filter",
-            "description": "Filter labelsets by the specified parameters.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "GetLabelSetsFilterInput",
-              "ofType": null
-            },
-            "defaultValue": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "page",
-            "description": "Offset Pagination controls.\n`skip`: The number of labelsets to be skipped.\n`take`: The maximum number of labelsets to be returned.",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "OffsetPageInput",
-              "ofType": null
-            },
-            "defaultValue": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "sort",
-            "description": "Sorts the labelsets by a specified field.\n`field`: The field to sort.\n`order`: one of [ASC, DESC].",
-            "type": {
-              "kind": "LIST",
-              "name": null,
-              "ofType": {
-                "kind": "NON_NULL",
-                "name": null,
-                "ofType": {
-                  "kind": "INPUT_OBJECT",
-                  "name": "SortInput",
-                  "ofType": null
-                }
-              }
-            },
-            "defaultValue": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          }
-        ],
-        "interfaces": null,
-        "enumValues": null,
-        "possibleTypes": null
-      },
-      {
-        "kind": "INPUT_OBJECT",
         "name": "GetLabelingFunctionsInput",
         "description": null,
         "fields": null,
@@ -14319,7 +14141,7 @@
                 "name": null,
                 "ofType": {
                   "kind": "ENUM",
-                  "name": "TextDocumentKind",
+                  "name": "ProjectKind",
                   "ofType": null
                 }
               }
@@ -17770,6 +17592,153 @@
         "possibleTypes": null
       },
       {
+        "kind": "OBJECT",
+        "name": "LabelClassArrowRule",
+        "description": null,
+        "fields": [
+          {
+            "name": "destinationIds",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "ID",
+                    "ofType": null
+                  }
+                }
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "originIds",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "ID",
+                    "ofType": null
+                  }
+                }
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "INPUT_OBJECT",
+        "name": "LabelClassArrowRuleInput",
+        "description": null,
+        "fields": null,
+        "inputFields": [
+          {
+            "name": "destinationIds",
+            "description": null,
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "ID",
+                    "ofType": null
+                  }
+                }
+              }
+            },
+            "defaultValue": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "originIds",
+            "description": null,
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "ID",
+                    "ofType": null
+                  }
+                }
+              }
+            },
+            "defaultValue": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "ENUM",
+        "name": "LabelClassType",
+        "description": null,
+        "fields": null,
+        "inputFields": null,
+        "interfaces": null,
+        "enumValues": [
+          {
+            "name": "ALL",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "ARROW",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "SPAN",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "possibleTypes": null
+      },
+      {
         "kind": "ENUM",
         "name": "LabelEntityType",
         "description": null,
@@ -17954,6 +17923,22 @@
         "name": "LabelSet",
         "description": null,
         "fields": [
+          {
+            "name": "arrowLabelRequired",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
           {
             "name": "id",
             "description": "Unique identifier of the labelset.",
@@ -18269,6 +18254,26 @@
         "description": "Represents a labelset item.",
         "fields": [
           {
+            "name": "arrowRules",
+            "description": "Only has effect if type is ARROW.",
+            "args": [],
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "OBJECT",
+                  "name": "LabelClassArrowRule",
+                  "ofType": null
+                }
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "color",
             "description": "The labelset item color when shown in web UI. 6 digit hex string, prefixed by #. Example: #df3920.",
             "args": [],
@@ -18323,6 +18328,22 @@
             },
             "isDeprecated": false,
             "deprecationReason": null
+          },
+          {
+            "name": "type",
+            "description": "Can be SPAN, ARROW, or ALL. Defaults to ALL.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "ENUM",
+                "name": "LabelClassType",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
           }
         ],
         "inputFields": null,
@@ -18336,6 +18357,26 @@
         "description": null,
         "fields": null,
         "inputFields": [
+          {
+            "name": "arrowRules",
+            "description": "Optional. Only has effect if type is ARROW.",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "LabelClassArrowRuleInput",
+                  "ofType": null
+                }
+              }
+            },
+            "defaultValue": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
           {
             "name": "color",
             "description": "Optional. Sets the labelset item color when shown in web UI. Accepts a 6 digit hex string, prefixed by #. Example: #df3920.",
@@ -18403,161 +18444,21 @@
             "defaultValue": null,
             "isDeprecated": false,
             "deprecationReason": null
-          }
-        ],
-        "interfaces": null,
-        "enumValues": null,
-        "possibleTypes": null
-      },
-      {
-        "kind": "INPUT_OBJECT",
-        "name": "LabelSetInput",
-        "description": null,
-        "fields": null,
-        "inputFields": [
-          {
-            "name": "id",
-            "description": null,
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "ID",
-                "ofType": null
-              }
-            },
-            "defaultValue": null,
-            "isDeprecated": false,
-            "deprecationReason": null
           },
           {
-            "name": "index",
-            "description": null,
+            "name": "type",
+            "description": "Optional. Can be SPAN, ARROW, or ALL. Defaults to ALL.",
             "type": {
-              "kind": "SCALAR",
-              "name": "Int",
+              "kind": "ENUM",
+              "name": "LabelClassType",
               "ofType": null
             },
             "defaultValue": null,
             "isDeprecated": false,
             "deprecationReason": null
-          },
-          {
-            "name": "name",
-            "description": null,
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
-              }
-            },
-            "defaultValue": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "tagItems",
-            "description": null,
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "LIST",
-                "name": null,
-                "ofType": {
-                  "kind": "NON_NULL",
-                  "name": null,
-                  "ofType": {
-                    "kind": "INPUT_OBJECT",
-                    "name": "TagItemInput",
-                    "ofType": null
-                  }
-                }
-              }
-            },
-            "defaultValue": null,
-            "isDeprecated": false,
-            "deprecationReason": null
           }
         ],
         "interfaces": null,
-        "enumValues": null,
-        "possibleTypes": null
-      },
-      {
-        "kind": "OBJECT",
-        "name": "LabelSetPaginatedResponse",
-        "description": null,
-        "fields": [
-          {
-            "name": "nodes",
-            "description": "List of labelsets. See type `LabelSet`.",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "LIST",
-                "name": null,
-                "ofType": {
-                  "kind": "NON_NULL",
-                  "name": null,
-                  "ofType": {
-                    "kind": "OBJECT",
-                    "name": "LabelSet",
-                    "ofType": null
-                  }
-                }
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "pageInfo",
-            "description": null,
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "PageInfo",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "totalCount",
-            "description": "Total number of labelsets that matches the applied filter.",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "Int",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          }
-        ],
-        "inputFields": null,
-        "interfaces": [
-          {
-            "kind": "INTERFACE",
-            "name": "PaginatedResponse",
-            "ofType": null
-          }
-        ],
         "enumValues": null,
         "possibleTypes": null
       },
@@ -18713,6 +18614,22 @@
               "kind": "SCALAR",
               "name": "String",
               "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "arrowLabelRequired",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
+              }
             },
             "isDeprecated": false,
             "deprecationReason": null
@@ -19223,6 +19140,18 @@
         "fields": null,
         "inputFields": [
           {
+            "name": "arrowLabelRequired",
+            "description": null,
+            "type": {
+              "kind": "SCALAR",
+              "name": "Boolean",
+              "ofType": null
+            },
+            "defaultValue": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "name",
             "description": null,
             "type": {
@@ -19274,6 +19203,26 @@
         "fields": null,
         "inputFields": [
           {
+            "name": "arrowRules",
+            "description": null,
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "LabelClassArrowRuleInput",
+                  "ofType": null
+                }
+              }
+            },
+            "defaultValue": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "color",
             "description": null,
             "type": {
@@ -19323,6 +19272,18 @@
             "type": {
               "kind": "SCALAR",
               "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "type",
+            "description": null,
+            "type": {
+              "kind": "ENUM",
+              "name": "LabelClassType",
               "ofType": null
             },
             "defaultValue": null,
@@ -20029,7 +19990,7 @@
                 "name": null,
                 "ofType": {
                   "kind": "ENUM",
-                  "name": "TextDocumentKind",
+                  "name": "ProjectKind",
                   "ofType": null
                 }
               }
@@ -21024,69 +20985,6 @@
                 "kind": "SCALAR",
                 "name": "ID",
                 "ofType": null
-              }
-            },
-            "defaultValue": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          }
-        ],
-        "interfaces": null,
-        "enumValues": null,
-        "possibleTypes": null
-      },
-      {
-        "kind": "INPUT_OBJECT",
-        "name": "MultipleLabelSetInput",
-        "description": null,
-        "fields": null,
-        "inputFields": [
-          {
-            "name": "index",
-            "description": null,
-            "type": {
-              "kind": "SCALAR",
-              "name": "Int",
-              "ofType": null
-            },
-            "defaultValue": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "name",
-            "description": null,
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
-              }
-            },
-            "defaultValue": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "tagItems",
-            "description": null,
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "LIST",
-                "name": null,
-                "ofType": {
-                  "kind": "NON_NULL",
-                  "name": null,
-                  "ofType": {
-                    "kind": "INPUT_OBJECT",
-                    "name": "TagItemInput",
-                    "ofType": null
-                  }
-                }
               }
             },
             "defaultValue": null,
@@ -22154,7 +22052,7 @@
           },
           {
             "name": "createLabelSet",
-            "description": "Creates a new labelset.\nThe created labelset will not appear in `getLabelSets` or `getPaginatedLabelSets` until it is used in at least one project.\nTo use it in a project, use the returned `LabelSet.id` to create a new project via `launchTextProjectAsync`. Put the ID in the `labelSetIDs` field.\nTo add the labelset to an existing project document, use the `updateTextDocument` mutation.",
+            "description": "Creates a new labelset.\nThe created labelset will appear in `getCabinetLabelSetsById`",
             "args": [
               {
                 "name": "input",
@@ -22222,51 +22120,6 @@
               "kind": "OBJECT",
               "name": "LabelSetTemplate",
               "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "createMultipleLabelSet",
-            "description": "Creates multiple labelsets at once.\nThe created labelsets will not appear in `getLabelSets` or `getPaginatedLabelSets` until they are used in at least one project.\nTo use it in a project, use the returned `LabelSet.id` to create a new project via `launchTextProjectAsync`. Put the ID in the `labelSetIDs` field.\nTo add the labelset to an existing project document, use the `updateTextDocument` mutation.",
-            "args": [
-              {
-                "name": "labelSets",
-                "description": null,
-                "type": {
-                  "kind": "NON_NULL",
-                  "name": null,
-                  "ofType": {
-                    "kind": "LIST",
-                    "name": null,
-                    "ofType": {
-                      "kind": "NON_NULL",
-                      "name": null,
-                      "ofType": {
-                        "kind": "INPUT_OBJECT",
-                        "name": "MultipleLabelSetInput",
-                        "ofType": null
-                      }
-                    }
-                  }
-                },
-                "defaultValue": null,
-                "isDeprecated": false,
-                "deprecationReason": null
-              }
-            ],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "LIST",
-                "name": null,
-                "ofType": {
-                  "kind": "OBJECT",
-                  "name": "LabelSet",
-                  "ofType": null
-                }
-              }
             },
             "isDeprecated": false,
             "deprecationReason": null
@@ -22880,6 +22733,39 @@
             "deprecationReason": null
           },
           {
+            "name": "deleteGuideline",
+            "description": null,
+            "args": [
+              {
+                "name": "id",
+                "description": null,
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null,
+                "isDeprecated": false,
+                "deprecationReason": null
+              }
+            ],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "deleteLabelSet",
             "description": "Deletes a labelset.\nIf the labelset is used in a project, any labelset item from the labelset that has been applied will be removed.",
             "args": [
@@ -22915,68 +22801,6 @@
                     "ofType": null
                   }
                 }
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "deleteLabelSetTagItem",
-            "description": "Deletes a specific labelset item from a labelset.\nIf the specified item is used in a project, they will be removed.",
-            "args": [
-              {
-                "name": "input",
-                "description": null,
-                "type": {
-                  "kind": "NON_NULL",
-                  "name": null,
-                  "ofType": {
-                    "kind": "INPUT_OBJECT",
-                    "name": "DeleteLabelSetTagItemInput",
-                    "ofType": null
-                  }
-                },
-                "defaultValue": null,
-                "isDeprecated": false,
-                "deprecationReason": null
-              }
-            ],
-            "type": {
-              "kind": "OBJECT",
-              "name": "TagItem",
-              "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "deleteLabelSetTagItems",
-            "description": "Deletes multiple labelset items from a labelset.\nIf any of the specified item is used in a project, they will be removed.",
-            "args": [
-              {
-                "name": "input",
-                "description": null,
-                "type": {
-                  "kind": "NON_NULL",
-                  "name": null,
-                  "ofType": {
-                    "kind": "INPUT_OBJECT",
-                    "name": "DeleteLabelSetTagItemsInput",
-                    "ofType": null
-                  }
-                },
-                "defaultValue": null,
-                "isDeprecated": false,
-                "deprecationReason": null
-              }
-            ],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "LabelSet",
-                "ofType": null
               }
             },
             "isDeprecated": false,
@@ -25849,39 +25673,6 @@
             "deprecationReason": null
           },
           {
-            "name": "updateLabelSet",
-            "description": "Updates a labelset details.",
-            "args": [
-              {
-                "name": "input",
-                "description": null,
-                "type": {
-                  "kind": "NON_NULL",
-                  "name": null,
-                  "ofType": {
-                    "kind": "INPUT_OBJECT",
-                    "name": "UpdateLabelSetInput",
-                    "ofType": null
-                  }
-                },
-                "defaultValue": null,
-                "isDeprecated": false,
-                "deprecationReason": null
-              }
-            ],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "LabelSet",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
             "name": "updateLabelSetTemplate",
             "description": "Updates the specified labelset template.",
             "args": [
@@ -26053,51 +25844,6 @@
                 "kind": "OBJECT",
                 "name": "UpdateMultiRowAnswersResult",
                 "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "updateMultipleLabelSet",
-            "description": "Updates multiple labelset details at once.",
-            "args": [
-              {
-                "name": "labelSets",
-                "description": null,
-                "type": {
-                  "kind": "NON_NULL",
-                  "name": null,
-                  "ofType": {
-                    "kind": "LIST",
-                    "name": null,
-                    "ofType": {
-                      "kind": "NON_NULL",
-                      "name": null,
-                      "ofType": {
-                        "kind": "INPUT_OBJECT",
-                        "name": "UpdateLabelSetInput",
-                        "ofType": null
-                      }
-                    }
-                  }
-                },
-                "defaultValue": null,
-                "isDeprecated": false,
-                "deprecationReason": null
-              }
-            ],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "LIST",
-                "name": null,
-                "ofType": {
-                  "kind": "OBJECT",
-                  "name": "LabelSet",
-                  "ofType": null
-                }
               }
             },
             "isDeprecated": false,
@@ -28325,11 +28071,6 @@
           },
           {
             "kind": "OBJECT",
-            "name": "LabelSetPaginatedResponse",
-            "ofType": null
-          },
-          {
-            "kind": "OBJECT",
             "name": "MlModelPaginatedResponse",
             "ofType": null
           },
@@ -29405,6 +29146,41 @@
         "inputFields": null,
         "interfaces": [],
         "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "ENUM",
+        "name": "ProjectKind",
+        "description": "See [this documentation](https://datasaurai.gitbook.io/datasaur/creating-a-project#task-types).",
+        "fields": null,
+        "inputFields": null,
+        "interfaces": null,
+        "enumValues": [
+          {
+            "name": "BBOX_BASED",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "DOCUMENT_BASED",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "ROW_BASED",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "TOKEN_BASED",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
         "possibleTypes": null
       },
       {
@@ -30839,7 +30615,7 @@
               "name": null,
               "ofType": {
                 "kind": "ENUM",
-                "name": "TextDocumentKind",
+                "name": "ProjectKind",
                 "ofType": null
               }
             },
@@ -30858,7 +30634,7 @@
                 "name": null,
                 "ofType": {
                   "kind": "ENUM",
-                  "name": "TextDocumentKind",
+                  "name": "ProjectKind",
                   "ofType": null
                 }
               }
@@ -32949,47 +32725,6 @@
             "deprecationReason": null
           },
           {
-            "name": "getDocumentLabelSets",
-            "description": "Returns labelsets associated with the specified document.\nTo get `documentId`, see `getCabinet`.",
-            "args": [
-              {
-                "name": "documentId",
-                "description": null,
-                "type": {
-                  "kind": "NON_NULL",
-                  "name": null,
-                  "ofType": {
-                    "kind": "SCALAR",
-                    "name": "ID",
-                    "ofType": null
-                  }
-                },
-                "defaultValue": null,
-                "isDeprecated": false,
-                "deprecationReason": null
-              }
-            ],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "LIST",
-                "name": null,
-                "ofType": {
-                  "kind": "NON_NULL",
-                  "name": null,
-                  "ofType": {
-                    "kind": "OBJECT",
-                    "name": "LabelSet",
-                    "ofType": null
-                  }
-                }
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
             "name": "getDocumentMetasByCabinetId",
             "description": null,
             "args": [
@@ -33909,30 +33644,6 @@
             "deprecationReason": null
           },
           {
-            "name": "getLabelSets",
-            "description": "Returns a list of labelset.",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "LIST",
-                "name": null,
-                "ofType": {
-                  "kind": "NON_NULL",
-                  "name": null,
-                  "ofType": {
-                    "kind": "OBJECT",
-                    "name": "LabelSet",
-                    "ofType": null
-                  }
-                }
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
             "name": "getLabelSetsByTeamId",
             "description": null,
             "args": [
@@ -34222,39 +33933,6 @@
               "ofType": {
                 "kind": "OBJECT",
                 "name": "PaginatedChartDataResponse",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "getPaginatedLabelSets",
-            "description": "Returns a paginated list of labelsets.",
-            "args": [
-              {
-                "name": "input",
-                "description": null,
-                "type": {
-                  "kind": "NON_NULL",
-                  "name": null,
-                  "ofType": {
-                    "kind": "INPUT_OBJECT",
-                    "name": "GetLabelSetsPaginatedInput",
-                    "ofType": null
-                  }
-                },
-                "defaultValue": null,
-                "isDeprecated": false,
-                "deprecationReason": null
-              }
-            ],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "LabelSetPaginatedResponse",
                 "ofType": null
               }
             },
@@ -36258,6 +35936,55 @@
               "kind": "OBJECT",
               "name": "User",
               "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "validateCabinet",
+            "description": "Checks whether the cabinet can be safely mark as completed or not.\nReturns true if valid, causes error otherwise",
+            "args": [
+              {
+                "name": "projectId",
+                "description": null,
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "ID",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null,
+                "isDeprecated": false,
+                "deprecationReason": null
+              },
+              {
+                "name": "role",
+                "description": null,
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "ENUM",
+                    "name": "Role",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null,
+                "isDeprecated": false,
+                "deprecationReason": null
+              }
+            ],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
+              }
             },
             "isDeprecated": false,
             "deprecationReason": null
@@ -38796,6 +38523,22 @@
             "deprecationReason": null
           },
           {
+            "name": "requireCaptcha",
+            "description": null,
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
+              }
+            },
+            "defaultValue": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "surname",
             "description": null,
             "type": {
@@ -39690,8 +39433,8 @@
                   "kind": "NON_NULL",
                   "name": null,
                   "ofType": {
-                    "kind": "OBJECT",
-                    "name": "ConflictAnswer",
+                    "kind": "SCALAR",
+                    "name": "ConflictAnswerScalar",
                     "ofType": null
                   }
                 }
@@ -40569,6 +40312,26 @@
         "description": null,
         "fields": [
           {
+            "name": "arrowRules",
+            "description": "Only has effect if type is ARROW.",
+            "args": [],
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "OBJECT",
+                  "name": "LabelClassArrowRule",
+                  "ofType": null
+                }
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "color",
             "description": "6 digit hex string, prefixed by #. Example: #df3920.",
             "args": [],
@@ -40635,6 +40398,22 @@
             },
             "isDeprecated": false,
             "deprecationReason": null
+          },
+          {
+            "name": "type",
+            "description": "Can be SPAN, ARROW, or ALL. Defaults to ALL.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "ENUM",
+                "name": "LabelClassType",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
           }
         ],
         "inputFields": null,
@@ -40648,6 +40427,26 @@
         "description": null,
         "fields": null,
         "inputFields": [
+          {
+            "name": "arrowRules",
+            "description": "Optional. Only has effect if type is ARROW.",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "LabelClassArrowRuleInput",
+                  "ofType": null
+                }
+              }
+            },
+            "defaultValue": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
           {
             "name": "color",
             "description": "Optional. 6 digit hex string, prefixed by #. Example: #df3920.",
@@ -40711,6 +40510,18 @@
                 "name": "String",
                 "ofType": null
               }
+            },
+            "defaultValue": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "type",
+            "description": "Optional. Can be SPAN, ARROW, or ALL. Defaults to ALL.",
+            "type": {
+              "kind": "ENUM",
+              "name": "LabelClassType",
+              "ofType": null
             },
             "defaultValue": null,
             "isDeprecated": false,
@@ -42257,41 +42068,6 @@
         "possibleTypes": null
       },
       {
-        "kind": "ENUM",
-        "name": "TextDocumentKind",
-        "description": "See [this documentation](https://datasaurai.gitbook.io/datasaur/creating-a-project#task-types).",
-        "fields": null,
-        "inputFields": null,
-        "interfaces": null,
-        "enumValues": [
-          {
-            "name": "BBOX_BASED",
-            "description": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "DOCUMENT_BASED",
-            "description": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "ROW_BASED",
-            "description": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "TOKEN_BASED",
-            "description": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          }
-        ],
-        "possibleTypes": null
-      },
-      {
         "kind": "OBJECT",
         "name": "TextDocumentSettings",
         "description": null,
@@ -42539,7 +42315,7 @@
                   "name": null,
                   "ofType": {
                     "kind": "ENUM",
-                    "name": "TextDocumentKind",
+                    "name": "ProjectKind",
                     "ofType": null
                   }
                 }
@@ -42853,7 +42629,7 @@
             "description": "Deprecated, use kinds to support mixed labeling",
             "type": {
               "kind": "ENUM",
-              "name": "TextDocumentKind",
+              "name": "ProjectKind",
               "ofType": null
             },
             "defaultValue": null,
@@ -45341,77 +45117,6 @@
       },
       {
         "kind": "INPUT_OBJECT",
-        "name": "UpdateLabelSetInput",
-        "description": null,
-        "fields": null,
-        "inputFields": [
-          {
-            "name": "id",
-            "description": "Required. The labelset to modify.",
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "ID",
-                "ofType": null
-              }
-            },
-            "defaultValue": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "index",
-            "description": "Optional. Updates the labelset's index.",
-            "type": {
-              "kind": "SCALAR",
-              "name": "Int",
-              "ofType": null
-            },
-            "defaultValue": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "name",
-            "description": "Optional. New value for the labelset name. If not supplied, the labelset's name is not changed.",
-            "type": {
-              "kind": "SCALAR",
-              "name": "String",
-              "ofType": null
-            },
-            "defaultValue": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "tagItems",
-            "description": "Optional. New items to replace the labelset items. If not supplied, the items are not replaced.",
-            "type": {
-              "kind": "LIST",
-              "name": null,
-              "ofType": {
-                "kind": "NON_NULL",
-                "name": null,
-                "ofType": {
-                  "kind": "INPUT_OBJECT",
-                  "name": "TagItemInput",
-                  "ofType": null
-                }
-              }
-            },
-            "defaultValue": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          }
-        ],
-        "interfaces": null,
-        "enumValues": null,
-        "possibleTypes": null
-      },
-      {
-        "kind": "INPUT_OBJECT",
         "name": "UpdateLabelSetSettingsInput",
         "description": null,
         "fields": null,
@@ -46153,6 +45858,18 @@
         "description": null,
         "fields": null,
         "inputFields": [
+          {
+            "name": "arrowLabelRequired",
+            "description": "Optional. Defaults to false.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "Boolean",
+              "ofType": null
+            },
+            "defaultValue": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
           {
             "name": "id",
             "description": "Required. The labelset id to modify.",
@@ -47647,7 +47364,7 @@
             "description": null,
             "type": {
               "kind": "ENUM",
-              "name": "TextDocumentKind",
+              "name": "ProjectKind",
               "ofType": null
             },
             "defaultValue": null,
@@ -48717,7 +48434,7 @@
                   "name": null,
                   "ofType": {
                     "kind": "ENUM",
-                    "name": "TextDocumentKind",
+                    "name": "ProjectKind",
                     "ofType": null
                   }
                 }

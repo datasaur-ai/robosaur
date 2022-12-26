@@ -73,6 +73,7 @@ export type Scalars = {
    */
   AnswerScalar: any;
   CellScalar: any;
+  ConflictAnswerScalar: any;
   ConflictTextLabelScalar: any;
   /** A date-time string at UTC, such as 2007-12-03T10:15:30Z, compliant with the `date-time` format outlined in section 5.6 of the RFC 3339 profile of the ISO 8601 standard for representation of dates and times using the Gregorian calendar. */
   DateTime: any;
@@ -158,6 +159,8 @@ export enum AnswerType {
 
 /** Parameters to add new labelset item to existing labelset. */
 export type AppendLabelSetTagItemsInput = {
+  /** Optional. Defaults to false. */
+  arrowLabelRequired?: InputMaybe<Scalars['Boolean']>;
   /** Required. The labelset to modify. */
   labelSetId: Scalars['ID'];
   /** Optional. The labelset's signature. */
@@ -168,6 +171,8 @@ export type AppendLabelSetTagItemsInput = {
 
 /** Representation of a new labelset item. */
 export type AppendTagItemInput = {
+  /** Optional. Only has effect if type is ARROW. */
+  arrowRules?: InputMaybe<Array<LabelClassArrowRuleInput>>;
   /** Optional. The labelset item color when shown in web UI. 6 digit hex string, prefixed by #. Example: #df3920. */
   color?: InputMaybe<Scalars['String']>;
   /** Optional. Description of the labelset item. */
@@ -179,6 +184,8 @@ export type AppendTagItemInput = {
    * Note that `tagName` is case-insensitive, i.e. `per` is treated the same way as `PER` would.
    */
   tagName: Scalars['String'];
+  /** Optional. Can be SPAN, ARROW, or ALL. Defaults to ALL. */
+  type?: InputMaybe<LabelClassType>;
 };
 
 export type AssignProjectInput = {
@@ -195,7 +202,7 @@ export type AutoLabelModel = {
 
 export type AutoLabelModelsInput = {
   documentId: Scalars['ID'];
-  kind: TextDocumentKind;
+  kind: ProjectKind;
 };
 
 export type AutoLabelProjectOptionsInput = {
@@ -268,6 +275,7 @@ export type BBoxLabel = {
   caption?: Maybe<Scalars['String']>;
   deleted: Scalars['Boolean'];
   documentId: Scalars['ID'];
+  /** The hashCode of this label. */
   id: Scalars['ID'];
   shapes: Array<BBoxShape>;
 };
@@ -293,6 +301,7 @@ export type BBoxLabelInput = {
   bboxLabelClassId: Scalars['ID'];
   caption?: InputMaybe<Scalars['String']>;
   documentId: Scalars['ID'];
+  /** Optional. The hashCode of this label. */
   id?: InputMaybe<Scalars['ID']>;
   shapes: Array<BBoxShapeInput>;
 };
@@ -692,6 +701,8 @@ export type CreateFileTransformerInput = {
 };
 
 export type CreateLabelSetInput = {
+  /** Optional. Defaults to false. */
+  arrowLabelRequired?: InputMaybe<Scalars['Boolean']>;
   /**
    * The labelset's zero-based index in a project.
    * Each project can have up to 5 labelset.
@@ -979,24 +990,6 @@ export type DefinitionEntry = {
 export type DeleteExtensionElementInput = {
   cabinetId: Scalars['String'];
   id: Scalars['String'];
-};
-
-export type DeleteLabelSetTagItemInput = {
-  /** Required. The labelset to modify. */
-  labelSetId: Scalars['ID'];
-  /** Optional. The labelset's signature. */
-  labelSetSignature?: InputMaybe<Scalars['String']>;
-  /** Required. The ID of the labelset item to be deleted. */
-  tagItemId: Scalars['ID'];
-};
-
-export type DeleteLabelSetTagItemsInput = {
-  /** Required. The labelset to modify. */
-  labelSetId: Scalars['ID'];
-  /** Optional. The labelset's signature. */
-  labelSetSignature?: InputMaybe<Scalars['String']>;
-  /** Required. IDs of the items to be deleted. */
-  tagItemIds: Array<Scalars['ID']>;
 };
 
 export type DeleteLabelsOnTextDocumentInput = {
@@ -1718,34 +1711,6 @@ export type GetLabelSetTemplatesResponse = PaginatedResponse & {
   totalCount: Scalars['Int'];
 };
 
-export type GetLabelSetsFilterInput = {
-  /** Optional. Filter labelsets by its `LabelSet.name` or `Project.name` field. */
-  keyword?: InputMaybe<Scalars['String']>;
-  /** Optional. Filter labelsets by its associated project's status. */
-  projectStatuses?: InputMaybe<Array<GqlProjectStatus>>;
-  /** Required. Filter labelsets by team. */
-  teamId: Scalars['ID'];
-};
-
-export type GetLabelSetsPaginatedInput = {
-  /** Cursor to the current page of result. */
-  cursor?: InputMaybe<Scalars['String']>;
-  /** Filter labelsets by the specified parameters. */
-  filter?: InputMaybe<GetLabelSetsFilterInput>;
-  /**
-   * Offset Pagination controls.
-   * `skip`: The number of labelsets to be skipped.
-   * `take`: The maximum number of labelsets to be returned.
-   */
-  page?: InputMaybe<OffsetPageInput>;
-  /**
-   * Sorts the labelsets by a specified field.
-   * `field`: The field to sort.
-   * `order`: one of [ASC, DESC].
-   */
-  sort?: InputMaybe<Array<SortInput>>;
-};
-
 export type GetLabelingFunctionsInput = {
   dataProgrammingId: Scalars['ID'];
   labelingFunctionIds?: InputMaybe<Array<Scalars['ID']>>;
@@ -1827,7 +1792,7 @@ export type GetProjectsFilterInput = {
   /** Optional. Filters projects by keyword, searches project name and tags. By default shows all projects. */
   keyword?: InputMaybe<Scalars['String']>;
   /** Optional. Filters projects by its kind. */
-  kinds?: InputMaybe<Array<TextDocumentKind>>;
+  kinds?: InputMaybe<Array<ProjectKind>>;
   /** Optional. Filters projects by its LabelSet. See `LabelSet.signature`. */
   labelSetSignatures?: InputMaybe<Array<Scalars['String']>>;
   /** Optional. Filters projects by its labeler. */
@@ -2230,6 +2195,23 @@ export enum KeyPayloadType {
   User = 'USER'
 }
 
+export type LabelClassArrowRule = {
+  __typename?: 'LabelClassArrowRule';
+  destinationIds: Array<Scalars['ID']>;
+  originIds: Array<Scalars['ID']>;
+};
+
+export type LabelClassArrowRuleInput = {
+  destinationIds: Array<Scalars['ID']>;
+  originIds: Array<Scalars['ID']>;
+};
+
+export enum LabelClassType {
+  All = 'ALL',
+  Arrow = 'ARROW',
+  Span = 'SPAN'
+}
+
 export enum LabelEntityType {
   Arrow = 'ARROW',
   BboxBound = 'BBOX_BOUND',
@@ -2261,6 +2243,7 @@ export enum LabelPhase {
 
 export type LabelSet = {
   __typename?: 'LabelSet';
+  arrowLabelRequired: Scalars['Boolean'];
   /** Unique identifier of the labelset. */
   id: Scalars['ID'];
   /**
@@ -2313,6 +2296,8 @@ export type LabelSetConfigInput = {
 /** Represents a labelset item. */
 export type LabelSetConfigOptions = {
   __typename?: 'LabelSetConfigOptions';
+  /** Only has effect if type is ARROW. */
+  arrowRules?: Maybe<Array<LabelClassArrowRule>>;
   /** The labelset item color when shown in web UI. 6 digit hex string, prefixed by #. Example: #df3920. */
   color?: Maybe<Scalars['String']>;
   /** Unique identifier of the labelset item. */
@@ -2321,9 +2306,13 @@ export type LabelSetConfigOptions = {
   label: Scalars['String'];
   /** Optional. Use this field if you want to create hierarchical options. Use another option's id to make it as a parent option. */
   parentId?: Maybe<Scalars['ID']>;
+  /** Can be SPAN, ARROW, or ALL. Defaults to ALL. */
+  type: LabelClassType;
 };
 
 export type LabelSetConfigOptionsInput = {
+  /** Optional. Only has effect if type is ARROW. */
+  arrowRules?: InputMaybe<Array<LabelClassArrowRuleInput>>;
   /** Optional. Sets the labelset item color when shown in web UI. Accepts a 6 digit hex string, prefixed by #. Example: #df3920. */
   color?: InputMaybe<Scalars['String']>;
   description?: InputMaybe<Scalars['String']>;
@@ -2333,22 +2322,8 @@ export type LabelSetConfigOptionsInput = {
   label: Scalars['String'];
   /** Optional. Use this field if you want to create hierarchical options. Use another option's id to make it as a parent option. */
   parentId?: InputMaybe<Scalars['ID']>;
-};
-
-export type LabelSetInput = {
-  id: Scalars['ID'];
-  index?: InputMaybe<Scalars['Int']>;
-  name: Scalars['String'];
-  tagItems: Array<TagItemInput>;
-};
-
-export type LabelSetPaginatedResponse = PaginatedResponse & {
-  __typename?: 'LabelSetPaginatedResponse';
-  /** List of labelsets. See type `LabelSet`. */
-  nodes: Array<LabelSet>;
-  pageInfo: PageInfo;
-  /** Total number of labelsets that matches the applied filter. */
-  totalCount: Scalars['Int'];
+  /** Optional. Can be SPAN, ARROW, or ALL. Defaults to ALL. */
+  type?: InputMaybe<LabelClassType>;
 };
 
 export type LabelSetTemplate = {
@@ -2366,6 +2341,7 @@ export type LabelSetTemplate = {
 export type LabelSetTemplateItem = {
   __typename?: 'LabelSetTemplateItem';
   activationConditionLogic?: Maybe<Scalars['String']>;
+  arrowLabelRequired: Scalars['Boolean'];
   bindToColumn?: Maybe<Scalars['String']>;
   createdAt?: Maybe<Scalars['String']>;
   defaultValue?: Maybe<Scalars['String']>;
@@ -2440,15 +2416,18 @@ export enum LabelSetTemplateType {
 }
 
 export type LabelSetTextProjectInput = {
+  arrowLabelRequired?: InputMaybe<Scalars['Boolean']>;
   name: Scalars['String'];
   options: Array<LabelSetTextProjectOptionInput>;
 };
 
 export type LabelSetTextProjectOptionInput = {
+  arrowRules?: InputMaybe<Array<LabelClassArrowRuleInput>>;
   color?: InputMaybe<Scalars['String']>;
   id: Scalars['String'];
   label: Scalars['String'];
   parentId?: InputMaybe<Scalars['String']>;
+  type?: InputMaybe<LabelClassType>;
 };
 
 export type LabelerStatistic = {
@@ -2522,7 +2501,7 @@ export type LaunchTextProjectInput = {
   /** Optional. Sets the labeling guideline for the project. */
   guidelineId?: InputMaybe<Scalars['ID']>;
   /** Required. Sets the project kinds. */
-  kinds?: InputMaybe<Array<TextDocumentKind>>;
+  kinds?: InputMaybe<Array<ProjectKind>>;
   /** Optional. LabelSetId for Token Based Labeling. You can provide labelSetId when creating project or you can create LabelSet after the project is created. */
   labelSetIDs?: InputMaybe<Array<Scalars['ID']>>;
   /** Deprecated. Please use field `labelSets` instead. */
@@ -2646,12 +2625,6 @@ export type MlModelSettingInput = {
   teamId: Scalars['ID'];
 };
 
-export type MultipleLabelSetInput = {
-  index?: InputMaybe<Scalars['Int']>;
-  name: Scalars['String'];
-  tagItems: Array<TagItemInput>;
-};
-
 export type Mutation = {
   __typename?: 'Mutation';
   acceptBoundingBoxConflict: Array<BoundingBoxLabel>;
@@ -2682,20 +2655,11 @@ export type Mutation = {
   createGuideline: Guideline;
   /**
    * Creates a new labelset.
-   * The created labelset will not appear in `getLabelSets` or `getPaginatedLabelSets` until it is used in at least one project.
-   * To use it in a project, use the returned `LabelSet.id` to create a new project via `launchTextProjectAsync`. Put the ID in the `labelSetIDs` field.
-   * To add the labelset to an existing project document, use the `updateTextDocument` mutation.
+   * The created labelset will appear in `getCabinetLabelSetsById`
    */
   createLabelSet: LabelSet;
   /** Creates a new labelset template. */
   createLabelSetTemplate?: Maybe<LabelSetTemplate>;
-  /**
-   * Creates multiple labelsets at once.
-   * The created labelsets will not appear in `getLabelSets` or `getPaginatedLabelSets` until they are used in at least one project.
-   * To use it in a project, use the returned `LabelSet.id` to create a new project via `launchTextProjectAsync`. Put the ID in the `labelSetIDs` field.
-   * To add the labelset to an existing project document, use the `updateTextDocument` mutation.
-   */
-  createMultipleLabelSet: Array<Maybe<LabelSet>>;
   createPersonalTag: Tag;
   createProjectTemplate: ProjectTemplate;
   createQuestionSet: QuestionSet;
@@ -2712,21 +2676,12 @@ export type Mutation = {
   deleteDocumentBoundLabels: Scalars['Boolean'];
   deleteExtensionElement?: Maybe<ProjectExtension>;
   deleteExternalObjectStorage: ExternalObjectStorage;
+  deleteGuideline: Scalars['Boolean'];
   /**
    * Deletes a labelset.
    * If the labelset is used in a project, any labelset item from the labelset that has been applied will be removed.
    */
   deleteLabelSet: Array<Scalars['ID']>;
-  /**
-   * Deletes a specific labelset item from a labelset.
-   * If the specified item is used in a project, they will be removed.
-   */
-  deleteLabelSetTagItem?: Maybe<TagItem>;
-  /**
-   * Deletes multiple labelset items from a labelset.
-   * If any of the specified item is used in a project, they will be removed.
-   */
-  deleteLabelSetTagItems: LabelSet;
   /** Deletes the specified labelset templates. Returns true if the templates are deleted successfully. */
   deleteLabelSetTemplates?: Maybe<Scalars['Boolean']>;
   deleteLabelingFunctions: Scalars['Boolean'];
@@ -2855,16 +2810,12 @@ export type Mutation = {
   updateDocumentQuestion: Question;
   updateDocumentQuestions: Array<Question>;
   updateFileTransformer: FileTransformer;
-  /** Updates a labelset details. */
-  updateLabelSet: LabelSet;
   /** Updates the specified labelset template. */
   updateLabelSetTemplate?: Maybe<LabelSetTemplate>;
   updateLabelingFunction: LabelingFunction;
   updateLabels: UpdateLabelsResult;
   updateLastOpenedDocument: Cabinet;
   updateMultiRowAnswers: UpdateMultiRowAnswersResult;
-  /** Updates multiple labelset details at once. */
-  updateMultipleLabelSet: Array<Maybe<LabelSet>>;
   updateProject: Project;
   updateProjectBBoxLabelSet: BBoxLabelSet;
   updateProjectExtension?: Maybe<ProjectExtension>;
@@ -3054,11 +3005,6 @@ export type MutationCreateLabelSetTemplateArgs = {
 };
 
 
-export type MutationCreateMultipleLabelSetArgs = {
-  labelSets: Array<MultipleLabelSetInput>;
-};
-
-
 export type MutationCreatePersonalTagArgs = {
   input: CreatePersonalTagInput;
 };
@@ -3142,18 +3088,13 @@ export type MutationDeleteExternalObjectStorageArgs = {
 };
 
 
+export type MutationDeleteGuidelineArgs = {
+  id: Scalars['String'];
+};
+
+
 export type MutationDeleteLabelSetArgs = {
   id: Scalars['ID'];
-};
-
-
-export type MutationDeleteLabelSetTagItemArgs = {
-  input: DeleteLabelSetTagItemInput;
-};
-
-
-export type MutationDeleteLabelSetTagItemsArgs = {
-  input: DeleteLabelSetTagItemsInput;
 };
 
 
@@ -3518,11 +3459,6 @@ export type MutationUpdateFileTransformerArgs = {
 };
 
 
-export type MutationUpdateLabelSetArgs = {
-  input: UpdateLabelSetInput;
-};
-
-
 export type MutationUpdateLabelSetTemplateArgs = {
   input: UpdateLabelSetTemplateInput;
 };
@@ -3546,11 +3482,6 @@ export type MutationUpdateLastOpenedDocumentArgs = {
 
 export type MutationUpdateMultiRowAnswersArgs = {
   input: UpdateMultiRowAnswersInput;
-};
-
-
-export type MutationUpdateMultipleLabelSetArgs = {
-  labelSets: Array<UpdateLabelSetInput>;
 };
 
 
@@ -3925,6 +3856,14 @@ export type ProjectFinalReport = {
   project: Project;
 };
 
+/** See [this documentation](https://datasaurai.gitbook.io/datasaur/creating-a-project#task-types). */
+export enum ProjectKind {
+  BboxBased = 'BBOX_BASED',
+  DocumentBased = 'DOCUMENT_BASED',
+  RowBased = 'ROW_BASED',
+  TokenBased = 'TOKEN_BASED'
+}
+
 export type ProjectLaunchJob = {
   __typename?: 'ProjectLaunchJob';
   job: Job;
@@ -4071,8 +4010,8 @@ export type ProjectTemplateTextDocumentSetting = {
   fileTransformerId?: Maybe<Scalars['ID']>;
   firstRowAsHeader?: Maybe<Scalars['Boolean']>;
   hideBoundingBoxIfNoSpanOrArrowLabel: Scalars['Boolean'];
-  kind: TextDocumentKind;
-  kinds?: Maybe<Array<TextDocumentKind>>;
+  kind: ProjectKind;
+  kinds?: Maybe<Array<ProjectKind>>;
   mediaDisplayStrategy: MediaDisplayStrategy;
   /** @deprecated Please use field `transcriptMethod` instead. */
   ocrMethod?: Maybe<TranscriptMethod>;
@@ -4153,11 +4092,6 @@ export type Query = {
    */
   getDocumentAnswersOld: DocumentAnswer;
   getDocumentLabelConflicts: Array<ConflictAnswer>;
-  /**
-   * Returns labelsets associated with the specified document.
-   * To get `documentId`, see `getCabinet`.
-   */
-  getDocumentLabelSets: Array<LabelSet>;
   getDocumentMetasByCabinetId: Array<DocumentMeta>;
   getDocumentQuestions: Array<Question>;
   getEditSentenceConflicts: EditSentenceConflict;
@@ -4188,8 +4122,6 @@ export type Query = {
   getLabelSetTemplate?: Maybe<LabelSetTemplate>;
   /** Returns a list of labelset templates. */
   getLabelSetTemplates: GetLabelSetTemplatesResponse;
-  /** Returns a list of labelset. */
-  getLabelSets: Array<LabelSet>;
   getLabelSetsByTeamId: Array<LabelSet>;
   getLabelingFunction: LabelingFunction;
   getLabelingFunctions?: Maybe<Array<LabelingFunction>>;
@@ -4198,8 +4130,6 @@ export type Query = {
   getMlModels: MlModelPaginatedResponse;
   getOverallProjectPerformance: OverallProjectPerformance;
   getPaginatedChartData: PaginatedChartDataResponse;
-  /** Returns a paginated list of labelsets. */
-  getPaginatedLabelSets: LabelSetPaginatedResponse;
   getPaginatedQuestionSets: GetPaginatedQuestionSetResponse;
   getPairKappas: Array<PairKappa>;
   /** Returns a list of personal tags. */
@@ -4268,6 +4198,11 @@ export type Query = {
   /** Generate audiowaveform data for an audio project. Waveform data generated by using https://github.com/bbc/audiowaveform */
   getWaveformPeaks: WaveformPeaks;
   me?: Maybe<User>;
+  /**
+   * Checks whether the cabinet can be safely mark as completed or not.
+   * Returns true if valid, causes error otherwise
+   */
+  validateCabinet: Scalars['Boolean'];
   verifyBetaKey?: Maybe<Scalars['Boolean']>;
   verifyInvitationLink: InvitationVerificationResult;
   verifyResetPasswordSignature?: Maybe<Scalars['Boolean']>;
@@ -4510,11 +4445,6 @@ export type QueryGetDocumentLabelConflictsArgs = {
 };
 
 
-export type QueryGetDocumentLabelSetsArgs = {
-  documentId: Scalars['ID'];
-};
-
-
 export type QueryGetDocumentMetasByCabinetIdArgs = {
   cabinetId: Scalars['ID'];
 };
@@ -4671,11 +4601,6 @@ export type QueryGetOverallProjectPerformanceArgs = {
 
 export type QueryGetPaginatedChartDataArgs = {
   input: PaginatedAnalyticsDashboardQueryInput;
-};
-
-
-export type QueryGetPaginatedLabelSetsArgs = {
-  input: GetLabelSetsPaginatedInput;
 };
 
 
@@ -4920,6 +4845,12 @@ export type QueryGetUsageArgs = {
 export type QueryGetWaveformPeaksArgs = {
   documentId: Scalars['String'];
   pixelPerSecond?: InputMaybe<Scalars['Int']>;
+};
+
+
+export type QueryValidateCabinetArgs = {
+  projectId: Scalars['ID'];
+  role: Role;
 };
 
 
@@ -5213,6 +5144,7 @@ export type RequestDemoInput = {
   givenName: Scalars['String'];
   numberOfLabelers: Scalars['Int'];
   recaptcha?: InputMaybe<Scalars['String']>;
+  requireCaptcha: Scalars['Boolean'];
   surname: Scalars['String'];
   utmSource?: InputMaybe<Scalars['String']>;
 };
@@ -5318,7 +5250,7 @@ export type RowAnswer = {
 
 export type RowAnswerConflicts = {
   __typename?: 'RowAnswerConflicts';
-  conflicts: Array<ConflictAnswer>;
+  conflicts: Array<Scalars['ConflictAnswerScalar']>;
   line: Scalars['Int'];
 };
 
@@ -5437,6 +5369,8 @@ export type Tag = {
 
 export type TagItem = {
   __typename?: 'TagItem';
+  /** Only has effect if type is ARROW. */
+  arrowRules?: Maybe<Array<LabelClassArrowRule>>;
   /** 6 digit hex string, prefixed by #. Example: #df3920. */
   color?: Maybe<Scalars['String']>;
   desc?: Maybe<Scalars['String']>;
@@ -5446,9 +5380,13 @@ export type TagItem = {
   parentId?: Maybe<Scalars['ID']>;
   /** Labelset item name, displayed in web UI. Case insensitive. */
   tagName: Scalars['String'];
+  /** Can be SPAN, ARROW, or ALL. Defaults to ALL. */
+  type: LabelClassType;
 };
 
 export type TagItemInput = {
+  /** Optional. Only has effect if type is ARROW. */
+  arrowRules?: InputMaybe<Array<LabelClassArrowRuleInput>>;
   /** Optional. 6 digit hex string, prefixed by #. Example: #df3920. */
   color?: InputMaybe<Scalars['String']>;
   /** Optional. Description of the labelset item. */
@@ -5459,6 +5397,8 @@ export type TagItemInput = {
   parentId?: InputMaybe<Scalars['ID']>;
   /** Required. The text to be displayed in the web UI. */
   tagName: Scalars['String'];
+  /** Optional. Can be SPAN, ARROW, or ALL. Defaults to ALL. */
+  type?: InputMaybe<LabelClassType>;
 };
 
 export type TargetApiInput = {
@@ -5616,14 +5556,6 @@ export type TextDocumentSentencesArgs = {
   start: Scalars['Int'];
 };
 
-/** See [this documentation](https://datasaurai.gitbook.io/datasaur/creating-a-project#task-types). */
-export enum TextDocumentKind {
-  BboxBased = 'BBOX_BASED',
-  DocumentBased = 'DOCUMENT_BASED',
-  RowBased = 'ROW_BASED',
-  TokenBased = 'TOKEN_BASED'
-}
-
 export type TextDocumentSettings = {
   __typename?: 'TextDocumentSettings';
   /** Forces every token to have at least one label in Token Based Labeling. */
@@ -5651,7 +5583,7 @@ export type TextDocumentSettings = {
   hideBoundingBoxIfNoSpanOrArrowLabel?: Maybe<Scalars['Boolean']>;
   id: Scalars['ID'];
   /** The project kinds associated with the document. */
-  kinds: Array<TextDocumentKind>;
+  kinds: Array<ProjectKind>;
   mediaDisplayStrategy: MediaDisplayStrategy;
   /**
    * The sentence separator of the document. One of [`
@@ -5703,7 +5635,7 @@ export type TextDocumentSettingsInput = {
   /** Required for `.csv` files / row-based task. Sets the first row of data as header rows. Defaults to `null`. */
   firstRowAsHeader?: InputMaybe<Scalars['Boolean']>;
   /** Deprecated, use kinds to support mixed labeling */
-  kind?: InputMaybe<TextDocumentKind>;
+  kind?: InputMaybe<ProjectKind>;
   /** For Row Based Labeling. Defaults to `NONE`. */
   mediaDisplayStrategy?: InputMaybe<MediaDisplayStrategy>;
   /** Deprecated. Please use field `transcriptMethod` instead. */
@@ -5984,17 +5916,6 @@ export type UpdateFileTransformerInput = {
   name?: InputMaybe<Scalars['String']>;
 };
 
-export type UpdateLabelSetInput = {
-  /** Required. The labelset to modify. */
-  id: Scalars['ID'];
-  /** Optional. Updates the labelset's index. */
-  index?: InputMaybe<Scalars['Int']>;
-  /** Optional. New value for the labelset name. If not supplied, the labelset's name is not changed. */
-  name?: InputMaybe<Scalars['String']>;
-  /** Optional. New items to replace the labelset items. If not supplied, the items are not replaced. */
-  tagItems?: InputMaybe<Array<TagItemInput>>;
-};
-
 export type UpdateLabelSetSettingsInput = {
   /** Required. The labelset ID. */
   id: Scalars['ID'];
@@ -6074,6 +5995,8 @@ export type UpdateProjectLabelSetByLabelSetTemplateInput = {
 };
 
 export type UpdateProjectLabelSetInput = {
+  /** Optional. Defaults to false. */
+  arrowLabelRequired?: InputMaybe<Scalars['Boolean']>;
   /** Required. The labelset id to modify. */
   id: Scalars['ID'];
   /** Optional. The labelset signature to modify. */
@@ -6220,7 +6143,7 @@ export type UpdateTextDocumentSettingsInput = {
   /** Enables placing multiple labels on one character / token span. */
   allowMultiLabels?: InputMaybe<Scalars['Boolean']>;
   autoScrollWhenLabeling?: InputMaybe<Scalars['Boolean']>;
-  kind?: InputMaybe<TextDocumentKind>;
+  kind?: InputMaybe<ProjectKind>;
   lang?: InputMaybe<Scalars['String']>;
   projectId: Scalars['ID'];
   /**
@@ -6345,7 +6268,7 @@ export type WorkspaceSettings = {
   fileTransformerId?: Maybe<Scalars['ID']>;
   firstRowAsHeader?: Maybe<Scalars['Boolean']>;
   id: Scalars['ID'];
-  kinds: Array<TextDocumentKind>;
+  kinds: Array<ProjectKind>;
   mediaDisplayStrategy: MediaDisplayStrategy;
   ocrProvider?: Maybe<OcrProvider>;
   sentenceSeparator: Scalars['String'];
