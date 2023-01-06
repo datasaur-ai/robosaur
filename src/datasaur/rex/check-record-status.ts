@@ -1,13 +1,14 @@
-import { getRepository } from '../../database/repository';
-import { ProcessRecordEntity } from '../../database/entities/process_record.entity';
+import { TeamX } from '../../database/entities/teamPayloads/teamX.entity';
+import { getTeamRepository } from '../../database/repository';
 import { JobCanceledError } from './errors/job-canceled-error';
+import { OCR_STATUS } from './interface';
 
 export const checkRecordStatus = async (id: number) => {
-  const recordRepo = await getRepository(ProcessRecordEntity);
+  const saveKeepingRepo = await getTeamRepository<TeamX>();
 
-  const record = await recordRepo.findOneBy({ 'data.id': id });
+  const saveKeeping = await saveKeepingRepo.findOne({ where: { _id: id } });
 
-  if (!record) {
+  if (!saveKeeping || saveKeeping.ocr_status === OCR_STATUS.STOPPED) {
     throw new JobCanceledError(id);
   }
 };
