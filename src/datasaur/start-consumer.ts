@@ -1,7 +1,5 @@
 import { ProcessJob } from '../execution';
 import { getLogger } from '../logger';
-import { randbetween } from '../utils/randbetween';
-import { wait } from '../utils/wait';
 import { createRecordAndReturnSaveKeeping } from './rex/create-record-and-return-save-keeping';
 import { dequeueDocument } from './rex/dequeue-document';
 import { validateRecord } from './rex/validate-record';
@@ -13,13 +11,13 @@ let intervalId;
 export const startConsumer = async (processJob: ProcessJob<unknown[]>, teamId: number) => {
   clearInterval(intervalId);
   const interval = Math.floor(Math.random() * (10000 - 1000 + 1) + 1000);
-  intervalId = setInterval(async function() {
+  intervalId = setInterval(async () => {
     const queueAvailable = await validateRecord(teamId, MAX_DOCS);
 
     if (!queueAvailable) {
       getLogger().info(`Team ${teamId} Max number of concurrent process is reached [MAX_DOCS: ${MAX_DOCS}]`);
-    }
-
+      return;
+    } 
     const document = await dequeueDocument(teamId);
 
     if (!document) {
@@ -27,7 +25,8 @@ export const startConsumer = async (processJob: ProcessJob<unknown[]>, teamId: n
       if (interval % 2 === 0) {
         getLogger().info(`Team ${teamId} No new document is found in the queue`);
       }
-    }
+      return;
+    } 
 
     const saveKeepingId = document.save_keeping_id;
 
