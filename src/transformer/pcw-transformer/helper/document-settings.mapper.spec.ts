@@ -1,7 +1,7 @@
 import { Config } from '../../../config/interfaces';
 import {
   MediaDisplayStrategy,
-  TextDocumentKind,
+  ProjectKind,
   TextDocumentSettingsInput,
   TextDocumentViewer,
   TokenizationMethod,
@@ -22,7 +22,7 @@ describe('documentSettingsMapper', () => {
       tokenizer: 'WINK',
       transcriptMethod: TranscriptMethod.Transcription,
       displayedRows: -1,
-      kind: TextDocumentKind.TokenBased,
+      kind: ProjectKind.TokenBased,
       mediaDisplayStrategy: MediaDisplayStrategy.Thumbnail,
       viewer: TextDocumentViewer.Token,
       viewerConfig: {
@@ -60,7 +60,7 @@ describe('documentSettingsMapper', () => {
       sentenceSeparator: '\n',
       autoScrollWhenLabeling: true,
       displayedRows: -1,
-      kind: TextDocumentKind.TokenBased,
+      kind: ProjectKind.TokenBased,
       mediaDisplayStrategy: MediaDisplayStrategy.Thumbnail,
       tokenizer: TokenizationMethod.Wink,
       transcriptMethod: TranscriptMethod.Transcription,

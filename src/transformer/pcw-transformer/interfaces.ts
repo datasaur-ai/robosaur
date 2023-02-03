@@ -8,7 +8,7 @@ import {
   ProjectPurpose,
   ProjectSettingsInput,
   SplitDocumentOptionInput,
-  TextDocumentKind,
+  ProjectKind,
   TextDocumentSettingsInput,
   TextDocumentType,
 } from '../../generated/graphql';
@@ -35,7 +35,7 @@ export interface PCWPayload {
   documentAssignments?: DocumentAssignmentInput[];
   name: string;
   type?: TextDocumentType;
-  kinds?: TextDocumentKind[];
+  kinds?: ProjectKind[];
   labelSets?: LabelSetTextProjectInput[];
   labelSetIDs?: string[];
   labelSetId?: string;

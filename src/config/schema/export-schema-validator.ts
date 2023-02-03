@@ -1,6 +1,6 @@
 import Ajv, { JSONSchemaType } from 'ajv';
 import { ExportFormat } from '../../datasaur/interfaces';
-import { TextDocumentKind } from '../../generated/graphql';
+import { ProjectKind } from '../../generated/graphql';
 import { ExportConfig, StateConfig, StorageSources } from '../interfaces';
 
 const schemaValidator = new Ajv({ allErrors: true });
@@ -23,7 +23,7 @@ const ExportSchema: JSONSchemaType<ExportConfig> = {
       properties: {
         kind: {
           type: 'string',
-          enum: [TextDocumentKind.TokenBased, TextDocumentKind.RowBased, TextDocumentKind.DocumentBased],
+          enum: [ProjectKind.TokenBased, ProjectKind.RowBased, ProjectKind.DocumentBased, ProjectKind.BboxBased],
         },
         date: { type: 'object', nullable: true, required: ['newestDate'] },
         tags: { type: 'array', nullable: true, items: { type: 'string' } },
