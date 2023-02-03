@@ -11,7 +11,6 @@ let intervalId;
 export const startConsumer = async (processJob: ProcessJob<unknown[]>, teamId: number) => {
   clearInterval(intervalId);
   const interval = Math.floor(Math.random() * (10000 - 1000 + 1) + 1000);
-  console.log(interval);
   intervalId = setInterval(async () => {
     const queueAvailable = await validateRecord(teamId, MAX_DOCS);
 
