@@ -28,6 +28,12 @@ services:
       - MONGO_INITDB_ROOT_USERNAME=vulcan
       - MONGO_INITDB_ROOT_PASSWORD=vulcan
       - MONGO_INITDB_DATABASE=vulcan
+  rabbitmq:
+    image: rabbitmq:3.11
+    volumes:
+      - ./rabbitmqdata:/var/lib/rabbitmq
+    ports:
+      - 5672:5672
   mongo-express:
     image: mongo-express
     restart: always
