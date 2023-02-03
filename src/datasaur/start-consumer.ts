@@ -11,6 +11,8 @@ const MAX_DOCS = Number(process.env.MAX_DOCS ?? 3);
 export const startConsumer = async (processJob: ProcessJob<unknown[]>, teamId: number) => {
   while (true) {
     const sleeptimeSecond = random(10) + 1;
+    await sleep(sleeptimeSecond * 1000);
+
     const queueAvailable = await validateRecord(teamId, MAX_DOCS);
 
     if (!queueAvailable) {
@@ -38,7 +40,5 @@ export const startConsumer = async (processJob: ProcessJob<unknown[]>, teamId: n
     getLogger().info(`Process Job Team ${teamId} and Save Keeping Id ${document.save_keeping_id}`);
     // trace id is using save_keeping_id, thats why teamId is the 2nd argument
     await processJob(`${document.save_keeping_id}`, teamId, saveKeeping);
-
-    await sleep(sleeptimeSecond * 1000);
   }
 };
