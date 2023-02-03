@@ -1,5 +1,4 @@
-import { existsSync, read, writeFileSync } from 'fs';
-import { writeFile, readFile, access } from 'fs/promises';
+import { access, readFile, writeFile } from 'fs/promises';
 import { Health, healthPath, HEALTH_STATUS } from '../datasaur/rex/interface';
 import { createSimpleHandlerContext } from '../execution';
 import { getLogger } from '../logger';
