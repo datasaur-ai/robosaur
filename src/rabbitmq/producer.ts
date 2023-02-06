@@ -10,6 +10,6 @@ export class Producer extends RabbitmqChannel {
 
   public sendMessage<T = any>(data: T): void {
     const stringifiedData = JSON.stringify(data);
-    this.channel.sendToQueue(this.queueName, Buffer.from(stringifiedData));
+    this.channel.sendToQueue(this.queueName, Buffer.from(stringifiedData), { persistent: true });
   }
 }

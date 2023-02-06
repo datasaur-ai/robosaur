@@ -27,9 +27,10 @@ export class Consumer<T> extends RabbitmqChannel {
           const messageContent = message.content.toString();
           const body = JSON.parse(messageContent) as T;
           await callback(body);
-          this.channel.ack(message);
         } catch (err) {
           getLogger().error(err);
+        } finally {
+          message && this.channel.ack(message);
         }
       },
       { noAck: false },
