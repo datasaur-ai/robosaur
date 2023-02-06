@@ -1,5 +1,7 @@
 FROM node:16.18-alpine3.16
 
+RUN apk add --update bind-tools
+
 WORKDIR /home/robosaur
 RUN mkdir -p ./logs && mkdir -p ./config && mkdir -p ./state
 COPY package*.json ./
