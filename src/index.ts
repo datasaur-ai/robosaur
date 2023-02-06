@@ -14,6 +14,7 @@ import { handleUpdateCustomAPI } from './handlers/update-custom-api.handler';
 import { handleUpdateFileTransformer } from './handlers/update-file-transformer.handler';
 import { getLogger } from './logger';
 import { healthCheck } from './handlers/health-check.handler';
+import { handleStartProducer } from './handlers/start-producer.handler';
 
 const program = new Command();
 
@@ -21,6 +22,7 @@ program.name(packageJson.name).version(packageJson.version);
 
 program.command('test <configFile>').action(handleTest);
 
+program.command('start-producer <configFile>').description('start OCR producer').action(handleStartProducer);
 program.command('start-consumer <configFile>').description('start OCR consumer').action(handleStartConsumer);
 
 program

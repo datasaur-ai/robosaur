@@ -5,16 +5,37 @@
       - ./robosaur.env
     environment:
       - TEAM_ID=${NAME}
+      - COMMAND_NAME=start-producer
     ports:
       - 6969
     volumes:
       - ./docker-config:/home/robosaur/config
-      - ./docker-state-${NAME}:/home/robosaur/sample/rex
-      - ./docker-logs-${NAME}:/home/robosaur/logs
-      - ./docker-export-${NAME}:/home/robosaur/sample/rex/export
+      - ./docker-logs-${NAME}/producers:/home/robosaur/logs
     healthcheck:
-      test: ['CMD', 'npm', 'start', 'health-check']
+      test: ["CMD", "wget", "http://localhost:3000/health", "-O", "-"]
       interval: 30s
-      timeout: 30s
+      timeout: 20s
       retries: 5
       start_period: 30s
+  consumer-${NAME}:
+    build:
+      context: .
+      dockerfile: robosaur.Dockerfile
+    deploy:
+      mode: replicated
+      replicas: 3
+    volumes:
+      - ./sample/rex/config_rex.json:/home/robosaur/config/config.json
+      - ./sample/rex/logs-${NAME}/consumers:/home/robosaur/logs
+    extra_hosts:
+      - 'host.docker.internal:172.17.0.1'
+    environment:
+      - TEAM_ID=${NAME}
+      COMMAND_NAME: start-consumer
+    healthcheck:
+      test: ["CMD", "wget", "http://localhost:3000/health", "-O", "-"]
+      interval: 30s
+      timeout: 20s
+      retries: 5
+      start_period: 30s
+    restart: always
