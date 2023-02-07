@@ -4,3 +4,9 @@ networks:
     external:
       name: ${DOCKER_NETWORK_NAME}
 services:
+  rabbitmq:
+    image: rabbitmq:3.11
+    volumes:
+      - ./rabbitmqdata:/var/lib/rabbitmq
+    ports:
+      - 5672:5672
