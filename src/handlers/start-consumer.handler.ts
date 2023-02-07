@@ -2,6 +2,7 @@ import { setConfigByJSONFile } from '../config/config';
 import { getDatabaseValidators } from '../config/schema/validator';
 import { initDatabase } from '../database';
 import { HEALTH_STATUS } from '../datasaur/rex/interface';
+import { orchestrateJob } from '../datasaur/rex/orchestrate-job';
 import { startConsumer } from '../datasaur/start-consumer';
 import { createConsumerHandlerContext, ProcessJob } from '../execution';
 import { createHealthcheckServer } from '../healthcheck-server/create-healthcheck-server';
@@ -21,13 +22,8 @@ const startUp = (setHealthStatus: (status: HEALTH_STATUS) => void) => {
   });
 };
 
-export const handleStartConsumer = createConsumerHandlerContext(
-  'start-consumer',
-  _handleStartConsumer,
-  async (...args) => {
-    getLogger().info('orchestrate-job,' + JSON.stringify(args));
-  },
-);
+export const handleStartConsumer = createConsumerHandlerContext('start-consumer', _handleStartConsumer, orchestrateJob);
+
 // TODO: deduplicate
 export async function _handleStartConsumer(processJob: ProcessJob<unknown[]>, configFile: string) {
   const teamId = process.env.TEAM_ID;
