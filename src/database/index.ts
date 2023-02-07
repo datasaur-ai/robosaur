@@ -1,5 +1,6 @@
 import { DataSource } from 'typeorm';
 import { getConfig } from '../config/config';
+import { getLogger } from '../logger';
 
 let databaseSource: DataSource;
 
@@ -24,14 +25,15 @@ export const initDatabase = () => {
 
 const getDataSource = async () => {
   if (!databaseSource.isInitialized) {
-    await databaseSource
-      .initialize()
-      .then(() => {
-        console.log(`MongoDB has been initialized`);
-      })
-      .catch((err) => {
-        console.error(`MongoDB initialization error`, err);
-      });
+    try {
+      await databaseSource.initialize();
+      getLogger().info(`MongoDB has been initialized`);
+      return databaseSource;
+    } catch (err) {
+      getLogger().error(`MongoDB initialization error`, err);
+      // rethrow
+      throw err;
+    }
   }
   return databaseSource;
 };

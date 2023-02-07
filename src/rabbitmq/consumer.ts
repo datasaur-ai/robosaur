@@ -15,6 +15,7 @@ export class Consumer<T> extends RabbitmqChannel {
   public static async create<T>(host: string, queueName: string, consumerId: string): Promise<Consumer<T>> {
     const consumer = new Consumer<T>(await connect(host), queueName, consumerId);
     await consumer.initiateChannel(1);
+    consumer.setupOnConnectionClose();
     return consumer;
   }
 
@@ -35,5 +36,12 @@ export class Consumer<T> extends RabbitmqChannel {
       },
       { noAck: false },
     );
+  }
+
+  private setupOnConnectionClose() {
+    this.channel.connection.on('close', (error) => {
+      getLogger().error(error?.message ?? error);
+      process.exit(1);
+    });
   }
 }
