@@ -57,23 +57,22 @@ export function createConsumerHandlerContext<T extends unknown[], U extends unkn
   consumerFn: ConsumerFn<T, U>,
   onJob: HandlerContextCallback<U>,
 ) {
-  getLoggerService().registerResolver(() => {
-    const traceId = getExecutionValue('trace-id');
-    return {
-      'trace-id': traceId,
-      command: commandName,
-    };
-  });
-
-  const wrappedProcessJob = (traceId: string, ...args: U) => {
-    return executionNamespace.runAndReturn(async () => {
-      preventNewTraceIdGeneration();
-      executionNamespace.set('trace-id', traceId);
-      return onJob(...args);
-    });
-  };
-
   return async (...args: T) => {
+    getLoggerService().registerResolver(() => {
+      const traceId = getExecutionValue('trace-id');
+      return {
+        'trace-id': traceId,
+        command: commandName,
+      };
+    });
+
+    const wrappedProcessJob = (traceId: string, ...args: U) => {
+      return executionNamespace.runAndReturn(async () => {
+        preventNewTraceIdGeneration();
+        executionNamespace.set('trace-id', traceId);
+        return onJob(...args);
+      });
+    };
     const result = await Promise.resolve(consumerFn(wrappedProcessJob, ...args));
     getLoggerService().popResolver();
     return result;
