@@ -3,9 +3,9 @@ import { RabbitmqChannel } from './rabbitmq-channel';
 
 export class Producer extends RabbitmqChannel {
   public static async create(host: string, queueName: string): Promise<Producer> {
-    const consumer = new Producer(await connect(host), queueName);
-    await consumer.initiateChannel();
-    return consumer;
+    const producer = new Producer(await connect(host), queueName);
+    await producer.initiateChannel();
+    return producer;
   }
 
   public sendMessage<T = any>(data: T): void {
