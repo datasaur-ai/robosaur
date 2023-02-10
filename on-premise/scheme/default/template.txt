@@ -22,6 +22,8 @@
     deploy:
       mode: replicated
       replicas: 3
+    env_file:
+      - ./robosaur.env
     volumes:
       - ./docker-config:/home/robosaur/config
       - ./docker-logs-${NAME}/consumers:/home/robosaur/logs
