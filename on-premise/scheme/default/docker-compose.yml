@@ -8,7 +8,7 @@ volumes:
     name: datasaur_rabbitmq_data
 services:
   rabbitmq:
-    image: rabbitmq:3.11
+    image: rabbitmq:3.11-management
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
     ports:
