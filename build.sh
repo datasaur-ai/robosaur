@@ -22,6 +22,10 @@ docker-compose -f docker-compose.build.yml build
 echo "saving robosaur image"
 
 docker save datasaur/robosaur:${dockerTag} | gzip > build/datasaur-robosaur.tar.gz
+
+docker pull rabbitmq:3.11-management
+docker save rabbitmq:3.11-management | gzip > build/rabbitmq.tar.gz
+
 rm -rf datasaur-robosaur-${dockerTag}
 mv build datasaur-robosaur-${dockerTag}
 echo "creating artifact"

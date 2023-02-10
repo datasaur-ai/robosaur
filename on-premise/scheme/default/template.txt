@@ -1,6 +1,6 @@
-  robosaur-${NAME}:
+  producer-${NAME}:
     image: datasaur/robosaur:${DOCKER_TAG}
-    container_name: datasaur-robosaur-${NAME}
+    container_name: datasaur-producer-${NAME}
     env_file:
       - ./robosaur.env
     environment:
@@ -18,9 +18,8 @@
       retries: 5
       start_period: 30s
   consumer-${NAME}:
-    build:
-      context: .
-      dockerfile: robosaur.Dockerfile
+    image: datasaur/robosaur:${DOCKER_TAG}
+    container_name: datasaur-consumer-${NAME}
     deploy:
       mode: replicated
       replicas: 3
@@ -31,7 +30,7 @@
       - 'host.docker.internal:172.17.0.1'
     environment:
       - TEAM_ID=${NAME}
-      COMMAND_NAME: start-consumer
+      - COMMAND_NAME=start-consumer
     healthcheck:
       test: ["CMD", "wget", "http://localhost:3000/health", "-O", "-"]
       interval: 30s
