@@ -9,7 +9,6 @@ import { checkRecordStatus } from './check-record-status';
 import { cleanUpTempFolders } from './cleanUpTempFolders';
 import { ensureNoRequeue } from './ensure-no-requeue';
 import { ExportProjectError } from './errors/export-project-error';
-import { HandledError } from './errors/handled-error';
 import { OcrError } from './errors/ocr-error';
 import { ProjectCreationError } from './errors/project-creation-error';
 import { handleProjectCreationInputFiles } from './handle-project-creation-input-files';
@@ -22,20 +21,20 @@ export const orchestrateJob: HandlerContextCallback<[number, any, string]> = asy
   configFile: string,
 ) => {
   getLogger().info(`Working on Team ID: ${teamId}`);
+
   const cleanUp = async (error: Error) => {
     // check handled error
-    if (error instanceof HandledError) {
-      getLogger().info('error already handled by another process');
-    } else {
-      let status: OCR_STATUS;
-      if (error instanceof OcrError) {
-        status = error.status;
-      } else {
-        status = OCR_STATUS.UNKNOWN_ERROR;
-      }
 
-      await abortJob(teamId, saveKeepingId, `${status}`, error);
+    let status: OCR_STATUS;
+    if (error instanceof OcrError) {
+      status = error.status;
+    } else {
+      status = OCR_STATUS.UNKNOWN_ERROR;
     }
+
+    await abortJob(teamId, saveKeepingId, `${status}`, error);
+    getLogger().info(error.message, { stack: error.stack });
+
     cleanUpTempFolders();
   };
 

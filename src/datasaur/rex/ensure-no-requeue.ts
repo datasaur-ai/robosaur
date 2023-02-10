@@ -6,15 +6,17 @@ import { OCR_STATUS } from './interface';
 const MAX_TIMEOUT_IN_MINUTES = Number(process.env.MAX_TIMEOUT_IN_MINUTES ?? 30);
 
 export const ensureNoRequeue = async (saveKeepingId: number) => {
+  getLogger().info('Ensuring no re-queue');
   const saveKeepingRepo = await getTeamRepository();
   const saveKeepingDocument = await saveKeepingRepo.findOne({ where: { _id: saveKeepingId } });
 
   if (saveKeepingDocument) {
-    const status: OCR_STATUS = saveKeepingDocument.ocr_status;
+    const { ocr_status, start_ocr } = saveKeepingDocument;
+    getLogger().info(`checking SaveKeeping document`, { status: ocr_status, start: start_ocr });
+    const status: OCR_STATUS = ocr_status;
+    const timeInMinutes = _countTime(start_ocr);
 
-    const timeInMinutes = _countTime(saveKeepingDocument.start_ocr);
-
-    if (status !== OCR_STATUS.IN_QUEUE && timeInMinutes >= MAX_TIMEOUT_IN_MINUTES) {
+    if (status !== OCR_STATUS.IN_QUEUE && timeInMinutes && timeInMinutes >= MAX_TIMEOUT_IN_MINUTES) {
       getLogger().warn('found a timed out process, removing the process...');
       getLogger().warn('The SaveKeeping document is re-enqueued, aborting job...');
       throw new OcrError('document is re-queueing, marked as timeout', OCR_STATUS.TIMEOUT);
@@ -26,6 +28,7 @@ export const ensureNoRequeue = async (saveKeepingId: number) => {
 };
 
 const _countTime = (recordTimestamp: string) => {
+  if (!recordTimestamp) return;
   const recordTime = parseDate(recordTimestamp);
   const timeNow = new Date();
 

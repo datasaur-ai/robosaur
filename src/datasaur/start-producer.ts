@@ -5,7 +5,7 @@ import { random } from '../utils/random';
 import { sleep } from '../utils/sleep';
 import { moveDocumentToProcess } from './rex/dequeue-document';
 
-export const startProducer = async (processJob: ProcessJob<[number, any, Producer]>, teamId: number) => {
+export const startProducer = async (processJob: ProcessJob<[number, number, Producer]>, teamId: number) => {
   const queueHost = process.env.QUEUE_HOST ?? 'amqp://rabbitmq:5672';
   const producer = await Producer.create(queueHost, `process_record_${teamId}`);
   while (true) {

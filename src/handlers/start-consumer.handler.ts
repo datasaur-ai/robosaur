@@ -7,9 +7,13 @@ import { getLogger } from '../logger';
 import { getTeamId } from './producer-consumer/get-team-id';
 import { initiateProcess } from './producer-consumer/initiate-process';
 
-export const handleStartConsumer = createConsumerHandlerContext('start-consumer', _handleStartConsumer, orchestrateJob);
+export const handleStartConsumer = createConsumerHandlerContext<[string], [number, any, string]>(
+  'start-consumer',
+  _handleStartConsumer,
+  orchestrateJob,
+);
 
-export async function _handleStartConsumer(processJob: ProcessJob<unknown[]>, configFile: string) {
+export async function _handleStartConsumer(processJob: ProcessJob<[number, any, string]>, configFile: string) {
   const teamId = getTeamId();
   const { setHealthStatus, startApp: startHealthcheckServer } = await createHealthcheckServer(`consumer_${teamId}`);
   try {
