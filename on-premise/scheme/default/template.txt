@@ -23,8 +23,8 @@
       mode: replicated
       replicas: 3
     volumes:
-      - ./sample/rex/config_rex.json:/home/robosaur/config/config.json
-      - ./sample/rex/logs-${NAME}/consumers:/home/robosaur/logs
+      - ./docker-config:/home/robosaur/config
+      - ./docker-logs-${NAME}/consumers:/home/robosaur/logs
     extra_hosts:
       - 'host.docker.internal:172.17.0.1'
     environment:
