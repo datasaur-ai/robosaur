@@ -3,10 +3,13 @@ networks:
   default:
     external:
       name: ${DOCKER_NETWORK_NAME}
+volumes:
+  rabbitmq_data:
+    name: datasaur_rabbitmq_data
 services:
   rabbitmq:
     image: rabbitmq:3.11
     volumes:
-      - ./rabbitmqdata:/var/lib/rabbitmq
+      - rabbitmq_data:/var/lib/rabbitmq
     ports:
       - 5672:5672

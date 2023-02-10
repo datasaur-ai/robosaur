@@ -19,7 +19,6 @@
       start_period: 30s
   consumer-${NAME}:
     image: datasaur/robosaur:${DOCKER_TAG}
-    container_name: datasaur-consumer-${NAME}
     deploy:
       mode: replicated
       replicas: 3
