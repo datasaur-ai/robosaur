@@ -1,6 +1,5 @@
   producer-${NAME}:
     image: datasaur/robosaur:${DOCKER_TAG}
-    container_name: datasaur-producer-${NAME}
     env_file:
       - ./robosaur.env
     environment:
