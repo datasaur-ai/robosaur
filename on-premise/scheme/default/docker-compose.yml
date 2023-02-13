@@ -19,7 +19,6 @@ services:
       - '3100'
     volumes:
       - ./volumes/loki:/loki
-
   promtail:
     image: grafana/promtail:2.6.1
     volumes:
