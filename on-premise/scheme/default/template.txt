@@ -3,7 +3,7 @@
     deploy:
       resources:
         limits:
-          memory: 1000M
+          memory: 2000M
     env_file:
       - ./robosaur.env
     environment:
@@ -27,7 +27,7 @@
       replicas: 2
       resources:
         limits:
-          memory: 1000M
+          memory: 2000M
     env_file:
       - ./robosaur.env
     volumes:
