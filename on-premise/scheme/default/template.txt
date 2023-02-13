@@ -1,5 +1,9 @@
   producer-${NAME}:
     image: datasaur/robosaur:${DOCKER_TAG}
+    deploy:
+      resources:
+        limits:
+          memory: 1000M
     env_file:
       - ./robosaur.env
     environment:
@@ -7,7 +11,6 @@
       - COMMAND_NAME=start-producer
     ports:
       - 6969
-    mem_limit: 1000M
     volumes:
       - ./docker-config:/home/robosaur/config
       - ./docker-logs-${NAME}/producers:/home/robosaur/logs
@@ -22,9 +25,11 @@
     deploy:
       mode: replicated
       replicas: 2
+      resources:
+        limits:
+          memory: 1000M
     env_file:
       - ./robosaur.env
-    mem_limit: 1000M
     volumes:
       - ./docker-config:/home/robosaur/config
       - ./docker-logs-${NAME}/consumers:/home/robosaur/logs
