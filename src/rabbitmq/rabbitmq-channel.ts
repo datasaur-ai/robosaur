@@ -1,4 +1,5 @@
 import { Connection, Channel } from 'amqplib/callback_api';
+import { getLogger } from '../logger';
 
 export abstract class RabbitmqChannel {
   protected channel: Channel;
@@ -20,5 +21,27 @@ export abstract class RabbitmqChannel {
     if (prefetch !== null && prefetch !== undefined) {
       this.channel.prefetch(prefetch);
     }
+  }
+
+  protected setupOnConnectionClose() {
+    this.channel.connection.on('error', (error) => {
+      getLogger().error('RabbitMQ Connection error', { cause: error });
+      process.exit(1);
+    });
+
+    this.channel.connection.on('close', (error) => {
+      getLogger().error('RabbitMQ Connection closed', { cause: error });
+      process.exit(1);
+    });
+
+    this.channel.on('error', (error) => {
+      getLogger().error('RabbitMQ Channel error', { cause: error });
+      process.exit(1);
+    });
+
+    this.channel.on('close', (error) => {
+      getLogger().error('RabbitMQ Channel closed', { cause: error });
+      process.exit(1);
+    });
   }
 }

@@ -38,26 +38,4 @@ export class Consumer<T> extends RabbitmqChannel {
       { noAck: false },
     );
   }
-
-  private setupOnConnectionClose() {
-    this.channel.connection.on('error', (error) => {
-      getLogger().error('RabbitMQ Connection error', { cause: error });
-      process.exit(1);
-    });
-
-    this.channel.connection.on('close', (error) => {
-      getLogger().error('RabbitMQ Connection closed', { cause: error });
-      process.exit(1);
-    });
-
-    this.channel.on('error', (error) => {
-      getLogger().error('RabbitMQ Channel error', { cause: error });
-      process.exit(1);
-    });
-
-    this.channel.on('close', (error) => {
-      getLogger().error('RabbitMQ Channel closed', { cause: error });
-      process.exit(1);
-    });
-  }
 }

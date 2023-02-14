@@ -16,12 +16,15 @@ export const handleStartConsumer = createConsumerHandlerContext<[string], [numbe
 export async function _handleStartConsumer(processJob: ProcessJob<[number, any, string]>, configFile: string) {
   const teamId = getTeamId();
   const { setHealthStatus, startApp: startHealthcheckServer } = await createHealthcheckServer(`consumer_${teamId}`);
+  let isError = false;
   try {
     await initiateProcess('Consumer', startHealthcheckServer, setHealthStatus, configFile);
     await startConsumer(processJob, Number.parseInt(teamId), configFile);
   } catch (e) {
     getLogger().error(e.stack);
+    isError = true;
   } finally {
     setHealthStatus(HEALTH_STATUS.STOPPED);
   }
+  process.exit(isError ? 1 : 0);
 }
