@@ -14,7 +14,7 @@ export const checkRecordStatus = async (id: number) => {
     throw new JobCanceledError(id);
   }
 
-  if (!saveKeeping || saveKeeping.ocr_status !== OCR_STATUS.IN_PROGRESS) {
+  if (saveKeeping.ocr_status !== OCR_STATUS.IN_PROGRESS) {
     if (isTimeout(saveKeeping.start_ocr!)) {
       throw new OcrError('document process is timeout', OCR_STATUS.TIMEOUT);
     }

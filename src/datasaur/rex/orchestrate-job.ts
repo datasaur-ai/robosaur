@@ -13,7 +13,7 @@ import { OcrError } from './errors/ocr-error';
 import { ProjectCreationError } from './errors/project-creation-error';
 import { handleProjectCreationInputFiles } from './handle-project-creation-input-files';
 import { OCR_STATUS } from './interface';
-import { updateSaveKeepingStatus } from './update-save-keeping-status';
+import { updateSaveKeepingStatusToInProgress } from './update-save-keeping-status-to-in-progress';
 
 export const orchestrateJob: HandlerContextCallback<[number, any, string]> = async (
   teamId: number,
@@ -47,7 +47,7 @@ export const orchestrateJob: HandlerContextCallback<[number, any, string]> = asy
     await ensureNoRequeue(saveKeepingId);
 
     getLogger().info(`Team ${teamId} Update Save Keeping status to IN_PROGRESS`);
-    const payload = (await updateSaveKeepingStatus(teamId, saveKeepingId)) as BasePayload;
+    const payload = (await updateSaveKeepingStatusToInProgress(saveKeepingId)) as BasePayload;
 
     getLogger().info(`Process Job Team ${teamId} and Save Keeping Id ${saveKeepingId}`);
 
