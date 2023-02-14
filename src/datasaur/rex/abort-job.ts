@@ -30,7 +30,7 @@ export const abortJob = async (teamId: number, id: number, message: string, erro
     getLogger().info(`Process record not found`);
   }
 
-  if (payload.ocr_status === OCR_STATUS.IN_PROGRESS) {
+  if (payload.ocr_status === OCR_STATUS.IN_PROGRESS || message === OCR_STATUS.READ) {
     getLogger().info(`Updating save keeping. Updating ocr_status to ${message}`, payload);
 
     await saveKeepingRepo.update(
