@@ -11,6 +11,9 @@ mkdir build
 
 cp -r scheme/default/* ./build
 
+mkdir -p ./build/volumes/loki
+mkdir -p ./build/volumes/grafana
+
 cp ./../sample/rex/config_rex.json ./build/docker-config/config.json
 
 export CI_REGISTRY=682361690817.dkr.ecr.us-east-1.amazonaws.com
@@ -25,6 +28,15 @@ docker save datasaur/robosaur:${dockerTag} | gzip > build/datasaur-robosaur.tar.
 
 docker pull rabbitmq:3.11-management
 docker save rabbitmq:3.11-management | gzip > build/rabbitmq.tar.gz
+
+docker pull grafana/loki:2.6.1
+docker save grafana/loki:2.6.1 | gzip > build/loki.tar.gz
+
+docker pull grafana/promtail:2.6.1
+docker save grafana/promtail:2.6.1 | gzip > build/promtail.tar.gz
+
+docker pull grafana/grafana:9.2.2
+docker save grafana/grafana:9.2.2 | gzip > build/grafana.tar.gz
 
 rm -rf datasaur-robosaur-${dockerTag}
 mv build datasaur-robosaur-${dockerTag}

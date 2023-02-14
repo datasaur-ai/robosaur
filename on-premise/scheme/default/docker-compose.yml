@@ -13,3 +13,22 @@ services:
       - rabbitmq_data:/var/lib/rabbitmq
     ports:
       - 5672:5672
+  loki:
+    image: grafana/loki:2.6.1
+    ports:
+      - '3100'
+    volumes:
+      - ./volumes/loki:/loki
+  promtail:
+    image: grafana/promtail:2.6.1
+    volumes:
+      - ./loki/promtail-config.yaml:/etc/promtail/config.yml
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /var/lib/docker/containers:/var/lib/docker/containers
+  grafana:
+    image: grafana/grafana:9.2.2
+    ports:
+      - '3002:3000'
+    volumes:
+      - ./volumes/grafana:/var/lib/grafana
+      - ./loki/grafana/provisioning/:/etc/grafana/provisioning/

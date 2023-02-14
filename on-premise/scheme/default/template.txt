@@ -1,6 +1,9 @@
   producer-${NAME}:
     image: datasaur/robosaur:${DOCKER_TAG}
-    container_name: datasaur-producer-${NAME}
+    deploy:
+      resources:
+        limits:
+          memory: 2000M
     env_file:
       - ./robosaur.env
     environment:
@@ -21,7 +24,10 @@
     image: datasaur/robosaur:${DOCKER_TAG}
     deploy:
       mode: replicated
-      replicas: 3
+      replicas: 2
+      resources:
+        limits:
+          memory: 2000M
     env_file:
       - ./robosaur.env
     volumes:
