@@ -39,6 +39,7 @@ export async function sendRequestToEndpoint(teamId: number, id: number) {
   const DELAY_RETRY = Number(process.env.DELAY_RETRY) || 1000;
   while (counterRetry < LIMIT_RETRY) {
     try {
+      counterRetry += 1;
       getLogger().info(`sending request to ${exportEndpoint}...`, {
         payload: base64Encode(JSON.stringify(payload)),
       });
@@ -69,7 +70,6 @@ export async function sendRequestToEndpoint(teamId: number, id: number) {
           error: JSON.stringify(error),
           message: error.message,
         });
-        counterRetry += 1;
         sleep(DELAY_RETRY);
       }
     }
