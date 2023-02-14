@@ -29,6 +29,7 @@ export class Consumer<T> extends RabbitmqChannel {
           const body = JSON.parse(messageContent) as T;
           await callback(body);
         } catch (err) {
+          getLogger().error('caught error in consumer');
           getLogger().error(err);
         } finally {
           message && this.channel.ack(message);
@@ -39,8 +40,23 @@ export class Consumer<T> extends RabbitmqChannel {
   }
 
   private setupOnConnectionClose() {
+    this.channel.connection.on('error', (error) => {
+      getLogger().error('RabbitMQ Connection error', { cause: error });
+      process.exit(1);
+    });
+
     this.channel.connection.on('close', (error) => {
-      getLogger().error(error?.message ?? error);
+      getLogger().error('RabbitMQ Connection closed', { cause: error });
+      process.exit(1);
+    });
+
+    this.channel.on('error', (error) => {
+      getLogger().error('RabbitMQ Channel error', { cause: error });
+      process.exit(1);
+    });
+
+    this.channel.on('close', (error) => {
+      getLogger().error('RabbitMQ Channel closed', { cause: error });
       process.exit(1);
     });
   }

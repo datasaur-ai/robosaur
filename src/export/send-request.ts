@@ -1,6 +1,5 @@
 import axios from 'axios';
 import { getTeamRepository } from '../database/repository';
-import { SendGatewayError } from '../datasaur/rex/errors/send-gateway-error';
 import { OCR_STATUS, PAYLOAD_MESSAGE, PAYLOAD_STATUS } from '../datasaur/rex/interface';
 import { getLogger } from '../logger';
 import { sleep } from '../utils/sleep';
@@ -33,7 +32,7 @@ export async function sendRequestToEndpoint(teamId: number, id: number) {
     team_id: teamId,
   };
 
-  getLogger().info(`Payload to be sent`, payload);
+  getLogger().info(`Payload to be sent`, { payload });
 
   let counterRetry = 0;
   const LIMIT_RETRY = Number(process.env.LIMIT_RETRY);

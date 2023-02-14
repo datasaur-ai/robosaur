@@ -7,7 +7,7 @@ services:
     ports:
       - 6969
     volumes:
-      - ./sample/rex/config_rex.json:/home/robosaur/config/config.json
+      - ./sample/rex/config_rex_gcp.json:/home/robosaur/config/config.json
       - ./sample/rex/logs/producer:/home/robosaur/logs
     extra_hosts:
       - 'host.docker.internal:172.17.0.1'
@@ -25,9 +25,9 @@ services:
       dockerfile: robosaur.Dockerfile
     deploy:
       mode: replicated
-      replicas: 2
+      replicas: 1
     volumes:
-      - ./sample/rex/config_rex.json:/home/robosaur/config/config.json
+      - ./sample/rex/config_rex_gcp.json:/home/robosaur/config/config.json
       - ./sample/rex/logs/consumers:/home/robosaur/logs
     extra_hosts:
       - 'host.docker.internal:172.17.0.1'
@@ -43,6 +43,7 @@ services:
     image: rabbitmq:3.11-management
     volumes:
       - ./rabbitmqdata:/var/lib/rabbitmq
+      - ./rabbit-configuration/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf
     ports:
       - 5672:5672
       - 15672:15672
