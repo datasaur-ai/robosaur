@@ -6,7 +6,7 @@
   "scripts": {
     "test:ci": "jest --runInBand --ci",
     "test": "jest",
-    "start": "ts-node src/index.ts",
+    "start": "ts-node --transpile-only src/index.ts",
     "codegen": "graphql-codegen --config codegen.yml"
   },
   "engines": {
