@@ -13,7 +13,6 @@ services:
       restart_policy:
         condition: on-failure
         max_attempts: 3
-        window: 120s
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
     ports:
@@ -33,7 +32,6 @@ services:
     deploy:
       restart_policy:
         condition: any
-        window: 120s
   promtail:
     image: grafana/promtail:2.6.1
     volumes:
@@ -43,7 +41,6 @@ services:
     deploy:
       restart_policy:
         condition: any
-        window: 120s
   grafana:
     image: grafana/grafana:9.2.2
     ports:
@@ -60,4 +57,3 @@ services:
     deploy:
       restart_policy:
         condition: any
-        window: 120s

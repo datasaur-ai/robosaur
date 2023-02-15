@@ -7,7 +7,6 @@
       restart_policy:
         condition: on-failure
         max_attempts: 5
-        window: 120s
     env_file:
       - ./robosaur.env
     environment:
@@ -35,7 +34,6 @@
       restart_policy:
         condition: on-failure
         max_attempts: 5
-        window: 120s
     env_file:
       - ./robosaur.env
     volumes:
