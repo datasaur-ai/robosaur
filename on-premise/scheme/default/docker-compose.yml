@@ -3,4 +3,57 @@ networks:
   default:
     external:
       name: ${DOCKER_NETWORK_NAME}
+volumes:
+  rabbitmq_data:
+    name: datasaur_rabbitmq_data
 services:
+  rabbitmq:
+    image: rabbitmq:3.11-management
+    deploy:
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    ports:
+      - 5672:5672
+      - 15672:15672
+    healthcheck:
+      test: rabbitmq-diagnostics -q ping
+      interval: 30s
+      timeout: 30s
+      retries: 3
+  loki:
+    image: grafana/loki:2.6.1
+    ports:
+      - '3100'
+    volumes:
+      - ./volumes/loki:/loki
+    deploy:
+      restart_policy:
+        condition: any
+  promtail:
+    image: grafana/promtail:2.6.1
+    volumes:
+      - ./loki/promtail-config.yaml:/etc/promtail/config.yml
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /var/lib/docker/containers:/var/lib/docker/containers
+    deploy:
+      restart_policy:
+        condition: any
+  grafana:
+    image: grafana/grafana:9.2.2
+    ports:
+      - '3002:3000'
+    env_file:
+      - ./robosaur.env
+    environment:
+      - GF_SERVER_DOMAIN=${GRAFANA_DOMAIN}
+      - GF_SERVER_ROOT_URL=%(protocol)s://%(domain)s:%(http_port)s/grafana
+      - GF_SERVER_SERVE_FROM_SUB_PATH=true
+    volumes:
+      - ./volumes/grafana:/var/lib/grafana
+      - ./loki/grafana/provisioning/:/etc/grafana/provisioning/
+    deploy:
+      restart_policy:
+        condition: any

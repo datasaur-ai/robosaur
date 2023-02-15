@@ -19,31 +19,34 @@ export const abortJob = async (teamId: number, id: number, message: string, erro
       _id: id,
     },
   });
-  const recordRepo = await getRepository(ProcessRecordEntity);
 
+  const recordRepo = await getRepository(ProcessRecordEntity);
   const record = await recordRepo.findOneBy({ 'data.id': Number(id) });
 
   if (record) {
     getLogger().info(`Deleting record`, record);
-
     await recordRepo.delete(record);
   } else {
     getLogger().info(`Process record not found`);
   }
 
-  getLogger().info(`Updating save keeping. Updating ocr_status to ${message}`, payload);
+  if (payload.ocr_status === OCR_STATUS.IN_PROGRESS || message === OCR_STATUS.READ) {
+    getLogger().info(`Updating save keeping. Updating ocr_status to ${message}`, payload);
 
-  await saveKeepingRepo.update(
-    { _id: payload._id },
-    { ocr_status: message, end_ocr: message !== OCR_STATUS.UNKNOWN_ERROR ? formatDate(new Date()) : null },
-  );
+    await saveKeepingRepo.update(
+      { _id: payload._id },
+      { ocr_status: message, end_ocr: message !== OCR_STATUS.UNKNOWN_ERROR ? formatDate(new Date()) : null },
+    );
 
-  getLogger().info(`Updated save keeping`);
+    getLogger().info(`Updated save keeping`);
 
-  if (![OCR_STATUS.UNKNOWN_ERROR, OCR_STATUS.STOPPED].map((status) => status.toString()).includes(message)) {
-    // send any error except UNKNOWN_ERROR and STOPPED
-    getLogger().info(`Job ${payload._id} sending result back to gateway...`);
-    await sendRequestToEndpoint(teamId, payload._id);
+    if (![OCR_STATUS.UNKNOWN_ERROR, OCR_STATUS.STOPPED].map((status) => status.toString()).includes(message)) {
+      // send any error except UNKNOWN_ERROR and STOPPED
+      getLogger().info(`Job ${payload._id} sending result back to gateway...`);
+      await sendRequestToEndpoint(teamId, payload._id);
+    }
+  } else {
+    getLogger().info('Do not update status.');
   }
 
   if (error) {

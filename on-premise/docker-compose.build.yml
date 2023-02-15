@@ -4,4 +4,4 @@ services:
     image: datasaur/robosaur:${DOCKER_TAG}
     build:
       context: ./../
-      dockerfile: robosaur.Dockerfile    
+      dockerfile: robosaur.Dockerfile

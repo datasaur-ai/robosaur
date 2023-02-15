@@ -1,50 +1,30 @@
-import { setConfigByJSONFile } from '../config/config';
-import { getDatabaseValidators } from '../config/schema/validator';
-import { initDatabase } from '../database';
-import { HEALTH_STATUS, SI_TEAM_ID } from '../datasaur/rex/interface';
+import { HEALTH_STATUS } from '../datasaur/rex/interface';
 import { orchestrateJob } from '../datasaur/rex/orchestrate-job';
-import { updateHealthStatus } from '../datasaur/rex/update-health-status';
 import { startConsumer } from '../datasaur/start-consumer';
 import { createConsumerHandlerContext, ProcessJob } from '../execution';
+import { createHealthcheckServer } from '../healthcheck-server/create-healthcheck-server';
 import { getLogger } from '../logger';
+import { getTeamId } from './producer-consumer/get-team-id';
+import { initiateProcess } from './producer-consumer/initiate-process';
 
-const startUp = () => {
-  process.on('SIGINT', () => {
-    console.log('Process Interrupted');
-    updateHealthStatus(HEALTH_STATUS.STOPPED);
-    process.exit(0);
-  });
+export const handleStartConsumer = createConsumerHandlerContext<[string], [number, any, string]>(
+  'start-consumer',
+  _handleStartConsumer,
+  orchestrateJob,
+);
 
-  process.on('SIGTERM', () => {
-    console.log('Killing Process');
-    updateHealthStatus(HEALTH_STATUS.STOPPED);
-    process.exit(0);
-  });
-};
-
-export const handleStartConsumer = createConsumerHandlerContext('start-consumer', _handleStartConsumer, orchestrateJob);
-
-export async function _handleStartConsumer(processJob: ProcessJob<unknown[]>, configFile: string) {
+export async function _handleStartConsumer(processJob: ProcessJob<[number, any, string]>, configFile: string) {
+  const teamId = getTeamId();
+  const { setHealthStatus, startApp: startHealthcheckServer } = await createHealthcheckServer(`consumer_${teamId}`);
+  let isError = false;
   try {
-    startUp();
-    updateHealthStatus(HEALTH_STATUS.INITIAL);
-
-    getLogger().info('Begin running consumer', { configFile });
-    setConfigByJSONFile(configFile, getDatabaseValidators());
-    initDatabase();
-
-    updateHealthStatus(HEALTH_STATUS.READY);
-
-    const teamId = process.env.TEAM_ID;
-    if (!teamId) {
-      getLogger().error('Team Id not found in environment variables');
-      return;
-    }
-
-    await startConsumer(processJob, Number.parseInt(teamId));
+    await initiateProcess('Consumer', startHealthcheckServer, setHealthStatus, configFile);
+    await startConsumer(processJob, Number.parseInt(teamId), configFile);
   } catch (e) {
-    updateHealthStatus(HEALTH_STATUS.STOPPED);
+    getLogger().error(e.stack);
+    isError = true;
   } finally {
-    updateHealthStatus(HEALTH_STATUS.STOPPED);
+    setHealthStatus(HEALTH_STATUS.STOPPED);
   }
+  process.exit(isError ? 1 : 0);
 }

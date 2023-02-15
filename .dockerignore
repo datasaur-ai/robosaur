@@ -12,3 +12,4 @@ on-premise/
 .prettierrc.json
 build.sh
 robosaur.Dockerfile
+rabbitmqdata

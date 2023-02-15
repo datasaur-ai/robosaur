@@ -1,10 +1,9 @@
+import { getTeamRepository } from '../../database/repository';
 import { formatDate } from '../utils/format-date';
 import { OCR_STATUS } from './interface';
-import { getTeamRepository } from '../../database/repository';
 
-export const updateSaveKeepingStatus = async (teamId: number, id: number) => {
+export const updateSaveKeepingStatusToInProgress = async (id: number) => {
   const currentTime = formatDate(new Date());
-
   const saveKeepingRepo = await getTeamRepository();
 
   const saveKeeping = await saveKeepingRepo.findOne({

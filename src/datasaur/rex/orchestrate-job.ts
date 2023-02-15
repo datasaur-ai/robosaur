@@ -1,3 +1,5 @@
+import { BasePayload } from '../../database/entities/base-payload.entity';
+import { HandlerContextCallback } from '../../execution';
 import { saveExportResultsToDatabase } from '../../export/save-to-database';
 import { handleCreateProjects } from '../../handlers/create-projects.handler';
 import { handleExport } from '../../handlers/rex-export.handler';
@@ -5,23 +7,34 @@ import { getLogger } from '../../logger';
 import { abortJob } from './abort-job';
 import { checkRecordStatus } from './check-record-status';
 import { cleanUpTempFolders } from './cleanUpTempFolders';
+import { ensureNoRequeue } from './ensure-no-requeue';
 import { ExportProjectError } from './errors/export-project-error';
 import { OcrError } from './errors/ocr-error';
 import { ProjectCreationError } from './errors/project-creation-error';
 import { handleProjectCreationInputFiles } from './handle-project-creation-input-files';
 import { OCR_STATUS } from './interface';
-import { BasePayload } from '../../database/entities/base-payload.entity';
+import { updateSaveKeepingStatusToInProgress } from './update-save-keeping-status-to-in-progress';
 
-export const orchestrateJob = async (teamId: number, payload: BasePayload, configFile: string) => {
+export const orchestrateJob: HandlerContextCallback<[number, any, string]> = async (
+  teamId: number,
+  saveKeepingId: number,
+  configFile: string,
+) => {
   getLogger().info(`Working on Team ID: ${teamId}`);
+
   const cleanUp = async (error: Error) => {
+    // check handled error
+
     let status: OCR_STATUS;
     if (error instanceof OcrError) {
       status = error.status;
     } else {
       status = OCR_STATUS.UNKNOWN_ERROR;
     }
-    await abortJob(teamId, payload._id, `${status}`, error);
+
+    await abortJob(teamId, saveKeepingId, `${status}`, error);
+    getLogger().info(error.message, { stack: error.stack });
+
     cleanUpTempFolders();
   };
 
@@ -31,14 +44,21 @@ export const orchestrateJob = async (teamId: number, payload: BasePayload, confi
   };
 
   try {
-    getLogger().info(`Job ${payload._id} started`);
+    await ensureNoRequeue(saveKeepingId);
 
-    await checkRecordStatus(payload._id);
+    getLogger().info(`Team ${teamId} Update Save Keeping status to IN_PROGRESS`);
+    const payload = (await updateSaveKeepingStatusToInProgress(saveKeepingId)) as BasePayload;
 
-    getLogger().info(`Job ${payload._id} cleaning temporary folder`);
+    getLogger().info(`Process Job Team ${teamId} and Save Keeping Id ${saveKeepingId}`);
+
+    getLogger().info(`Job ${saveKeepingId} started`);
+
+    await checkRecordStatus(saveKeepingId);
+
+    getLogger().info(`Job ${saveKeepingId} cleaning temporary folder`);
     cleanUpTempFolders();
 
-    getLogger().info(`Job ${payload._id} prepare input files`);
+    getLogger().info(`Job ${saveKeepingId} prepare input files`);
     // Call project creation input handler
     try {
       await handleProjectCreationInputFiles(payload);
@@ -47,8 +67,8 @@ export const orchestrateJob = async (teamId: number, payload: BasePayload, confi
       return;
     }
 
-    await checkRecordStatus(payload._id);
-    getLogger().info(`Job ${payload._id} creating projects`);
+    await checkRecordStatus(saveKeepingId);
+    getLogger().info(`Job ${saveKeepingId} creating projects`);
     // Run create-projects command and trigger ML-Assisted Labeling
     try {
       await handleCreateProjects(configFile, { dryRun: false, usePcw: true, withoutPcw: false }, errorCallback);
@@ -59,8 +79,8 @@ export const orchestrateJob = async (teamId: number, payload: BasePayload, confi
       return;
     }
 
-    await checkRecordStatus(payload._id);
-    getLogger().info(`Job ${payload._id} exporting projects`);
+    await checkRecordStatus(saveKeepingId);
+    getLogger().info(`Job ${saveKeepingId} exporting projects`);
     // Call project export
     try {
       await handleExport(configFile, payload, errorCallback);
@@ -71,17 +91,19 @@ export const orchestrateJob = async (teamId: number, payload: BasePayload, confi
       return;
     }
 
+    await checkRecordStatus(saveKeepingId);
+
     try {
-      getLogger().info(`Job ${payload._id} saving result to database...`);
-      await saveExportResultsToDatabase(teamId, payload._id);
+      getLogger().info(`Job ${saveKeepingId} saving result to database...`);
+      await saveExportResultsToDatabase(teamId, saveKeepingId);
     } catch (e) {
       await cleanUp(e);
       return;
     }
 
-    getLogger().info(`Job ${payload._id} job finished. Cleaning up job`);
+    getLogger().info(`Job ${saveKeepingId} job finished. Cleaning up job`);
 
-    await abortJob(teamId, payload._id, OCR_STATUS.READ);
+    await abortJob(teamId, saveKeepingId, OCR_STATUS.READ);
     cleanUpTempFolders();
   } catch (e) {
     await cleanUp(e);

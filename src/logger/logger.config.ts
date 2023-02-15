@@ -5,7 +5,7 @@ import 'winston-daily-rotate-file';
 const MAXIMUM_LOGFILE_SIZE_BYTES = Number(process.env.MAXIMUM_LOGFILE_SIZE_BYTES ?? 10_000_000);
 const MAXIMUM_LOGFILE_COUNT = Number(process.env.MAXIMUM_LOGFILE_COUNT ?? 5);
 
-const DAILY_ROTATE_FILENAME = process.env.DAILY_ROTATE_FILENAME ?? 'winston-%DATE%.log';
+const DAILY_ROTATE_FILENAME = process.env.DAILY_ROTATE_FILENAME ?? 'robosaur-%DATE%.log';
 const DAILY_ROTATE_DATE_PATTERN = process.env.DAILY_ROTATE_DATE_PATTERN ?? 'YYYY-MM-DD';
 
 export const getConfigFromEnvironment = () => {
@@ -18,7 +18,7 @@ const defaultDailyRotateTransport = new transports.DailyRotateFile({
   datePattern: DAILY_ROTATE_DATE_PATTERN,
   maxSize: MAXIMUM_LOGFILE_SIZE_BYTES,
   maxFiles: MAXIMUM_LOGFILE_COUNT,
-  dirname: resolve(process.cwd(), 'logs'),
+  dirname: resolve(process.cwd(), `logs/${process.env.APP_SERVICE}_${process.env.APP_INDEX}`),
 });
 
 const defaultConsoleTransport = new transports.Console();
