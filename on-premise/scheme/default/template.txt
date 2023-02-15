@@ -4,6 +4,9 @@
       resources:
         limits:
           memory: 2000M
+      restart_policy:
+        condition: on-failure
+        max_attempts: 5
     env_file:
       - ./robosaur.env
     environment:
@@ -28,6 +31,9 @@
       resources:
         limits:
           memory: 2000M
+      restart_policy:
+        condition: on-failure
+        max_attempts: 5
     env_file:
       - ./robosaur.env
     volumes:
@@ -44,4 +50,3 @@
       timeout: 20s
       retries: 5
       start_period: 30s
-    restart: always
