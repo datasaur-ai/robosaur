@@ -51,8 +51,10 @@ services:
     image: grafana/grafana:9.2.2
     ports:
       - '3002:3000'
+    env_file:
+      - ./robosaur.env
     environment:
-      - GF_SERVER_DOMAIN=${DOMAIN}
+      - GF_SERVER_DOMAIN=${GRAFANA_DOMAIN}
       - GF_SERVER_ROOT_URL=%(protocol)s://%(domain)s:%(http_port)s/grafana
       - GF_SERVER_SERVE_FROM_SUB_PATH=true
     volumes:
