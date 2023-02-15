@@ -1,9 +1,8 @@
 import { getTeamRepository } from '../../database/repository';
 import { getLogger } from '../../logger';
-import { parseDate } from '../utils/parse-date';
 import { OcrError } from './errors/ocr-error';
 import { OCR_STATUS } from './interface';
-const MAX_TIMEOUT_IN_MINUTES = Number(process.env.MAX_TIMEOUT_IN_MINUTES ?? 30);
+import { isTimeout } from './is-timeout';
 
 export const ensureNoRequeue = async (saveKeepingId: number) => {
   getLogger().info('Ensuring no re-queue');
@@ -14,9 +13,8 @@ export const ensureNoRequeue = async (saveKeepingId: number) => {
     const { ocr_status, start_ocr } = saveKeepingDocument;
     getLogger().info(`checking SaveKeeping document`, { status: ocr_status, start: start_ocr });
     const status: OCR_STATUS = ocr_status;
-    const timeInMinutes = _countTime(start_ocr);
 
-    if (status !== OCR_STATUS.IN_QUEUE && timeInMinutes && timeInMinutes >= MAX_TIMEOUT_IN_MINUTES) {
+    if (status !== OCR_STATUS.IN_QUEUE && isTimeout(start_ocr)) {
       getLogger().warn('found a timed out process, removing the process...');
       getLogger().warn('The SaveKeeping document is re-enqueued, aborting job...');
       throw new OcrError('document is re-queueing, marked as timeout', OCR_STATUS.TIMEOUT);
@@ -25,13 +23,4 @@ export const ensureNoRequeue = async (saveKeepingId: number) => {
       throw new Error('This error is caused by previous consumer error');
     }
   }
-};
-
-const _countTime = (recordTimestamp: string) => {
-  if (!recordTimestamp) return;
-  const recordTime = parseDate(recordTimestamp);
-  const timeNow = new Date();
-
-  const td = timeNow.getTime() - recordTime.getTime();
-  return Math.floor(td / 1000 / 60);
 };

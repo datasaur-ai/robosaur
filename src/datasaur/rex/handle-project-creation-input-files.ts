@@ -1,17 +1,16 @@
+import { S3 } from 'aws-sdk';
 import axios, { AxiosResponse } from 'axios';
 import { createReadStream, createWriteStream, existsSync, mkdirSync, unlinkSync, writeFileSync } from 'fs';
-import * as minio from 'minio';
+import * as https from 'https';
 import * as stream from 'stream';
 import { promisify } from 'util';
 import { Logger } from 'winston';
+import { BasePayload } from '../../database/entities/base-payload.entity';
 import { getLogger } from '../../logger';
+import { AwsS3StorageClient, EXPIRED_IN_SECONDS } from '../../utils/object-storage/aws-s3-storage';
 import { DownloadFileError } from './errors/download-file-error';
 import { NoSIError } from './errors/no-si-error';
 import { RecognizeDocumentError } from './errors/recognize-document-error';
-import * as https from 'https';
-import { AwsS3StorageClient, EXPIRED_IN_SECONDS } from '../../utils/object-storage/aws-s3-storage';
-import { S3 } from 'aws-sdk';
-import { BasePayload } from '../../database/entities/base-payload.entity';
 
 interface DocumentRecognitionResponseData {
   orientation_preds: number[];

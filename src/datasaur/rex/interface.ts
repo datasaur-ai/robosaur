@@ -31,6 +31,8 @@ export const PAYLOAD_MESSAGE = {
     [OCR_STATUS.EXPORT_PROJECT_ERROR]: 'File Transformer Failed to Export',
     [OCR_STATUS.POST_PROCESS_ERROR]: 'Post Processing Failed to process File Transformer values',
     [OCR_STATUS.NO_SI_ERROR]: 'Document type is not recognized by classifier ',
+    [OCR_STATUS.TIMEOUT]: 'Worker timeout on SURAT-INSTRUKSI',
+    [OCR_STATUS.UNKNOWN_ERROR]: 'Unknown error on SURAT-INSTRUKSI',
   },
   indonesia: {
     [OCR_STATUS.READ]: 'OCR Berhasil',
@@ -42,6 +44,8 @@ export const PAYLOAD_MESSAGE = {
     [OCR_STATUS.EXPORT_PROJECT_ERROR]: 'File Transformer Gagal Melakukan Ekspor',
     [OCR_STATUS.POST_PROCESS_ERROR]: 'Post Processing Gagal memproses File Transformer values',
     [OCR_STATUS.NO_SI_ERROR]: 'Tipe dokumen tidak diketahui oleh classifier',
+    [OCR_STATUS.TIMEOUT]: 'Worker timeout pada SURAT-INSTRUKSI',
+    [OCR_STATUS.UNKNOWN_ERROR]: 'Error tidak dikenal pada SURAT-INSTRUKSI',
   },
 };
 

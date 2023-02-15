@@ -1,7 +1,9 @@
 import { TeamX } from '../../database/entities/teamPayloads/teamX.entity';
 import { getTeamRepository } from '../../database/repository';
 import { JobCanceledError } from './errors/job-canceled-error';
+import { OcrError } from './errors/ocr-error';
 import { OCR_STATUS } from './interface';
+import { isTimeout } from './is-timeout';
 
 export const checkRecordStatus = async (id: number) => {
   const saveKeepingRepo = await getTeamRepository<TeamX>();
@@ -10,5 +12,11 @@ export const checkRecordStatus = async (id: number) => {
 
   if (!saveKeeping || saveKeeping.ocr_status === OCR_STATUS.STOPPED) {
     throw new JobCanceledError(id);
+  }
+
+  if (saveKeeping.ocr_status !== OCR_STATUS.IN_PROGRESS) {
+    if (isTimeout(saveKeeping.start_ocr!)) {
+      throw new OcrError('document process is timeout', OCR_STATUS.TIMEOUT);
+    }
   }
 };

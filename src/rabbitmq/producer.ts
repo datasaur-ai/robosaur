@@ -5,6 +5,7 @@ export class Producer extends RabbitmqChannel {
   public static async create(host: string, queueName: string): Promise<Producer> {
     const producer = new Producer(await connect(host), queueName);
     await producer.initiateChannel();
+    producer.setupOnConnectionClose();
     return producer;
   }
 
