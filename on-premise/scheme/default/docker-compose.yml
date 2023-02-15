@@ -33,7 +33,7 @@ services:
       - ./volumes/loki:/loki
     deploy:
       restart_policy:
-        condition: always
+        condition: any
         delay: 5s
         window: 120s
   promtail:
@@ -44,7 +44,7 @@ services:
       - /var/lib/docker/containers:/var/lib/docker/containers
     deploy:
       restart_policy:
-        condition: always
+        condition: any
         delay: 5s
         window: 120s
   grafana:
@@ -60,6 +60,6 @@ services:
       - ./loki/grafana/provisioning/:/etc/grafana/provisioning/
     deploy:
       restart_policy:
-        condition: always
+        condition: any
         delay: 5s
         window: 120s
