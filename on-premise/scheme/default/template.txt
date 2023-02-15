@@ -6,7 +6,6 @@
           memory: 2000M
       restart_policy:
         condition: on-failure
-        delay: 15s
         max_attempts: 5
         window: 120s
     env_file:
@@ -35,7 +34,6 @@
           memory: 2000M
       restart_policy:
         condition: on-failure
-        delay: 15s
         max_attempts: 5
         window: 120s
     env_file:

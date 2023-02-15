@@ -12,7 +12,6 @@ services:
     deploy:
       restart_policy:
         condition: on-failure
-        delay: 5s
         max_attempts: 3
         window: 120s
     volumes:
@@ -34,7 +33,6 @@ services:
     deploy:
       restart_policy:
         condition: any
-        delay: 5s
         window: 120s
   promtail:
     image: grafana/promtail:2.6.1
@@ -45,7 +43,6 @@ services:
     deploy:
       restart_policy:
         condition: any
-        delay: 5s
         window: 120s
   grafana:
     image: grafana/grafana:9.2.2
@@ -63,5 +60,4 @@ services:
     deploy:
       restart_policy:
         condition: any
-        delay: 5s
         window: 120s
