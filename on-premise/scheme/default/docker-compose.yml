@@ -9,23 +9,44 @@ volumes:
 services:
   rabbitmq:
     image: rabbitmq:3.11-management
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
     ports:
       - 5672:5672
       - 15672:15672
+    healthcheck:
+      test: rabbitmq-diagnostics -q ping
+      interval: 30s
+      timeout: 30s
+      retries: 3
   loki:
     image: grafana/loki:2.6.1
     ports:
       - '3100'
     volumes:
       - ./volumes/loki:/loki
+    deploy:
+      restart_policy:
+        condition: always
+        delay: 5s
+        window: 120s
   promtail:
     image: grafana/promtail:2.6.1
     volumes:
       - ./loki/promtail-config.yaml:/etc/promtail/config.yml
       - /var/run/docker.sock:/var/run/docker.sock
       - /var/lib/docker/containers:/var/lib/docker/containers
+    deploy:
+      restart_policy:
+        condition: always
+        delay: 5s
+        window: 120s
   grafana:
     image: grafana/grafana:9.2.2
     ports:
@@ -37,3 +58,8 @@ services:
     volumes:
       - ./volumes/grafana:/var/lib/grafana
       - ./loki/grafana/provisioning/:/etc/grafana/provisioning/
+    deploy:
+      restart_policy:
+        condition: always
+        delay: 5s
+        window: 120s
