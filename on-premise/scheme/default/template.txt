@@ -3,7 +3,7 @@
     deploy:
       resources:
         limits:
-          memory: 2000M
+          memory: 500M
       restart_policy:
         condition: on-failure
         max_attempts: 5
@@ -30,7 +30,7 @@
       replicas: 2
       resources:
         limits:
-          memory: 2000M
+          memory: 500M
       restart_policy:
         condition: on-failure
         max_attempts: 5
