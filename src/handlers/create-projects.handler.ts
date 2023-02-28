@@ -29,6 +29,7 @@ interface ProjectCreationOption {
   dryRun: boolean;
   usePcw: boolean;
   withoutPcw: boolean;
+  saveKeepingId?: number;
 }
 
 interface ProjectConfiguration {
@@ -71,7 +72,7 @@ async function _handleCreateProjects(
   const results = await submitProjectCreationJob(createConfig, projectsToBeCreated, scriptState, dryRun);
   await checkProjectCreationJob(results, scriptState, cwd, dryRun, errorCallback);
 
-  await handleAutoLabel(projectsToBeCreated, dryRun, errorCallback);
+  await handleAutoLabel(projectsToBeCreated, dryRun, options.saveKeepingId, errorCallback);
 }
 
 async function setProjectCreationConfig(

@@ -71,7 +71,11 @@ export const orchestrateJob: HandlerContextCallback<[number, any, string]> = asy
     getLogger().info(`Job ${saveKeepingId} creating projects`);
     // Run create-projects command and trigger ML-Assisted Labeling
     try {
-      await handleCreateProjects(configFile, { dryRun: false, usePcw: true, withoutPcw: false }, errorCallback);
+      await handleCreateProjects(
+        configFile,
+        { dryRun: false, usePcw: true, withoutPcw: false, saveKeepingId },
+        errorCallback,
+      );
     } catch (e) {
       if (!(e instanceof OcrError)) {
         await cleanUp(new ProjectCreationError(e));

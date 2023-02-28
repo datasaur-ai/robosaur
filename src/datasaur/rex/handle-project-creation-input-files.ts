@@ -8,6 +8,7 @@ import { Logger } from 'winston';
 import { BasePayload } from '../../database/entities/base-payload.entity';
 import { getLogger } from '../../logger';
 import { AwsS3StorageClient, EXPIRED_IN_SECONDS } from '../../utils/object-storage/aws-s3-storage';
+import { checkRecordStatus } from './check-record-status';
 import { DownloadFileError } from './errors/download-file-error';
 import { NoSIError } from './errors/no-si-error';
 import { RecognizeDocumentError } from './errors/recognize-document-error';
@@ -38,6 +39,8 @@ class ProjectCreationInputFilesHandler {
       } else if (OBJECT_STORAGE_CLIENT === 'HCP') {
         await this.downloadFileFromHCP();
       }
+
+      await checkRecordStatus(this.getSaveKeepingId());
 
       // Step 2: Document recognition API
       const recognitionResult = await this.recognizeDocument();
@@ -219,6 +222,10 @@ class ProjectCreationInputFilesHandler {
     };
   }
 
+  private getSaveKeepingId() {
+    return this.data._id;
+  }
+
   private createLocalDirectory() {
     if (!existsSync(this.localDirectoryPath())) {
       mkdirSync(this.localDirectoryPath(), { recursive: true });
@@ -238,7 +245,7 @@ class ProjectCreationInputFilesHandler {
   }
 
   private localDirectoryPath(): string {
-    const projectName = this.data._id;
+    const projectName = this.getSaveKeepingId();
     return `temps/${projectName}`;
   }
 

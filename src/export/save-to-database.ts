@@ -8,6 +8,7 @@ import { postProcessDocumentData } from './post-process';
 import { getTeamRepository } from '../database/repository';
 import { formatDate } from '../datasaur/utils/format-date';
 import { OCR_STATUS } from '../datasaur/rex/interface';
+import { checkRecordStatus } from '../datasaur/rex/check-record-status';
 
 function addLeadingZeros(num: number, totalLength: number): string {
   return String(num).padStart(totalLength, '0');
@@ -52,10 +53,14 @@ export async function saveExportResultsToDatabase(teamId: number, id: number) {
       filenameWithExtension.splice(-2);
       const filename = filenameWithExtension.join('_');
 
+      await checkRecordStatus(id);
+
       getLogger().info(`post processing document_data of ${file}...`);
       documentData[filename] = await postProcessDocumentData(json.document_data);
       readingResult[filename] = json.reading_result;
     }
+
+    await checkRecordStatus(id);
 
     getLogger().info(`Post processing is successful`);
     getLogger().info(`Updating save keeping in database. Before`, record);
