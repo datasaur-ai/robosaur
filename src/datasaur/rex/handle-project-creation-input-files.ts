@@ -261,9 +261,10 @@ class ProjectCreationInputFilesHandler {
 
   private fileName(): string {
     const { _id: dataId, document_extension } = this.data;
+    const teamId = process.env.TEAM_ID;
     const paddedPage = this.currentPage.toString().padStart(3, '0');
     const documentExtension = document_extension ? `${document_extension}` : '';
-    return `${dataId}_${paddedPage}${documentExtension}`;
+    return `${teamId}_${dataId}_${paddedPage}${documentExtension}`;
   }
 }
 
