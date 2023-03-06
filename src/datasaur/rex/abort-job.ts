@@ -7,7 +7,7 @@ import { formatDate } from '../utils/format-date';
 import { checkStoppedRecord } from './check-stopped-record';
 import { MongoRepository, ObjectLiteral } from 'typeorm';
 
-export const abortJob = async (teamId: number, id: number, message: string, error?: Error) => {
+export async function abortJob(teamId: number, id: number, message: string, error?: Error) {
   if (error) {
     getLogger().error(
       `Team ${teamId} Aborting job ${id} because of '${message}' detail error: ${JSON.stringify(error)}`,
@@ -29,16 +29,10 @@ export const abortJob = async (teamId: number, id: number, message: string, erro
   const isStatusRead = message === OCR_STATUS.READ;
   const shouldUpdateStatus = (isStatusInProgress || isStatusRead) && !isRecordStopped;
 
-  if (shouldUpdateStatus) {
-    await updateSaveKeepingOcrStatus(saveKeepingRepo, message, payload, teamId, id);
-  } else {
-    getLogger().info('Do not update ocr status.');
-  }
+  await checkIfStatusNeedUpdate(shouldUpdateStatus, saveKeepingRepo, message, payload, teamId, id);
 
-  if (error) {
-    getLogger().error(error.message);
-  }
-};
+  printError(error);
+}
 
 async function deleteProcessRecordIfExists(id: number) {
   const recordRepo = await getRepository(ProcessRecordEntity);
@@ -49,6 +43,21 @@ async function deleteProcessRecordIfExists(id: number) {
     await recordRepo.delete(record);
   } else {
     getLogger().info(`Process record not found`);
+  }
+}
+
+async function checkIfStatusNeedUpdate(
+  shouldUpdateStatus: boolean,
+  saveKeepingRepo: MongoRepository<ObjectLiteral>,
+  message: string,
+  payload: ObjectLiteral,
+  teamId: number,
+  id: number,
+) {
+  if (shouldUpdateStatus) {
+    await updateSaveKeepingOcrStatus(saveKeepingRepo, message, payload, teamId, id);
+  } else {
+    getLogger().info('Do not update ocr status.');
   }
 }
 
@@ -72,5 +81,11 @@ async function updateSaveKeepingOcrStatus(
     // send any error except UNKNOWN_ERROR and STOPPED
     getLogger().info(`Job ${payload._id} sending result back to gateway...`);
     await sendRequestToEndpoint(teamId, payload._id);
+  }
+}
+
+function printError(error?: Error) {
+  if (error) {
+    getLogger().error(error.message, { stack: error.stack });
   }
 }

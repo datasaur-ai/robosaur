@@ -40,8 +40,6 @@ class ProjectCreationInputFilesHandler {
         await this.downloadFileFromHCP();
       }
 
-      await checkRecordStatus(this.getSaveKeepingId());
-
       // Step 2: Document recognition API
       const recognitionResult = await this.recognizeDocument();
 
