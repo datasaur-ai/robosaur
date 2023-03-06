@@ -1,16 +1,13 @@
 import { Column, Entity, ObjectID, ObjectIdColumn } from 'typeorm';
 
-@Entity({ name: 'stopped' })
+@Entity({ name: 'stopped_text_extraction_job' })
 export class StoppedRecord {
   @ObjectIdColumn()
-  _id: ObjectID;
+  _id: number;
 
   @Column()
-  team_id: number;
+  team: number;
 
   @Column()
-  save_keeping_id: number;
-
-  @Column()
-  file_name: string;
+  page: string;
 }
