@@ -15,8 +15,6 @@ export interface Replacer {
 }
 
 export function getCancelStateMessage(cancelState: CancelState, replacer: Replacer) {
-  if (cancelState === CancelState.TEXT_EXTRACTION && !replacer.page) {
-  }
   let message = (cancelState as unknown) as string;
   for (const [key, value] of Object.entries(replacer)) {
     message = message.replaceAll(`{${key}}`, value);

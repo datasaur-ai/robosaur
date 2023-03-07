@@ -13,12 +13,14 @@ export async function checkStoppedRecord(teamId: number, saveKeepingId: number, 
   const repo = await getStoppedRepository();
   const stoppedRecord = await findStopped(repo, teamId, saveKeepingId);
   if (stoppedRecord) {
-    printCanceledTextExtraction(stoppedRecord);
+    const [message, meta] = getCanceledTextExtractionLogMessage(stoppedRecord);
+    getLogger().info(message, meta);
     return true;
   }
 
   const cancelState = error.cancelState;
-  printCanceled(teamId, saveKeepingId, cancelState);
+  const [message, meta] = getCanceledLogMessage(teamId, saveKeepingId, cancelState);
+  getLogger().info(message, meta);
   return true;
 }
 
@@ -31,22 +33,22 @@ async function findStopped(repo: Repo, teamId: number, saveKeepingId: number) {
   return stopped;
 }
 
-function printCanceledTextExtraction(stopped: StoppedRecord) {
+function getCanceledTextExtractionLogMessage(stopped: StoppedRecord): [string, any] {
   const { _id: saveKeepingId, team: teamId, page } = stopped;
-  const meta = { teamId, saveKeepingId };
+  const meta = { teamId };
   const replacer: Replacer = {
     id: String(saveKeepingId),
     page: String(page),
   };
   const message = getCancelStateMessage(CancelState.TEXT_EXTRACTION, replacer);
-  getLogger().info(message, meta);
+  return [message, meta];
 }
 
-function printCanceled(team: number, saveKeepingId: number, cancelState: CancelState) {
-  const meta = { team, saveKeepingId };
+function getCanceledLogMessage(teamId: number, saveKeepingId: number, cancelState: CancelState): [string, any] {
+  const meta = { teamId };
   const replacer: Replacer = { id: String(saveKeepingId) };
   const message = getCancelStateMessage(cancelState, replacer);
-  getLogger().info(message, meta);
+  return [message, meta];
 }
 
 function isCanceledError(error?: Error): error is JobCanceledError {

@@ -25,7 +25,7 @@ export async function abortJob(teamId: number, id: number, message: string, erro
 
   await deleteProcessRecordIfExists(id);
 
-  let error = overrideCancelError(payload._id, payload.ocr_status, errorInput);
+  const error = overrideCancelError(payload._id, payload.ocr_status, errorInput);
 
   const isRecordStopped = await checkStoppedRecord(teamId, id, error);
 
