@@ -249,7 +249,7 @@ class ProjectCreationInputFilesHandler {
 
   private remoteFilePath(): string {
     const directoryPath = this.remoteDirectoryPath();
-    return `${directoryPath}${directoryPath ? '/' : ''}${this.fileName()}`;
+    return `${directoryPath}${directoryPath ? '/' : ''}${this.remoteFileName()}`;
   }
 
   private remoteDirectoryPath(): string {
@@ -263,6 +263,13 @@ class ProjectCreationInputFilesHandler {
     const paddedPage = this.currentPage.toString().padStart(3, '0');
     const documentExtension = document_extension ? `${document_extension}` : '';
     return `${teamId}_${dataId}_${paddedPage}${documentExtension}`;
+  }
+
+  private remoteFileName(): string {
+    const { _id: dataId, document_extension } = this.data;
+    const paddedPage = this.currentPage.toString().padStart(3, '0');
+    const documentExtension = document_extension ? `${document_extension}` : '';
+    return `${dataId}_${paddedPage}${documentExtension}`;
   }
 }
 
