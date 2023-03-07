@@ -8,7 +8,6 @@ import { Logger } from 'winston';
 import { BasePayload } from '../../database/entities/base-payload.entity';
 import { getLogger } from '../../logger';
 import { AwsS3StorageClient, EXPIRED_IN_SECONDS } from '../../utils/object-storage/aws-s3-storage';
-import { checkRecordStatus } from './check-record-status';
 import { DownloadFileError } from './errors/download-file-error';
 import { NoSIError } from './errors/no-si-error';
 import { RecognizeDocumentError } from './errors/recognize-document-error';

@@ -1,11 +1,11 @@
-import { Repository } from 'typeorm';
+import { MongoRepository } from 'typeorm';
 import { StoppedRecord } from '../../database/entities/stopped-record.entity';
 import { getRepository } from '../../database/repository';
 import { getLogger } from '../../logger';
 import { CancelState, getCancelStateMessage, Replacer } from './cancel-state';
 import { JobCanceledError } from './errors/job-canceled-error';
 
-type Repo = Repository<StoppedRecord>;
+type Repo = MongoRepository<StoppedRecord>;
 
 export async function checkStoppedRecord(teamId: number, saveKeepingId: number, error?: Error): Promise<boolean> {
   if (!isCanceledError(error)) return false;
@@ -30,6 +30,11 @@ async function getStoppedRepository(): Promise<Repo> {
 
 async function findStopped(repo: Repo, teamId: number, saveKeepingId: number) {
   const stopped = await repo.findOne({ where: { team: teamId, _id: saveKeepingId } });
+
+  if (stopped) {
+    await repo.deleteOne({ _id: saveKeepingId });
+  }
+
   return stopped;
 }
 
