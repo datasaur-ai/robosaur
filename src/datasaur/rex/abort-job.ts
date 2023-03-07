@@ -6,11 +6,13 @@ import { OCR_STATUS } from './interface';
 import { formatDate } from '../utils/format-date';
 import { checkStoppedRecord } from './check-stopped-record';
 import { MongoRepository, ObjectLiteral } from 'typeorm';
+import { JobCanceledError } from './errors/job-canceled-error';
+import { CancelState } from './cancel-state';
 
-export async function abortJob(teamId: number, id: number, message: string, error?: Error) {
-  if (error) {
+export async function abortJob(teamId: number, id: number, message: string, errorInput?: Error) {
+  if (errorInput) {
     getLogger().error(
-      `Team ${teamId} Aborting job ${id} because of '${message}' detail error: ${JSON.stringify(error)}`,
+      `Team ${teamId} Aborting job ${id} because of '${message}' detail error: ${JSON.stringify(errorInput)}`,
     );
   } else {
     getLogger().info(`Team ${teamId} Aborting job ${id}. message: ${message}`);
@@ -23,6 +25,8 @@ export async function abortJob(teamId: number, id: number, message: string, erro
 
   await deleteProcessRecordIfExists(id);
 
+  let error = overrideCancelError(payload._id, payload.ocr_status, errorInput);
+
   const isRecordStopped = await checkStoppedRecord(teamId, id);
 
   const isStatusInProgress = payload.ocr_status === OCR_STATUS.IN_PROGRESS;
@@ -32,6 +36,13 @@ export async function abortJob(teamId: number, id: number, message: string, erro
   await checkIfStatusNeedUpdate(shouldUpdateStatus, saveKeepingRepo, message, payload, teamId, id);
 
   printError(error);
+}
+
+function overrideCancelError(id: number, ocrStatus: OCR_STATUS, error?: Error): Error | undefined {
+  if (ocrStatus === OCR_STATUS.STOPPED) {
+    return new JobCanceledError(id, CancelState.TEXT_EXTRACTION);
+  }
+  return error;
 }
 
 async function deleteProcessRecordIfExists(id: number) {
