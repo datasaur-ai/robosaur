@@ -27,7 +27,7 @@ export async function abortJob(teamId: number, id: number, message: string, erro
 
   let error = overrideCancelError(payload._id, payload.ocr_status, errorInput);
 
-  const isRecordStopped = await checkStoppedRecord(teamId, id);
+  const isRecordStopped = await checkStoppedRecord(teamId, id, error);
 
   const isStatusInProgress = payload.ocr_status === OCR_STATUS.IN_PROGRESS;
   const isStatusRead = message === OCR_STATUS.READ;
