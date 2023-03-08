@@ -7,8 +7,13 @@ import { BaseCron } from './base.cron';
 type Repo = MongoRepository<StoppedRecord>;
 
 export class DeleteOrphanStoppedRecords extends BaseCron {
-  constructor() {
-    super('0 0 * * *');
+  private constructor(expr: string) {
+    super(expr);
+  }
+
+  static create() {
+    const expr = process.env.DELETE_ORPHAN_STOPPED_RECORDS_SCHEDULE ?? '0 0 * * *';
+    return new DeleteOrphanStoppedRecords(expr);
   }
 
   protected onRun = async () => {

@@ -18,7 +18,7 @@ export const handleStartProducer = createConsumerHandlerContext<string[], [numbe
 export async function _handleStartProducer(processJob: ProcessJob<[number, number, Producer]>, configFile: string) {
   const teamId = getTeamId();
   const { setHealthStatus, startApp: startHealthcheckServer } = await createHealthcheckServer(`producer_${teamId}`);
-  await new DeleteOrphanStoppedRecords().run();
+  await DeleteOrphanStoppedRecords.create().run();
   let isError = false;
   try {
     await initiateProcess('Producer', startHealthcheckServer, setHealthStatus, configFile);
