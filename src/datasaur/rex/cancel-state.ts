@@ -3,7 +3,7 @@ export enum CancelState {
   DOCUMENT_RECOGNITION = 'Document {id} stopped after document-recognition process',
   PROJECT_CREATION = 'Document {id} stopped after project creation',
   PROJECT_EXPORT = 'Document {id} stopped after project export',
-  TEXT_EXTRACTION = 'Document {id} stopped after text-extraction process at {page}',
+  TEXT_EXTRACTION = 'Document id {id} stopped after text-extraction process at page {page}',
   FIELD_EXTRACTION = 'Document {id} stopped after field-extraction process',
   POST_PROCESSING = 'Document {id} stopped after post-processing process',
 }
