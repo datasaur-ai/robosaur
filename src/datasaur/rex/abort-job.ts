@@ -39,6 +39,7 @@ export async function abortJob(teamId: number, id: number, message: string, erro
 }
 
 function overrideCancelError(id: number, ocrStatus: OCR_STATUS, error?: Error): Error | undefined {
+  if (error && error instanceof JobCanceledError) return error;
   if (ocrStatus === OCR_STATUS.STOPPED) {
     return new JobCanceledError(id, CancelState.TEXT_EXTRACTION);
   }
