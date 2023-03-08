@@ -10,7 +10,7 @@ import { JobCanceledError } from './errors/job-canceled-error';
 import { CancelState } from './cancel-state';
 
 export async function abortJob(teamId: number, id: number, message: string, errorInput?: Error) {
-  if (errorInput) {
+  if (errorInput && !(errorInput instanceof JobCanceledError)) {
     getLogger().error(
       `Team ${teamId} Aborting job ${id} because of '${message}' detail error: ${JSON.stringify(errorInput)}`,
     );
