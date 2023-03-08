@@ -5,6 +5,7 @@ import { handleCreateProjects } from '../../handlers/create-projects.handler';
 import { handleExport } from '../../handlers/rex-export.handler';
 import { getLogger } from '../../logger';
 import { abortJob } from './abort-job';
+import { CancelState } from './cancel-state';
 import { checkRecordStatus } from './check-record-status';
 import { cleanUpTempFolders } from './cleanUpTempFolders';
 import { ensureNoRequeue } from './ensure-no-requeue';
@@ -33,8 +34,6 @@ export const orchestrateJob: HandlerContextCallback<[number, any, string]> = asy
     }
 
     await abortJob(teamId, saveKeepingId, `${status}`, error);
-    getLogger().info(error.message, { stack: error.stack });
-
     cleanUpTempFolders();
   };
 
@@ -53,7 +52,7 @@ export const orchestrateJob: HandlerContextCallback<[number, any, string]> = asy
 
     getLogger().info(`Job ${saveKeepingId} started`);
 
-    await checkRecordStatus(saveKeepingId);
+    await checkRecordStatus(saveKeepingId, CancelState.UPDATE_IN_PROGRESS);
 
     getLogger().info(`Job ${saveKeepingId} cleaning temporary folder`);
     cleanUpTempFolders();
@@ -67,11 +66,16 @@ export const orchestrateJob: HandlerContextCallback<[number, any, string]> = asy
       return;
     }
 
-    await checkRecordStatus(saveKeepingId);
+    await checkRecordStatus(saveKeepingId, CancelState.DOCUMENT_RECOGNITION);
+
     getLogger().info(`Job ${saveKeepingId} creating projects`);
     // Run create-projects command and trigger ML-Assisted Labeling
     try {
-      await handleCreateProjects(configFile, { dryRun: false, usePcw: true, withoutPcw: false }, errorCallback);
+      await handleCreateProjects(
+        configFile,
+        { dryRun: false, usePcw: true, withoutPcw: false, saveKeepingId },
+        errorCallback,
+      );
     } catch (e) {
       if (!(e instanceof OcrError)) {
         await cleanUp(new ProjectCreationError(e));
@@ -79,9 +83,10 @@ export const orchestrateJob: HandlerContextCallback<[number, any, string]> = asy
       return;
     }
 
-    await checkRecordStatus(saveKeepingId);
+    await checkRecordStatus(saveKeepingId, CancelState.PROJECT_CREATION);
+
     getLogger().info(`Job ${saveKeepingId} exporting projects`);
-    // Call project export
+
     try {
       await handleExport(configFile, payload, errorCallback);
     } catch (e) {
@@ -91,7 +96,7 @@ export const orchestrateJob: HandlerContextCallback<[number, any, string]> = asy
       return;
     }
 
-    await checkRecordStatus(saveKeepingId);
+    await checkRecordStatus(saveKeepingId, CancelState.PROJECT_EXPORT);
 
     try {
       getLogger().info(`Job ${saveKeepingId} saving result to database...`);

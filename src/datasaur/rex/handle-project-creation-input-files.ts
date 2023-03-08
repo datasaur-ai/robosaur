@@ -219,6 +219,10 @@ class ProjectCreationInputFilesHandler {
     };
   }
 
+  private getSaveKeepingId() {
+    return this.data._id;
+  }
+
   private createLocalDirectory() {
     if (!existsSync(this.localDirectoryPath())) {
       mkdirSync(this.localDirectoryPath(), { recursive: true });
@@ -238,13 +242,13 @@ class ProjectCreationInputFilesHandler {
   }
 
   private localDirectoryPath(): string {
-    const projectName = this.data._id;
+    const projectName = this.getSaveKeepingId();
     return `temps/${projectName}`;
   }
 
   private remoteFilePath(): string {
     const directoryPath = this.remoteDirectoryPath();
-    return `${directoryPath}${directoryPath ? '/' : ''}${this.fileName()}`;
+    return `${directoryPath}${directoryPath ? '/' : ''}${this.remoteFileName()}`;
   }
 
   private remoteDirectoryPath(): string {
@@ -253,6 +257,14 @@ class ProjectCreationInputFilesHandler {
   }
 
   private fileName(): string {
+    const { _id: dataId, document_extension } = this.data;
+    const teamId = process.env.TEAM_ID;
+    const paddedPage = this.currentPage.toString().padStart(3, '0');
+    const documentExtension = document_extension ? `${document_extension}` : '';
+    return `${teamId}_${dataId}_${paddedPage}${documentExtension}`;
+  }
+
+  private remoteFileName(): string {
     const { _id: dataId, document_extension } = this.data;
     const paddedPage = this.currentPage.toString().padStart(3, '0');
     const documentExtension = document_extension ? `${document_extension}` : '';

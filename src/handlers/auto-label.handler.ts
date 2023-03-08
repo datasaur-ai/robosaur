@@ -9,18 +9,25 @@ import { getState } from '../utils/states/getStates';
 import { ProjectState } from '../utils/states/interfaces';
 import { ScriptState } from '../utils/states/script-state';
 import { AutoLabelError } from '../datasaur/rex/errors/auto-label-error';
+import { checkRecordStatus } from '../datasaur/rex/check-record-status';
+import { CancelState } from '../datasaur/rex/cancel-state';
 
 export const handleAutoLabel = createSimpleHandlerContext('auto-label', _handleAutoLabel);
 
 async function _handleAutoLabel(
   projects: { name: string; fullPath: string }[],
   dryRun: boolean,
+  saveKeepingId?: number,
   errorCallback?: (error: Error) => Promise<void>,
 ) {
   if (!getConfig().create.autoLabel?.enableAutoLabel) return;
 
   const scriptState = await getState();
   const projectsToAutoLabel = getProjectsToAutoLabel(projects, scriptState);
+
+  if (saveKeepingId !== undefined && saveKeepingId !== null) {
+    await checkRecordStatus(saveKeepingId, CancelState.TEXT_EXTRACTION);
+  }
 
   const autoLabelResults = await submitAutoLabelJob(projectsToAutoLabel, dryRun);
   await checkAutoLabelJob(autoLabelResults, dryRun, errorCallback);

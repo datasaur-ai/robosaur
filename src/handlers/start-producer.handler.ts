@@ -5,6 +5,7 @@ import { createConsumerHandlerContext, ProcessJob } from '../execution';
 import { createHealthcheckServer } from '../healthcheck-server/create-healthcheck-server';
 import { getLogger } from '../logger';
 import { Producer } from '../rabbitmq/producer';
+import { DeleteOrphanStoppedRecords } from './crons/delete-orphan-stopped-records.cron';
 import { getTeamId } from './producer-consumer/get-team-id';
 import { initiateProcess } from './producer-consumer/initiate-process';
 
@@ -17,6 +18,7 @@ export const handleStartProducer = createConsumerHandlerContext<string[], [numbe
 export async function _handleStartProducer(processJob: ProcessJob<[number, number, Producer]>, configFile: string) {
   const teamId = getTeamId();
   const { setHealthStatus, startApp: startHealthcheckServer } = await createHealthcheckServer(`producer_${teamId}`);
+  await DeleteOrphanStoppedRecords.create().run();
   let isError = false;
   try {
     await initiateProcess('Producer', startHealthcheckServer, setHealthStatus, configFile);
