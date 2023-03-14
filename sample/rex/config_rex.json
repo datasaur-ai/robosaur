@@ -61,147 +61,267 @@
           "name": "Rex Label Set",
           "options": [
             {
-              "id": "SUYMZaeWloeJhuM33yO-L",
+              "id": "aQnrY6tWHpTcMnii3zoYbv",
               "parentId": null,
-              "label": "mata_uang",
+              "label": "B-MATA_UANG",
               "color": null
             },
             {
-              "id": "ErWr05_taeMm_CmkAWrCq",
+              "id": "ft4jPfEsYo4GwaNyftvn5V",
               "parentId": null,
-              "label": "tanggal_transaksi",
+              "label": "B-TANGGAL_TRANSAKSI",
               "color": null
             },
             {
-              "id": "GPuJQDlsWdT5ap_18mDQ5",
+              "id": "4WnZDXWE7svbV8se7sSCiP",
               "parentId": null,
-              "label": "nomor_rekening_sumber_dana",
+              "label": "B-NO_URUT",
               "color": null
             },
             {
-              "id": "lSuMbGf1eY0pt3F9K4xWF",
+              "id": "sEvTxUb5LdderHCxGGgpEt",
               "parentId": null,
-              "label": "nama_rekening_sumber_dana",
+              "label": "B-NOMOR_REKENING_SUMBER_DANA",
               "color": null
             },
             {
-              "id": "gMJer9xsGikvjlyCAAG62",
+              "id": "6BVdAN1s5Uh7uzsD8E3ukC",
               "parentId": null,
-              "label": "nominal_transaksi_debet",
+              "label": "B-NAMA_REKENING_SUMBER_DANA",
               "color": null
             },
             {
-              "id": "InwDoTqhF-_BI5gJfZpi_",
+              "id": "1yZhTuCMoMymdbBwBR7aYK",
               "parentId": null,
-              "label": "nomor_rekening_tujuan",
+              "label": "B-NOMINAL_TRANSAKSI_DEBET",
               "color": null
             },
             {
-              "id": "rS9VUo4z_qef7iLKuvbRo",
+              "id": "byy2ixWG7pgvB4yC3cWprK",
               "parentId": null,
-              "label": "nama_rekening_tujuan",
+              "label": "B-NOMOR_REKENING_TUJUAN",
               "color": null
             },
             {
-              "id": "1ABTAZiCnsl1Jsx2_oZqg",
+              "id": "mfv2wdQ2YvsStNzaYqiTr4",
               "parentId": null,
-              "label": "bank_tujuan",
+              "label": "B-NAMA_REKENING_TUJUAN",
               "color": null
             },
             {
-              "id": "Zt_F8BdiU6cWvL7aOLQI9",
+              "id": "1Epozr6jeY31QiqXVoxHVF",
               "parentId": null,
-              "label": "nominal_transaksi_tujuan",
+              "label": "B-BANK_TUJUAN",
               "color": null
             },
             {
-              "id": "9xLXMO7csX9K1u8-FGGrV",
+              "id": "oEK3C9xbXAw8psM8cXUUWM",
               "parentId": null,
-              "label": "nominal_transaksi_biaya",
+              "label": "B-NOMINAL_TRANSAKSI_TUJUAN",
               "color": null
             },
             {
-              "id": "3_0c_fXZZqv2jqs9ajsNh",
+              "id": "w8ipXQfcoxoEEZB4p1Ecfq",
               "parentId": null,
-              "label": "nomor_rekening_biaya",
+              "label": "B-NOMINAL_TRANSAKSI_BIAYA",
               "color": null
             },
             {
-              "id": "Gi63t1wJo8VY8_Y0WDGhp",
+              "id": "bLjcGsaFk1XSX1DW8Jof3c",
               "parentId": null,
-              "label": "berita_kredit",
+              "label": "B-NOMOR_REKENING_BIAYA",
               "color": null
             },
             {
-              "id": "o4BMohsC1BPYbT8LYFhhi",
+              "id": "tF3nWQbxzt9or7Zyt4o4Vn",
               "parentId": null,
-              "label": "checksum",
+              "label": "B-BERITA_KREDIT",
               "color": null
             },
             {
-              "id": "PcN6lwaxcovv_irMtnwpU",
+              "id": "t3gfjvqgXie2BHDpA73FCb",
               "parentId": null,
-              "label": "total_transaksi_debet",
+              "label": "B-CHECKSUM",
               "color": null
             },
             {
-              "id": "bvqKnQeiga1CnDUnGxart",
+              "id": "kXytb7t1tpw3p2kaFxdh8P",
               "parentId": null,
-              "label": "total_transaksi_kredit",
+              "label": "B-TOTAL_TRANSAKSI_DEBET",
               "color": null
             },
             {
-              "id": "Fzqu5Kh658frxUGl_Czmb",
+              "id": "eRcCbtLkRPnZhwR81xSnEs",
               "parentId": null,
-              "label": "total_pembayaran",
+              "label": "B-TOTAL_TRANSAKSI_KREDIT",
               "color": null
             },
             {
-              "id": "hVtkQxEBhL-Mbuykua_pD",
+              "id": "1krM4gHGfKZzV7YXYChbdN",
               "parentId": null,
-              "label": "total_debet",
+              "label": "B-TOTAL_PEMBAYARAN",
               "color": null
             },
             {
-              "id": "HssD60UtaJTb-N7PaEt0A",
+              "id": "7LKKyTwoR5D8Xysrkvuyvz",
               "parentId": null,
-              "label": "total_biaya",
+              "label": "B-TOTAL_DEBET",
               "color": null
             },
             {
-              "id": "XPtv6emj9xwm3RnLtnhyt",
+              "id": "6M7qoso2uqXuS7h3BVZ1qF",
               "parentId": null,
-              "label": "berita_debet",
+              "label": "B-TOTAL_BIAYA",
               "color": null
             },
             {
-              "id": "RcMepZG8RwcAzXLzY-0BT",
+              "id": "wnwNYgHvxenRGQ3EpCFgVj",
               "parentId": null,
-              "label": "nama_rekening_biaya",
+              "label": "B-LAYANAN",
               "color": null
             },
             {
-              "id": "yZn0-fk6bv1upWsJ6P2mK",
+              "id": "tVLxfH3W3ARVqxii9qgHrC",
               "parentId": null,
-              "label": "layanan",
+              "label": "B-STATUS_PENDUDUK",
               "color": null
             },
             {
-              "id": "mgwDBHtNZHcalJqQRJtBz",
+              "id": "bK4P3hNaaPDK2RX1JDVFQ4",
               "parentId": null,
-              "label": "status_penduduk",
+              "label": "B-JENIS_PENERIMA",
               "color": null
             },
             {
-              "id": "_w4V7zLScttg8Fql_7QIx",
+              "id": "oBzCFgfU7Ve7ZT3skov4yP",
               "parentId": null,
-              "label": "jenis_penerima",
+              "label": "I-MATA_UANG",
               "color": null
             },
             {
-              "id": "7iQliX_3OaacVlml8gp-M",
+              "id": "hjFppgxBihnPoAYTTDwTqu",
               "parentId": null,
-              "label": "no_urut",
+              "label": "I-TANGGAL_TRANSAKSI",
+              "color": null
+            },
+            {
+              "id": "wktfcFaW7FKWpiP9HHJe6V",
+              "parentId": null,
+              "label": "I-NO_URUT",
+              "color": null
+            },
+            {
+              "id": "eWvwyHASiiooPKcRxBnDUM",
+              "parentId": null,
+              "label": "I-NOMOR_REKENING_SUMBER_DANA",
+              "color": null
+            },
+            {
+              "id": "e5Jbn9jL6YLkWUfQguPF4W",
+              "parentId": null,
+              "label": "I-NAMA_REKENING_SUMBER_DANA",
+              "color": null
+            },
+            {
+              "id": "1jFmmTx6JCicj22U9n9qVr",
+              "parentId": null,
+              "label": "I-NOMINAL_TRANSAKSI_DEBET",
+              "color": null
+            },
+            {
+              "id": "vBnZAWGTQkFqbqRsjStaue",
+              "parentId": null,
+              "label": "I-NOMOR_REKENING_TUJUAN",
+              "color": null
+            },
+            {
+              "id": "31k8gYFD5Fm4Ddy3FKT6Mi",
+              "parentId": null,
+              "label": "I-NAMA_REKENING_TUJUAN",
+              "color": null
+            },
+            {
+              "id": "nPcHTua9aC3vzMsiuXNb1H",
+              "parentId": null,
+              "label": "I-BANK_TUJUAN",
+              "color": null
+            },
+            {
+              "id": "tSa9rji1rC23Ghuyb1N974",
+              "parentId": null,
+              "label": "I-NOMINAL_TRANSAKSI_TUJUAN",
+              "color": null
+            },
+            {
+              "id": "jY8sefWNCsJS97BcXkZjf3",
+              "parentId": null,
+              "label": "I-NOMINAL_TRANSAKSI_BIAYA",
+              "color": null
+            },
+            {
+              "id": "rSCJ7WFZp1hCj3gbDYeGq7",
+              "parentId": null,
+              "label": "I-NOMOR_REKENING_BIAYA",
+              "color": null
+            },
+            {
+              "id": "a7e6qveEhssxB5BBTFoKVY",
+              "parentId": null,
+              "label": "I-BERITA_KREDIT",
+              "color": null
+            },
+            {
+              "id": "n5dDGtfiyv8b21CQPeK4Pd",
+              "parentId": null,
+              "label": "I-CHECKSUM",
+              "color": null
+            },
+            {
+              "id": "jNdgrSRpKZWXateARyVjPX",
+              "parentId": null,
+              "label": "I-TOTAL_TRANSAKSI_DEBET",
+              "color": null
+            },
+            {
+              "id": "2pzhsP2TTNzcibXStY6eiw",
+              "parentId": null,
+              "label": "I-TOTAL_TRANSAKSI_KREDIT",
+              "color": null
+            },
+            {
+              "id": "175XCM3hmAFsUVHik6UUY8",
+              "parentId": null,
+              "label": "I-TOTAL_PEMBAYARAN",
+              "color": null
+            },
+            {
+              "id": "1TEZYrDQ7CFSUGD6RGyd5F",
+              "parentId": null,
+              "label": "I-TOTAL_DEBET",
+              "color": null
+            },
+            {
+              "id": "w8pkWHhkSth2up6bEzBDy2",
+              "parentId": null,
+              "label": "I-TOTAL_BIAYA",
+              "color": null
+            },
+            {
+              "id": "hPxrrkf17Fiqg3QajGY6Bn",
+              "parentId": null,
+              "label": "I-LAYANAN",
+              "color": null
+            },
+            {
+              "id": "ovEena3QKrcJnLyreZwgGz",
+              "parentId": null,
+              "label": "I-STATUS_PENDUDUK",
+              "color": null
+            },
+            {
+              "id": "kxJ5q29S6T6r8EH3ejaBj3",
+              "parentId": null,
+              "label": "I-JENIS_PENERIMA",
               "color": null
             }
           ]
@@ -213,8 +333,13 @@
           "role": "LABELER_AND_REVIEWER"
         }
       ],
-      "tagNames": ["SI", "team-15"],
-      "kinds": ["TOKEN_BASED"],
+      "tagNames": [
+        "SI",
+        "team-15"
+      ],
+      "kinds": [
+        "TOKEN_BASED"
+      ],
       "type": "OCR"
     },
     "autoLabel": {
