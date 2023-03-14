@@ -8,6 +8,8 @@ import { Logger } from 'winston';
 import { BasePayload } from '../../database/entities/base-payload.entity';
 import { getLogger } from '../../logger';
 import { AwsS3StorageClient, EXPIRED_IN_SECONDS } from '../../utils/object-storage/aws-s3-storage';
+import { CancelState } from './cancel-state';
+import { checkRecordStatus } from './check-record-status';
 import { DownloadFileError } from './errors/download-file-error';
 import { NoSIError } from './errors/no-si-error';
 import { RecognizeDocumentError } from './errors/recognize-document-error';
@@ -27,27 +29,32 @@ class ProjectCreationInputFilesHandler {
   constructor(private readonly data: BasePayload) {}
 
   public async handle(): Promise<void> {
-    for (this.currentPage = 0; this.currentPage < this.totalDocumentPage(); this.currentPage++) {
-      const OBJECT_STORAGE_CLIENT = process.env.OBJECT_STORAGE_CLIENT ?? 'S3';
-      this.logger.info(`Processing document page ${this.currentPage + 1}..`);
-      this.createLocalDirectory();
+    try {
+      for (this.currentPage = 0; this.currentPage < this.totalDocumentPage(); this.currentPage++) {
+        const OBJECT_STORAGE_CLIENT = process.env.OBJECT_STORAGE_CLIENT ?? 'S3';
+        this.logger.info(`Processing document page ${this.currentPage + 1}..`);
+        this.createLocalDirectory();
 
-      // Step 1: Download document
-      if (OBJECT_STORAGE_CLIENT === 'S3') {
-        await this.downloadFileFromS3();
-      } else if (OBJECT_STORAGE_CLIENT === 'HCP') {
-        await this.downloadFileFromHCP();
+        // Step 1: Download document
+        if (OBJECT_STORAGE_CLIENT === 'S3') {
+          await this.downloadFileFromS3();
+        } else if (OBJECT_STORAGE_CLIENT === 'HCP') {
+          await this.downloadFileFromHCP();
+        }
+
+        // Step 2: Document recognition API
+        const recognitionResult = await this.recognizeDocument();
+
+        // Step 3: Keep or remove the downloaded file
+        this.filterDocumentFile(recognitionResult);
       }
 
-      // Step 2: Document recognition API
-      const recognitionResult = await this.recognizeDocument();
-
-      // Step 3: Keep or remove the downloaded file
-      this.filterDocumentFile(recognitionResult);
-    }
-
-    if (this.SICount === 0) {
-      throw new NoSIError();
+      if (this.SICount === 0) {
+        throw new NoSIError();
+      }
+    } catch (err) {
+      await checkRecordStatus(this.data._id, CancelState.DOCUMENT_RECOGNITION);
+      throw err;
     }
   }
 
