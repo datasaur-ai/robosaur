@@ -25,10 +25,6 @@ async function _handleAutoLabel(
   const scriptState = await getState();
   const projectsToAutoLabel = getProjectsToAutoLabel(projects, scriptState);
 
-  if (saveKeepingId !== undefined && saveKeepingId !== null) {
-    await checkRecordStatus(saveKeepingId, CancelState.TEXT_EXTRACTION);
-  }
-
   const autoLabelResults = await submitAutoLabelJob(projectsToAutoLabel, dryRun);
   await checkAutoLabelJob(autoLabelResults, dryRun, errorCallback);
 }
