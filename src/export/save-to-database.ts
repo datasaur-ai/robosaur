@@ -41,8 +41,7 @@ export async function saveExportResultsToDatabase(teamId: number, id: number) {
     });
 
     for (let i = 0; i < record.page_count; i++) {
-      const teamId = process.env.TEAM_ID;
-      const filename = teamId + '_' + id + '_' + addLeadingZeros(i, 3);
+      const filename = id + '_' + addLeadingZeros(i, 3);
       documentData[filename] = null;
       readingResult[filename] = null;
     }
@@ -53,7 +52,8 @@ export async function saveExportResultsToDatabase(teamId: number, id: number) {
 
       const filenameWithExtension = path.parse(file).name.split('_');
       filenameWithExtension.splice(-2);
-      const filename = filenameWithExtension.join('_');
+      const [_teamId, ...restFileName] = filenameWithExtension;
+      const filename = restFileName.join('_');
 
       await checkRecordStatus(id, CancelState.FIELD_EXTRACTION);
 
