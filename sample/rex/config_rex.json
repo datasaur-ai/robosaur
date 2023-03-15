@@ -347,7 +347,8 @@
       "labelerEmail": "jeremia.daniel@yahoo.com",
       "targetApiEndpoint": "http://40.88.146.178/si/field-extractor",
       "targetApiSecretKey": "secret",
-      "numberOfFilesPerRequest": 1
+      "numberOfFilesPerRequest": 1,
+      "role": "REVIEWER"
     }
   }
 }
