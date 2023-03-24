@@ -9,6 +9,7 @@
         max_attempts: 5
     env_file:
       - ./robosaur.env
+    user: ${UID}:${GID}
     environment:
       - TEAM_ID=${NAME}
       - COMMAND_NAME=start-producer
@@ -36,6 +37,7 @@
         max_attempts: 5
     env_file:
       - ./robosaur.env
+    user: ${UID}:${GID}
     volumes:
       - ./docker-config:/home/robosaur/config
       - ./docker-logs-${NAME}/consumers:/home/robosaur/logs

@@ -4,4 +4,7 @@ services:
     image: datasaur/robosaur:${DOCKER_TAG}
     build:
       context: ./../
+      args:
+        uid: 1003
+        gid: 1004
       dockerfile: robosaur.Dockerfile
