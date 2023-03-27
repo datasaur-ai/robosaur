@@ -12,4 +12,4 @@ cat ${DIR}/template.txt >> ${DIR}/docker-compose.yml
 
 sed -i 's/${NAME}/'${NAME}'/g' ${DIR}/docker-compose.yml
 sed -i 's/${UID}/'${UID}'/g' ${DIR}/docker-compose.yml
-sed -i 's/${UID}/'${UID}'/g' ${DIR}/docker-compose.yml
+sed -i 's/${GID}/'${GID}'/g' ${DIR}/docker-compose.yml
