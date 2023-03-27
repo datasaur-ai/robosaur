@@ -6,6 +6,7 @@ logs/
 quickstart/export
 quickstart/state
 docker-*/
+!docker-folder-template/
 
 .env
 
