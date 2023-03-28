@@ -5,6 +5,6 @@ services:
     build:
       context: ./../
       args:
-        uid: 1003
-        gid: 1004
+        uid: ${USER_ID}
+        gid: ${GROUP_ID}
       dockerfile: robosaur.Dockerfile

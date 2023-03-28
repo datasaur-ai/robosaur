@@ -3,6 +3,8 @@
 set -e
 
 dockerTag=$1
+userId=$2
+groupId=$3
 
 cd on-premise
 echo "removing temporary folder"
@@ -15,6 +17,8 @@ cp ./../sample/rex/config_rex.json ./build/docker-config/config.json
 
 export CI_REGISTRY=682361690817.dkr.ecr.us-east-1.amazonaws.com
 export DOCKER_TAG=$dockerTag
+export USER_ID=$userId
+export GROUP_ID=$groupId
 echo ${dockerTag} > build/version
 
 docker-compose -f docker-compose.build.yml build
