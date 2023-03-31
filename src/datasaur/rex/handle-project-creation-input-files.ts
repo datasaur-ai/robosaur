@@ -43,6 +43,7 @@ class ProjectCreationInputFilesHandler {
         }
 
         // Step 2: Document recognition API
+        await checkRecordStatus(this.data._id, CancelState.DOCUMENT_RECOGNITION);
         const recognitionResult = await this.recognizeDocument();
 
         // Step 3: Keep or remove the downloaded file
