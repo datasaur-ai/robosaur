@@ -55,8 +55,6 @@ export async function saveExportResultsToDatabase(teamId: number, id: number) {
       const [_teamId, ...restFileName] = filenameWithExtension;
       const filename = restFileName.join('_');
 
-      await checkRecordStatus(id, CancelState.FIELD_EXTRACTION);
-
       getLogger().info(`post processing document_data of ${file}...`);
       documentData[filename] = await postProcessDocumentData(json.document_data);
       readingResult[filename] = json.reading_result;

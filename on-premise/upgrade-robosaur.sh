@@ -11,6 +11,7 @@
 
 currentVersion=$1
 newVersion=$2
+currentDirectory=/opt
 
 cd datasaur-robosaur-$currentVersion
 ./down.sh
@@ -20,6 +21,10 @@ mkdir datasaur-robosaur-$newVersion && tar -zvxf datasaur-robosaur-$newVersion.t
 cp datasaur-robosaur-$currentVersion-old/robosaur.env datasaur-robosaur-$newVersion/
 cp -r datasaur-robosaur-$currentVersion-old/docker-config datasaur-robosaur-$newVersion/
 cd datasaur-robosaur-$newVersion
-./add-channel.sh 15
-./add-channel.sh 16
+./add-channel.sh 15 1000 1000
+./add-channel.sh 16 1000 1000
 ./upgrade.sh
+
+# Use sed to modify restart_instruction_letter.sh
+scriptFile="$currentDirectory/restart_instruction_letter.sh"
+sed -i "s|$currentDirectory/datasaur-robosaur-$currentVersion|$currentDirectory/datasaur-robosaur-$newVersion|g" "$scriptFile"
