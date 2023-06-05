@@ -1,6 +1,7 @@
 import { DataSource } from 'typeorm';
 import { getConfig } from '../config/config';
 import { getLogger } from '../logger';
+import { sleep } from '../utils/sleep';
 
 let databaseSource: DataSource;
 
@@ -23,19 +24,28 @@ export const initDatabase = () => {
   });
 };
 
+const RETRY_SLEEP_DURATION_MS = 180000; // 3 minutes
+
 const getDataSource = async () => {
-  if (!databaseSource.isInitialized) {
+  if (databaseSource.isInitialized) {
+    return databaseSource;
+  }
+
+  while (true) {
     try {
       await databaseSource.initialize();
       getLogger().info(`MongoDB has been initialized`);
       return databaseSource;
     } catch (err) {
-      getLogger().error(`MongoDB initialization error`, err);
-      // rethrow
-      throw err;
+      if (err.name !== 'MongoNetworkError') {
+        getLogger().error(`MongoDB initialization error`, err);
+        throw err;
+      }
+
+      getLogger().warn('MongoDB connection error, retrying connection in 3 minutes');
+      await sleep(RETRY_SLEEP_DURATION_MS);
     }
   }
-  return databaseSource;
 };
 
 export default getDataSource;
