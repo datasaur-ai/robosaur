@@ -24,8 +24,6 @@ export const initDatabase = () => {
   });
 };
 
-const RETRY_SLEEP_DURATION_MS = 180000; // 3 minutes
-
 const getDataSource = async () => {
   if (databaseSource.isInitialized) {
     return databaseSource;
@@ -43,7 +41,7 @@ const getDataSource = async () => {
       }
 
       getLogger().warn('MongoDB connection error, retrying connection in 3 minutes');
-      await sleep(RETRY_SLEEP_DURATION_MS);
+      await sleep(Number(process.env.MONGODB_CONNECTION_RETRY_INTERVAL));
     }
   }
 };
