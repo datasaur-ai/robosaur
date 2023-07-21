@@ -10,6 +10,21 @@ export interface Tag {
   name: string;
 }
 
+export interface ProjectWithAssignment extends Project {
+  createdDate: string;
+  completedDate?: string; //In ISO 8601 string
+  assignees: [
+    {
+      role: string;
+      teamMember: {
+        user: {
+          id: string;
+        };
+      };
+    },
+  ];
+}
+
 export interface LabelItem {
   id: string;
   parentId?: string | null;
