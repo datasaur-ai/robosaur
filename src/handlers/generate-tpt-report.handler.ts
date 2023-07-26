@@ -1,12 +1,24 @@
+import addDays from 'date-fns/addDays';
+import fromUnixTime from 'date-fns/fromUnixTime';
+import getUnixTime from 'date-fns/getUnixTime';
+import format from 'date-fns/format';
 import { getProjectsWithAssignment } from '../datasaur/get-projects-with-assignment';
+import { getRowAnalyticEvents } from '../datasaur/get-row-analytic-events';
 import { createSimpleHandlerContext } from '../execution';
 import { getLogger, getLoggerService } from '../logger';
+import { sleep } from '../utils/sleep';
+import { generateUnixTimestampRanges } from './generate-tpt-report/helpers';
+import { ReportDictionary, RowAnalyticEventResponse } from './generate-tpt-report/interfaces';
 import { ProjectCollection } from './generate-tpt-report/project-collection';
 import { ReportBuilder } from './generate-tpt-report/report-builder';
-import getUnixTime from 'date-fns/getUnixTime';
-import fromUnixTime from 'date-fns/fromUnixTime';
-import { generateUnixTimestampRanges } from './generate-tpt-report/helpers';
-import { ReportDictionary } from './generate-tpt-report/interfaces';
+import { isEmpty } from 'lodash';
+import { setConfigByJSONFile } from '../config/config';
+import { getGenerateTptReportValidators } from '../config/schema/validator';
+import { resolve } from 'path';
+import { writeToCsv } from './generate-tpt-report/writer';
+
+const DEFAULT_SIZE_PER_REQUEST = 500;
+const MAX_RETRY_ATTEMPTS = 3;
 
 export const handleGenerateTptReport = createSimpleHandlerContext('generate-tpt-report', _handleGenerateTptReport);
 
@@ -17,14 +29,17 @@ export interface GenerateTptReportOptions {
 }
 
 export async function _handleGenerateTptReport(teamId: string, configFile: string, options: GenerateTptReportOptions) {
-  // setup the configuration json
-  // TODO
+  const { startDate, endDate, all } = options;
 
   getLoggerService().registerResolver(() => {
     return {
       teamId,
     };
   });
+
+  // setup the configuration json
+  const cwd = process.cwd();
+  setConfigByJSONFile(resolve(cwd, configFile), getGenerateTptReportValidators());
 
   // get All projects within the team
   const allProjects = await getProjectsWithAssignment(teamId);
@@ -33,15 +48,14 @@ export async function _handleGenerateTptReport(teamId: string, configFile: strin
   const projectCollection = new ProjectCollection(allProjects);
 
   // generateAll or within a Date Range
-  if (options.all) {
+  if (all) {
     await generateReportAllTime(teamId, projectCollection);
   } else {
-    await generateReportWithinDateRange();
+    await generateReportWithinDateRange(teamId, projectCollection, startDate, endDate);
   }
 }
 
 async function generateReportAllTime(teamId: string, projectCollection: ProjectCollection) {
-  // instantiate report builder
   getLogger().info('generating report all time');
   const reportBuilder = new ReportBuilder(projectCollection);
 
@@ -56,18 +70,50 @@ async function generateReportAllTime(teamId: string, projectCollection: ProjectC
     const startDate = fromUnixTime(timestampRange.start).toISOString();
     const endDate = fromUnixTime(timestampRange.end).toISOString();
 
-    console.log(`\nProcessing events from ${startDate} to ${endDate}...`);
+    getLogger().info(`\nProcessing events from ${startDate} to ${endDate}...`);
 
     await fetchAndProcessAllEventsWithinDateRange(teamId, reportBuilder, startDate, endDate);
   }
 
   const fileName = `all-time-timestamp-tpt-team-${teamId}.csv`;
   writeToCsv(fileName, reportBuilder.getReport());
-  console.log(`\nThe report is available now: ${fileName}`);
+  getLogger().info(`\nThe report is available now: ${fileName}`);
 }
 
-async function generateReportWithinDateRange() {
-  getLogger().info('');
+async function generateReportWithinDateRange(
+  teamId: string,
+  projectCollection: ProjectCollection,
+  startDate?: string,
+  endDate?: string,
+) {
+  const reportBuilder = new ReportBuilder(projectCollection);
+  getLogger().info(`Generating timestamp TPT report for team id ${teamId} at ${new Date().toISOString()}...`);
+
+  const { isError, startAt, endAt } = await fetchAndProcessAllEventsWithinDateRange(
+    teamId,
+    reportBuilder,
+    startDate,
+    endDate,
+  );
+
+  const resolvedEndDate = format(
+    endDate ? new Date(endDate) : startDate ? addDays(new Date(startDate), 7) : new Date(),
+    'MM-dd-yy',
+  );
+
+  getLogger().debug(`endDate ${endDate ?? '-'} / startDate ${startDate ?? '-'} resolved to ${resolvedEndDate}`);
+
+  if (!isError) {
+    if (isEmpty(reportBuilder.getReport())) {
+      getLogger().warn('Sorry, but there is no row being labeled at the current period');
+      getLogger().warn('No report will be generated');
+    } else {
+      const fileName = `${resolvedEndDate}-timestamp-tpt-team-${teamId}.csv`;
+      writeToCsv(fileName, reportBuilder.getReport());
+      getLogger().info(`The report is available now: ${fileName}`);
+      getLogger().info(`It's generated from ${startAt?.toISOString()} until ${endAt?.toISOString()}`);
+    }
+  }
 }
 
 async function fetchAndProcessAllEventsWithinDateRange(
@@ -78,12 +124,74 @@ async function fetchAndProcessAllEventsWithinDateRange(
 ) {
   let totalEventProcessed = 0;
   let done = false;
-  let cursor = null;
+  let cursor: string | null = null;
   let isError = false;
   let startAt: Date | undefined;
   let endAt: Date | undefined;
 
-  // TODO
+  while (!done) {
+    let result: RowAnalyticEventResponse;
+    try {
+      result = await getEventsWithRetries(teamId, cursor, startDate, endDate);
+      if (!startAt && result?.getRowAnalyticEvents?.nodes?.length > 0) {
+        startAt = fromUnixTime(+result.getRowAnalyticEvents.nodes[0].createdAt / 1000);
+      }
+    } catch (error) {
+      getLogger().error('Sorry, there is currently something wrong with Datasaur API');
+      getLogger().error('Please try again later or contact Datasaur and send this error below');
+      getLogger().error(error);
+      done = true;
+      isError = true;
+      continue;
+    }
+
+    processEvents(result, reportBuilder);
+
+    if (result?.getRowAnalyticEvents?.pageInfo?.nextCursor === null) {
+      if (result?.getRowAnalyticEvents?.nodes?.length > 0) {
+        endAt = fromUnixTime(+result.getRowAnalyticEvents.nodes[0].createdAt / 1000);
+      }
+      done = true;
+    } else {
+      cursor = result?.getRowAnalyticEvents?.pageInfo?.nextCursor;
+    }
+
+    const totalNodes = result?.getRowAnalyticEvents?.nodes?.length;
+    if (totalNodes) {
+      totalEventProcessed += result.getRowAnalyticEvents.nodes.length;
+      getLogger().info(`Successfully process ${totalEventProcessed} events`);
+    }
+
+    await sleep(1000);
+  }
+
+  return { isError, startAt, endAt };
 }
 
-function writeToCsv(fileName: string, reportDictionary: ReportDictionary) {}
+function processEvents(result: RowAnalyticEventResponse, reportBuilder: ReportBuilder) {
+  if (result?.getRowAnalyticEvents?.nodes) {
+    for (const node of result.getRowAnalyticEvents.nodes) {
+      reportBuilder.processEvent(node);
+    }
+  }
+}
+
+async function getEventsWithRetries(teamId: string, cursor: string | null, startDate?: string, endDate?: string) {
+  let result: RowAnalyticEventResponse;
+  let retryAttempts = 1;
+
+  do {
+    try {
+      result = await getRowAnalyticEvents(teamId, DEFAULT_SIZE_PER_REQUEST, cursor, startDate, endDate);
+      break;
+    } catch (error) {
+      retryAttempts++;
+      if (retryAttempts > MAX_RETRY_ATTEMPTS) {
+        throw new Error(error);
+      }
+      await sleep(1000);
+    }
+  } while (retryAttempts <= MAX_RETRY_ATTEMPTS);
+
+  return result!;
+}
