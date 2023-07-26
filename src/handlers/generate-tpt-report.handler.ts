@@ -1,20 +1,20 @@
 import addDays from 'date-fns/addDays';
+import format from 'date-fns/format';
 import fromUnixTime from 'date-fns/fromUnixTime';
 import getUnixTime from 'date-fns/getUnixTime';
-import format from 'date-fns/format';
+import { isEmpty } from 'lodash';
+import { resolve } from 'path';
+import { setConfigByJSONFile } from '../config/config';
+import { getGenerateTptReportValidators } from '../config/schema/validator';
 import { getProjectsWithAssignment } from '../datasaur/get-projects-with-assignment';
 import { getRowAnalyticEvents } from '../datasaur/get-row-analytic-events';
 import { createSimpleHandlerContext } from '../execution';
 import { getLogger, getLoggerService } from '../logger';
 import { sleep } from '../utils/sleep';
-import { generateUnixTimestampRanges } from './generate-tpt-report/helpers';
-import { ReportDictionary, RowAnalyticEventResponse } from './generate-tpt-report/interfaces';
+import { generateFilePath, generateUnixTimestampRanges } from './generate-tpt-report/helpers';
+import { RowAnalyticEventResponse } from './generate-tpt-report/interfaces';
 import { ProjectCollection } from './generate-tpt-report/project-collection';
 import { ReportBuilder } from './generate-tpt-report/report-builder';
-import { isEmpty } from 'lodash';
-import { setConfigByJSONFile } from '../config/config';
-import { getGenerateTptReportValidators } from '../config/schema/validator';
-import { resolve } from 'path';
 import { writeToCsv } from './generate-tpt-report/writer';
 
 const DEFAULT_SIZE_PER_REQUEST = 500;
@@ -26,10 +26,11 @@ export interface GenerateTptReportOptions {
   startDate?: string;
   endDate?: string;
   all?: boolean;
+  outDir?: string;
 }
 
 export async function _handleGenerateTptReport(teamId: string, configFile: string, options: GenerateTptReportOptions) {
-  const { startDate, endDate, all } = options;
+  const { startDate, endDate, all, outDir } = options;
 
   getLoggerService().registerResolver(() => {
     return {
@@ -38,8 +39,7 @@ export async function _handleGenerateTptReport(teamId: string, configFile: strin
   });
 
   // setup the configuration json
-  const cwd = process.cwd();
-  setConfigByJSONFile(resolve(cwd, configFile), getGenerateTptReportValidators());
+  setConfigByJSONFile(resolve(configFile), getGenerateTptReportValidators());
 
   // get All projects within the team
   const allProjects = await getProjectsWithAssignment(teamId);
@@ -49,13 +49,13 @@ export async function _handleGenerateTptReport(teamId: string, configFile: strin
 
   // generateAll or within a Date Range
   if (all) {
-    await generateReportAllTime(teamId, projectCollection);
+    await generateReportAllTime(teamId, projectCollection, outDir);
   } else {
-    await generateReportWithinDateRange(teamId, projectCollection, startDate, endDate);
+    await generateReportWithinDateRange(teamId, projectCollection, startDate, endDate, outDir);
   }
 }
 
-async function generateReportAllTime(teamId: string, projectCollection: ProjectCollection) {
+async function generateReportAllTime(teamId: string, projectCollection: ProjectCollection, outDir?: string) {
   getLogger().info('generating report all time');
   const reportBuilder = new ReportBuilder(projectCollection);
 
@@ -75,8 +75,8 @@ async function generateReportAllTime(teamId: string, projectCollection: ProjectC
     await fetchAndProcessAllEventsWithinDateRange(teamId, reportBuilder, startDate, endDate);
   }
 
-  const fileName = `all-time-timestamp-tpt-team-${teamId}.csv`;
-  writeToCsv(fileName, reportBuilder.getReport());
+  const fileName = generateFilePath(teamId, undefined, outDir);
+  await writeToCsv(fileName, reportBuilder.getReport());
   getLogger().info(`\nThe report is available now: ${fileName}`);
 }
 
@@ -85,6 +85,7 @@ async function generateReportWithinDateRange(
   projectCollection: ProjectCollection,
   startDate?: string,
   endDate?: string,
+  outDir?: string,
 ) {
   const reportBuilder = new ReportBuilder(projectCollection);
   getLogger().info(`Generating timestamp TPT report for team id ${teamId} at ${new Date().toISOString()}...`);
@@ -108,8 +109,12 @@ async function generateReportWithinDateRange(
       getLogger().warn('Sorry, but there is no row being labeled at the current period');
       getLogger().warn('No report will be generated');
     } else {
-      const fileName = `${resolvedEndDate}-timestamp-tpt-team-${teamId}.csv`;
-      writeToCsv(fileName, reportBuilder.getReport());
+      const fileName = generateFilePath(
+        teamId,
+        { startDate: startAt ?? new Date(), endDate: endAt ?? new Date() },
+        outDir,
+      );
+      await writeToCsv(fileName, reportBuilder.getReport());
       getLogger().info(`The report is available now: ${fileName}`);
       getLogger().info(`It's generated from ${startAt?.toISOString()} until ${endAt?.toISOString()}`);
     }

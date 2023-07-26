@@ -10,7 +10,6 @@ export async function writeToCsv(fileName: string, data: ReportDictionary) {
     for (const line of Object.keys(data[documentId])) {
       for (const userId of Object.keys(data[documentId][line])) {
         const node = data[documentId][line][userId];
-        console.log(node.startDate);
         csvData.push([
           node.projectId,
           node.projectName,
