@@ -30,7 +30,7 @@ function base32(num: number) {
 }
 
 function extractHumanReadableTimeRange(range: { startDate: Date; endDate: Date }): string {
-  const stringFormat = 'yyyy_MM';
+  const stringFormat = 'yyyy_MM_dd';
   const start = format(range.startDate, stringFormat);
   const end = format(range.endDate, stringFormat);
   return `${start}-${end}`;
