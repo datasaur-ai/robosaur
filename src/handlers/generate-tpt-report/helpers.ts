@@ -46,3 +46,16 @@ export function generateFilePath(teamId: string, range?: { startDate: Date; endD
   }
   return fileName;
 }
+
+export function resolveEndOfDayEndDate(endDate?: string): string | undefined {
+  if (endDate === null || endDate === undefined) {
+    return undefined;
+  }
+
+  const currentEndDate = new Date(endDate);
+  const nextDate = new Date(currentEndDate);
+  nextDate.setDate(currentEndDate.getDate() + 1);
+
+  const minus1MsDate = new Date(nextDate.getTime() - 1);
+  return minus1MsDate.toISOString();
+}

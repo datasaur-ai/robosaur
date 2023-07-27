@@ -12,7 +12,7 @@ import { createSimpleHandlerContext } from '../execution';
 import { getLogger, getLoggerService } from '../logger';
 import { sleep } from '../utils/sleep';
 import { ScriptAction } from './constants';
-import { generateFilePath, generateUnixTimestampRanges } from './generate-tpt-report/helpers';
+import { generateFilePath, generateUnixTimestampRanges, resolveEndOfDayEndDate } from './generate-tpt-report/helpers';
 import { RowAnalyticEventResponse } from './generate-tpt-report/interfaces';
 import { ProjectCollection } from './generate-tpt-report/project-collection';
 import { ReportBuilder } from './generate-tpt-report/report-builder';
@@ -186,9 +186,11 @@ async function getEventsWithRetries(teamId: string, cursor: string | null, start
   let result: RowAnalyticEventResponse;
   let retryAttempts = 1;
 
+  const endOfDayOfEndDate = resolveEndOfDayEndDate(endDate);
+
   do {
     try {
-      result = await getRowAnalyticEvents(teamId, DEFAULT_SIZE_PER_REQUEST, cursor, startDate, endDate);
+      result = await getRowAnalyticEvents(teamId, DEFAULT_SIZE_PER_REQUEST, cursor, startDate, endOfDayOfEndDate);
       break;
     } catch (error) {
       retryAttempts++;
