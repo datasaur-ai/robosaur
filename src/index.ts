@@ -60,8 +60,8 @@ program
   .option('-s, --startDate <value>', 'Start date in ISO 8601 format')
   .option('-e, --endDate <value>', 'End date in ISO 8601 format')
   .option('-o, --outDir <value>', 'Path to a directory where the output will be written')
-  .option('-a, --all', 'generate all-time TPT report', false)
-  .description('generate timestamp TPT report for a specific team with maximum 7 days period')
+  .option('-a, --all', 'generate all-time Time Per Task report', false)
+  .description('generate timestamp Time Per Task report for a specific team with maximum 7 days period')
   .action(handleGenerateTptReport);
 
 program.parseAsync(process.argv);

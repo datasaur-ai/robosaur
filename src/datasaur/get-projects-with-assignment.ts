@@ -2,7 +2,7 @@ import { gql } from 'graphql-request';
 import { ProjectWithAssignment } from './interfaces';
 import { query } from './query';
 
-const GET_PROJECT_WITH_ASSIGNMNET_QUERY = gql`
+const GET_PROJECT_WITH_ASSIGNMENT_QUERY = gql`
   query GetProjectsWithAssignmentQuery($input: GetProjectsPaginatedInput!) {
     result: getProjects(input: $input) {
       nodes {
@@ -44,7 +44,7 @@ export async function getProjectsWithAssignment(teamId: string) {
     },
   };
 
-  let data = await query(GET_PROJECT_WITH_ASSIGNMNET_QUERY, variables);
+  let data = await query(GET_PROJECT_WITH_ASSIGNMENT_QUERY, variables);
   while (true) {
     projects.push(...data.result.nodes);
 
@@ -52,7 +52,7 @@ export async function getProjectsWithAssignment(teamId: string) {
       break;
     }
 
-    const nextVarialbes = {
+    const nextVariables = {
       input: {
         filter: {
           teamId,
@@ -61,7 +61,7 @@ export async function getProjectsWithAssignment(teamId: string) {
       },
     };
 
-    data = await query(GET_PROJECT_WITH_ASSIGNMNET_QUERY, nextVarialbes);
+    data = await query(GET_PROJECT_WITH_ASSIGNMENT_QUERY, nextVariables);
   }
 
   return projects;
