@@ -11,6 +11,7 @@ import { getRowAnalyticEvents } from '../datasaur/get-row-analytic-events';
 import { createSimpleHandlerContext } from '../execution';
 import { getLogger, getLoggerService } from '../logger';
 import { sleep } from '../utils/sleep';
+import { ScriptAction } from './constants';
 import { generateFilePath, generateUnixTimestampRanges } from './generate-tpt-report/helpers';
 import { RowAnalyticEventResponse } from './generate-tpt-report/interfaces';
 import { ProjectCollection } from './generate-tpt-report/project-collection';
@@ -39,7 +40,7 @@ export async function _handleGenerateTptReport(teamId: string, configFile: strin
   });
 
   // setup the configuration json
-  setConfigByJSONFile(resolve(configFile), getGenerateTptReportValidators());
+  setConfigByJSONFile(resolve(configFile), getGenerateTptReportValidators(), ScriptAction.TPT_REPORT, teamId);
 
   // get All projects within the team
   const allProjects = await getProjectsWithAssignment(teamId);
