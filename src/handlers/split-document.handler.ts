@@ -48,6 +48,7 @@ export async function _handleSplitDocument(configFile: string) {
   const filename = basename(path).replace('.csv', '');
   const parseResult = parse(file, { header });
   const contents = chunk(parseResult.data, linesPerFile)
+    // @ts-ignore
     .map((rows) => rows.filter((row) => Object.values(row).filter((value) => !!value).length))
     .filter((rows) => rows.length > 0)
     .map((rows) => unparse(rows, parseResult.meta))

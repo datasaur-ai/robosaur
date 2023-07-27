@@ -19,6 +19,10 @@ export function getApplyTagValidators() {
   return [validateConfigCredentials, validateConfigApplyTags];
 }
 
+export function getGenerateTptReportValidators() {
+  return [validateConfigCredentials];
+}
+
 export function getSplitDocumentValidators() {
   return [validateConfigSplitDocument];
 }

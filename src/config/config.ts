@@ -26,6 +26,7 @@ export function setConfigByJSONFile(
   filePath: string,
   validators: Array<Function> = [],
   context: ScriptAction = ScriptAction.NONE,
+  overrideTeamIdFromConfig?: string,
 ) {
   getLogger().info(`reading config from: ${filePath}`);
   config = readJSONFile(filePath);
@@ -35,7 +36,11 @@ export function setConfigByJSONFile(
     validator(config as Config);
   }
 
-  setActiveTeamId(context);
+  if (overrideTeamIdFromConfig) {
+    activeTeamId = overrideTeamIdFromConfig;
+  } else {
+    setActiveTeamId(context);
+  }
 
   configPath = filePath;
 }
@@ -47,6 +52,8 @@ export function getActiveTeamId() {
 
 function setActiveTeamId(context: ScriptAction) {
   switch (context) {
+    case ScriptAction.TPT_REPORT:
+      break;
     case ScriptAction.PROJECT_CREATION:
       activeTeamId =
         getConfig().create.teamId ||

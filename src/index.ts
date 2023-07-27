@@ -9,6 +9,7 @@ import { handleCreateProjects } from './handlers/create-projects.handler';
 import { handleExportProjects } from './handlers/export-projects.handler';
 import { handleSplitDocument } from './handlers/split-document.handler';
 import { getLogger } from './logger';
+import { handleGenerateTptReport } from './handlers/generate-tpt-report.handler';
 
 const program = new Command();
 
@@ -53,6 +54,15 @@ program
   )
   .description('Applies tags to projects based on the given config file')
   .action(handleApplyTags);
+
+program
+  .command(`generate-tpt-report <teamId> <configFile>`)
+  .option('-s, --startDate <value>', 'Start date in ISO 8601 format')
+  .option('-e, --endDate <value>', 'End date in ISO 8601 format')
+  .option('-o, --outDir <value>', 'Path to a directory where the output will be written')
+  .option('-a, --all', 'generate all-time Time Per Task report', false)
+  .description('generate timestamp Time Per Task report for a specific team with maximum 7 days period')
+  .action(handleGenerateTptReport);
 
 program.parseAsync(process.argv);
 
