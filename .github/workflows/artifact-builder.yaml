@@ -1,0 +1,60 @@
+name: Artifact Builder
+
+on:
+  workflow_dispatch:
+    inputs:
+      IMAGE_TAG:
+        description: "robosaur image version"
+        default: "main"
+        required: true
+      USER_ID:
+        description: "User ID for build"
+        default: 0
+      GROUP_ID:
+        description: "Group ID for build"
+        default: 0
+
+jobs:
+  build-image:
+    runs-on: ubuntu-latest
+    outputs:
+      build_time: ${{ steps.build.outputs.build_time }}
+      upload_time: ${{ steps.upload.outputs.upload_time }}
+      start_time: ${{ steps.start.outputs.start_time }}
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+      with:
+        repository: datasaur-ai/robosaur
+        token: ${{ secrets.PAT_TOKEN }}
+        submodules: recursive
+        ref: ${{ github.ref }}
+
+    - name: Set up Google Cloud SDK
+      uses: google-github-actions/setup-gcloud@v0.3.0
+      with:
+        service_account_key: ${{ secrets.GCLOUD_AUTH }}
+        project_id: konde-245708
+        export_default_credentials: true
+
+    - name: Download lib
+      run: |
+        sudo apt install -y unzip
+
+    - name: Set start timestamp
+      id: start
+      run: |
+        printf -v now '%(%s)T'
+        echo start_time=`date --date @${now}` >> "$GITHUB_OUTPUT"
+
+    - name: Build Image
+      id: build
+      env:
+        IMAGE_TAG: ${{ inputs.IMAGE_TAG }}
+        USER_ID: ${{ inputs.USER_ID }}
+        GROUP_ID: ${{ inputs.GROUP_ID }}
+      run: |
+        rm -f ./on-premise/datasaur-robosaur-${IMAGE_TAG}.tar.gz
+        /bin/bash ./build.sh $IMAGE_TAG $USER_ID $GROUP_ID
+        printf -v now '%(%s)T'
+        echo build_time=`date --date @${now}` >> "$GITHUB_OUTPUT"
