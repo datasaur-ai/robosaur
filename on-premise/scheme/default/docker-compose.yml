@@ -27,7 +27,7 @@ services:
     image: grafana/loki:2.6.1
     user: ${CURRENT_USER}
     ports:
-      - '3100'
+      - 3100:3100
     volumes:
       - ./loki-data:/loki
     deploy:
@@ -46,7 +46,7 @@ services:
     image: grafana/grafana:9.2.2
     user: ${CURRENT_USER}
     ports:
-      - '3002:3000'
+      - 3002:3000
     env_file:
       - ./robosaur.env
     environment:
