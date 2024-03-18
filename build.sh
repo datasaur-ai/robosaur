@@ -21,7 +21,7 @@ export USER_ID=$userId
 export GROUP_ID=$groupId
 echo ${dockerTag} > build/version
 
-docker-compose -f docker-compose.build.yml build
+docker compose -f docker-compose.build.yml build
 
 echo "saving robosaur image"
 
