@@ -1,8 +1,8 @@
-version: '3.1'
+version: '3.8'
 networks:
   default:
-    external:
-      name: ${DOCKER_NETWORK_NAME}
+    external: true
+    name: ${DOCKER_NETWORK_NAME}
 volumes:
   rabbitmq_data:
     name: datasaur_rabbitmq_data
@@ -25,8 +25,11 @@ services:
       retries: 3
   loki:
     image: grafana/loki:2.6.1
+    user: ${CURRENT_USER}
     ports:
-      - '3100'
+      - 3100:3100
+    volumes:
+      - ./loki-data:/loki
     deploy:
       restart_policy:
         condition: any
@@ -41,8 +44,9 @@ services:
         condition: any
   grafana:
     image: grafana/grafana:9.2.2
+    user: ${CURRENT_USER}
     ports:
-      - '3002:3000'
+      - 3002:3000
     env_file:
       - ./robosaur.env
     environment:
@@ -51,6 +55,7 @@ services:
       - GF_SERVER_SERVE_FROM_SUB_PATH=true
     volumes:
       - ./loki/grafana/provisioning/:/etc/grafana/provisioning/
+      - ./grafana-data:/var/lib/grafana
     deploy:
       restart_policy:
         condition: any
